@@ -11,6 +11,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -54,6 +55,12 @@ public class RedmineManager {
 	private String host;
 	private String apiAccessKey;
 	
+	static {
+		Calendar validTill = LicenseManager.checkLicense();
+		System.out.println("Redmine API license is valid till: "
+				+ validTill.getTime());
+	}
+
 	/**
 	 * @param host complete URI, including protocol and port number. sample: http://demo.redmine.org:8080
 	 * @param apiAccessKey Redmine API authentication key.
