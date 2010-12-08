@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                         "http://castor.org/mapping.dtd">
+<mapping>
+	<description>Redmine XML -> Java API binding. see
+		http://code.google.com/p/redmine-connect </description>
+
+	<class name="org.alskor.redmine.Project">
+		<field name="id" type="integer">
+			<bind-xml name="id" node="element" />
+		</field>
+		<field name="name" type="string">
+			<bind-xml name="name" node="element" />
+		</field>
+		<field name="identifier" type="string">
+			<bind-xml name="identifier" node="element" />
+		</field>
+		<field name="trackers" type="org.alskor.redmine.Tracker" container="false" collection="arraylist">
+			<bind-xml name="trackers" />
+		</field>
+		
+	</class>
+	
+	<class name="org.alskor.redmine.Tracker">
+        <map-to xml="tracker"/>
+        <field name="id" type="integer" >
+            <bind-xml name="id" node="attribute"/>
+        </field>
+        <field name="name" type="string" >
+            <bind-xml name="name" node="attribute"/>
+        </field>
+    </class>
+
+	<class name="org.alskor.redmine.RedmineManager$ProjectsList">
+		<field name="projects" type="org.alskor.redmine.Project" collection="vector">
+			<bind-xml name="org.alskor.redmine.Project" />
+		</field>
+	</class>
+
+</mapping>
