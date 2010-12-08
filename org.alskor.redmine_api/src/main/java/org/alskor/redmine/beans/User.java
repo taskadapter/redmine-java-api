@@ -1,5 +1,10 @@
-package org.alskor.redmine;
+package org.alskor.redmine.beans;
 
+/**
+ * Redmine's User.
+ * 
+ * @author Alexey Skorokhodov
+ */
 public class User {
 	private Integer id;
 	private String fullName;

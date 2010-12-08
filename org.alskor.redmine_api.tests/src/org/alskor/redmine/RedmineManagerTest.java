@@ -11,7 +11,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.alskor.httputils.AuthenticationException;
+import org.alskor.redmine.beans.Issue;
+import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.Tracker;
+import org.alskor.redmine.beans.User;
+import org.alskor.redmine.internal.MyIOUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RedmineManagerTest {
@@ -383,11 +389,13 @@ public class RedmineManagerTest {
 	}
 	
 	@Test
+	@Ignore
 	public void testTrackerName() {
 		fail("not implemented");
 	}
 
 	@Test
+	@Ignore
 	public void testGetProject() {
 		fail("not implemented");
 	}
