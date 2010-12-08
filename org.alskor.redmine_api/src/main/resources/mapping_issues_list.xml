@@ -37,10 +37,10 @@
 		<field name="priorityText" type="string">
 			<bind-xml name="name" node="attribute" location="priority" />
 		</field>
-		<field name="startDate" type="string" handler="org.alskor.redmine.RedmineDateHandler">
+		<field name="startDate" type="string" handler="org.alskor.redmine.internal.RedmineDateHandler">
 			<bind-xml name="start_date" node="element" />
 		</field>
- 		<field name="dueDate" type="string" handler="org.alskor.redmine.RedmineDateHandler">
+ 		<field name="dueDate" type="string" handler="org.alskor.redmine.internal.RedmineDateHandler">
 			<bind-xml name="due_date" node="element" />
 		</field>
 
@@ -56,12 +56,6 @@
         </field>
     </class>
 
-<!-- date format is defined in RedmineDateHandler at this moment.
-
- <field-handler name="startAndDueDateHandler" class="org.some.package.CustomFieldHandlerImpl">
-   <param name="date-format" value="yyyy-MM-dd"/>
-</field-handler>
--->
 	<class name="org.alskor.redmine.User">
 		<field name="id" type="integer">
 			<bind-xml name="id" node="attribute" />
