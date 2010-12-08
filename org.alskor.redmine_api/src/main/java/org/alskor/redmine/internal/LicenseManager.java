@@ -1,7 +1,9 @@
-package org.alskor.redmine;
+package org.alskor.redmine.internal;
 
 import java.io.IOException;
 import java.util.Calendar;
+
+import org.alskor.redmine.MyIOUtils;
 
 public class LicenseManager {
 

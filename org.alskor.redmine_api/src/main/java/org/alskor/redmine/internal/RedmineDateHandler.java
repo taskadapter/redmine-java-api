@@ -1,4 +1,4 @@
-package org.alskor.redmine;
+package org.alskor.redmine.internal;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
