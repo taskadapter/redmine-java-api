@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projects type="array">
+  <project>
+    <id>1</id>
+    <name>proj1</name>
+    <identifier>proj1</identifier>
+    <description></description>
+    <created_on>Mon May 10 12:46:28 -0700 2010</created_on>
+    <updated_on>Mon May 10 12:46:28 -0700 2010</updated_on>
+  </project>
+  <project>
+    <id>2</id>
+    <name>proj1-sub1</name>
+    <identifier>proj1sub1</identifier>
+    <description></description>
+    <parent name="proj1" id="1"/>
+    <created_on>Mon May 10 12:46:51 -0700 2010</created_on>
+    <updated_on>Mon May 10 12:46:51 -0700 2010</updated_on>
+  </project>
+  <project>
+    <id>3</id>
+    <name>proj2</name>
+    <identifier>proj2</identifier>
+    <description></description>
+    <created_on>Tue May 11 16:31:19 -0700 2010</created_on>
+    <updated_on>Tue May 11 16:31:19 -0700 2010</updated_on>
+  </project>
+  <project>
+    <id>6</id>
+    <name>SEP</name>
+    <identifier>sep</identifier>
+    <description></description>
+    <created_on>Fri May 21 12:43:32 -0700 2010</created_on>
+    <updated_on>Fri May 21 12:43:32 -0700 2010</updated_on>
+  </project>
+  <project>
+    <id>7</id>
+    <name>ace</name>
+    <identifier>ace</identifier>
+    <description></description>
+    <parent name="SEP" id="6"/>
+    <created_on>Fri May 21 12:45:00 -0700 2010</created_on>
+    <updated_on>Fri May 21 12:45:00 -0700 2010</updated_on>
+  </project>
+  <project>
+    <id>8</id>
+    <name>SEP-support</name>
+    <identifier>sep-support</identifier>
+    <description></description>
+    <created_on>Fri May 21 14:08:31 -0700 2010</created_on>
+    <updated_on>Fri May 21 14:08:31 -0700 2010</updated_on>
+  </project>
+</projects>

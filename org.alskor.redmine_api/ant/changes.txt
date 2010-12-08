@@ -1,0 +1,5 @@
+Issues can be found here:  http://code.google.com/p/redmine-connect/issues
+
+v. 0.0.4 (April 27, 2010)
+  * Issue 3 add "issue priority" field to Java API
+  * Issue 5 add "done ratio" ("percent complete") field to Redmine Java API
