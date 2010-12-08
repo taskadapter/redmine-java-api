@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.alskor.redmine.beans.Issue;
+
 /** 
  * Utility class to help convert flat list of Redmine issues to a tree-like structure.
  *  

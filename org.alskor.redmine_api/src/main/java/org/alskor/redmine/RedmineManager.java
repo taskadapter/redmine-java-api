@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -22,6 +21,9 @@ import javax.net.ssl.X509TrustManager;
 
 import org.alskor.httputils.AuthenticationException;
 import org.alskor.httputils.WebConnector;
+import org.alskor.redmine.beans.Issue;
+import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.User;
 import org.alskor.redmine.internal.LicenseManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -46,6 +48,11 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
+/**
+ * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
+ * 
+ * @author Alexey Skorokhodov
+ */
 public class RedmineManager {
 	private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
 
@@ -72,22 +79,6 @@ public class RedmineManager {
 		this.apiAccessKey = apiAccessKey;
 	}
 
-	/**
-	 * Used when need to parse pre-loaded strings with XML response from Redmine
-	 * server
-	 */
-	public RedmineManager() {
-	}
-
-	// private static URL buildGetProjectsURL(String host, String apiAccessKey)
-	// throws MalformedURLException {
-	// String query = host + "/projects.xml";
-	// if (apiAccessKey != null) {
-	// query += "?key=" + apiAccessKey;
-	// }
-	// return new URL(query);
-	// }
-
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
         String query = getCreateIssueURI();
 		HttpPost httpPost = new HttpPost(query);
@@ -110,25 +101,21 @@ public class RedmineManager {
 	}
 
 	/**
-	 * get_issue_by_ID = GET  ${host}/issues/${id}.xml?key=${apiAccessKey}
+	 * <p>HTTP request:
+	 * <pre>GET /issues/[id].xml</pre>
 	 */
 	private String getURLIssueById(Integer id){
         return host + "/issues/" + id + ".xml?key=" +apiAccessKey;
 	}
-	
+
 	private String getURLProjectByKey(String id){
         return host + "/projects/" + id + ".xml?key=" +apiAccessKey;
 	}
 	
-	/**
-	 * <p>Required HTTP request format:   
-	 * <pre> PUT /issues/[id].xml </pre>
-	 * 
-	 * <p>This method cannot return the updated Issue from Redmine because the server does not provide any XML in response. 
-	 */
-	public void updateIssue(String projectKey, Issue issue) throws IOException,AuthenticationException,
-	RuntimeException {
-		
+	public void updateIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
+		/* note: This method cannot return the updated Issue from Redmine 
+		 * because the server does not provide any XML in response.
+		 */
 		String query = getUpdateIssueURI(issue.getId());
 		HttpPut httpRequest = new HttpPut(query);
 
@@ -221,15 +208,13 @@ public class RedmineManager {
 	}
 	
 	public static List<Project> getProjects(String xml) {
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, ProjectsList.class);
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, ArrayList.class);
+		
 		List<Project> list = null;
 		StringReader reader = null;
 		try {
 			reader = new StringReader(xml);
-			ProjectsList wrapper = (ProjectsList) unmarshaller
-					.unmarshal(reader);
-			list = wrapper.getProjects();
-
+			list = (ArrayList<Project>)  unmarshaller.unmarshal(reader);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -283,43 +268,6 @@ public class RedmineManager {
 		}
 	}
 
-	/**
-	 * This wrapper is required to satisfy Castor library mappings requirements.
-	 * It must be public and static.
-	 * 
-	 * @author Alexey Skorokhodov
-	 */
-	public static class ProjectsList {
-		private List<Project> list;
-
-		public List<Project> getProjects() {
-			return list;
-		}
-
-		public void setProjects(List<Project> list) {
-			this.list = list;
-		}
-	}
-
-	/**
-	 * This wrapper is required to satisfy Castor library mappings requirements.
-	 * It must be public and static.
-	 * 
-	 * @author Alexey Skorokhodov
-	 */
-	public static class IssuesList {
-		// Castor library REQUIRES Vector class, otherwise it will throw ClassCastException
-		private List<Issue> issues = new Vector<Issue>();
-
-		public List<Issue> getIssues() {
-			return issues;
-		}
-
-		public void setIssues(List<Issue> issuesList) {
-			this.issues = issuesList;
-		}
-	}
-	
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
 		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, Issue.class);
 		
@@ -361,13 +309,13 @@ public class RedmineManager {
 	}
 
 	protected static List<Issue> parseIssuesFromXML(String xml) throws RuntimeException {
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, IssuesList.class);
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, ArrayList.class);
 
-		IssuesList list = null;
+		List<Issue> list = null;
 		StringReader reader = null;
 		try {
 			reader = new StringReader(xml);
-			list = (IssuesList) unmarshaller.unmarshal(reader);
+			list = (List) unmarshaller.unmarshal(reader);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -376,7 +324,7 @@ public class RedmineManager {
 				reader.close();
 			}
 		}
-		return list.getIssues();
+		return list;
 	}
 	
 	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
@@ -442,10 +390,6 @@ public class RedmineManager {
 		return url;
 	}
 
-	/**
-	 * <p>HTTP request:
-	 * <pre>GET /issues/[id].xml</pre>
-	 */
 	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, RuntimeException {
         String query = getURLIssueById(id);
 		HttpGet http = new HttpGet(query);
@@ -453,11 +397,12 @@ public class RedmineManager {
 	}
 	
 	/**
-	 * <p>HTTP request:
-	 * <pre>GET /projects/[id].xml</pre> - Returns the project of given id or identifier.
+	 * 
+	 * @param projectKey string key like "project-ABC", NOT a database ID
+	 * @return Redmine's project
 	 */
-	public Project getProjectByIdentifier(String id) throws IOException, AuthenticationException, RuntimeException {
-        String query = getURLProjectByKey(id);
+	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException {
+        String query = getURLProjectByKey(projectKey);
 		HttpGet http = new HttpGet(query);
 		String responseXMLBody = sendRequestInternal(http);
 		Project projectFromServer = parseProjectFromXML(responseXMLBody);
