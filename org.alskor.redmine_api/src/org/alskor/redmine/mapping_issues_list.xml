@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                         "http://castor.org/mapping.dtd">
+<mapping>
+	<description>Redmine XML -> Java API binding. see
+		http://code.google.com/p/taskadapter </description>
+
+	<class name="org.alskor.redmine.Issue">
+		<field name="id" type="integer">
+			<bind-xml name="id" node="element" />
+		</field>
+		<field name="parentId" type="integer">
+			<bind-xml name="id" node="attribute" location="parent" />
+		</field>
+		<field name="subject" type="string">
+			<bind-xml name="subject" node="element" />
+		</field>
+		<field name="tracker" type="org.alskor.redmine.Tracker">
+			<bind-xml name="tracker"/>
+		</field>
+		<field name="estimatedHours" type="float">
+			<bind-xml name="estimated_hours" node="element" />
+		</field>
+		<field name="doneRatio" type="integer">
+			<bind-xml name="done_ratio" node="element" />
+		</field>
+		<field name="assignee" type="org.alskor.redmine.User">
+			<bind-xml name="assigned_to" />
+		</field>
+		<field name="author" type="org.alskor.redmine.User">
+			<bind-xml name="author" />
+		</field>
+		<field name="project" type="org.alskor.redmine.Project">
+			<bind-xml name="project" />
+		</field>
+
+		<field name="priorityText" type="string">
+			<bind-xml name="name" node="attribute" location="priority" />
+		</field>
+		<field name="startDate" type="string" handler="org.alskor.redmine.RedmineDateHandler">
+			<bind-xml name="start_date" node="element" />
+		</field>
+ 		<field name="dueDate" type="string" handler="org.alskor.redmine.RedmineDateHandler">
+			<bind-xml name="due_date" node="element" />
+		</field>
+
+	</class>
+	
+	<class name="org.alskor.redmine.Tracker">
+        <map-to xml="tracker"/>
+        <field name="id" type="integer" >
+            <bind-xml name="id" node="attribute"/>
+        </field>
+        <field name="name" type="string" >
+            <bind-xml name="name" node="attribute"/>
+        </field>
+    </class>
+
+<!-- date format is defined in RedmineDateHandler at this moment.
+
+ <field-handler name="startAndDueDateHandler" class="org.some.package.CustomFieldHandlerImpl">
+   <param name="date-format" value="yyyy-MM-dd"/>
+</field-handler>
+-->
+	<class name="org.alskor.redmine.User">
+		<field name="id" type="integer">
+			<bind-xml name="id" node="attribute" />
+		</field>
+		<field name="fullName" type="string">
+			<bind-xml name="name" node="attribute" />
+		</field>
+	</class>
+
+	<class name="org.alskor.redmine.Project">
+		<field name="id" type="integer">
+			<bind-xml name="id" node="attribute" />
+		</field>
+		<field name="name" type="string">
+			<bind-xml name="name" node="attribute" />
+		</field>
+		<field name="identifier" type="string">
+			<bind-xml name="identifier" node="attribute" />
+		</field>
+	</class>
+	
+	<class name="org.alskor.redmine.RedmineManager$IssuesList">
+		<field name="issues" type="org.alskor.redmine.Issue" collection="vector">
+			<bind-xml name="org.alskor.redmine.Issue" />
+		</field>
+	</class>
+
+
+</mapping>

@@ -1,0 +1,1 @@
+these files are required to create a regular JAR file with Redmine API through ANT build system. they were copied from old redmine_api project and require proper fixing before can be used in the new project.
