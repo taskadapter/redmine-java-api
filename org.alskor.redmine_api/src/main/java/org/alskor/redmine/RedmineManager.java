@@ -22,6 +22,7 @@ import javax.net.ssl.X509TrustManager;
 
 import org.alskor.httputils.AuthenticationException;
 import org.alskor.httputils.WebConnector;
+import org.alskor.redmine.internal.LicenseManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -48,9 +49,9 @@ import org.xml.sax.InputSource;
 public class RedmineManager {
 	private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
 
-	private static final String MAPPING_PROJECTS_LIST = "mapping_projects_list.xml";
+	private static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
 
-	private static final String MAPPING_ISSUES = "mapping_issues_list.xml";
+	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
 	private String host;
 	private String apiAccessKey;
