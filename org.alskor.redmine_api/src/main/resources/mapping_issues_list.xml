@@ -2,10 +2,11 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                          "http://castor.org/mapping.dtd">
 <mapping>
-	<description>Redmine XML -> Java API binding. see
-		http://code.google.com/p/taskadapter </description>
+	<description>Redmine XML -> Java API binding. see http://taskadapter.com</description>
 
-	<class name="org.alskor.redmine.Issue">
+	<class name="org.alskor.redmine.beans.Issue">
+		<map-to xml="issue"/>
+
 		<field name="id" type="integer">
 			<bind-xml name="id" node="element" />
 		</field>
@@ -15,7 +16,7 @@
 		<field name="subject" type="string">
 			<bind-xml name="subject" node="element" />
 		</field>
-		<field name="tracker" type="org.alskor.redmine.Tracker">
+		<field name="tracker" type="org.alskor.redmine.beans.Tracker">
 			<bind-xml name="tracker"/>
 		</field>
 		<field name="estimatedHours" type="float">
@@ -24,13 +25,13 @@
 		<field name="doneRatio" type="integer">
 			<bind-xml name="done_ratio" node="element" />
 		</field>
-		<field name="assignee" type="org.alskor.redmine.User">
+		<field name="assignee" type="org.alskor.redmine.beans.User">
 			<bind-xml name="assigned_to" />
 		</field>
-		<field name="author" type="org.alskor.redmine.User">
+		<field name="author" type="org.alskor.redmine.beans.User">
 			<bind-xml name="author" />
 		</field>
-		<field name="project" type="org.alskor.redmine.Project">
+		<field name="project" type="org.alskor.redmine.beans.Project">
 			<bind-xml name="project" />
 		</field>
 
@@ -46,7 +47,7 @@
 
 	</class>
 	
-	<class name="org.alskor.redmine.Tracker">
+	<class name="org.alskor.redmine.beans.Tracker">
         <map-to xml="tracker"/>
         <field name="id" type="integer" >
             <bind-xml name="id" node="attribute"/>
@@ -56,7 +57,7 @@
         </field>
     </class>
 
-	<class name="org.alskor.redmine.User">
+	<class name="org.alskor.redmine.beans.User">
 		<field name="id" type="integer">
 			<bind-xml name="id" node="attribute" />
 		</field>
@@ -65,7 +66,7 @@
 		</field>
 	</class>
 
-	<class name="org.alskor.redmine.Project">
+	<class name="org.alskor.redmine.beans.Project">
 		<field name="id" type="integer">
 			<bind-xml name="id" node="attribute" />
 		</field>
@@ -77,11 +78,4 @@
 		</field>
 	</class>
 	
-	<class name="org.alskor.redmine.RedmineManager$IssuesList">
-		<field name="issues" type="org.alskor.redmine.Issue" collection="vector">
-			<bind-xml name="org.alskor.redmine.Issue" />
-		</field>
-	</class>
-
-
 </mapping>

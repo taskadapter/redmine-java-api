@@ -1,4 +1,4 @@
-package org.alskor.redmine;
+package org.alskor.redmine.internal;
 
 import java.io.BufferedReader;
 import java.io.IOException;

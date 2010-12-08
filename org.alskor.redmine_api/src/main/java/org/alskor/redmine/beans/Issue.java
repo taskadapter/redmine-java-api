@@ -1,7 +1,12 @@
-package org.alskor.redmine;
+package org.alskor.redmine.beans;
 
 import java.util.Date;
 
+/**
+ * Redmine's Issue
+ * 
+ * @author Alexey Skorokhodov
+ */
 public class Issue {
 
 	private Integer id;
