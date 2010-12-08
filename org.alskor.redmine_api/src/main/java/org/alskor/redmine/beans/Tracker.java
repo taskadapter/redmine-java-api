@@ -1,7 +1,7 @@
-package org.alskor.redmine;
+package org.alskor.redmine.beans;
 
 /**
- * Represents Redmine's Tracker (bug/feature/task/...)
+ * Redmine's Tracker (bug/feature/task/...)
  */
 public class Tracker {
 	

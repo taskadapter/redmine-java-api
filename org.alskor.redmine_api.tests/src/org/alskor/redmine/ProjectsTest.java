@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.internal.MyIOUtils;
 import org.junit.Before;
 import org.junit.Test;
 

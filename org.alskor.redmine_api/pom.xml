@@ -20,7 +20,9 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.7</version>
         <configuration>
-          <show>public</show>
+          <!--<show>public</show>-->
+          <excludePackageNames>org.alskor.redmine.internal</excludePackageNames>          
+<!--          <excludePackageNames>org.alskor.redmine.internal.*:com.mycompany.myapp.package2:*.util.*</excludePackageNames>-->          
         </configuration>
       </plugin>
     </plugins>

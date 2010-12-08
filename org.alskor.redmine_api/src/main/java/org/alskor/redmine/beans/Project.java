@@ -1,9 +1,9 @@
-package org.alskor.redmine;
+package org.alskor.redmine.beans;
 
 import java.util.List;
 
 /**
- * Represents Redmine's Project.
+ * Redmine's Project.
  */
 public class Project {
 	/**
