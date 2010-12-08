@@ -1,0 +1,48 @@
+HTTP POST request to create issues with Basic Authentication and API access key.
+ 
+http://www.redmine.org/issues/5997
+
+One with username and password, one with an API key:
+
+$ curl -X POST -H "Content-Type: text/xml" -d "<issue><subject>api</subject><project_id>weimann3</project_id></issue>" http://admin:password@redmine.acheron/issues.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<issue>
+  <id>226</id>
+  <project name="Customer-focused analyzing inf" id="4"/>
+  <tracker name="Bug" id="1"/>
+  <status name="New" id="1"/>
+  <priority name="Normal" id="4"/>
+  <author name="Eric Davis" id="1"/>
+  <subject>api</subject>
+  <description></description>
+  <start_date>2010-08-12</start_date>
+  <due_date></due_date>
+  <done_ratio>0</done_ratio>
+  <estimated_hours></estimated_hours>
+  <spent_hours>0.0</spent_hours>
+  <created_on>Thu Aug 12 23:37:30 +0000 2010</created_on>
+  <updated_on>Thu Aug 12 23:37:30 +0000 2010</updated_on>
+  <relations>
+  </relations>
+</issue>
+$ curl -X POST -H "Content-Type: text/xml" -d "<issue><subject>api</subject><project_id>weimann3</project_id></issue>" http://8e8dc0e6a24a95b228a3c046b9e7fe4be3411412:X@redmine.acheron/issues.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<issue>
+  <id>227</id>
+  <project name="Customer-focused analyzing inf" id="4"/>
+  <tracker name="Bug" id="1"/>
+  <status name="New" id="1"/>
+  <priority name="Normal" id="4"/>
+  <author name="Eric Davis" id="1"/>
+  <subject>api</subject>
+  <description></description>
+  <start_date>2010-08-12</start_date>
+  <due_date></due_date>
+  <done_ratio>0</done_ratio>
+  <estimated_hours></estimated_hours>
+  <spent_hours>0.0</spent_hours>
+  <created_on>Thu Aug 12 23:38:50 +0000 2010</created_on>
+  <updated_on>Thu Aug 12 23:38:50 +0000 2010</updated_on>
+  <relations>
+  </relations>
+</issue>
