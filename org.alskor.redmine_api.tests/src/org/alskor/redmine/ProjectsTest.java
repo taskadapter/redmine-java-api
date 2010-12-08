@@ -19,7 +19,7 @@ public class ProjectsTest {
 	// Is executed before each test method
 	public void setup() throws Exception {
 		String text = MyIOUtils.getResourceAsString("projects.xml");
-		projectsList = RedmineManager.getProjects(text);
+		projectsList = RedmineManager.parseProjectsFromXML(text);
 	}
 
 	@Test

@@ -207,7 +207,7 @@ public class RedmineManager {
 		return xml;
 	}
 	
-	public static List<Project> getProjects(String xml) {
+	public static List<Project> parseProjectsFromXML(String xml) {
 		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, ArrayList.class);
 		
 		List<Project> list = null;
@@ -234,7 +234,7 @@ public class RedmineManager {
 		URL url = buildGetProjectsURL();
 		WebConnector c = new WebConnector();
 		StringBuffer response = c.loadData(url);
-		return getProjects(response.toString());
+		return parseProjectsFromXML(response.toString());
 	}
 	
 	private static Unmarshaller getUnmarshaller(String configFile, Class classToUse) {
@@ -343,13 +343,10 @@ public class RedmineManager {
 	}
 	
 	/**
-	 * there could be several issues with the same summary. 
+	 * There could be several issues with the same summary, so the method returns List. 
 	 * 
 	 * @param summaryField
 	 * @return empty list if not issues with this summary field exist, never NULL
-	 * @throws AuthenticationException 
-	 * @throws IOException 
-	 * @throws NoSuchAlgorithmException 
 	 */
 	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws NoSuchAlgorithmException, IOException, AuthenticationException {
 		URL url = getQueryIssueBySummaryURL(projectKey, summaryField);
@@ -410,7 +407,7 @@ public class RedmineManager {
 	}
 
 	// XXX this duplicates code in SSLSomething class.
-	public static HttpClient wrapClient(HttpClient base) {
+	private static HttpClient wrapClient(HttpClient base) {
 		try {
 			SSLContext ctx = SSLContext.getInstance("TLS");
 			X509TrustManager tm = new X509TrustManager() {
