@@ -478,7 +478,6 @@ public class RedmineManagerTest {
 		try {
 			Project createdProject = mgr.createProject(projectToCreate);
 			String key = createdProject.getIdentifier();
-//			assertNotNull("checking that a non-null project is returned", createdProject);
 			String newDescr = "NEW123";
 			String newName = "new name here";
 			
@@ -488,7 +487,7 @@ public class RedmineManagerTest {
 			
 			Project updatedProject = mgr.getProjectByIdentifier(key);
 			
-//			assertEquals(projectToCreate.getIdentifier(), createdProject.getIdentifier());
+			assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
 			assertEquals(newName, updatedProject.getName());
 			assertEquals(newDescr, updatedProject.getDescription());
 			
