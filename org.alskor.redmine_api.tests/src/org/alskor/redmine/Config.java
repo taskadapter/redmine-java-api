@@ -5,9 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Config {
-	private static final String TEST_PROPERTIES = "hostedreadmine.properties";
-//	private static final String TEST_PROPERTIES = "linuxvbox.properties";
-//	private static final String TEST_PROPERTIES = "vbox-home.properties";
+	private static final String TEST_PROPERTIES = "redmine_api_test.properties";
 
 	private static Properties properties = new Properties();
 	static {

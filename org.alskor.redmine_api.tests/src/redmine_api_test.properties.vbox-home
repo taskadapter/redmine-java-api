@@ -1,0 +1,11 @@
+# test config for Redmine API
+redmine.host=http://academ:3000
+redmine.apikey=01d7692c218a74d60d25d8eb5f62874a22ef8599
+redmine.user=admin
+
+redmine.projectKey=testproject
+# query 2: "created last 2 days" issues
+redmine.queryId=2
+
+createissue.userid=1
+createissue.userFirstAndLastName=Redmine Admin
