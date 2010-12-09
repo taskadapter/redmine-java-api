@@ -432,5 +432,30 @@ public class RedmineManagerTest {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testCreateProject() {
+		Project projectToCreate = new Project();
+		Long timeStamp = Calendar.getInstance().getTimeInMillis();
+		String key = "projkey" + timeStamp;
+		String name = "project number "+ timeStamp;
+		String description = "some description for the project";
+		projectToCreate.setIdentifier(key);
+		projectToCreate.setName(name);
+		projectToCreate.setDescription(description);
+		
+		try {
+			Project createdProject = mgr.createProject(projectToCreate);
+			
+			assertNotNull("checking that a non-null project is returned", createdProject);
+			
+			assertEquals(key, createdProject.getIdentifier());
+			assertEquals(name, createdProject.getName());
+			assertEquals(description, createdProject.getDescription());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
 
 }
