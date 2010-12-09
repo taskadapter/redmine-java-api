@@ -2,6 +2,7 @@ package org.alskor.redmine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -434,28 +435,78 @@ public class RedmineManagerTest {
 	}
 	
 	@Test
+	public void testParseProjectNoTrackerXML() {
+		String xml;
+		try {
+			xml = MyIOUtils.getResourceAsString("project_no_trackers.xml");
+			Project project = RedmineManager.parseProjectFromXML(xml);
+			List<Tracker> trackers = project.getTrackers();
+			assertNull("Trackers list must be NULL", trackers);
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+	@Test
 	public void testCreateProject() {
-		Project projectToCreate = new Project();
-		Long timeStamp = Calendar.getInstance().getTimeInMillis();
-		String key = "projkey" + timeStamp;
-		String name = "project number "+ timeStamp;
-		String description = "some description for the project";
-		projectToCreate.setIdentifier(key);
-		projectToCreate.setName(name);
-		projectToCreate.setDescription(description);
 		
+//		Tracker tracker = new Tracker(trackerBugId, trackerBugName);
+//		List<Tracker> trackers = new ArrayList<Tracker>();
+//		trackers.add(tracker);
+//		projectToCreate.setTrackers(trackers);
+		Project projectToCreate = generateRandomProject();
 		try {
 			Project createdProject = mgr.createProject(projectToCreate);
 			
 			assertNotNull("checking that a non-null project is returned", createdProject);
 			
-			assertEquals(key, createdProject.getIdentifier());
-			assertEquals(name, createdProject.getName());
-			assertEquals(description, createdProject.getDescription());
+			assertEquals(projectToCreate.getIdentifier(), createdProject.getIdentifier());
+			assertEquals(projectToCreate.getName(), createdProject.getName());
+			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
+			
+			List<Tracker> trackers = createdProject.getTrackers();
+			assertNotNull("checking that project has some trackers", trackers);
+			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
 
+	@Test
+	public void testUpdateProject() {
+		Project projectToCreate = generateRandomProject();
+		try {
+			Project createdProject = mgr.createProject(projectToCreate);
+			String key = createdProject.getIdentifier();
+//			assertNotNull("checking that a non-null project is returned", createdProject);
+			String newDescr = "NEW123";
+			String newName = "new name here";
+			
+			createdProject.setName(newName);
+			createdProject.setDescription(newDescr);
+			mgr.updateProject(createdProject);
+			
+			Project updatedProject = mgr.getProjectByIdentifier(key);
+			
+//			assertEquals(projectToCreate.getIdentifier(), createdProject.getIdentifier());
+			assertEquals(newName, updatedProject.getName());
+			assertEquals(newDescr, updatedProject.getDescription());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+	
+	private static Project generateRandomProject() {
+		Project project = new Project();
+		Long timeStamp = Calendar.getInstance().getTimeInMillis();
+		String key = "projkey" + timeStamp;
+		String name = "project number "+ timeStamp;
+		String description = "some description for the project";
+		project.setIdentifier(key);
+		project.setName(name);
+		project.setDescription(description);
+		return project;
+	}
 }
