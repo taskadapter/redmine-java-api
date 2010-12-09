@@ -147,7 +147,7 @@ public class RedmineManager {
 	}
 	
 	private String sendRequestInternal(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
-		System.out.println(request.getRequestLine());
+//		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		wrapClient(httpclient);
 		
@@ -502,7 +502,7 @@ public class RedmineManager {
         String query = buildCreateProjectURI();
 		HttpPost httpPost = new HttpPost(query);
 		String createProjectXML = convertToXML(project);
-		System.out.println("create project:" + createProjectXML);
+//		System.out.println("create project:" + createProjectXML);
 		setEntity(httpPost, createProjectXML);
 
 		String responseXMLBody = sendRequestInternal(httpPost);
