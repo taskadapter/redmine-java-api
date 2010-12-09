@@ -147,7 +147,7 @@ public class RedmineManager {
 	}
 	
 	private String sendRequestInternal(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
-
+		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		wrapClient(httpclient);
 		
@@ -525,6 +525,10 @@ public class RedmineManager {
 		return host + "/projects.xml?key=" + apiAccessKey;
 	}
 
+	private String buildUpdateProjectURI(String key) {
+		return host + "/projects/" + key +".xml?key=" + apiAccessKey;
+	}
+
 	private static Marshaller getMarshaller(String configFile, Writer writer) {
 		InputSource inputSource = new InputSource(
 				RedmineManager.class.getResourceAsStream(configFile));
@@ -540,5 +544,19 @@ public class RedmineManager {
 		}
 //		unmarshaller.setClass(classToUse);
 		return marshaller;
+	}
+
+	public void updateProject(Project project) throws IOException,
+			AuthenticationException {
+		/*
+		 * note: This method cannot return the updated object from Redmine
+		 * because the server does not provide any XML in response.
+		 */
+		String query = buildUpdateProjectURI(project.getIdentifier());
+		HttpPut httpRequest = new HttpPut(query);
+		String projectXML = convertToXML(project);
+		setEntity(httpRequest, projectXML);
+		sendRequestInternal(httpRequest);
+
 	}
 }
