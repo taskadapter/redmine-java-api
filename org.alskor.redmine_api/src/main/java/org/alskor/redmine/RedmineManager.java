@@ -2,7 +2,9 @@ package org.alskor.redmine;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -45,6 +47,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
@@ -82,7 +85,9 @@ public class RedmineManager {
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
         String query = getCreateIssueURI();
 		HttpPost httpPost = new HttpPost(query);
-		setEntity(httpPost, projectKey, issue);
+		String xmlBody = getIssueXML(projectKey, issue);
+
+		setEntity(httpPost, xmlBody);
 		return sendRequestExpectResponse(httpPost);
 	}
 	
@@ -120,12 +125,13 @@ public class RedmineManager {
 		HttpPut httpRequest = new HttpPut(query);
 
 		// XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
-		setEntity(httpRequest, projectKey, issue);
+		String xmlBody = getIssueXML(projectKey, issue);
+
+		setEntity(httpRequest, xmlBody);
 		sendRequestInternal(httpRequest);
 	}
 	
-	private void setEntity(HttpEntityEnclosingRequest request, String projectKey, Issue issue) throws UnsupportedEncodingException {
-		String xmlBody = getIssueXML(projectKey, issue);
+	private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
 		StringEntity entity = new StringEntity(xmlBody, "UTF-8");
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
@@ -492,4 +498,47 @@ public class RedmineManager {
 
 	}
 
+	public Project createProject(Project project) throws IOException,AuthenticationException {
+        String query = buildCreateProjectURI();
+		HttpPost httpPost = new HttpPost(query);
+		String createProjectXML = convertToXML(project);
+		System.out.println("create project:" + createProjectXML);
+		setEntity(httpPost, createProjectXML);
+
+		String responseXMLBody = sendRequestInternal(httpPost);
+		Project createdProject = parseProjectFromXML(responseXMLBody);
+		return createdProject;
+	}
+
+	private String convertToXML(Project project) {
+		StringWriter writer = new StringWriter();
+		try {
+			Marshaller m = getMarshaller(MAPPING_PROJECTS_LIST, writer);
+			m.marshal(project);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return writer.toString();
+	}
+
+	private String buildCreateProjectURI() {
+		return host + "/projects.xml?key=" + apiAccessKey;
+	}
+
+	private static Marshaller getMarshaller(String configFile, Writer writer) {
+		InputSource inputSource = new InputSource(
+				RedmineManager.class.getResourceAsStream(configFile));
+		Mapping mapping = new Mapping();
+		mapping.loadMapping(inputSource);
+
+		Marshaller marshaller;
+		try {
+			marshaller = new Marshaller(writer);
+			marshaller.setMapping(mapping);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+//		unmarshaller.setClass(classToUse);
+		return marshaller;
+	}
 }
