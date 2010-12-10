@@ -15,6 +15,7 @@ import org.alskor.redmine.internal.MyIOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
+
 public class RedmineIssuesMapTest {
 
 	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";

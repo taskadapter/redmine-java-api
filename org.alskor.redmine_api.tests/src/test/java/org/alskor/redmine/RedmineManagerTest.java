@@ -21,6 +21,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+
 public class RedmineManagerTest {
 
 	private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
