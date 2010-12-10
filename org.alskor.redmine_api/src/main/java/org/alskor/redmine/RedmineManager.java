@@ -13,7 +13,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 
@@ -51,6 +50,7 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
+
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
  * 
@@ -66,10 +66,16 @@ public class RedmineManager {
 	private String host;
 	private String apiAccessKey;
 	
+	private static boolean demoMode = true;
+	
 	static {
-		Calendar validTill = LicenseManager.checkLicense();
-		System.out.println("Redmine API license is valid till: "
-				+ validTill.getTime());
+		boolean valid = LicenseManager.checkLicense();
+		if (valid) {
+			// XXX we print out a message and take no actions at this moment.
+			// need to add some tricks for "trial/no license" mode.
+			System.out.println("Loaded valid Redmine API license"); //. Registered to: " + customerName);
+			demoMode = false;
+		}
 	}
 
 	/**

@@ -1,9 +1,12 @@
 package org.alskor.redmine.internal;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -27,12 +30,14 @@ public class MyIOUtils {
 		return in;
 	}
 
-	public static String getResourceAsString(String resource) throws IOException {
+	public static String getResourceAsString(String resource)
+			throws IOException {
 		InputStream in = getResourceAsStream(resource);
 		return convertStreamToString(in);
 	}
 
-	public static String convertStreamToString(InputStream is) throws IOException {
+	public static String convertStreamToString(InputStream is)
+			throws IOException {
 		/*
 		 * To convert the InputStream to String we use the Reader.read(char[]
 		 * buffer) method. We iterate until the Reader return -1 which means
@@ -56,6 +61,23 @@ public class MyIOUtils {
 			return writer.toString();
 		} else {
 			return "";
+		}
+	}
+
+	public static void writeToFile(String fileName, String text)
+			throws IOException {
+		BufferedWriter out = null;
+		try {
+			out = new BufferedWriter(new OutputStreamWriter(
+					// XXX is it UTF8 or UTF-8 ???
+					new FileOutputStream(fileName), "UTF8"));
+
+			out.write(text);
+			out.close();
+		} finally {
+			if (out != null) {
+				out.close();
+			}
 		}
 	}
 }
