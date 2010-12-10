@@ -25,6 +25,7 @@ import org.alskor.httputils.WebConnector;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
+import org.alskor.redmine.internal.License;
 import org.alskor.redmine.internal.LicenseManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -69,11 +70,11 @@ public class RedmineManager {
 	private static boolean demoMode = true;
 	
 	static {
-		boolean valid = LicenseManager.checkLicense();
-		if (valid) {
+		License license = LicenseManager.checkLicense();
+		if (license != null) {
 			// XXX we print out a message and take no actions at this moment.
 			// need to add some tricks for "trial/no license" mode.
-			System.out.println("Loaded valid Redmine API license"); //. Registered to: " + customerName);
+			System.out.println("Loaded valid Redmine API license. Registered to: " + license.getCustomerName());
 			demoMode = false;
 		}
 	}
