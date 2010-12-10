@@ -13,11 +13,6 @@ import java.io.Writer;
 
 public class MyIOUtils {
 
-	// public static URL getResourceAsURL(String resource) {
-	// ClassLoader cl = MyIOUtils.class.getClassLoader();
-	// return cl.getResource(resource);
-	// }
-
 	public static InputStream getResourceAsStream(String resource)
 			throws IOException {
 		ClassLoader cl = MyIOUtils.class.getClassLoader();
@@ -30,6 +25,9 @@ public class MyIOUtils {
 		return in;
 	}
 
+	/**
+	 *  Loads the resource from classpath
+	 */
 	public static String getResourceAsString(String resource)
 			throws IOException {
 		InputStream in = getResourceAsStream(resource);
