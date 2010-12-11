@@ -65,18 +65,32 @@ public class RedmineManager {
 
 	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
+	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
+		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
+
 	private String host;
 	private String apiAccessKey;
 	
-	private static boolean demoMode = true;
+	private static boolean trialMode = true;
 	
 	static {
-		License license = LicenseManager.getRedmineApiLicense();
-		if (license != null) {
+		License licenseRedmineAPI = LicenseManager.getRedmineApiLicense();
+		License licenseTaskAdapter = LicenseManager.getTaskAdapterLicense();
+
+		if (licenseRedmineAPI != null) { 
 			// XXX we print out a message and take no actions at this moment.
 			// need to add some tricks for "trial/no license" mode.
-			System.out.println("Loaded valid Redmine API license. Registered to: " + license.getCustomerName());
-			demoMode = false;
+			System.out.println("Redmine Java API: loaded valid license. Registered to: " + licenseRedmineAPI);
+			trialMode = false;
+		} 
+		if (trialMode && (licenseTaskAdapter != null)) {
+			System.out.println("Redmine Java API: will use Task Adapter's license: " + licenseTaskAdapter);
+			trialMode = false;
+		}
+		
+		// still trial mode?
+		if (trialMode) {
+			System.err.println(LICENSE_ERROR_MESSAGE);
 		}
 	}
 
@@ -336,6 +350,13 @@ public class RedmineManager {
 		} finally {
 			if (reader != null) {
 				reader.close();
+			}
+		}
+		if (trialMode) {
+			for (Issue i : list) {
+				if (!i.getSubject().startsWith(LicenseManager.TRIAL_PREFIX)) {
+					i.setSubject(LicenseManager.TRIAL_PREFIX + i.getSubject());
+				}
 			}
 		}
 		return list;
