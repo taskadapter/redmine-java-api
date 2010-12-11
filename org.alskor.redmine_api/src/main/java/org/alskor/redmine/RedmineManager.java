@@ -25,8 +25,6 @@ import org.alskor.httputils.WebConnector;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
-import org.alskor.redmine.internal.License;
-import org.alskor.redmine.internal.LicenseManager;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -51,6 +49,9 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
+import com.alskor.taskadapter.license.License;
+import com.alskor.taskadapter.license.LicenseManager;
+
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -70,7 +71,7 @@ public class RedmineManager {
 	private static boolean demoMode = true;
 	
 	static {
-		License license = LicenseManager.checkLicense();
+		License license = LicenseManager.getRedmineApiLicense();
 		if (license != null) {
 			// XXX we print out a message and take no actions at this moment.
 			// need to add some tricks for "trial/no license" mode.
