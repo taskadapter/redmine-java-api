@@ -232,7 +232,6 @@ public class RedmineManagerTest {
 	public void testParseIssuesFromEmptyXMLUsingRedmineLoader() {
 		// issues xml with no individual issues in the list should not break the
 		// loader.
-		// see http://code.google.com/p/redmine-connect/issues/detail?id=57
 
 		InputStream is;
 		RedmineLoader loader = new RedmineLoader();
