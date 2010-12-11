@@ -49,7 +49,6 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
-import com.alskor.taskadapter.license.License;
 import com.alskor.taskadapter.license.LicenseManager;
 
 
@@ -65,8 +64,8 @@ public class RedmineManager {
 
 	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
-	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
-		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
+//	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
+//		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
 
 	private String host;
 	private String apiAccessKey;
@@ -74,12 +73,11 @@ public class RedmineManager {
 	private static boolean trialMode = true;
 	
 	static {
+		/*
 		License licenseRedmineAPI = LicenseManager.getRedmineApiLicense();
 		License licenseTaskAdapter = LicenseManager.getTaskAdapterLicense();
 
 		if (licenseRedmineAPI != null) { 
-			// XXX we print out a message and take no actions at this moment.
-			// need to add some tricks for "trial/no license" mode.
 			System.out.println("Redmine Java API: loaded valid license. Registered to: " + licenseRedmineAPI);
 			trialMode = false;
 		} 
@@ -91,7 +89,7 @@ public class RedmineManager {
 		// still trial mode?
 		if (trialMode) {
 			System.err.println(LICENSE_ERROR_MESSAGE);
-		}
+		}*/
 	}
 
 	/**
@@ -107,6 +105,11 @@ public class RedmineManager {
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
         String query = getCreateIssueURI();
 		HttpPost httpPost = new HttpPost(query);
+		if (trialMode) {
+//				if (!issue.getSubject().startsWith(LicenseManager.TRIAL_PREFIX)) {
+//					issue.setSubject(LicenseManager.TRIAL_PREFIX + issue.getSubject());
+//				}
+		}
 		String xmlBody = getIssueXML(projectKey, issue);
 
 		setEntity(httpPost, xmlBody);
@@ -336,14 +339,32 @@ public class RedmineManager {
 		return project;
 	}
 
-	protected static List<Issue> parseIssuesFromXML(String xml) throws RuntimeException {
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, ArrayList.class);
+	protected static List<Issue> parseIssuesFromXML(String xml)
+			throws RuntimeException {
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES,
+				ArrayList.class);
 
-		List<Issue> list = null;
+		List<Issue> resultList = null;
 		StringReader reader = null;
 		try {
 			reader = new StringReader(xml);
-			list = (List) unmarshaller.unmarshal(reader);
+			resultList = (List) unmarshaller.unmarshal(reader);
+			if (trialMode) {
+//				int itemsToDelete = resultList.size() - LicenseManager.TRIAL_TASKS_NUMBER_LIMIT;
+//				if (itemsToDelete >0) {
+//					for (int i=0; i<itemsToDelete; i++) {
+//						// remove the last item
+//						resultList.remove(resultList.size());
+//					}
+//				for (Issue issue : resultList) {
+					// if (!issue.getSubject().startsWith(
+					// LicenseManager.TRIAL_PREFIX)) {
+					// issue.setSubject(LicenseManager.TRIAL_PREFIX
+					// + issue.getSubject());
+					// }
+//				}
+//				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -352,14 +373,7 @@ public class RedmineManager {
 				reader.close();
 			}
 		}
-		if (trialMode) {
-			for (Issue i : list) {
-				if (!i.getSubject().startsWith(LicenseManager.TRIAL_PREFIX)) {
-					i.setSubject(LicenseManager.TRIAL_PREFIX + i.getSubject());
-				}
-			}
-		}
-		return list;
+		return resultList;
 	}
 	
 	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
