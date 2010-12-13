@@ -15,6 +15,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -49,8 +51,6 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
-import com.alskor.taskadapter.license.LicenseManager;
-
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -64,11 +64,14 @@ public class RedmineManager {
 
 	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
+	private static final int DEFAULT_TASKS_PER_PAGE = 100;
+
 //	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
 //		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
 
 	private String host;
 	private String apiAccessKey;
+	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
 	
 	private static boolean trialMode = true;
 	
@@ -105,11 +108,6 @@ public class RedmineManager {
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
         String query = getCreateIssueURI();
 		HttpPost httpPost = new HttpPost(query);
-		if (trialMode) {
-//				if (!issue.getSubject().startsWith(LicenseManager.TRIAL_PREFIX)) {
-//					issue.setSubject(LicenseManager.TRIAL_PREFIX + issue.getSubject());
-//				}
-		}
 		String xmlBody = getIssueXML(projectKey, issue);
 
 		setEntity(httpPost, xmlBody);
@@ -376,6 +374,27 @@ public class RedmineManager {
 		return resultList;
 	}
 	
+	/** XML contains this line near the top:
+			<issues type="array" limit="25" total_count="103" offset="0">
+	  	need to parse "total_count" value
+	 */
+	protected static int parseIssuesTotalCount(String issuesXML) {
+		String reg = "<issues type=\"array\" limit=.+ total_count=\""; //\\d+ \" offset=\".+";
+//		System.out.println(issuesXML);
+//		System.out.println(reg);
+		Pattern pattern = Pattern.compile(reg);
+		Matcher matcher = pattern.matcher(issuesXML);
+		matcher.find();
+		int indexBeginNumber = matcher.end();
+		
+		String tmp1 = issuesXML.substring(indexBeginNumber);
+		int end = tmp1.indexOf('"');
+		String numStr = tmp1.substring(0, end);
+		int result = Integer.parseInt(numStr);
+		return result;
+	
+	}
+	
 	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
 		List<Issue> createdIssues = new ArrayList<Issue>();
 		Iterator<Issue> it = tasks.iterator();
@@ -488,47 +507,46 @@ public class RedmineManager {
 	}
 
 	public List<Issue> getIssues(String projectKey, String queryId) throws IOException, AuthenticationException {
-		URL url = buildGetIssuesByQueryURL(projectKey, queryId);
-		
 		WebConnector c = new WebConnector();
-		StringBuffer response = c.loadData(url);
+		List<Issue>  allTasks = new ArrayList<Issue>();
 		
-//		String query = url.toString();
-//		HttpGet httpRequest = new HttpGet(query);
-//		String response = sendRequestInternal(httpRequest);
+		int offsetIssuesNum = 0;
+		int totalIssuesFoundOnServer = -1;
+		int loaded = -1;
+		
+		do {
+			URL url = buildGetIssuesByQueryURL(projectKey, queryId, offsetIssuesNum);
 
-		System.err.println(response);
+			StringBuffer responseXML = c.loadData(url);
+			System.err.println(responseXML);
 
-		List<Issue>  foundIssues = parseIssuesFromXML(response.toString());
-		return foundIssues;
+			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
+					.toString());
+			List<Issue> foundIssues = parseIssuesFromXML(responseXML.toString());
+			// assuming every page has the same number of items 
+			loaded = foundIssues.size();
+			System.err.println("totalIssuesFoundOnServer="
+					+ totalIssuesFoundOnServer + " loaded = "
+					+ loaded);
+			allTasks.addAll(foundIssues);
+			offsetIssuesNum+= loaded;
+		} while (offsetIssuesNum < totalIssuesFoundOnServer);
+
+		return allTasks;
 	}
-	
-//	public StringBuffer getIssuesRawXML_TMP(String projectKey, String queryId) throws IOException, AuthenticationException {
-//		URL url = buildGetIssuesByQueryURL(projectKey, queryId);
-//		
-//		WebConnector c = new WebConnector();
-//		StringBuffer response = c.loadData(url);
-//		return response;
-//		String query = url.toString();
-//		HttpGet httpRequest = new HttpGet(query);
-//		String response = sendRequestInternal(httpRequest);
-//		System.err.println(response);
-//		IssuesList foundIssues = parseIssuesFromXML(response.toString());
-//		return foundIssues.getIssues();
-//	}
-	
+
 	/**
 	 * sample: http://demo.redmine.org/projects/ace/issues.xml?query_id=302
 	 */
-	private URL buildGetIssuesByQueryURL(String projectKey, String queryId) {
+	private URL buildGetIssuesByQueryURL(String projectKey, String queryId, int offsetIssuesNum) {
 		String charset = "UTF-8";
 		URL url = null;
 		try {
-//			String query = String.format("/projects/%s/issues.xml?query_id=%s",
 			String query = String.format("/issues.xml?project_id=%s&query_id=%s",
 					URLEncoder.encode(projectKey, charset),
 					URLEncoder.encode(queryId, charset));
-
+			query += "&offset=" + offsetIssuesNum;
+			query += "&limit=" + tasksPerPage;
 			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
 				query += String.format("&key=%s",
 						URLEncoder.encode(apiAccessKey, charset));
@@ -585,7 +603,6 @@ public class RedmineManager {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-//		unmarshaller.setClass(classToUse);
 		return marshaller;
 	}
 
@@ -601,5 +618,14 @@ public class RedmineManager {
 		setEntity(httpRequest, projectXML);
 		sendRequestInternal(httpRequest);
 
+	}
+
+	public int getTasksPerPage() {
+		return tasksPerPage;
+	}
+
+	// TODO add junit test
+	public void setTasksPerPage(int tasksPerPage) {
+		this.tasksPerPage = tasksPerPage;
 	}
 }
