@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.alskor.httputils.AuthenticationException;
+import org.alskor.redmine.RedmineManager.REDMINE_VERSION;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.Tracker;
@@ -517,4 +518,22 @@ public class RedmineManagerTest {
 		assertEquals(155,x);
 		System.out.println("success: parsed total_count attribute from issues xml. value= " + x);
 	}
+	
+	// XXX not completed. this test only works with hostedredmine.com. finish this test later
+	@Test
+	public void testPaging() {
+		try {
+			String queryIdAllIssues = "156";
+			RedmineManager mgr104 = new RedmineManager(Config.getHost(), Config.getApiKey());
+			mgr104.setRedmineVersion(REDMINE_VERSION.V104);
+			
+			List<Issue> issues = mgr104.getIssues(PROJECT_KEY, queryIdAllIssues);
+			System.out.println("getIssues() loaded " + issues.size() + " issues using query #" + queryIdAllIssues);
+			assertTrue(issues.size()>25);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
 }
