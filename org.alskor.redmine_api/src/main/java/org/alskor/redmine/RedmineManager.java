@@ -74,6 +74,12 @@ public class RedmineManager {
 	private String host;
 	private String apiAccessKey;
 	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
+
+	static enum REDMINE_VERSION {
+		V104, TRUNK
+	}
+	
+	private REDMINE_VERSION mode = REDMINE_VERSION.V104;
 	
 	private static boolean trialMode = true;
 	
@@ -513,12 +519,22 @@ public class RedmineManager {
 	}
 
 	public List<Issue> getIssues(String projectKey, String queryId) throws IOException, AuthenticationException {
+		if (mode.equals(REDMINE_VERSION.TRUNK)) {
+			return getIssuesTrunk(projectKey, queryId);
+		} else if (mode.equals(REDMINE_VERSION.V104)) {
+			return getIssuesV104(projectKey, queryId);
+		}
+		throw new RuntimeException("unsupported mode: " + mode);
+	}
+	
+	public List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
 		WebConnector c = new WebConnector();
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
 		int offsetIssuesNum = 0;
 		int totalIssuesFoundOnServer = UNKNOWN;
 		int loaded = -1;
+		int pageNum=0;
 		
 		do {
 			URL url = buildGetIssuesByQueryURL(projectKey, queryId, offsetIssuesNum);
@@ -546,6 +562,43 @@ public class RedmineManager {
 		return allTasks;
 	}
 
+	public List<Issue> getIssuesV104(String projectKey, String queryId) throws IOException, AuthenticationException {
+		WebConnector c = new WebConnector();
+		List<Issue>  allTasks = new ArrayList<Issue>();
+		
+//		int offsetIssuesNum = 0;
+//		int totalIssuesFoundOnServer = UNKNOWN;
+		int loaded = -1;
+		int pageNum=1;
+		
+		do {
+			URL url = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
+					pageNum);
+
+			StringBuffer responseXML = c.loadData(url);
+			System.err.println(responseXML);
+
+//			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
+//					.toString());
+			
+			List<Issue> foundIssues = parseIssuesFromXML(responseXML.toString());
+			// assuming every page has the same number of items 
+			loaded = foundIssues.size();
+//			System.err.println("totalIssuesFoundOnServer="
+//					+ totalIssuesFoundOnServer + " loaded = "
+//					+ loaded);
+			allTasks.addAll(foundIssues);
+//			offsetIssuesNum+= loaded;
+			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
+//			if (totalIssuesFoundOnServer == UNKNOWN) {
+//				totalIssuesFoundOnServer = loaded;
+//			}
+			pageNum++;
+		} while (loaded == 25);
+
+		return allTasks;
+	}
+
 	/**
 	 * sample: http://demo.redmine.org/projects/ace/issues.xml?query_id=302
 	 */
@@ -558,6 +611,27 @@ public class RedmineManager {
 					URLEncoder.encode(queryId, charset));
 			query += "&offset=" + offsetIssuesNum;
 			query += "&limit=" + tasksPerPage;
+			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
+				query += String.format("&key=%s",
+						URLEncoder.encode(apiAccessKey, charset));
+			}
+			url = new URL(host + query);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return url;
+
+	}
+
+	private URL buildGetIssuesByQueryURLRedmine104(String projectKey, String queryId, int pageNum) {
+		String charset = "UTF-8";
+		URL url = null;
+		try {
+			String query = String.format("/issues.xml?project_id=%s&query_id=%s",
+					URLEncoder.encode(projectKey, charset),
+					URLEncoder.encode(queryId, charset));
+			query += "&page=" + pageNum;
+			query += "&per_page=" + tasksPerPage;
 			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
 				query += String.format("&key=%s",
 						URLEncoder.encode(apiAccessKey, charset));
@@ -638,5 +712,9 @@ public class RedmineManager {
 	// TODO add junit test
 	public void setTasksPerPage(int tasksPerPage) {
 		this.tasksPerPage = tasksPerPage;
+	}
+	
+	public void setRedmineVersion(REDMINE_VERSION v){
+		mode = v;
 	}
 }
