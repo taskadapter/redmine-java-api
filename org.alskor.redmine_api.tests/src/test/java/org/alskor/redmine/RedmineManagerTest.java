@@ -509,4 +509,12 @@ public class RedmineManagerTest {
 		project.setDescription(description);
 		return project;
 	}
+	
+	@Test
+	public void testParseIssuesTotalCount() {
+		String tmp = "...xml... <issues type=\"array\" limit=\"25\" total_count=\"155\" offset=\"0\">....";
+		int x = RedmineManager.parseIssuesTotalCount(tmp);
+		assertEquals(155,x);
+		System.out.println("success: parsed total_count attribute from issues xml. value= " + x);
+	}
 }
