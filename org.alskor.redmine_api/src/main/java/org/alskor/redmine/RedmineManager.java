@@ -576,7 +576,7 @@ public class RedmineManager {
 					pageNum);
 
 			StringBuffer responseXML = c.loadData(url);
-			System.err.println(responseXML);
+//			System.err.println(responseXML);
 
 //			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
 //					.toString());
