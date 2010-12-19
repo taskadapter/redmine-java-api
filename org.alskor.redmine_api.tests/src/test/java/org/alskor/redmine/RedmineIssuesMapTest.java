@@ -20,7 +20,7 @@ import com.alskor.taskadapter.util.MyIOUtils;
 public class RedmineIssuesMapTest {
 
 	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";
-	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 12;
+	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 13;
 	private List<Issue> issuesList;
 	private HashMap<Integer, Issue> issuesMap;
 
