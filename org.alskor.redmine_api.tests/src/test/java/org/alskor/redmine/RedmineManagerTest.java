@@ -520,12 +520,12 @@ public class RedmineManagerTest {
 	}
 	
 	// XXX not completed. this test only works with hostedredmine.com. finish this test later
-	@Test
+/*	@Test
 	public void testPaging() {
 		try {
 			String queryIdAllIssues = "156";
 			RedmineManager mgr104 = new RedmineManager(Config.getHost(), Config.getApiKey());
-			mgr104.setRedmineVersion(REDMINE_VERSION.V104);
+//			mgr104.setRedmineVersion(REDMINE_VERSION.V104);
 			
 			List<Issue> issues = mgr104.getIssues(PROJECT_KEY, queryIdAllIssues);
 			System.out.println("getIssues() loaded " + issues.size() + " issues using query #" + queryIdAllIssues);
@@ -535,5 +535,30 @@ public class RedmineManagerTest {
 			fail(e.getMessage());
 		}
 	}
-
+*/
+	@Test
+	public void testNullEstimatedTime(){
+		String str;
+		try {
+			str = MyIOUtils.getResourceAsString("issues.xml");
+			List<Issue> issues = RedmineManager.parseIssuesFromXML(str);
+			Issue issue210 = findIssueInList(issues, 210);
+			assertNotNull(issue210);
+			
+			// must be NULL and not "0"
+			assertNull("estimated time must be null", issue210.getEstimatedHours());
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	private static Issue findIssueInList(List<Issue> list, Integer id) {
+		Issue result = null;
+		for(Issue issue:list) {
+			if (issue.getId().equals(id)){
+				result = issue;
+			}
+		}
+		return result;
+	}
 }

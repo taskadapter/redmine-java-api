@@ -347,6 +347,7 @@ public class RedmineManager {
 
 	protected static List<Issue> parseIssuesFromXML(String xml)
 			throws RuntimeException {
+		xml = removeBadTags(xml);
 		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES,
 				ArrayList.class);
 
@@ -382,6 +383,11 @@ public class RedmineManager {
 		return resultList;
 	}
 	
+	// see bug https://www.hostedredmine.com/issues/8240
+	private static String removeBadTags(String xml) {
+		return xml.replaceAll("<estimated_hours></estimated_hours>", "");
+	}
+
 	/** XML contains this line near the top:
 			<issues type="array" limit="25" total_count="103" offset="0">
 	  	need to parse "total_count" value
@@ -534,13 +540,13 @@ public class RedmineManager {
 		int offsetIssuesNum = 0;
 		int totalIssuesFoundOnServer = UNKNOWN;
 		int loaded = -1;
-		int pageNum=0;
+//		int pageNum=0;
 		
 		do {
 			URL url = buildGetIssuesByQueryURL(projectKey, queryId, offsetIssuesNum);
 
 			StringBuffer responseXML = c.loadData(url);
-			System.err.println(responseXML);
+//			System.err.println("RedmineManager: "  + responseXML);
 
 			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
 					.toString());
@@ -548,9 +554,9 @@ public class RedmineManager {
 			List<Issue> foundIssues = parseIssuesFromXML(responseXML.toString());
 			// assuming every page has the same number of items 
 			loaded = foundIssues.size();
-			System.err.println("totalIssuesFoundOnServer="
-					+ totalIssuesFoundOnServer + " loaded = "
-					+ loaded);
+//			System.err.println("totalIssuesFoundOnServer="
+//					+ totalIssuesFoundOnServer + " loaded = "
+//					+ loaded);
 			allTasks.addAll(foundIssues);
 			offsetIssuesNum+= loaded;
 			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
@@ -576,7 +582,7 @@ public class RedmineManager {
 					pageNum);
 
 			StringBuffer responseXML = c.loadData(url);
-//			System.err.println(responseXML);
+			System.err.println(responseXML);
 
 //			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
 //					.toString());

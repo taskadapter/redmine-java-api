@@ -1,260 +1,280 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <issues type="array">
-  <issue>
-    <id>18156</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <parent id="18154"/>
-    <subject>feature A - subitem1 - subsub1</subject>
-    <description></description>
-    <start_date>2010-04-14</start_date>
-    <due_date></due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours>2.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Wed Apr 14 13:56:30 -0700 2010</created_on>
-    <updated_on>Wed Apr 14 13:56:30 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>18155</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Developer 001" id="26372"/>
-    <fixed_version name="6.2" id="565"/>
-    <parent id="17636"/>
-    <subject>feature A - subitem2</subject>
-    <description></description>
-    <start_date>2010-04-14</start_date>
-    <due_date></due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours>4.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Wed Apr 14 13:54:51 -0700 2010</created_on>
-    <updated_on>Wed Apr 14 15:39:30 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>18154</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Developer 001" id="26372"/>
-    <fixed_version name="6.2" id="565"/>
-    <parent id="17636"/>
-    <subject>feature A - subitem1</subject>
-    <description></description>
-    <start_date>2010-04-14</start_date>
-    <due_date></due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours>2.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Wed Apr 14 13:53:47 -0700 2010</created_on>
-    <updated_on>Wed Apr 14 15:40:03 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17982</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Urgent" id="6"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>implement new GUI feature  123</subject>
-    <description></description>
-    <start_date>2010-04-13</start_date>
-    <due_date></due_date>
-    <done_ratio>10</done_ratio>
-    <estimated_hours>30.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Tue Apr 13 13:26:38 -0700 2010</created_on>
-    <updated_on>Tue Apr 13 13:26:38 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17964</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="High" id="5"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>some bug blocking feature A</subject>
-    <description></description>
-    <start_date>2010-04-13</start_date>
-    <due_date></due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours>1.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Tue Apr 13 10:02:06 -0700 2010</created_on>
-    <updated_on>Tue Apr 13 10:25:12 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17636</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>featureA</subject>
-    <description></description>
-    <start_date>2010-04-14</start_date>
-    <due_date></due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours>6.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Fri Apr 09 15:38:46 -0700 2010</created_on>
-    <updated_on>Wed Apr 14 13:56:30 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17617</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>some bug</subject>
-    <description>description-line1
-description-line2
-description-line3</description>
-    <start_date>2010-04-09</start_date>
-    <due_date>2010-04-21</due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours>2.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Fri Apr 09 12:17:15 -0700 2010</created_on>
-    <updated_on>Tue Apr 13 10:25:49 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17611</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>new feature 5</subject>
-    <description></description>
-    <start_date>2010-04-09</start_date>
-    <due_date></due_date>
-    <done_ratio>20</done_ratio>
-    <estimated_hours>25.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Fri Apr 09 11:17:13 -0700 2010</created_on>
-    <updated_on>Mon Apr 12 13:38:33 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17481</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>GUI feature - login forms</subject>
-    <description></description>
-    <start_date>2010-04-08</start_date>
-    <due_date></due_date>
-    <done_ratio>0</done_ratio>
-    <estimated_hours></estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Thu Apr 08 12:11:13 -0700 2010</created_on>
-    <updated_on>Thu Apr 08 12:14:41 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17321</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <parent id="17318"/>
-    <subject>task1</subject>
-    <description>description-line1-task1
-description-line2-task1
-description-line3-task1</description>
-    <start_date>2010-04-07</start_date>
-    <due_date></due_date>
-    <done_ratio>20</done_ratio>
-    <estimated_hours>10.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Wed Apr 07 11:46:27 -0700 2010</created_on>
-    <updated_on>Tue Apr 13 11:06:08 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17319</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Bug" id="1"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <assigned_to name="Developer 001" id="26372"/>
-    <fixed_version name="6.2" id="565"/>
-    <parent id="17318"/>
-    <subject>bug1</subject>
-    <description></description>
-    <start_date>2010-04-07</start_date>
-    <due_date></due_date>
-    <done_ratio>60</done_ratio>
-    <estimated_hours>5.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Wed Apr 07 11:45:57 -0700 2010</created_on>
-    <updated_on>Wed Apr 14 15:40:38 -0700 2010</updated_on>
-  </issue>
-  <issue>
-    <id>17318</id>
-    <project name="ace" id="9579"/>
-    <tracker name="Feature" id="2"/>
-    <status name="New" id="1"/>
-    <priority name="Normal" id="4"/>
-    <author name="Alexey Skor" id="19640"/>
-    <fixed_version name="6.2" id="565"/>
-    <subject>feature1</subject>
-    <description></description>
-    <start_date>2010-04-07</start_date>
-    <due_date></due_date>
-    <done_ratio>33</done_ratio>
-    <estimated_hours>15.0</estimated_hours>
-    <custom_fields>
-      <custom_field name="Has been tested" id="1">0</custom_field>
-    </custom_fields>
-    <created_on>Wed Apr 07 11:45:37 -0700 2010</created_on>
-    <updated_on>Wed Apr 14 15:40:39 -0700 2010</updated_on>
-  </issue>
+	<issue>
+		<id>18156</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<parent id="18154" />
+		<subject>feature A - subitem1 - subsub1</subject>
+		<description></description>
+		<start_date>2010-04-14</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>2.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Wed Apr 14 13:56:30 -0700 2010</created_on>
+		<updated_on>Wed Apr 14 13:56:30 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>18155</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Developer 001" id="26372" />
+		<fixed_version name="6.2" id="565" />
+		<parent id="17636" />
+		<subject>feature A - subitem2</subject>
+		<description></description>
+		<start_date>2010-04-14</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>4.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Wed Apr 14 13:54:51 -0700 2010</created_on>
+		<updated_on>Wed Apr 14 15:39:30 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>18154</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Developer 001" id="26372" />
+		<fixed_version name="6.2" id="565" />
+		<parent id="17636" />
+		<subject>feature A - subitem1</subject>
+		<description></description>
+		<start_date>2010-04-14</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>2.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Wed Apr 14 13:53:47 -0700 2010</created_on>
+		<updated_on>Wed Apr 14 15:40:03 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17982</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Urgent" id="6" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>implement new GUI feature 123</subject>
+		<description></description>
+		<start_date>2010-04-13</start_date>
+		<due_date></due_date>
+		<done_ratio>10</done_ratio>
+		<estimated_hours>30.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Tue Apr 13 13:26:38 -0700 2010</created_on>
+		<updated_on>Tue Apr 13 13:26:38 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17964</id>
+		<project name="ace" id="9579" />
+		<tracker name="Bug" id="1" />
+		<status name="New" id="1" />
+		<priority name="High" id="5" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>some bug blocking feature A</subject>
+		<description></description>
+		<start_date>2010-04-13</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>1.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Tue Apr 13 10:02:06 -0700 2010</created_on>
+		<updated_on>Tue Apr 13 10:25:12 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17636</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>featureA</subject>
+		<description></description>
+		<start_date>2010-04-14</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>6.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Fri Apr 09 15:38:46 -0700 2010</created_on>
+		<updated_on>Wed Apr 14 13:56:30 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17617</id>
+		<project name="ace" id="9579" />
+		<tracker name="Bug" id="1" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>some bug</subject>
+		<description>description-line1
+			description-line2
+			description-line3</description>
+		<start_date>2010-04-09</start_date>
+		<due_date>2010-04-21</due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>2.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Fri Apr 09 12:17:15 -0700 2010</created_on>
+		<updated_on>Tue Apr 13 10:25:49 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17611</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>new feature 5</subject>
+		<description></description>
+		<start_date>2010-04-09</start_date>
+		<due_date></due_date>
+		<done_ratio>20</done_ratio>
+		<estimated_hours>25.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Fri Apr 09 11:17:13 -0700 2010</created_on>
+		<updated_on>Mon Apr 12 13:38:33 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17481</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>GUI feature - login forms</subject>
+		<description></description>
+		<start_date>2010-04-08</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours></estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Thu Apr 08 12:11:13 -0700 2010</created_on>
+		<updated_on>Thu Apr 08 12:14:41 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17321</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<parent id="17318" />
+		<subject>task1</subject>
+		<description>description-line1-task1
+			description-line2-task1
+			description-line3-task1</description>
+		<start_date>2010-04-07</start_date>
+		<due_date></due_date>
+		<done_ratio>20</done_ratio>
+		<estimated_hours>10.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Wed Apr 07 11:46:27 -0700 2010</created_on>
+		<updated_on>Tue Apr 13 11:06:08 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17319</id>
+		<project name="ace" id="9579" />
+		<tracker name="Bug" id="1" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<assigned_to name="Developer 001" id="26372" />
+		<fixed_version name="6.2" id="565" />
+		<parent id="17318" />
+		<subject>bug1</subject>
+		<description></description>
+		<start_date>2010-04-07</start_date>
+		<due_date></due_date>
+		<done_ratio>60</done_ratio>
+		<estimated_hours>5.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Wed Apr 07 11:45:57 -0700 2010</created_on>
+		<updated_on>Wed Apr 14 15:40:38 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>17318</id>
+		<project name="ace" id="9579" />
+		<tracker name="Feature" id="2" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Alexey Skor" id="19640" />
+		<fixed_version name="6.2" id="565" />
+		<subject>feature1</subject>
+		<description></description>
+		<start_date>2010-04-07</start_date>
+		<due_date></due_date>
+		<done_ratio>33</done_ratio>
+		<estimated_hours>15.0</estimated_hours>
+		<custom_fields>
+			<custom_field name="Has been tested" id="1">0</custom_field>
+		</custom_fields>
+		<created_on>Wed Apr 07 11:45:37 -0700 2010</created_on>
+		<updated_on>Wed Apr 14 15:40:39 -0700 2010</updated_on>
+	</issue>
+	<issue>
+		<id>210</id>
+		<project name="ace" id="9579" />
+		<tracker name="Bug" id="1" />
+		<status name="New" id="1" />
+		<priority name="Normal" id="4" />
+		<author name="Redmine Admin" id="1" />
+		<subject>testGetIssues: Sat Dec 18 11:47:13 PST 2010</subject>
+		<description></description>
+		<start_date>2010-12-18</start_date>
+		<due_date></due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours></estimated_hours>
+		<created_on>2010-12-18T11:49:53-08:00</created_on>
+		<updated_on>2010-12-18T11:49:53-08:00</updated_on>
+	</issue>
 </issues>
+
+
+
+
