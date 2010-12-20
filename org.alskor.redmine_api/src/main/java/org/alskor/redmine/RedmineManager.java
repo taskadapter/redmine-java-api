@@ -64,7 +64,7 @@ public class RedmineManager {
 
 	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
-	private static final int DEFAULT_TASKS_PER_PAGE = 100;
+	private static final int DEFAULT_TASKS_PER_PAGE = 25;
 
 	private static final int UNKNOWN = -1;
 
@@ -577,6 +577,7 @@ public class RedmineManager {
 		int loaded = -1;
 		int pageNum=1;
 		int loadedOnPreviousStep;
+		boolean readMore = false;
 		do {
 			loadedOnPreviousStep = loaded;
 			URL url = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
@@ -589,8 +590,15 @@ public class RedmineManager {
 			// assuming every page has the same number of items 
 			loaded = foundIssues.size();
 			allTasks.addAll(foundIssues);
+			
+			readMore = false;
+			if ((pageNum == 1) && loaded==tasksPerPage) {
+				readMore = true;
+			} else if (loaded ==loadedOnPreviousStep){
+				readMore = true;
+			}
 			pageNum++;
-		} while (loaded >=loadedOnPreviousStep);
+		} while (readMore);
 
 		return allTasks;
 	}
