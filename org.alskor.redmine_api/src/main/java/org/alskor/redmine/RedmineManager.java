@@ -525,15 +525,16 @@ public class RedmineManager {
 	}
 
 	public List<Issue> getIssues(String projectKey, String queryId) throws IOException, AuthenticationException {
-		if (mode.equals(REDMINE_VERSION.TRUNK)) {
-			return getIssuesTrunk(projectKey, queryId);
-		} else if (mode.equals(REDMINE_VERSION.V104)) {
+//		if (mode.equals(REDMINE_VERSION.TRUNK)) {
+//			return getIssuesTrunk(projectKey, queryId);
+//		} else if (mode.equals(REDMINE_VERSION.V104)) {
 			return getIssuesV104(projectKey, queryId);
-		}
-		throw new RuntimeException("unsupported mode: " + mode);
+//		}
+//		throw new RuntimeException("unsupported mode: " + mode);
 	}
 	
-	public List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
+	// XXX this method will be used soon instead of temporary getIssuesV104()
+	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
 		WebConnector c = new WebConnector();
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
@@ -568,39 +569,28 @@ public class RedmineManager {
 		return allTasks;
 	}
 
-	public List<Issue> getIssuesV104(String projectKey, String queryId) throws IOException, AuthenticationException {
+	private List<Issue> getIssuesV104(String projectKey, String queryId) throws IOException, AuthenticationException {
+//		System.out.println("using redmine 1.0.4 compatibility mode");
 		WebConnector c = new WebConnector();
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
-//		int offsetIssuesNum = 0;
-//		int totalIssuesFoundOnServer = UNKNOWN;
 		int loaded = -1;
 		int pageNum=1;
-		
+		int loadedOnPreviousStep;
 		do {
+			loadedOnPreviousStep = loaded;
 			URL url = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
 					pageNum);
 
 			StringBuffer responseXML = c.loadData(url);
 			System.err.println(responseXML);
 
-//			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
-//					.toString());
-			
 			List<Issue> foundIssues = parseIssuesFromXML(responseXML.toString());
 			// assuming every page has the same number of items 
 			loaded = foundIssues.size();
-//			System.err.println("totalIssuesFoundOnServer="
-//					+ totalIssuesFoundOnServer + " loaded = "
-//					+ loaded);
 			allTasks.addAll(foundIssues);
-//			offsetIssuesNum+= loaded;
-			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
-//			if (totalIssuesFoundOnServer == UNKNOWN) {
-//				totalIssuesFoundOnServer = loaded;
-//			}
 			pageNum++;
-		} while (loaded == 25);
+		} while (loaded >=loadedOnPreviousStep);
 
 		return allTasks;
 	}
@@ -720,7 +710,8 @@ public class RedmineManager {
 		this.tasksPerPage = tasksPerPage;
 	}
 	
-	public void setRedmineVersion(REDMINE_VERSION v){
+/*	public void setRedmineVersion(REDMINE_VERSION v){
 		mode = v;
 	}
+*/
 }
