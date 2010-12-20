@@ -623,11 +623,17 @@ public class RedmineManager {
 		String charset = "UTF-8";
 		URL url = null;
 		try {
-			String query = String.format("/issues.xml?project_id=%s&query_id=%s",
-					URLEncoder.encode(projectKey, charset),
-					URLEncoder.encode(queryId, charset));
-			query += "&page=" + pageNum;
+			String query = "/issues.xml";
+			query += "?page=" + pageNum;
 			query += "&per_page=" + tasksPerPage;
+			if ((projectKey != null) && (!projectKey.isEmpty())) {
+				query += String.format("&project_id=%s",
+						URLEncoder.encode(projectKey, charset));
+			}
+			if ((queryId != null) && (!queryId.isEmpty())) {
+				query += String.format("&query_id=%s",
+						URLEncoder.encode(queryId, charset));
+			}
 			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
 				query += String.format("&key=%s",
 						URLEncoder.encode(apiAccessKey, charset));
