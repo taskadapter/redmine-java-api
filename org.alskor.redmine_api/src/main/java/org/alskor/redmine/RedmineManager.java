@@ -590,7 +590,7 @@ public class RedmineManager {
 
 			StringBuffer responseXML = c.loadData(url);
 			String responseXmlString = responseXML.toString();
-			System.err.println(responseXmlString);
+//			System.err.println(responseXmlString);
 			if (pageNum == FIRST_REDMINE_PAGE) {
 				firstPage = responseXML;
 			} else {
