@@ -569,36 +569,51 @@ public class RedmineManager {
 		return allTasks;
 	}
 
+	// IMPORTANT!! this method works with both Redmine 1.0.4 and Redmine/TRUNK versions (Dec 22, 2010)
 	private List<Issue> getIssuesV104(String projectKey, String queryId) throws IOException, AuthenticationException {
 //		System.out.println("using redmine 1.0.4 compatibility mode");
 		WebConnector c = new WebConnector();
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
-		int loaded = -1;
-		int pageNum=1;
-		int loadedOnPreviousStep;
-		boolean readMore = false;
+//		int loaded = -1;
+		final int FIRST_REDMINE_PAGE = 1;
+		int pageNum = FIRST_REDMINE_PAGE;
+//		int loadedOnPreviousStep;
+//		boolean readMore = false;
+		// Redmine 1.0.4 (and Trunk at this moment - Dec 22, 2010) returns the same page1 when no other pages are available!!
+		StringBuffer firstPage=null;
+		
 		do {
-			loadedOnPreviousStep = loaded;
+//			loadedOnPreviousStep = loaded;
 			URL url = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
 					pageNum);
 
 			StringBuffer responseXML = c.loadData(url);
-			System.err.println(responseXML);
-
-			List<Issue> foundIssues = parseIssuesFromXML(responseXML.toString());
-			// assuming every page has the same number of items 
-			loaded = foundIssues.size();
-			allTasks.addAll(foundIssues);
-			
-			readMore = false;
-			if ((pageNum == 1) && loaded==tasksPerPage) {
-				readMore = true;
-			} else if (loaded ==loadedOnPreviousStep){
-				readMore = true;
+			String responseXmlString = responseXML.toString();
+			System.err.println(responseXmlString);
+			if (pageNum == FIRST_REDMINE_PAGE) {
+				firstPage = responseXML;
+			} else {
+				// check that the response is NOT equal to the First Page
+				// - this would indicate that no more pages are available;
+				if (firstPage.toString().equals(responseXmlString)) {
+					// done, no more pages. exit the loop
+					break;
+				}
 			}
+			List<Issue> foundIssues = parseIssuesFromXML(responseXmlString);
+			// assuming every page has the same number of items 
+//			loaded = foundIssues.size();
+			allTasks.addAll(foundIssues);
+
+//			readMore = false;
+//			if ((pageNum == 1) && loaded==tasksPerPage) {
+//				readMore = true;
+//			} else if (loaded ==loadedOnPreviousStep){
+//				readMore = true;
+//			}
 			pageNum++;
-		} while (readMore);
+		} while (true);
 
 		return allTasks;
 	}
