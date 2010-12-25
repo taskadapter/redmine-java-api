@@ -102,6 +102,8 @@
 		<zip destfile="${redmine_api.build.dir}/redmine_api.zip" >
 			<fileset dir="${redmine_api.build.dir}" includes="${api_jar_file_name}"/>
 			<fileset dir=".." includes="lib/**/*"/>
+			<fileset dir="${project_root}" includes="licenses.cmd"/>
+			<fileset dir="${project_root}" includes="licenses.sh"/>
 			<zipfileset dir="${httputils_build.dir}" includes="*.jar" prefix="lib"/>
 			<zipfileset dir="${TAutils.build.dir}" includes="*.jar" prefix="lib"/>
 <!--			<zipfileset dir="${samples.dir}" includes="*.java" prefix="sample"/> -->
