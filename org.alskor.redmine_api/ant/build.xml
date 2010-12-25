@@ -13,13 +13,20 @@
 
 	<property name="build.dir.classes" value="${redmine_api.build.dir}/classes" />
 	<property name="lib.dir" value="../lib" />
-	<property name="httputils_lib.dir" value="${project_root}/org.alskor.httputils/target/classes" />
-	<property name="TAutils.dir" value="${project_root}/com.alskor.taskadapter.util/target/classes" />
-
+	
+	<property name="httputils_build.dir" value="${project_root}/org.alskor.httputils/target" />
+	<property name="httputils_classes.dir" value="${httputils_build.dir}/classes" />
+	<property name="TAutils.build.dir" value="${project_root}/com.alskor.taskadapter.util/target" />
+	<property name="TAutils.classes.dir" value="${TAutils.build.dir}/classes" />
+	
+	<property name="javadoc.dir" value="../target/site/apidocs" />
+	
+<!--	<property name="samples.dir" value="${project_root}/redmine_api_sample_project/src" />-->
+	
 	<path id="redmine_api.classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar" />
-		<pathelement location="${httputils_lib.dir}" />
-		<pathelement location="${TAutils.dir}" />
+		<pathelement location="${httputils_classes.dir}" />
+		<pathelement location="${TAutils.classes.dir}" />
 	</path>
 
 	<path id="test_classpath">
@@ -30,9 +37,7 @@
 		<pathelement location="${junit.jar}"/>
 	</path>
 
-	<!--		<pathelement location="${build.dir.classes}"/> -->
-
-	<target name="build_redmine_api" depends="clean, compile, jar, compile_tests, test" />
+	<target name="build_redmine_api" depends="clean, compile, jar, compile_tests, test, zip" />
 
 	<target name="clean">
 		<delete dir="${redmine_api.build.dir}" />
@@ -94,9 +99,16 @@
 	</target>
 
 	<target name="zip">
-		<zip destfile="${redmine_api.build.dir}/redmine_api_full.zip" >
+		<zip destfile="${redmine_api.build.dir}/redmine_api.zip" >
 			<fileset dir="${redmine_api.build.dir}" includes="${api_jar_file_name}"/>
-			<fileset dir="../doc" includes="*"/>
+			<fileset dir=".." includes="lib/**/*"/>
+			<zipfileset dir="${httputils_build.dir}" includes="*.jar" prefix="lib"/>
+			<zipfileset dir="${TAutils.build.dir}" includes="*.jar" prefix="lib"/>
+<!--			<zipfileset dir="${samples.dir}" includes="*.java" prefix="sample"/> -->
+			
+			<zipfileset dir="${javadoc.dir}" includes="*" prefix="javadoc"/>
+			
+			<fileset dir="../doc" includes="**/*"/>
 		</zip>
 	</target>
 </project>
