@@ -51,6 +51,10 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
+import com.alskor.taskadapter.license.License;
+import com.alskor.taskadapter.license.LicenseManager;
+import com.alskor.taskadapter.license.LicenseValidationException;
+
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -68,8 +72,8 @@ public class RedmineManager {
 
 	private static final int UNKNOWN = -1;
 
-//	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
-//		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
+	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
+		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
 
 	private String host;
 	private String apiAccessKey;
@@ -84,9 +88,20 @@ public class RedmineManager {
 	private static boolean trialMode = true;
 	
 	static {
-		/*
-		License licenseRedmineAPI = LicenseManager.getRedmineApiLicense();
-		License licenseTaskAdapter = LicenseManager.getTaskAdapterLicense();
+		trialMode = true;
+		
+		License licenseRedmineAPI = null;
+		try {
+			licenseRedmineAPI = LicenseManager.getRedmineApiLicense();
+		} catch (LicenseValidationException e) {
+			// ignore, do not show the stacktrace!
+		}
+		License licenseTaskAdapter = null;
+		try {
+			licenseTaskAdapter = LicenseManager.getTaskAdapterLicense();
+		} catch (LicenseValidationException e) {
+			// ignore, do not show the stacktrace!
+		}
 
 		if (licenseRedmineAPI != null) { 
 			System.out.println("Redmine Java API: loaded valid license. Registered to: " + licenseRedmineAPI);
@@ -100,7 +115,7 @@ public class RedmineManager {
 		// still trial mode?
 		if (trialMode) {
 			System.err.println(LICENSE_ERROR_MESSAGE);
-		}*/
+		}
 	}
 
 	/**
@@ -356,22 +371,6 @@ public class RedmineManager {
 		try {
 			reader = new StringReader(xml);
 			resultList = (List) unmarshaller.unmarshal(reader);
-			if (trialMode) {
-//				int itemsToDelete = resultList.size() - LicenseManager.TRIAL_TASKS_NUMBER_LIMIT;
-//				if (itemsToDelete >0) {
-//					for (int i=0; i<itemsToDelete; i++) {
-//						// remove the last item
-//						resultList.remove(resultList.size());
-//					}
-//				for (Issue issue : resultList) {
-					// if (!issue.getSubject().startsWith(
-					// LicenseManager.TRIAL_PREFIX)) {
-					// issue.setSubject(LicenseManager.TRIAL_PREFIX
-					// + issue.getSubject());
-					// }
-//				}
-//				}
-			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -528,7 +527,17 @@ public class RedmineManager {
 //		if (mode.equals(REDMINE_VERSION.TRUNK)) {
 //			return getIssuesTrunk(projectKey, queryId);
 //		} else if (mode.equals(REDMINE_VERSION.V104)) {
-			return getIssuesV104(projectKey, queryId);
+		List<Issue> issues = getIssuesV104(projectKey, queryId);
+		
+		if (trialMode) {
+			List<Issue> trialList = new ArrayList<Issue>(issues.size()); 
+			for (int i=0; i<LicenseManager.TRIAL_TASKS_NUMBER_LIMIT; i++) {
+				trialList.add(issues.get(i));
+			}
+			issues = trialList;
+		}
+
+		return issues; 
 //		}
 //		throw new RuntimeException("unsupported mode: " + mode);
 	}
