@@ -1,39 +1,36 @@
 <project default="build_redmine_api">
 
 	<property file="build.properties" />
-	<property name="src.dir" value="src/main/java" />
-	<property name="src_resources.dir" value="src/main/resources" />
-	<property name="src_tests.dir" value="src/test/java" />
-	<property name="test_resources.dir" value="src/test/resources" />
+	<property name="project_root" value="../.." />
+	<property name="src.dir" value="../src/main/java" />
+	<property name="src_resources.dir" value="../src/main/resources" />
+	<property name="test_project.dir" value="${project_root}/org.alskor.redmine_api.tests" />
+	<property name="src_tests.dir" value="${test_project.dir}/src/test/java" />
+	<property name="test_resources.dir" value="${test_project.dir}/src/test/resources" />
 	<property name="redmine_api.build.dir" value="build" />
-	<property name="redmine_api.build.jarfile" value="${redmine_api.build.dir}/jar/${api_jar_file_name}" />
+	<property name="redmine_api.build.jarfile" value="${redmine_api.build.dir}/${api_jar_file_name}" />
+	<property name="junit.jar" value="${project_root}/lib/junit-4.8.2.jar" />
 
 	<property name="build.dir.classes" value="${redmine_api.build.dir}/classes" />
-	<property name="lib.dir" value="lib" />
+	<property name="lib.dir" value="../lib" />
+	<property name="httputils_lib.dir" value="${project_root}/org.alskor.httputils/target/classes" />
+	<property name="TAutils.dir" value="${project_root}/com.alskor.taskadapter.util/target/classes" />
 
 	<path id="redmine_api.classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<pathelement location="${httputils_lib.dir}" />
+		<pathelement location="${TAutils.dir}" />
 	</path>
 
 	<path id="test_classpath">
-		<!-- pathelement: one for each of the [directories] where class files, 
-		     log4j property files and other resources etc are to be found -->
 		<path refid="redmine_api.classpath" />
 		<pathelement location="${redmine_api.build.jarfile}" />
 		<pathelement location="${redmine_api.build.dir}/tests" />
 		<pathelement location="${test_resources.dir}" />
+		<pathelement location="${junit.jar}"/>
 	</path>
-	<!--
-	 	<path refid="redmine_api.classpath"/>
-		<pathelement location="${redmine_api.build.jarfile}"/>
-		<pathelement location="${redmine_api.build.dir}/tests"/>
-		<fileset dir="${test_resources.dir}" includes="**/*.*" />
--->
 
-	<!--
-	<pathelement location="${junit.jar}"/>-->
 	<!--		<pathelement location="${build.dir.classes}"/> -->
-	<!--		<path refid="redmine_api.classpath"/> -->
 
 	<target name="build_redmine_api" depends="clean, compile, jar, compile_tests, test" />
 
@@ -60,8 +57,8 @@
 	</target>
 
 	<target name="jar">
-		<mkdir dir="${redmine_api.build.dir}/jar" />
-		<jar destfile="${redmine_api.build.dir}/jar/${api_jar_file_name}" basedir="${redmine_api.build.dir}/classes">
+<!--		<mkdir dir="${redmine_api.build.dir}" />-->
+		<jar destfile="${redmine_api.build.dir}/${api_jar_file_name}" basedir="${redmine_api.build.dir}/classes">
 			<manifest>
 				<attribute name="Class-Path" value="castor-1.3.1/castor-1.3.1-anttasks.jar  
 					 castor-1.3.1/castor-1.3.1-codegen.jar 
@@ -94,5 +91,12 @@
 				</fileset>
 			</batchtest>
 		</junit>
+	</target>
+
+	<target name="zip">
+		<zip destfile="${redmine_api.build.dir}/redmine_api_full.zip" >
+			<fileset dir="${redmine_api.build.dir}" includes="${api_jar_file_name}"/>
+			<fileset dir="../doc" includes="*"/>
+		</zip>
 	</target>
 </project>
