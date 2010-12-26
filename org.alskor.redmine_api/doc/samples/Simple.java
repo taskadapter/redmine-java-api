@@ -5,7 +5,7 @@ import org.alskor.httputils.AuthenticationException;
 import org.alskor.redmine.RedmineManager;
 import org.alskor.redmine.beans.Issue;
 
-public class TryRedmineAPI {
+public class Simple {
 	private static String redmineHost = "https://www.hostedredmine.com";
 	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
 	private static String projectKey = "taskconnector-test";
