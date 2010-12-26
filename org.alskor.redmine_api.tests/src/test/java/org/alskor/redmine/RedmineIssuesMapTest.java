@@ -11,6 +11,7 @@ import java.util.List;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
+import org.alskor.redmine.internal.RedmineXMLParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,7 +29,7 @@ public class RedmineIssuesMapTest {
 	 // Is executed before each test method
 	public void setup() throws Exception {
 		String str = MyIOUtils.getResourceAsString(FILE_1_ISSUES_XML_FILE_NAME);
-		this.issuesList = RedmineManager.parseIssuesFromXML(str);
+		this.issuesList = RedmineXMLParser.parseIssuesFromXML(str);
 		
 		RedmineIssuesMap loader = new RedmineIssuesMap(issuesList);
 		issuesMap = loader.getIssuesMap();

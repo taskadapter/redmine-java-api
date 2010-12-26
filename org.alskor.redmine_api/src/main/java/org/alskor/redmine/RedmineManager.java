@@ -1,7 +1,6 @@
 package org.alskor.redmine;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
@@ -15,8 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -27,6 +24,7 @@ import org.alskor.httputils.WebConnector;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
+import org.alskor.redmine.internal.RedmineXMLParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -46,9 +44,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
 import com.alskor.taskadapter.license.License;
@@ -64,13 +60,7 @@ import com.alskor.taskadapter.license.LicenseValidationException;
 public class RedmineManager {
 	private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
 
-	private static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
-
-	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
-
 	private static final int DEFAULT_TASKS_PER_PAGE = 25;
-
-	private static final int UNKNOWN = -1;
 
 	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
 		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
@@ -79,7 +69,7 @@ public class RedmineManager {
 	private String apiAccessKey;
 	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
 
-	static enum REDMINE_VERSION {
+	private static enum REDMINE_VERSION {
 		V104, TRUNK
 	}
 	
@@ -188,7 +178,7 @@ public class RedmineManager {
 	private Issue sendRequestExpectResponse(HttpRequest request) throws IOException,AuthenticationException,
 		RuntimeException{
 		String responseXMLBody = sendRequestInternal(request);
-		Issue issueFromServer = parseIssueFromXML(responseXMLBody);
+		Issue issueFromServer = RedmineXMLParser.parseIssueFromXML(responseXMLBody);
 		return issueFromServer;
 	}
 	
@@ -259,24 +249,6 @@ public class RedmineManager {
 		return xml;
 	}
 	
-	public static List<Project> parseProjectsFromXML(String xml) {
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, ArrayList.class);
-		
-		List<Project> list = null;
-		StringReader reader = null;
-		try {
-			reader = new StringReader(xml);
-			list = (ArrayList<Project>)  unmarshaller.unmarshal(reader);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return list;
-	}
-
 	/**
 	 * Get available projects list.
 	 * 
@@ -286,23 +258,7 @@ public class RedmineManager {
 		URL url = buildGetProjectsURL();
 		WebConnector c = new WebConnector();
 		StringBuffer response = c.loadData(url);
-		return parseProjectsFromXML(response.toString());
-	}
-	
-	private static Unmarshaller getUnmarshaller(String configFile, Class classToUse) {
-		InputSource inputSource = new InputSource(
-				RedmineManager.class.getResourceAsStream(configFile));
-		Mapping mapping = new Mapping();
-		mapping.loadMapping(inputSource);
-
-		Unmarshaller unmarshaller;
-		try {
-			unmarshaller = new Unmarshaller(mapping);
-		} catch (MappingException e) {
-			throw new RuntimeException(e);
-		}
-		unmarshaller.setClass(classToUse);
-		return unmarshaller;
+		return RedmineXMLParser.parseProjectsFromXML(response.toString());
 	}
 	
 	/**
@@ -320,98 +276,6 @@ public class RedmineManager {
 		}
 	}
 
-	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, Issue.class);
-		
-		Issue issue = null;
-		StringReader reader = null;
-		try {
-//			System.err.println(xml);
-			reader = new StringReader(xml);
-			issue = (Issue) unmarshaller.unmarshal(reader);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return issue;
-	}
-	
-	public static Project parseProjectFromXML(String xml) throws RuntimeException {
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST,
-				Project.class);
-		
-		Project project = null;
-		StringReader reader = null;
-		try {
-			reader = new StringReader(xml);
-			project = (Project) unmarshaller.unmarshal(reader);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return project;
-	}
-
-	protected static List<Issue> parseIssuesFromXML(String xml)
-			throws RuntimeException {
-		xml = removeBadTags(xml);
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES,
-				ArrayList.class);
-
-		List<Issue> resultList = null;
-		StringReader reader = null;
-		try {
-			reader = new StringReader(xml);
-			resultList = (List) unmarshaller.unmarshal(reader);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return resultList;
-	}
-	
-	// see bug https://www.hostedredmine.com/issues/8240
-	private static String removeBadTags(String xml) {
-		return xml.replaceAll("<estimated_hours></estimated_hours>", "");
-	}
-
-	/** XML contains this line near the top:
-			<issues type="array" limit="25" total_count="103" offset="0">
-	  	need to parse "total_count" value
-	  	@return -1 (UNKNOWN) if can't parse - which means that the string is invalid / generated by an old Redmine version
-	 */
-	protected static int parseIssuesTotalCount(String issuesXML) {
-		String reg = "<issues type=\"array\" limit=.+ total_count=\""; //\\d+ \" offset=\".+";
-//		System.out.println(issuesXML);
-//		System.out.println(reg);
-		Pattern pattern = Pattern.compile(reg);
-		Matcher matcher = pattern.matcher(issuesXML);
-		int result = UNKNOWN;
-		if (matcher.find()) {
-		
-			int indexBeginNumber = matcher.end();
-			
-			String tmp1 = issuesXML.substring(indexBeginNumber);
-			int end = tmp1.indexOf('"');
-			String numStr = tmp1.substring(0, end);
-			result = Integer.parseInt(numStr);
-		}
-		return result;
-	
-	}
-	
 	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
 		List<Issue> createdIssues = new ArrayList<Issue>();
 		Iterator<Issue> it = tasks.iterator();
@@ -439,7 +303,7 @@ public class RedmineManager {
 		WebConnector c = new WebConnector();
 		StringBuffer response = c.loadData(url);
 
-		List<Issue> foundIssues = parseIssuesFromXML(response.toString());
+		List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(response.toString());
 		return foundIssues;
 	}
 	
@@ -480,14 +344,14 @@ public class RedmineManager {
 	
 	/**
 	 * 
-	 * @param projectKey string key like "project-ABC", NOT a database ID
+	 * @param projectKey string key like "project-ABC", NOT a database numeric ID
 	 * @return Redmine's project
 	 */
 	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException {
         String query = getURLProjectByKey(projectKey);
 		HttpGet http = new HttpGet(query);
 		String responseXMLBody = sendRequestInternal(http);
-		Project projectFromServer = parseProjectFromXML(responseXMLBody);
+		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(responseXMLBody);
 		return projectFromServer;
 	}
 
@@ -548,7 +412,7 @@ public class RedmineManager {
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
 		int offsetIssuesNum = 0;
-		int totalIssuesFoundOnServer = UNKNOWN;
+		int totalIssuesFoundOnServer = RedmineXMLParser.UNKNOWN;
 		int loaded = -1;
 //		int pageNum=0;
 		
@@ -558,10 +422,10 @@ public class RedmineManager {
 			StringBuffer responseXML = c.loadData(url);
 //			System.err.println("RedmineManager: "  + responseXML);
 
-			totalIssuesFoundOnServer = parseIssuesTotalCount(responseXML
+			totalIssuesFoundOnServer = RedmineXMLParser.parseIssuesTotalCount(responseXML
 					.toString());
 			
-			List<Issue> foundIssues = parseIssuesFromXML(responseXML.toString());
+			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXML.toString());
 			// assuming every page has the same number of items 
 			loaded = foundIssues.size();
 //			System.err.println("totalIssuesFoundOnServer="
@@ -570,7 +434,7 @@ public class RedmineManager {
 			allTasks.addAll(foundIssues);
 			offsetIssuesNum+= loaded;
 			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
-			if (totalIssuesFoundOnServer == UNKNOWN) {
+			if (totalIssuesFoundOnServer == RedmineXMLParser.UNKNOWN) {
 				totalIssuesFoundOnServer = loaded;
 			}
 		} while (offsetIssuesNum < totalIssuesFoundOnServer);
@@ -610,7 +474,7 @@ public class RedmineManager {
 					break;
 				}
 			}
-			List<Issue> foundIssues = parseIssuesFromXML(responseXmlString);
+			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXmlString);
 			// assuming every page has the same number of items 
 //			loaded = foundIssues.size();
 			allTasks.addAll(foundIssues);
@@ -686,14 +550,14 @@ public class RedmineManager {
 		setEntity(httpPost, createProjectXML);
 
 		String responseXMLBody = sendRequestInternal(httpPost);
-		Project createdProject = parseProjectFromXML(responseXMLBody);
+		Project createdProject = RedmineXMLParser.parseProjectFromXML(responseXMLBody);
 		return createdProject;
 	}
 
 	private String convertToXML(Project project) {
 		StringWriter writer = new StringWriter();
 		try {
-			Marshaller m = getMarshaller(MAPPING_PROJECTS_LIST, writer);
+			Marshaller m = getMarshaller(RedmineXMLParser.MAPPING_PROJECTS_LIST, writer);
 			m.marshal(project);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -739,11 +603,17 @@ public class RedmineManager {
 
 	}
 
+	/**
+	 * This number of tasks will be requested from Redmine server in getIssues() call. 
+	 */
 	public int getTasksPerPage() {
 		return tasksPerPage;
 	}
 
 	// TODO add junit test
+	/**
+	 * This number of tasks will be requested from Redmine server in getIssues() call. 
+	 */
 	public void setTasksPerPage(int tasksPerPage) {
 		this.tasksPerPage = tasksPerPage;
 	}

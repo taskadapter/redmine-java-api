@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.internal.RedmineXMLParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +22,7 @@ public class ProjectsTest {
 	// Is executed before each test method
 	public void setup() throws Exception {
 		String text = MyIOUtils.getResourceAsString("projects.xml");
-		projectsList = RedmineManager.parseProjectsFromXML(text);
+		projectsList = RedmineXMLParser.parseProjectsFromXML(text);
 	}
 
 	@Test
