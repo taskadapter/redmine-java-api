@@ -2,7 +2,6 @@ package org.alskor.redmine;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -20,12 +19,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.alskor.taskadapter.util.MyIOUtils;
-
-
 public class RedmineManagerTest {
 
-	private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
 
 	private RedmineManager mgr;
 
@@ -250,22 +245,6 @@ public class RedmineManagerTest {
 	}*/
 
 	@Test
-	public void testParseIssuesFromEmptyXML() {
-		// issues xml with no individual issues in the list should not break the
-		// loader.
-		// see http://code.google.com/p/redmine-connect/issues/detail?id=57
-
-		try {
-			String str = MyIOUtils.getResourceAsString(FILE_EMPTY_ISSUES_XML);
-			List<Issue> issues = RedmineManager.parseIssuesFromXML(str);
-			assertTrue(issues.isEmpty());
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Error:" + e);
-		}
-		
-	}
-	@Test
 	public void testUpdateIssue() {
 		try {
 			Issue issue = new Issue();
@@ -360,35 +339,6 @@ public class RedmineManagerTest {
 		}
 	}
 	
-	@Test
-	public void testCountIssues() {
-		try {
-			String xml = MyIOUtils.getResourceAsString("test_issues_big_file.xml");
-			List<Issue> issues = RedmineManager.parseIssuesFromXML(xml);
-			assertEquals(40, issues.size());
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-
-	}
-	
-	@Test
-	public void testCreateIssueNonUnicodeSymbols() {
-		String xml;
-		try {
-			xml = MyIOUtils.getResourceAsString("issues_foreign_symbols.xml");
-			List<Issue> issues = RedmineManager.parseIssuesFromXML(xml);
-			// must be 1 issue in the file
-			assertTrue(issues.size()==1);
-			Issue toCreate = issues.get(0);
-			Issue created = mgr.createIssue(PROJECT_KEY, toCreate);
-			assertEquals("Example with accents Ação", created.getSubject());
-			
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-
-	}
 	
 	@Test
 	@Ignore
@@ -402,51 +352,6 @@ public class RedmineManagerTest {
 		fail("not implemented");
 	}
 
-	@Test
-	public void testParseProjectXML() {
-		String xml;
-		try {
-			xml = MyIOUtils.getResourceAsString("project.xml");
-			Project project = RedmineManager.parseProjectFromXML(xml);
-			Integer expectedProjectID = 308;
-			String expectedName = "taskconnector-test";
-			String expectedKey = "taskconnector-test";
-			assertEquals(expectedProjectID, project.getId());
-			assertEquals(expectedName, project.getName());
-			assertEquals(expectedKey, project.getIdentifier());
-			
-			/**
-		    <tracker name="Feature" id="2"/>
-		    <tracker name="Support" id="3"/>
-		    <tracker name="Bug" id="1"/>
-		    <tracker name="Task" id="4"/>
-		    */
-			List<Tracker> trackers = project.getTrackers();
-			assertNotNull("Trackers list must not be NULL", trackers);
-			assertEquals(4, trackers.size());
-			
-			Tracker tracker = project.getTrackerByName("Support");
-			assertNotNull("Tracker must be not null", tracker);
-			Integer expectedTrackerId = 3;
-			assertEquals("checking id of 'support' tracker", expectedTrackerId, tracker.getId());
-			
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
-	
-	@Test
-	public void testParseProjectNoTrackerXML() {
-		String xml;
-		try {
-			xml = MyIOUtils.getResourceAsString("project_no_trackers.xml");
-			Project project = RedmineManager.parseProjectFromXML(xml);
-			List<Tracker> trackers = project.getTrackers();
-			assertNull("Trackers list must be NULL", trackers);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}
 	
 	// XXX this test fails, it's reported to Redmine.
 	@Ignore
@@ -513,14 +418,6 @@ public class RedmineManagerTest {
 		return project;
 	}
 	
-	@Test
-	public void testParseIssuesTotalCount() {
-		String tmp = "...xml... <issues type=\"array\" limit=\"25\" total_count=\"155\" offset=\"0\">....";
-		int x = RedmineManager.parseIssuesTotalCount(tmp);
-		assertEquals(155,x);
-		System.out.println("success: parsed total_count attribute from issues xml. value= " + x);
-	}
-	
 	// XXX not completed. this test only works with hostedredmine.com. finish this test later
 /*	@Test
 	public void testPaging() {
@@ -538,29 +435,17 @@ public class RedmineManagerTest {
 		}
 	}
 */
+
 	@Test
-	public void testNullEstimatedTime(){
-		String str;
+	public void testCreateIssueNonUnicodeSymbols() {
 		try {
-			str = MyIOUtils.getResourceAsString("issues.xml");
-			List<Issue> issues = RedmineManager.parseIssuesFromXML(str);
-			Issue issue210 = findIssueInList(issues, 210);
-			assertNotNull(issue210);
-			
-			// must be NULL and not "0"
-			assertNull("estimated time must be null", issue210.getEstimatedHours());
-		} catch (IOException e) {
+			String nonLatinSymbols = "Example with accents Ação";
+			Issue toCreate = new Issue();
+			toCreate.setSubject(nonLatinSymbols);
+			Issue created = mgr.createIssue(PROJECT_KEY, toCreate);
+			assertEquals(nonLatinSymbols, created.getSubject());
+		} catch (Exception e) {
 			fail(e.getMessage());
 		}
-	}
-	
-	private static Issue findIssueInList(List<Issue> list, Integer id) {
-		Issue result = null;
-		for(Issue issue:list) {
-			if (issue.getId().equals(id)){
-				result = issue;
-			}
-		}
-		return result;
 	}
 }
