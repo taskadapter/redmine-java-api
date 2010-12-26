@@ -4,7 +4,8 @@ Bundle-Name: Redmine_api
 Bundle-SymbolicName: org.alskor.redmine_api
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Alskor
-Require-Bundle: org.alskor.httputils;bundle-version="1.0.0"
+Require-Bundle: org.alskor.httputils;bundle-version="1.0.0",
+ com.alskor.taskadapter.util;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.alskor.redmine,

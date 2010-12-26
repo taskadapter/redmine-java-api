@@ -23,7 +23,5 @@
 	<classpathentry kind="lib" path="lib/httpcomponents-client-4.0.1/httpclient-4.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/httpcomponents-client-4.0.1/httpcore-4.0.1.jar" sourcepath="C:/Users/ask/.m2/repository/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1-sources.jar"/>
 	<classpathentry kind="lib" path="lib/httpcomponents-client-4.0.1/httpmime-4.0.1.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.alskor.httputils"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/com.alskor.taskadapter.util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
