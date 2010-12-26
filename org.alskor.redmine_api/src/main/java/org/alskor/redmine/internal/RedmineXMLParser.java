@@ -3,6 +3,7 @@ package org.alskor.redmine.internal;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,35 +18,37 @@ import org.xml.sax.InputSource;
 public class RedmineXMLParser {
 
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
-			Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(RedmineXMLParser.MAPPING_ISSUES, Issue.class);
-			
-			Issue issue = null;
-			StringReader reader = null;
-			try {
-	//			System.err.println(xml);
-				reader = new StringReader(xml);
-				issue = (Issue) unmarshaller.unmarshal(reader);
-	
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (reader != null) {
-					reader.close();
-				}
-			}
-			return issue;
-		}
+		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
+				RedmineXMLParser.MAPPING_ISSUES, Issue.class);
 
-	public static Project parseProjectFromXML(String xml) throws RuntimeException {
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(RedmineXMLParser.MAPPING_PROJECTS_LIST,
-				Project.class);
-		
+		Issue issue = null;
+		StringReader reader = null;
+		try {
+			// System.err.println(xml);
+			reader = new StringReader(xml);
+			issue = (Issue) unmarshaller.unmarshal(reader);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				reader.close();
+			}
+		}
+		return issue;
+	}
+
+	public static Project parseProjectFromXML(String xml)
+			throws RuntimeException {
+		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
+				RedmineXMLParser.MAPPING_PROJECTS_LIST, Project.class);
+
 		Project project = null;
 		StringReader reader = null;
 		try {
 			reader = new StringReader(xml);
 			project = (Project) unmarshaller.unmarshal(reader);
-	
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -58,16 +61,18 @@ public class RedmineXMLParser {
 
 	public static List<Issue> parseIssuesFromXML(String xml)
 			throws RuntimeException {
+		verifyStartsAsXML(xml);
+		
 		xml = RedmineXMLParser.removeBadTags(xml);
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(RedmineXMLParser.MAPPING_ISSUES,
-				ArrayList.class);
-	
+		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
+				RedmineXMLParser.MAPPING_ISSUES, ArrayList.class);
+
 		List<Issue> resultList = null;
 		StringReader reader = null;
 		try {
 			reader = new StringReader(xml);
 			resultList = (List) unmarshaller.unmarshal(reader);
-	
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -112,13 +117,14 @@ public class RedmineXMLParser {
 	}
 
 	public static List<Project> parseProjectsFromXML(String xml) {
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(RedmineXMLParser.MAPPING_PROJECTS_LIST, ArrayList.class);
-		
+		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
+				RedmineXMLParser.MAPPING_PROJECTS_LIST, ArrayList.class);
+
 		List<Project> list = null;
 		StringReader reader = null;
 		try {
 			reader = new StringReader(xml);
-			list = (ArrayList<Project>)  unmarshaller.unmarshal(reader);
+			list = (ArrayList<Project>) unmarshaller.unmarshal(reader);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -129,12 +135,13 @@ public class RedmineXMLParser {
 		return list;
 	}
 
-	private static Unmarshaller getUnmarshaller(String configFile, Class classToUse) {
+	private static Unmarshaller getUnmarshaller(String configFile,
+			Class classToUse) {
 		InputSource inputSource = new InputSource(
 				RedmineManager.class.getResourceAsStream(configFile));
 		Mapping mapping = new Mapping();
 		mapping.loadMapping(inputSource);
-	
+
 		Unmarshaller unmarshaller;
 		try {
 			unmarshaller = new Unmarshaller(mapping);
@@ -149,4 +156,22 @@ public class RedmineXMLParser {
 	public static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
 	public static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
+	/**
+	 * @throws  RuntimeException if the text does not start with a valid XML tag.
+	 */
+	private static boolean verifyStartsAsXML(String text) {
+		String XML_START_PATTERN = "<?xml version="; // "1.0"
+														// encoding="UTF-8"?>";
+		String lines[] = text.split("\\r?\\n");
+		if ((lines.length > 0) && lines[0].startsWith(XML_START_PATTERN)) {
+			return true;
+		} else {
+			// show not more than 500 chars
+			int charsToShow = text.length() < 500 ? text.length() : 500;
+			throw new RuntimeException(
+					"RedmineXMLParser: can't parse the response. This is not a valid XML:\n\n"
+							+ text.substring(0, charsToShow) + "...");
+		}
+
+	}
 }

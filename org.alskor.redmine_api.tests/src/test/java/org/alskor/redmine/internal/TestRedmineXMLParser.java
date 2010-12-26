@@ -148,4 +148,18 @@ public class TestRedmineXMLParser {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testParseInvalidPage() {
+		try {
+			String text = MyIOUtils
+					.getResourceAsString("invalid_page.txt");
+			RedmineXMLParser.parseIssuesFromXML(text);
+			fail("Must have failed with RuntimeException");
+		} catch (IOException e) {
+			fail(e.getMessage());
+		} catch (RuntimeException e) {
+			System.out.println("Got expected RuntimeException when parsing invalid xml");
+		}
+	}
 }
