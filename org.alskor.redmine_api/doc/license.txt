@@ -1,7 +1,8 @@
 Software License Agreement.
 
 This license agreement covers
-"Redmine Java API" product ("Software")    (http://www.taskadapter.com).
+"Redmine Java API" product (referred as "Software" in this document) 
+http://www.taskadapter.com
 
 1. This is an agreement between Licensor and Licensee, who is being licensed to use the named Software.
 
