@@ -44,6 +44,9 @@
  		<field name="dueDate" type="string" handler="org.alskor.redmine.internal.RedmineDateHandler">
 			<bind-xml name="due_date" node="element" />
 		</field>
+		<field name="description" type="string">
+			<bind-xml name="description" node="element" />
+		</field>
 
 	</class>
 	

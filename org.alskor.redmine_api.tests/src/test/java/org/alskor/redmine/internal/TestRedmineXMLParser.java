@@ -162,4 +162,18 @@ public class TestRedmineXMLParser {
 			System.out.println("Got expected RuntimeException when parsing invalid xml");
 		}
 	}
+	
+	@Test
+	public void testParseDescription() {
+		try {
+			String xml = MyIOUtils
+					.getResourceAsString("issues.xml");
+			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
+			Issue issue210 = findIssueInList(issues, 210);
+			assertTrue(issue210.getDescription().startsWith("Announcements2010/12/22 Announcing the Eclipse Mobile"));
+			assertTrue(issue210.getDescription().endsWith("series. For December 6-10, here are the DemoCamps taking place"));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
 }
