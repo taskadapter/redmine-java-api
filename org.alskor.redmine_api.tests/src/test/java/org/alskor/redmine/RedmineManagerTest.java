@@ -364,16 +364,8 @@ public class RedmineManagerTest {
 		fail("not implemented");
 	}
 
-	
-	// XXX this test fails, it's reported to Redmine.
-	@Ignore
 	@Test
 	public void testCreateProject() {
-		
-//		Tracker tracker = new Tracker(trackerBugId, trackerBugName);
-//		List<Tracker> trackers = new ArrayList<Tracker>();
-//		trackers.add(tracker);
-//		projectToCreate.setTrackers(trackers);
 		Project projectToCreate = generateRandomProject();
 		try {
 			Project createdProject = mgr.createProject(projectToCreate);
@@ -384,9 +376,13 @@ public class RedmineManagerTest {
 			assertEquals(projectToCreate.getName(), createdProject.getName());
 			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
 			
-			List<Tracker> trackers = createdProject.getTrackers();
-			assertNotNull("checking that project has some trackers", trackers);
-			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
+			/* 
+			 * Redmine 1.0.5 and Trunk (pre-1.1 version) do not provide list of trackers with the project.
+			 * see enhancement request http://www.redmine.org/issues/7184
+			 */
+//			List<Tracker> trackers = createdProject.getTrackers();
+//			assertNotNull("checking that project has some trackers", trackers);
+//			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -460,4 +456,25 @@ public class RedmineManagerTest {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testCreateIssueSummaryOnly() {
+		try {
+			Issue issueToCreate = new Issue();
+			issueToCreate.setSubject("This is the summary line 123");
+
+			Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+			assertNotNull("Checking returned result", newIssue);
+			assertNotNull("New issue must have some ID", newIssue.getId());
+
+			// check AUTHOR
+			String EXPECTED_USER_FULL_NAME  = Config.getParam("createissue.userFirstAndLastName");
+			assertEquals(EXPECTED_USER_FULL_NAME, newIssue.getAuthor().getFullName());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
+
 }
