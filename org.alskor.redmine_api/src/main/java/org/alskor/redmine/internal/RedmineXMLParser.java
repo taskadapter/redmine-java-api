@@ -3,7 +3,6 @@ package org.alskor.redmine.internal;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +23,7 @@ public class RedmineXMLParser {
 		Issue issue = null;
 		StringReader reader = null;
 		try {
-			// System.err.println(xml);
+//			 System.err.println(xml);
 			reader = new StringReader(xml);
 			issue = (Issue) unmarshaller.unmarshal(reader);
 

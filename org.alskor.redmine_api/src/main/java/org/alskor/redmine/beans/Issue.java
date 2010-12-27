@@ -21,6 +21,7 @@ public class Issue {
 	private Date startDate;
 	private Date dueDate;
 	private Tracker tracker;
+	private String description;
 	
 	public Project getProject() {
 		return project;
@@ -131,6 +132,14 @@ public class Issue {
 
 	public void setTracker(Tracker tracker) {
 		this.tracker = tracker;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 }

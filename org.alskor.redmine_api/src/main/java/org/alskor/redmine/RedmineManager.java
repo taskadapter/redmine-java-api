@@ -245,6 +245,11 @@ public class RedmineManager {
 		if (issue.getEstimatedHours() != null) {
 			xml += "<estimated_hours>" + issue.getEstimatedHours() + "</estimated_hours>";
 		}
+		
+		if (issue.getDescription() != null) {
+			xml += "<description>" + issue.getDescription() + "</description>";
+		}
+		
 		xml += "</issue>";
 		return xml;
 	}
@@ -468,13 +473,17 @@ public class RedmineManager {
 				firstPage = responseXML;
 			} else {
 				// check that the response is NOT equal to the First Page
-				// - this would indicate that no more pages are available;
+				// - this would indicate that no more pages are available (for Redmine 1.0.*);
 				if (firstPage.toString().equals(responseXmlString)) {
 					// done, no more pages. exit the loop
 					break;
 				}
 			}
 			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXmlString);
+			if (foundIssues.size() == 0) {
+				// and this is to provide compatibility with Redmine 1.1.0
+				break;
+			}
 			// assuming every page has the same number of items 
 //			loaded = foundIssues.size();
 			allTasks.addAll(foundIssues);

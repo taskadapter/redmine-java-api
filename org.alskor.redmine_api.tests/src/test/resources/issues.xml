@@ -265,7 +265,27 @@
 		<priority name="Normal" id="4" />
 		<author name="Redmine Admin" id="1" />
 		<subject>testGetIssues: Sat Dec 18 11:47:13 PST 2010</subject>
-		<description></description>
+		<description>Announcements2010/12/22 Announcing the Eclipse Mobile
+			Plugin-FestThe Eclipse Mobile Plugin-Fest is a two day workshop to
+			test interoperability and compatibility between Eclipse-based plugins
+			and products used by mobile developers.2010/12/22 EclipseCon 2011
+			Program AnnouncedThe Eclipse Foundation is pleased to announce the
+			technical program for EclipseCon 2011. The 4-day conference programm
+			will feature 20 in-depth tutorials and over 100 sessions convering a
+			wide range of topics, in...2010/12/08 Eclipse Community Awards 2011
+			Open for NominationsThe Eclipse Community Awards 2011 are open for
+			nominations. Help Eclipse honour the best individuals, projects and
+			technologies from our community by telling us about your favourites.
+			The deadline for nominations is January 28, 2011. You can check out
+			the ...2010/12/02 EclipseCon Audition Sessions, Take 2The EclipseCon
+			program committee is holding another series of auditions on December
+			15, 2010. If you're interested in speaking at EclipseCon, the
+			audition sessions are your chance to present a short version of your
+			talk proposal to the program committee and the Eclipse community.
+			These auditi...2010/11/29 Eclipse DemoCamps Dec. 6-10: Berlin,
+			Florence, KarlsruheThere are only a few DemoCamps left in the fall
+			series. For December 6-10, here are the DemoCamps taking place
+		</description>
 		<start_date>2010-12-18</start_date>
 		<due_date></due_date>
 		<done_ratio>0</done_ratio>

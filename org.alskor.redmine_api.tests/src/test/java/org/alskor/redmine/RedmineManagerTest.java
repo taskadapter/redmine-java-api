@@ -53,6 +53,11 @@ public class RedmineManagerTest {
 			issueToCreate.setDueDate(due.getTime());
 			User assignee = getOurUser();
 			issueToCreate.setAssignee(assignee);
+			
+			String description = "This is the description for the new task." +
+					"\nIt has several lines." +
+					"\nThis is the last line.";
+			issueToCreate.setDescription(description);
 
 			float estimatedHours = 44;
 			issueToCreate.setEstimatedHours(estimatedHours);
@@ -92,6 +97,13 @@ public class RedmineManagerTest {
 
 			// check ESTIMATED TIME
 			assertEquals((Float) estimatedHours, newIssue.getEstimatedHours());
+			
+			// check multi-line DESCRIPTION
+			String regexpStripExtra = "\\r|\\n|\\s";
+			description = description.replaceAll(regexpStripExtra, "");
+			String actualDescription = newIssue.getDescription();
+			actualDescription = actualDescription.replaceAll(regexpStripExtra, "");
+			assertEquals(description, actualDescription);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
