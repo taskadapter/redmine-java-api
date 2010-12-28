@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -206,29 +205,30 @@ public class RedmineManagerTest {
 
 	@Test
 	public void testWrongCredentialsOnCreateIssue() throws RuntimeException {
+		
 		RedmineManager redmineMgrEmpty = new RedmineManager(Config.getHost(), null);
 
-		// running with NO API access key set
+		// NO API access key set
 		Issue issue = new Issue();
 		issue.setSubject("test zzx");
 		try {
 			redmineMgrEmpty.createIssue(PROJECT_KEY, issue);
 			fail("Must have failed with '401 Not authorized'");
-		} catch (IOException e) {
-			fail("Some exception : " + e);
 		} catch (AuthenticationException e) {
 			System.out.println("Got expected AuthenticationException.");
+		} catch (Exception e) {
+			fail("Got unexpected exception : " + e);
 		}
-
-		// set invalid key
+		
+		// set invalid API access key
 		RedmineManager redmineMgrInvalidKey = new RedmineManager(Config.getHost(), "wrong_key");
 		try {
 			redmineMgrInvalidKey.createIssue(PROJECT_KEY, issue);
 			fail("Must have failed with '401 Not authorized'");
-		} catch (IOException e) {
-			fail("Some exception : " + e);
 		} catch (AuthenticationException e) {
 			System.out.println("Got expected AuthenticationException.");
+		} catch (Exception e) {
+			fail("Got unexpected exception : " + e);
 		}
 
 	}
@@ -265,7 +265,7 @@ public class RedmineManagerTest {
 			String changedSubject = "changed subject";
 			newIssue.setSubject(changedSubject);
 
-			mgr.updateIssue(PROJECT_KEY, newIssue);
+			mgr.updateIssue(newIssue);
 
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
 
@@ -467,6 +467,22 @@ public class RedmineManagerTest {
 	}
 
 	@Test
+	public void testCreateIssueInvalidProjectKey() {
+		try {
+			Issue issueToCreate = new Issue();
+			issueToCreate.setSubject("Summary line 100");
+			String invalidProjectKey = "someNotExistingProjectKey";
+			mgr.createIssue(invalidProjectKey, issueToCreate);
+			
+			fail("Must have failed with NotFoundException because we provided invalid project key.");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException: " + e.getMessage());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
+	@Test
 	public void testGetProjectNonExistingId() {
 		try {
 			mgr.getProjectByIdentifier("some-non-existing-key");
@@ -474,7 +490,6 @@ public class RedmineManagerTest {
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
@@ -487,7 +502,6 @@ public class RedmineManagerTest {
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
 		}
 	}
@@ -501,7 +515,21 @@ public class RedmineManagerTest {
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			e.printStackTrace();
+			fail();
+		}
+	}
+
+	@Test
+	public void testUpdateIssueNonExistingId() {
+		try {
+			int nonExistingId = 999999;
+			Issue issue = new Issue();
+			issue.setId(nonExistingId);
+			mgr.updateIssue(issue);
+			fail("Must have failed with NotFoundException because we provided invalid issue ID.");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException.");
+		} catch (Exception e) {
 			fail();
 		}
 	}
