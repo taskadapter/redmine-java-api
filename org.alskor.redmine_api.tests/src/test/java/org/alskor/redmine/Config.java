@@ -35,10 +35,11 @@ public class Config {
 		return properties.getProperty("redmine.projectKey");
 	}
 
-	public static String getQueryId() {
-		return properties.getProperty("redmine.queryId");
+	public static Integer getQueryId() {
+		String s = properties.getProperty("redmine.queryId");
+		return Integer.parseInt(s);
 	}
-	
+
 	public static String getParam(String key) {
 		return properties.getProperty(key);
 	}

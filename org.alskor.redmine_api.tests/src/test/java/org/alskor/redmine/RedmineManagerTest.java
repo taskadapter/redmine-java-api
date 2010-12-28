@@ -328,7 +328,7 @@ public class RedmineManagerTest {
 			issueToCreate.setSubject("testGetIssues: " + new Date());
 			Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
 
-			String queryIdIssuesCreatedLast2Days = Config.getQueryId();
+			Integer queryIdIssuesCreatedLast2Days = Config.getQueryId();
 			List<Issue> issues = mgr.getIssues(PROJECT_KEY, queryIdIssuesCreatedLast2Days);
 			System.out.println("getIssues() loaded " + issues.size() + " issues using query #" + queryIdIssuesCreatedLast2Days);
 			assertTrue(issues.size()>0);
@@ -345,6 +345,19 @@ public class RedmineManagerTest {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetIssuesInvalidQueryId() {
+		try {
+			Integer invalidQueryId = 9999999;
+			mgr.getIssues(PROJECT_KEY, invalidQueryId);
+			fail("Must have failed with NotFoundException because query ID is invalid");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException:" + e.getMessage());
+		} catch (Exception e) {
 			fail(e.getMessage());
 		}
 	}
