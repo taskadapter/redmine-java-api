@@ -121,16 +121,16 @@ public class RedmineManager {
 		this.apiAccessKey = apiAccessKey;
 	}
 
-	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
+	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException {
         String query = getCreateIssueURI();
 		HttpPost http = new HttpPost(query);
 		String xmlBody = getIssueXML(projectKey, issue);
 		setEntity(http, xmlBody);
 		HttpResponse response = sendRequestInternal(http);
-//		int code = getCode(response);
-//		if (code == HttpStatus.SC_NOT_FOUND) {
-//			throw new NotFoundException("Issue with id '" + id + "' is not found.");
-//		}
+		int code = getCode(response);
+		if (code == HttpStatus.SC_NOT_FOUND) {
+			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
+		}
 		String body = getBody(response);
 		Issue newIssue = RedmineXMLParser.parseIssueFromXML(body);
 		return newIssue;
@@ -162,7 +162,7 @@ public class RedmineManager {
         return host + "/projects/" + key + ".xml?key=" +apiAccessKey;
 	}
 	
-	public void updateIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
+	public void updateIssue(Issue issue) throws IOException,AuthenticationException, NotFoundException {
 		/* note: This method cannot return the updated Issue from Redmine 
 		 * because the server does not provide any XML in response.
 		 */
@@ -170,18 +170,21 @@ public class RedmineManager {
 		HttpPut httpRequest = new HttpPut(query);
 
 		// XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
-		String xmlBody = getIssueXML(projectKey, issue);
+		String NO_PROJECT_KEY = null;
+		String xmlBody = getIssueXML(NO_PROJECT_KEY, issue);
 
 		setEntity(httpRequest, xmlBody);
-		sendRequestInternal(httpRequest);
+		HttpResponse response = sendRequestInternal(httpRequest);
+		int code = getCode(response);
+		if (code == HttpStatus.SC_NOT_FOUND) {
+			throw new NotFoundException("Issue with id="+ issue.getId() + " is not found.");
+		}
 	}
 	
 	private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
 		StringEntity entity = new StringEntity(xmlBody, "UTF-8");
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
-
-//		System.out.println(request.getRequestLine() + "  -> " + xmlBody);
 	}
 	
 	// TODO maybe add NotFoundException to this method itself rather than to calling methods?
@@ -228,7 +231,11 @@ public class RedmineManager {
 	// Can't use Castor here because this "post" format differs from "get" one.
 	// see http://www.redmine.org/issues/6128#note-2 for details
 	private String getIssueXML(String projectKey, Issue issue) {
-		String xml = "<issue>" + "<project_id>" + projectKey + "</project_id>";
+		String xml = "<issue>";
+		if (projectKey != null) {
+			// projectKey is required for "new issue" request, but not for "update issue" one.
+			xml += "<project_id>" + projectKey + "</project_id>";
+		}
 		if (issue.getParentId() != null) {
 			xml += "<parent_issue_id>" + issue.getParentId() + "</parent_issue_id>";
 		}
