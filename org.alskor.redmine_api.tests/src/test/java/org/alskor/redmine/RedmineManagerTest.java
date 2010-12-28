@@ -1,7 +1,7 @@
 package org.alskor.redmine;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -11,9 +11,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.alskor.httputils.AuthenticationException;
+import org.alskor.httputils.NotFoundException;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
-import org.alskor.redmine.beans.Tracker;
 import org.alskor.redmine.beans.User;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -351,19 +351,6 @@ public class RedmineManagerTest {
 		}
 	}
 	
-	
-	@Test
-	@Ignore
-	public void testTrackerName() {
-		fail("not implemented");
-	}
-
-	@Test
-	@Ignore
-	public void testGetProject() {
-		fail("not implemented");
-	}
-
 	@Test
 	public void testCreateProject() {
 		Project projectToCreate = generateRandomProject();
@@ -390,9 +377,10 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testUpdateProject() {
+	public void testCreateGetUpdateDeleteProject() {
 		Project projectToCreate = generateRandomProject();
 		try {
+			projectToCreate.setIdentifier("zzz");
 			Project createdProject = mgr.createProject(projectToCreate);
 			String key = createdProject.getIdentifier();
 			String newDescr = "NEW123";
@@ -403,10 +391,13 @@ public class RedmineManagerTest {
 			mgr.updateProject(createdProject);
 			
 			Project updatedProject = mgr.getProjectByIdentifier(key);
+			assertNotNull(updatedProject);
 			
 			assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
 			assertEquals(newName, updatedProject.getName());
 			assertEquals(newDescr, updatedProject.getDescription());
+			
+			mgr.deleteProject(key);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -477,4 +468,30 @@ public class RedmineManagerTest {
 		}
 	}
 
+	@Test
+	public void testDeleteNonExistingProject() {
+		try {
+			mgr.deleteProject("some-non-existing-key");
+			fail("Must have failed with NotFoundException");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+	
+	@Test
+	public void testGetIssueNonExistingId() {
+		try {
+			int someNonExistingID = 999999;
+			mgr.getIssueById(someNonExistingID);
+			fail("Must have failed with NotFoundException.");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail();
+		}
+	}
 }
