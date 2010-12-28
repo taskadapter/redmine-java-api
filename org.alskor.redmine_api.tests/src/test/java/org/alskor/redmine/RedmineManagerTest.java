@@ -155,7 +155,7 @@ public class RedmineManagerTest {
 			// try to find the issue
 			List<Issue> foundIssues = mgr.getIssuesBySummary(PROJECT_KEY,
 					summary);
-			System.out.println("foundIssues: " + foundIssues);
+//			System.out.println("foundIssues: " + foundIssues);
 
 			assertNotNull("Checking if search results is not NULL", foundIssues);
 			assertTrue("Search results must be not empty",
@@ -546,4 +546,5 @@ public class RedmineManagerTest {
 			fail();
 		}
 	}
+	
 }
