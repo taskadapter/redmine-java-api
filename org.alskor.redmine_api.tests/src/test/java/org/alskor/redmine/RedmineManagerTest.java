@@ -1,7 +1,7 @@
 package org.alskor.redmine;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -16,11 +16,9 @@ import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class RedmineManagerTest {
-
 
 	private RedmineManager mgr;
 
@@ -468,6 +466,19 @@ public class RedmineManagerTest {
 		}
 	}
 
+	@Test
+	public void testGetProjectNonExistingId() {
+		try {
+			mgr.getProjectByIdentifier("some-non-existing-key");
+			fail("Must have failed with NotFoundException");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException.");
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+	
 	@Test
 	public void testDeleteNonExistingProject() {
 		try {
