@@ -184,6 +184,8 @@ public class RedmineManager {
 //		System.out.println(request.getRequestLine() + "  -> " + xmlBody);
 	}
 	
+	// TODO maybe add NotFoundException to this method itself rather than to calling methods?
+	// this aproach has pros and cons...
 	private HttpResponse sendRequestInternal(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
 //		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -368,10 +370,14 @@ public class RedmineManager {
 	 * @param projectKey string key like "project-ABC", NOT a database numeric ID
 	 * @return Redmine's project
 	 */
-	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException {
+	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLProjectByKey(projectKey);
 		HttpGet http = new HttpGet(query);
 		HttpResponse response = sendRequestInternal(http);
+		int code = getCode(response);
+		if (code == HttpStatus.SC_NOT_FOUND) {
+			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
+		}
 		String body = getBody(response); 
 		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(body);
 		return projectFromServer;
