@@ -20,6 +20,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.alskor.httputils.AuthenticationException;
+import org.alskor.httputils.NotFoundException;
 import org.alskor.httputils.WebConnector;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
@@ -30,8 +31,10 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -69,11 +72,11 @@ public class RedmineManager {
 	private String apiAccessKey;
 	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
 
-	private static enum REDMINE_VERSION {
-		V104, TRUNK
-	}
+//	private static enum REDMINE_VERSION {
+//		V104, TRUNK
+//	}
 	
-	private REDMINE_VERSION mode = REDMINE_VERSION.V104;
+//	private REDMINE_VERSION mode = REDMINE_VERSION.V104;
 	
 	private static boolean trialMode = true;
 	
@@ -120,11 +123,17 @@ public class RedmineManager {
 
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
         String query = getCreateIssueURI();
-		HttpPost httpPost = new HttpPost(query);
+		HttpPost http = new HttpPost(query);
 		String xmlBody = getIssueXML(projectKey, issue);
-
-		setEntity(httpPost, xmlBody);
-		return sendRequestExpectResponse(httpPost);
+		setEntity(http, xmlBody);
+		HttpResponse response = sendRequestInternal(http);
+//		int code = getCode(response);
+//		if (code == HttpStatus.SC_NOT_FOUND) {
+//			throw new NotFoundException("Issue with id '" + id + "' is not found.");
+//		}
+		String body = getBody(response);
+		Issue newIssue = RedmineXMLParser.parseIssueFromXML(body);
+		return newIssue;
 	}
 	
 	/**
@@ -149,8 +158,8 @@ public class RedmineManager {
         return host + "/issues/" + id + ".xml?key=" +apiAccessKey;
 	}
 
-	private String getURLProjectByKey(String id){
-        return host + "/projects/" + id + ".xml?key=" +apiAccessKey;
+	private String getURLProjectByKey(String key){
+        return host + "/projects/" + key + ".xml?key=" +apiAccessKey;
 	}
 	
 	public void updateIssue(String projectKey, Issue issue) throws IOException,AuthenticationException {
@@ -175,21 +184,13 @@ public class RedmineManager {
 //		System.out.println(request.getRequestLine() + "  -> " + xmlBody);
 	}
 	
-	private Issue sendRequestExpectResponse(HttpRequest request) throws IOException,AuthenticationException,
-		RuntimeException{
-		String responseXMLBody = sendRequestInternal(request);
-		Issue issueFromServer = RedmineXMLParser.parseIssueFromXML(responseXMLBody);
-		return issueFromServer;
-	}
-	
-	private String sendRequestInternal(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
+	private HttpResponse sendRequestInternal(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
 //		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		wrapClient(httpclient);
 		
 		HttpResponse response = httpclient.execute((HttpUriRequest)request);
-		HttpEntity responseEntity = response.getEntity();
-
+//		HttpEntity responseEntity = response.getEntity();
 		
 		// System.out.println("----------------------------------------");
 		System.out.println(response.getStatusLine());
@@ -203,16 +204,24 @@ public class RedmineManager {
 //			System.out.println("Response content length: "
 //					+ responseEntity.getContentLength());
 //		}
-		String responseBody = EntityUtils.toString(responseEntity);
 		// System.out.println(responseBody);
 		httpclient.getConnectionManager().shutdown();
-		return responseBody;
+//		String responseBody = EntityUtils.toString(responseEntity);
+		return response;
 	}
 
 	static String REDMINE_START_DATE_FORMAT = "yyyy-MM-dd";
 	static SimpleDateFormat sdf =       new SimpleDateFormat(REDMINE_START_DATE_FORMAT);
 
+	private static int getCode(HttpResponse response) {
+		return response.getStatusLine().getStatusCode();
+	}
 	
+	private static String getBody(HttpResponse response) throws ParseException, IOException {
+		HttpEntity responseEntity = response.getEntity();
+		String responseBody = EntityUtils.toString(responseEntity);
+		return responseBody;
+	}
 	  
 	// Can't use Castor here because this "post" format differs from "get" one.
 	// see http://www.redmine.org/issues/6128#note-2 for details
@@ -341,10 +350,17 @@ public class RedmineManager {
 		return url;
 	}
 
-	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, RuntimeException {
+	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLIssueById(id);
 		HttpGet http = new HttpGet(query);
-		return sendRequestExpectResponse(http);
+		HttpResponse response = sendRequestInternal(http);
+		int code = getCode(response);
+		if (code == HttpStatus.SC_NOT_FOUND) {
+			throw new NotFoundException("Issue with id '" + id + "' is not found.");
+		}
+		String body = getBody(response);
+		Issue issue = RedmineXMLParser.parseIssueFromXML(body);
+		return issue;
 	}
 	
 	/**
@@ -355,11 +371,27 @@ public class RedmineManager {
 	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException {
         String query = getURLProjectByKey(projectKey);
 		HttpGet http = new HttpGet(query);
-		String responseXMLBody = sendRequestInternal(http);
-		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(responseXMLBody);
+		HttpResponse response = sendRequestInternal(http);
+		String body = getBody(response); 
+		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(body);
 		return projectFromServer;
 	}
 
+	/**
+	 * @param projectKey string key like "project-ABC", NOT a database numeric ID
+	 * 
+	 * @throws NotFoundException if the project with the given key is not found 
+	 */
+	public void deleteProject(String projectKey) throws IOException, AuthenticationException, NotFoundException {
+        String query = getURLProjectByKey(projectKey);
+        HttpDelete http = new HttpDelete(query);
+		HttpResponse response = sendRequestInternal(http);
+		int code = getCode(response);
+		if (code == HttpStatus.SC_NOT_FOUND) {
+			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
+		}
+	}
+	
 	// XXX this duplicates code in SSLSomething class.
 	private static HttpClient wrapClient(HttpClient base) {
 		try {
@@ -558,8 +590,9 @@ public class RedmineManager {
 //		System.out.println("create project:" + createProjectXML);
 		setEntity(httpPost, createProjectXML);
 
-		String responseXMLBody = sendRequestInternal(httpPost);
-		Project createdProject = RedmineXMLParser.parseProjectFromXML(responseXMLBody);
+		HttpResponse response = sendRequestInternal(httpPost);
+		String body = getBody(response);
+		Project createdProject = RedmineXMLParser.parseProjectFromXML(body);
 		return createdProject;
 	}
 
