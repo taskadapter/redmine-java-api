@@ -7,12 +7,10 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.net.ssl.SSLContext;
@@ -31,7 +29,6 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -112,8 +109,12 @@ public class RedmineManager {
 	}
 
 	/**
-	 * @param host complete URI, including protocol and port number. sample: http://demo.redmine.org:8080
-	 * @param apiAccessKey Redmine API authentication key.
+	 * Creates an instance of RedmineManager class. Host and apiAccessKey are not checked at this moment.
+	 * 
+	 * @param host complete Redmine server web URI, including protocol and port number. Example: http://demo.redmine.org:8080
+	 * @param apiAccessKey Redmine API access key. It is shown on "My Account" / "API access key" webpage 
+	 *   (check  <i>http://redmine_server_url/my/account<i> URL).
+	 *   This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public". 
 	 */
 	public RedmineManager(String host, String apiAccessKey) {
 		super();
@@ -121,18 +122,40 @@ public class RedmineManager {
 		this.apiAccessKey = apiAccessKey;
 	}
 
+	/**
+	 * Sample usage:
+	 * <p>
+	 * 
+	 * <pre>
+	 * {@code
+	 *   Issue issueToCreate = new Issue();
+	 *   issueToCreate.setSubject("This is the summary line 123");
+	 *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+	 * }
+	 * <p>
+	 * 
+	 * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
+	 * @param issue the Issue object to create on the server.
+	 * 
+	 * @return the newly created Issue.
+	 * 
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException
+	 * the project with the given projectKey is not found
+	 */
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException {
         String query = getCreateIssueURI();
 		HttpPost http = new HttpPost(query);
 		String xmlBody = getIssueXML(projectKey, issue);
 		setEntity(http, xmlBody);
-		HttpResponse response = sendRequestInternal(http);
-		int code = getCode(response);
-		if (code == HttpStatus.SC_NOT_FOUND) {
+		Response response = sendRequest(http);
+		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
 		}
-		String body = getBody(response);
-		Issue newIssue = RedmineXMLParser.parseIssueFromXML(body);
+		Issue newIssue = RedmineXMLParser.parseIssueFromXML(response.getBody());
 		return newIssue;
 	}
 	
@@ -162,7 +185,17 @@ public class RedmineManager {
         return host + "/projects/" + key + ".xml?key=" +apiAccessKey;
 	}
 	
-	public void updateIssue(Issue issue) throws IOException,AuthenticationException, NotFoundException {
+	/**
+	 * 
+	 * @param issue the Issue to update on the server. issue.getId() is used for identification.
+	 *  
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException the issue with the required ID is not found
+	 */
+	public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException {
 		/* note: This method cannot return the updated Issue from Redmine 
 		 * because the server does not provide any XML in response.
 		 */
@@ -174,9 +207,8 @@ public class RedmineManager {
 		String xmlBody = getIssueXML(NO_PROJECT_KEY, issue);
 
 		setEntity(httpRequest, xmlBody);
-		HttpResponse response = sendRequestInternal(httpRequest);
-		int code = getCode(response);
-		if (code == HttpStatus.SC_NOT_FOUND) {
+		Response response = sendRequest(httpRequest);
+		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Issue with id="+ issue.getId() + " is not found.");
 		}
 	}
@@ -187,24 +219,26 @@ public class RedmineManager {
 		request.setEntity(entity);
 	}
 	
-	// TODO maybe add NotFoundException to this method itself rather than to calling methods?
-	// this aproach has pros and cons...
-	private HttpResponse sendRequestInternal(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
+	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
 //		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		wrapClient(httpclient);
 		
-		HttpResponse response = httpclient.execute((HttpUriRequest)request);
-//		HttpEntity responseEntity = response.getEntity();
+		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
 		
 		// System.out.println("----------------------------------------");
-		System.out.println(response.getStatusLine());
-		int responseCode = response.getStatusLine().getStatusCode();
+		System.out.println(httpResponse.getStatusLine());
+		int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode ==	HttpStatus.SC_UNAUTHORIZED) {
 			// TODO should I show this key in the clear text?
 			throw new AuthenticationException("Authorization error for API access key = " + apiAccessKey);
 		}
-		
+		HttpEntity responseEntity = httpResponse.getEntity();
+		String responseBody = EntityUtils.toString(responseEntity);
+
+		// have to fill our own object, otherwise there's no guarantee 
+		// that the request body can be retrieved later ("socket closed" exception can occur) 
+		Response r = new Response(responseCode, responseBody);
 //		if (responseEntity != null) {
 //			System.out.println("Response content length: "
 //					+ responseEntity.getContentLength());
@@ -212,22 +246,29 @@ public class RedmineManager {
 		// System.out.println(responseBody);
 		httpclient.getConnectionManager().shutdown();
 //		String responseBody = EntityUtils.toString(responseEntity);
-		return response;
+		return r;
 	}
-
+	
+	class Response {
+		private int code;
+		private String body;
+		public Response(int code, String body) {
+			super();
+			this.code = code;
+			this.body = body;
+		}
+		public int getCode() {
+			return code;
+		}
+		public String getBody() {
+			return body;
+		}
+		
+	}
+	
 	static String REDMINE_START_DATE_FORMAT = "yyyy-MM-dd";
 	static SimpleDateFormat sdf =       new SimpleDateFormat(REDMINE_START_DATE_FORMAT);
 
-	private static int getCode(HttpResponse response) {
-		return response.getStatusLine().getStatusCode();
-	}
-	
-	private static String getBody(HttpResponse response) throws ParseException, IOException {
-		HttpEntity responseEntity = response.getEntity();
-		String responseBody = EntityUtils.toString(responseEntity);
-		return responseBody;
-	}
-	  
 	// Can't use Castor here because this "post" format differs from "get" one.
 	// see http://www.redmine.org/issues/6128#note-2 for details
 	private String getIssueXML(String projectKey, Issue issue) {
@@ -273,9 +314,13 @@ public class RedmineManager {
 	}
 	
 	/**
-	 * Get available projects list.
+	 * Load the list of projects available to the user, which is represented by the API access key.
 	 * 
 	 * @return list of Project objects
+	 * 
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
 	 */
 	public List<Project> getProjects() throws IOException,AuthenticationException{
 		URL url = buildGetProjectsURL();
@@ -299,28 +344,33 @@ public class RedmineManager {
 		}
 	}
 
-	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
-		List<Issue> createdIssues = new ArrayList<Issue>();
-		Iterator<Issue> it = tasks.iterator();
-		while (it.hasNext()) {
-			Issue issueToCreate = it.next();
-			try {
-				Issue newIssue = createIssue(projectKey, issueToCreate);
-				createdIssues.add(newIssue);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return createdIssues;
-	}
+//	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
+//		List<Issue> createdIssues = new ArrayList<Issue>();
+//		Iterator<Issue> it = tasks.iterator();
+//		while (it.hasNext()) {
+//			Issue issueToCreate = it.next();
+//			try {
+//				Issue newIssue = createIssue(projectKey, issueToCreate);
+//				createdIssues.add(newIssue);
+//			} catch (Exception e) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+//		return createdIssues;
+//	}
 	
 	/**
 	 * There could be several issues with the same summary, so the method returns List. 
 	 * 
 	 * @param summaryField
+	 * 
 	 * @return empty list if not issues with this summary field exist, never NULL
+	 * 
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
 	 */
-	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws NoSuchAlgorithmException, IOException, AuthenticationException {
+	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException {
 		URL url = getQueryIssueBySummaryURL(projectKey, summaryField);
 		
 		WebConnector c = new WebConnector();
@@ -359,48 +409,62 @@ public class RedmineManager {
 		return url;
 	}
 
+	/**
+	 * 
+	 * @param id the Redmine issue ID
+	 * @return Issue object
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException the issue with the given id is not found on the server
+	 */
 	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLIssueById(id);
 		HttpGet http = new HttpGet(query);
-		HttpResponse response = sendRequestInternal(http);
-		int code = getCode(response);
-		if (code == HttpStatus.SC_NOT_FOUND) {
+		Response response = sendRequest(http);
+		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Issue with id '" + id + "' is not found.");
 		}
-		String body = getBody(response);
-		Issue issue = RedmineXMLParser.parseIssueFromXML(body);
+		Issue issue = RedmineXMLParser.parseIssueFromXML(response.getBody());
 		return issue;
 	}
 	
 	/**
 	 * 
 	 * @param projectKey string key like "project-ABC", NOT a database numeric ID
+	 * 
 	 * @return Redmine's project
+	 * 
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException the project with the given key is not found
 	 */
 	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLProjectByKey(projectKey);
 		HttpGet http = new HttpGet(query);
-		HttpResponse response = sendRequestInternal(http);
-		int code = getCode(response);
-		if (code == HttpStatus.SC_NOT_FOUND) {
+		Response response = sendRequest(http);
+		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
 		}
-		String body = getBody(response); 
-		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(body);
+		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(response.getBody());
 		return projectFromServer;
 	}
 
 	/**
 	 * @param projectKey string key like "project-ABC", NOT a database numeric ID
-	 * 
-	 * @throws NotFoundException if the project with the given key is not found 
+	 *
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException if the project with the given key is not found
 	 */
 	public void deleteProject(String projectKey) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLProjectByKey(projectKey);
         HttpDelete http = new HttpDelete(query);
-		HttpResponse response = sendRequestInternal(http);
-		int code = getCode(response);
-		if (code == HttpStatus.SC_NOT_FOUND) {
+		Response response = sendRequest(http);
+		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
 		}
 	}
@@ -437,7 +501,23 @@ public class RedmineManager {
 		}
 	}
 
-	public List<Issue> getIssues(String projectKey, String queryId) throws IOException, AuthenticationException {
+	/**
+	 * 
+	 * @param projectKey
+	 * @param queryId id of the saved query in Redmine. the query must be accessible to the user 
+	 *   represented by the API access key (if the Redmine project requires authorization). 
+	 *   This parameter is <b>optional<b>, NULL can be provided to get all available issues.
+	 * 
+	 * @return list of Issue objects
+	 * @throws IOException
+	 * 
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 *             
+	 * @see Issue
+	 */
+	public List<Issue> getIssues(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException {
 //		if (mode.equals(REDMINE_VERSION.TRUNK)) {
 //			return getIssuesTrunk(projectKey, queryId);
 //		} else if (mode.equals(REDMINE_VERSION.V104)) {
@@ -457,7 +537,7 @@ public class RedmineManager {
 	}
 	
 	// XXX this method will be used soon instead of temporary getIssuesV104()
-	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
+/*	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
 		WebConnector c = new WebConnector();
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
@@ -491,40 +571,41 @@ public class RedmineManager {
 
 		return allTasks;
 	}
-
+*/
+	
 	// IMPORTANT!! this method works with both Redmine 1.0.4 and Redmine/TRUNK versions (Dec 22, 2010)
-	private List<Issue> getIssuesV104(String projectKey, String queryId) throws IOException, AuthenticationException {
-//		System.out.println("using redmine 1.0.4 compatibility mode");
-		WebConnector c = new WebConnector();
+	private List<Issue> getIssuesV104(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException {
 		List<Issue>  allTasks = new ArrayList<Issue>();
 		
-//		int loaded = -1;
 		final int FIRST_REDMINE_PAGE = 1;
 		int pageNum = FIRST_REDMINE_PAGE;
-//		int loadedOnPreviousStep;
-//		boolean readMore = false;
 		// Redmine 1.0.4 (and Trunk at this moment - Dec 22, 2010) returns the same page1 when no other pages are available!!
-		StringBuffer firstPage=null;
+		String firstPage=null;
 		
 		do {
-//			loadedOnPreviousStep = loaded;
-			URL url = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
+			String query = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
 					pageNum);
 
-			StringBuffer responseXML = c.loadData(url);
-			String responseXmlString = responseXML.toString();
+			HttpGet http = new HttpGet(query);
+			Response response = sendRequest(http);
+			
+			if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
+				throw new NotFoundException("Project with key '" + projectKey + "' or query with ID =" + queryId + " is not found.");
+			}
+			String body = response.getBody();
+			
 //			System.err.println(responseXmlString);
 			if (pageNum == FIRST_REDMINE_PAGE) {
-				firstPage = responseXML;
+				firstPage = body;
 			} else {
 				// check that the response is NOT equal to the First Page
 				// - this would indicate that no more pages are available (for Redmine 1.0.*);
-				if (firstPage.toString().equals(responseXmlString)) {
+				if (firstPage.equals(body)) {
 					// done, no more pages. exit the loop
 					break;
 				}
 			}
-			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXmlString);
+			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(body);
 			if (foundIssues.size() == 0) {
 				// and this is to provide compatibility with Redmine 1.1.0
 				break;
@@ -548,54 +629,83 @@ public class RedmineManager {
 	/**
 	 * sample: http://demo.redmine.org/projects/ace/issues.xml?query_id=302
 	 */
-	private URL buildGetIssuesByQueryURL(String projectKey, String queryId, int offsetIssuesNum) {
-		String charset = "UTF-8";
-		URL url = null;
-		try {
-			String query = String.format("/issues.xml?project_id=%s&query_id=%s",
-					URLEncoder.encode(projectKey, charset),
-					URLEncoder.encode(queryId, charset));
-			query += "&offset=" + offsetIssuesNum;
-			query += "&limit=" + tasksPerPage;
-			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
-				query += String.format("&key=%s",
-						URLEncoder.encode(apiAccessKey, charset));
-			}
-			url = new URL(host + query);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return url;
+//	private URL buildGetIssuesByQueryURL(String projectKey, String queryId, int offsetIssuesNum) {
+//		String charset = "UTF-8";
+//		URL url = null;
+//		try {
+//			String query = String.format("/issues.xml?project_id=%s&query_id=%s",
+//					URLEncoder.encode(projectKey, charset),
+//					URLEncoder.encode(queryId, charset));
+//			query += "&offset=" + offsetIssuesNum;
+//			query += "&limit=" + tasksPerPage;
+//			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
+//				query += String.format("&key=%s",
+//						URLEncoder.encode(apiAccessKey, charset));
+//			}
+//			url = new URL(host + query);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//		return url;
+//
+//	}
 
-	}
-
-	private URL buildGetIssuesByQueryURLRedmine104(String projectKey, String queryId, int pageNum) {
+	private String buildGetIssuesByQueryURLRedmine104(String projectKey, Integer queryId, int pageNum) {
 		String charset = "UTF-8";
-		URL url = null;
+//		URL url = null;
+		String query = host + "/issues.xml";
+
 		try {
-			String query = "/issues.xml";
 			query += "?page=" + pageNum;
 			query += "&per_page=" + tasksPerPage;
 			if ((projectKey != null) && (!projectKey.isEmpty())) {
 				query += String.format("&project_id=%s",
 						URLEncoder.encode(projectKey, charset));
 			}
-			if ((queryId != null) && (!queryId.isEmpty())) {
-				query += String.format("&query_id=%s",
-						URLEncoder.encode(queryId, charset));
+			if (queryId != null) {
+				query += "&query_id=" +	queryId.toString();
 			}
 			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
 				query += String.format("&key=%s",
 						URLEncoder.encode(apiAccessKey, charset));
 			}
-			url = new URL(host + query);
+//			url = new URL(host + query);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return url;
+		return query;
 
 	}
 
+	/**
+	 * Sample usage:
+	 * <p>
+	 * 
+	 * <pre>
+	 * {@code
+	 * 	Project project = new Project();
+	 * 	Long timeStamp = Calendar.getInstance().getTimeInMillis();
+	 * 	String key = &quot;projkey&quot; + timeStamp;
+	 * 	String name = &quot;project number &quot; + timeStamp;
+	 * 	String description = &quot;some description for the project&quot;;
+	 * 	project.setIdentifier(key);
+	 * 	project.setName(name);
+	 * 	project.setDescription(description);
+	 * 
+	 * 	Project createdProject = mgr.createProject(project);
+	 * }
+	 * </pre>
+	 * 
+	 * @param project
+	 *            project to create on the server
+	 * 
+	 * @return the newly created Project object.
+	 * 
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 */
 	public Project createProject(Project project) throws IOException,AuthenticationException {
         String query = buildCreateProjectURI();
 		HttpPost httpPost = new HttpPost(query);
@@ -603,9 +713,8 @@ public class RedmineManager {
 //		System.out.println("create project:" + createProjectXML);
 		setEntity(httpPost, createProjectXML);
 
-		HttpResponse response = sendRequestInternal(httpPost);
-		String body = getBody(response);
-		Project createdProject = RedmineXMLParser.parseProjectFromXML(body);
+		Response response = sendRequest(httpPost);
+		Project createdProject = RedmineXMLParser.parseProjectFromXML(response.getBody());
 		return createdProject;
 	}
 
@@ -644,6 +753,14 @@ public class RedmineManager {
 		return marshaller;
 	}
 
+	/**
+	 * 
+	 * @param project
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 */
 	public void updateProject(Project project) throws IOException,
 			AuthenticationException {
 		/*
@@ -654,8 +771,7 @@ public class RedmineManager {
 		HttpPut httpRequest = new HttpPut(query);
 		String projectXML = convertToXML(project);
 		setEntity(httpRequest, projectXML);
-		sendRequestInternal(httpRequest);
-
+		sendRequest(httpRequest);
 	}
 
 	/**
