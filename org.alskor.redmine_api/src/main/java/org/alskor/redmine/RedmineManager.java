@@ -590,7 +590,7 @@ public class RedmineManager {
 			Response response = sendRequest(http);
 			
 			if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
-				throw new NotFoundException("Project with key '" + projectKey + "' or query with ID =" + queryId + " is not found.");
+				throw new NotFoundException("Project with key '" + projectKey + "' or query with ID " + queryId + " is not found on the server.");
 			}
 			String body = response.getBody();
 			
