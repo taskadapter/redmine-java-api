@@ -4,11 +4,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>main</artifactId>
-    <groupId>org.alskor.taskconverter</groupId>
+    <groupId>com.taskconverter</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>org.alskor.taskconverter</groupId>
-  <artifactId>org.alskor.redmine_api</artifactId>
+
+  <artifactId>redmine_api</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>eclipse-plugin</packaging>
 
