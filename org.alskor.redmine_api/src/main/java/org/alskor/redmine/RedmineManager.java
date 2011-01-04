@@ -47,9 +47,9 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.xml.sax.InputSource;
 
-import com.alskor.taskadapter.license.License;
-import com.alskor.taskadapter.license.LicenseManager;
-import com.alskor.taskadapter.license.LicenseValidationException;
+import com.taskadapter.license.License;
+import com.taskadapter.license.LicenseManager;
+import com.taskadapter.license.LicenseValidationException;
 
 
 /**

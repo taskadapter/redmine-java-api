@@ -14,7 +14,7 @@ import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.Tracker;
 import org.junit.Test;
 
-import com.alskor.taskadapter.util.MyIOUtils;
+import com.taskadapter.util.MyIOUtils;
 
 public class TestRedmineXMLParser {
 	private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
