@@ -16,7 +16,7 @@
 	
 	<property name="httputils_build.dir" value="${project_root}/org.alskor.httputils/target" />
 	<property name="httputils_classes.dir" value="${httputils_build.dir}/classes" />
-	<property name="TAutils.build.dir" value="${project_root}/com.alskor.taskadapter.util/target" />
+	<property name="TAutils.build.dir" value="${project_root}/com.taskadapter.util/target" />
 	<property name="TAutils.classes.dir" value="${TAutils.build.dir}/classes" />
 	
 	<property name="javadoc.dir" value="../target/site/apidocs" />
