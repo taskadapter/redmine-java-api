@@ -139,7 +139,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testFindIssuesBySummary() {
+	public void testGetIssuesBySummary() {
 		String summary = "issue with subject ABC";
 		try {
 			Issue issue = new Issue();

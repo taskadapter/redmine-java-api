@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -19,7 +17,6 @@ import javax.net.ssl.X509TrustManager;
 
 import org.alskor.httputils.AuthenticationException;
 import org.alskor.httputils.NotFoundException;
-import org.alskor.httputils.WebConnector;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
@@ -323,27 +320,20 @@ public class RedmineManager {
 	 *             requires authorization. Check the constructor arguments.
 	 */
 	public List<Project> getProjects() throws IOException,AuthenticationException{
-		URL url = buildGetProjectsURL();
-		WebConnector c = new WebConnector();
-		StringBuffer response = c.loadData(url);
-		return RedmineXMLParser.parseProjectsFromXML(response.toString());
+		String query = buildGetProjectsURLString();
+		HttpGet http = new HttpGet(query);
+		Response response = sendRequest(http);
+		return RedmineXMLParser.parseProjectsFromXML(response.getBody());
 	}
 	
-	/**
-	 * sample: http://demo.redmine.org/projects.xml?key=abc
-	 */
-	private URL buildGetProjectsURL() {
+	private String buildGetProjectsURLString() {
 		String query = host + "/projects.xml";
 		if (apiAccessKey != null) {
 			query += "?key=" + apiAccessKey;
 		}
-		try {
-			return new URL(query);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException("can't create URL for this string: '" + query + "'. Reason: " +e);
-		}
+		return query;
 	}
-
+	
 //	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
 //		List<Issue> createdIssues = new ArrayList<Issue>();
 //		Iterator<Issue> it = tasks.iterator();
@@ -371,16 +361,15 @@ public class RedmineManager {
 	 *             requires authorization. Check the constructor arguments.
 	 */
 	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException {
-		URL url = getQueryIssueBySummaryURL(projectKey, summaryField);
-		
-		WebConnector c = new WebConnector();
-		StringBuffer response = c.loadData(url);
+		String query = buildQueryIssueBySummaryURL(projectKey, summaryField);
+		HttpGet http = new HttpGet(query);
+		Response response = sendRequest(http);
 
-		List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(response.toString());
+		List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(response.getBody());
 		return foundIssues;
 	}
 	
-	private URL getQueryIssueBySummaryURL(String projectKey, String issueSummary) {
+	private String buildQueryIssueBySummaryURL(String projectKey, String issueSummary) {
 		String charset = "UTF-8";
 		String query;
 		try {
@@ -399,14 +388,7 @@ public class RedmineManager {
 				throw new RuntimeException(e);
 			}
 		}
-		URL url;
-		try {
-			url = new URL(host + query);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
-		
-		return url;
+		return host + query;
 	}
 
 	/**
@@ -469,7 +451,6 @@ public class RedmineManager {
 		}
 	}
 	
-	// XXX this duplicates code in SSLSomething class.
 	private static HttpClient wrapClient(HttpClient base) {
 		try {
 			SSLContext ctx = SSLContext.getInstance("TLS");
