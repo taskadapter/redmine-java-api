@@ -8,4 +8,14 @@ taskadapter-1.0.0.14-linux.gtk.x86_64.zip    0
 taskadapter-1.0.0.14-macosx.cocoa.x86.zip    3
 taskadapter-1.0.0.14-macosx.cocoa.x86_64.zip 0
 taskadapter-1.0.0.14-win32.win32.x86.zip     24
-taskadapter-1.0.0.14-win32.win32.x86_64.zip  8 
+taskadapter-1.0.0.14-win32.win32.x86_64.zip  8
+
+======== Jan 3 2011 - Jan 6 2011 ===============
+
+taskadapter-1.0.0.15-linux.gtk.x86.zip       0
+taskadapter-1.0.0.15-macosx.cocoa.x86.zip    0
+taskadapter-1.0.0.15-macosx.cocoa.x86_64.zip 0
+taskadapter-1.0.0.15-win32.win32.x86.zip     11
+taskadapter-1.0.0.15-win32.win32.x86_64.zip  3
+
+ 
