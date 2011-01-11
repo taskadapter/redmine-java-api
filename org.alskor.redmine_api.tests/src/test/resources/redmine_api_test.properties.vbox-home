@@ -3,9 +3,9 @@ redmine.host=http://academ64:3000
 redmine.apikey=9d4afa67851f5bcb9e60b9f28ec224ec6ef247ee
 redmine.user=admin
 
-redmine.projectKey=testproject
+##redmine.projectKey=testproject
 # query 2: "created last 2 days" issues
-redmine.queryId=2
+##redmine.queryId=2
 
 createissue.userid=1
 createissue.userFirstAndLastName=Redmine Admin

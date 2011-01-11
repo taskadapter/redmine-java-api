@@ -425,6 +425,8 @@ public class RedmineManager {
 	 */
 	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLProjectByKey(projectKey);
+		// see bug http://www.redmine.org/issues/7184
+        query+="&include=trackers";
 		HttpGet http = new HttpGet(query);
 		Response response = sendRequest(http);
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
@@ -689,6 +691,9 @@ public class RedmineManager {
 	 */
 	public Project createProject(Project project) throws IOException,AuthenticationException {
         String query = buildCreateProjectURI();
+		// see bug http://www.redmine.org/issues/7184
+        query+="&include=trackers";
+        
 		HttpPost httpPost = new HttpPost(query);
 		String createProjectXML = convertToXML(project);
 //		System.out.println("create project:" + createProjectXML);
