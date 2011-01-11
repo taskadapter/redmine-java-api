@@ -13,20 +13,50 @@ import org.alskor.httputils.AuthenticationException;
 import org.alskor.httputils.NotFoundException;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.Tracker;
 import org.alskor.redmine.beans.User;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RedmineManagerTest {
 
-	private RedmineManager mgr;
+	private static RedmineManager mgr;
 
-	private final static String PROJECT_KEY = Config.getProjectKey();
+	private static String PROJECT_KEY;// = Config.getProjectKey();
+	// private static String projectKey;
 
+	@BeforeClass
+	public static void oneTimeSetUp() {
+		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
+		Project junitTestPRoject = new Project();
+		junitTestPRoject.setName("test project");
+		junitTestPRoject.setIdentifier("test"
+				+ Calendar.getInstance().getTimeInMillis());
+		try {
+			Project createdProject = mgr.createProject(junitTestPRoject);
+			PROJECT_KEY = createdProject.getIdentifier();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("can't create a test project" + e.getMessage());
+		}
+	}
+
+	@AfterClass
+	public static void oneTimeTearDown() {
+		try {
+			mgr.deleteProject(PROJECT_KEY);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("can't delete the test project '" + PROJECT_KEY + ". reason: "
+					+ e.getMessage());
+		}
+	}
+      
 	@Before
 	// Is executed before each test method
 	public void setup() throws Exception {
-		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
 	}
 
 	@Test
@@ -328,9 +358,10 @@ public class RedmineManagerTest {
 			issueToCreate.setSubject("testGetIssues: " + new Date());
 			Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
 
-			Integer queryIdIssuesCreatedLast2Days = Config.getQueryId();
-			List<Issue> issues = mgr.getIssues(PROJECT_KEY, queryIdIssuesCreatedLast2Days);
-			System.out.println("getIssues() loaded " + issues.size() + " issues using query #" + queryIdIssuesCreatedLast2Days);
+//			Integer queryIdIssuesCreatedLast2Days = Config.getQueryId();
+//			List<Issue> issues = mgr.getIssues(PROJECT_KEY, queryIdIssuesCreatedLast2Days);
+			List<Issue> issues = mgr.getIssues(PROJECT_KEY, null);
+			System.out.println("getIssues() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
 			assertTrue(issues.size()>0);
 			boolean found = false;
 			for (Issue issue : issues) {
@@ -340,8 +371,8 @@ public class RedmineManagerTest {
 				}
 			}
 			if (!found) {
-				fail("getIssues() didn't return the issue we just created. query #"
-						+ queryIdIssuesCreatedLast2Days + " must have returned all issues created during the last 2 days");
+				fail("getIssues() didn't return the issue we just created. The query "
+						/*+ queryIdIssuesCreatedLast2Days*/ + " must have returned all issues created during the last 2 days");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -365,6 +396,7 @@ public class RedmineManagerTest {
 	@Test
 	public void testCreateProject() {
 		Project projectToCreate = generateRandomProject();
+		String key = null;
 		try {
 			Project createdProject = mgr.createProject(projectToCreate);
 			
@@ -374,16 +406,19 @@ public class RedmineManagerTest {
 			assertEquals(projectToCreate.getName(), createdProject.getName());
 			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
 			
-			/* 
-			 * Redmine 1.0.5 and Trunk (pre-1.1 version) do not provide list of trackers with the project.
-			 * see enhancement request http://www.redmine.org/issues/7184
-			 */
-//			List<Tracker> trackers = createdProject.getTrackers();
-//			assertNotNull("checking that project has some trackers", trackers);
-//			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
+			List<Tracker> trackers = createdProject.getTrackers();
+			key = createdProject.getIdentifier();
+			assertNotNull("checking that project has some trackers", trackers);
+			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
+			if (key != null) {
+				try {
+					mgr.deleteProject(key);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -407,6 +442,9 @@ public class RedmineManagerTest {
 			assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
 			assertEquals(newName, updatedProject.getName());
 			assertEquals(newDescr, updatedProject.getDescription());
+			List<Tracker> trackers = updatedProject.getTrackers();
+			assertNotNull("checking that project has some trackers", trackers);
+			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 			
 			mgr.deleteProject(key);
 			
@@ -546,5 +584,5 @@ public class RedmineManagerTest {
 			fail();
 		}
 	}
-	
+
 }

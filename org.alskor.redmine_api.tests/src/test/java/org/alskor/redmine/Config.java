@@ -31,14 +31,14 @@ public class Config {
 		return properties.getProperty("redmine.apikey");
 	}
 
-	public static String getProjectKey() {
-		return properties.getProperty("redmine.projectKey");
-	}
+//	public static String getProjectKey() {
+//		return properties.getProperty("redmine.projectKey");
+//	}
 
-	public static Integer getQueryId() {
-		String s = properties.getProperty("redmine.queryId");
-		return Integer.parseInt(s);
-	}
+//	public static Integer getQueryId() {
+//		String s = properties.getProperty("redmine.queryId");
+//		return Integer.parseInt(s);
+//	}
 
 	public static String getParam(String key) {
 		return properties.getProperty(key);
