@@ -507,8 +507,10 @@ public class RedmineManager {
 		List<Issue> issues = getIssuesV104(projectKey, queryId);
 		
 		if (trialMode) {
-			List<Issue> trialList = new ArrayList<Issue>(issues.size()); 
-			for (int i=0; i<LicenseManager.TRIAL_TASKS_NUMBER_LIMIT; i++) {
+			List<Issue> trialList = new ArrayList<Issue>(issues.size());
+			int maxTasks = (issues.size() > LicenseManager.TRIAL_TASKS_NUMBER_LIMIT) ? LicenseManager.TRIAL_TASKS_NUMBER_LIMIT : issues
+					.size();
+			for (int i = 0; i < maxTasks; i++) {
 				trialList.add(issues.get(i));
 			}
 			issues = trialList;
