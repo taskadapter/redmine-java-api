@@ -62,7 +62,7 @@ public class Project {
 	}
 
 	/**
-	 * @param project name
+	 * @param name the project name
 	 */
 	public void setName(String name) {
 		this.name = name;
