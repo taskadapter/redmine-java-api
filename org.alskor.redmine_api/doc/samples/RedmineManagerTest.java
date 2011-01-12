@@ -13,20 +13,49 @@ import org.alskor.httputils.AuthenticationException;
 import org.alskor.httputils.NotFoundException;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.Tracker;
 import org.alskor.redmine.beans.User;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RedmineManagerTest {
 
-	private RedmineManager mgr;
+	private static RedmineManager mgr;
 
-	private final static String PROJECT_KEY = Config.getProjectKey();
+	private static String projectKey;
 
+	@BeforeClass
+	public static void oneTimeSetUp() {
+		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
+		Project junitTestPRoject = new Project();
+		junitTestPRoject.setName("test project");
+		junitTestPRoject.setIdentifier("test"
+				+ Calendar.getInstance().getTimeInMillis());
+		try {
+			Project createdProject = mgr.createProject(junitTestPRoject);
+			projectKey = createdProject.getIdentifier();
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("can't create a test project" + e.getMessage());
+		}
+	}
+
+	@AfterClass
+	public static void oneTimeTearDown() {
+		try {
+			mgr.deleteProject(projectKey);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail("can't delete the test project '" + projectKey + ". reason: "
+					+ e.getMessage());
+		}
+	}
+      
 	@Before
 	// Is executed before each test method
 	public void setup() throws Exception {
-		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
 	}
 
 	@Test
@@ -59,7 +88,7 @@ public class RedmineManagerTest {
 			float estimatedHours = 44;
 			issueToCreate.setEstimatedHours(estimatedHours);
 			
-			Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 //			System.out.println("created: " + newIssue);
 			assertNotNull("Checking returned result", newIssue);
 			assertNotNull("New issue must have some ID", newIssue.getId());
@@ -112,7 +141,7 @@ public class RedmineManagerTest {
 		try {
 			Issue parentIssue = new Issue();
 			parentIssue.setSubject("parent 1");
-			Issue newParentIssue = mgr.createIssue(PROJECT_KEY, parentIssue);
+			Issue newParentIssue = mgr.createIssue(projectKey, parentIssue);
 			System.out.println("created parent: " + newParentIssue);
 
 			assertNotNull("Checking parent was created", newParentIssue);
@@ -126,7 +155,7 @@ public class RedmineManagerTest {
 			childIssue.setSubject("child 1");
 			childIssue.setParentId(parentId);
 
-			Issue newChildIssue = mgr.createIssue(PROJECT_KEY, childIssue);
+			Issue newChildIssue = mgr.createIssue(projectKey, childIssue);
 			System.out.println("created child: " + newChildIssue);
 
 			assertEquals("Checking parent ID of the child issue", parentId,
@@ -139,7 +168,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testFindIssuesBySummary() {
+	public void testGetIssuesBySummary() {
 		String summary = "issue with subject ABC";
 		try {
 			Issue issue = new Issue();
@@ -147,13 +176,13 @@ public class RedmineManagerTest {
 			User assignee = getOurUser();
 			issue.setAssignee(assignee);
 
-			Issue newIssue = mgr.createIssue(PROJECT_KEY, issue);
+			Issue newIssue = mgr.createIssue(projectKey, issue);
 			System.out.println("created: " + newIssue);
 			assertNotNull("Checking returned result", newIssue);
 			assertNotNull("New issue must have some ID", newIssue.getId());
 
 			// try to find the issue
-			List<Issue> foundIssues = mgr.getIssuesBySummary(PROJECT_KEY,
+			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey,
 					summary);
 //			System.out.println("foundIssues: " + foundIssues);
 
@@ -181,7 +210,7 @@ public class RedmineManagerTest {
 		String summary = "some summary here for issue which does not exist";
 		try {
 			// try to find the issue
-			List<Issue> foundIssues = mgr.getIssuesBySummary(PROJECT_KEY,
+			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey,
 					summary);
 			assertNotNull("Search result must be not null", foundIssues);
 			assertTrue("Search result list must be empty",
@@ -212,7 +241,7 @@ public class RedmineManagerTest {
 		Issue issue = new Issue();
 		issue.setSubject("test zzx");
 		try {
-			redmineMgrEmpty.createIssue(PROJECT_KEY, issue);
+			redmineMgrEmpty.createIssue(projectKey, issue);
 			fail("Must have failed with '401 Not authorized'");
 		} catch (AuthenticationException e) {
 			System.out.println("Got expected AuthenticationException.");
@@ -223,7 +252,7 @@ public class RedmineManagerTest {
 		// set invalid API access key
 		RedmineManager redmineMgrInvalidKey = new RedmineManager(Config.getHost(), "wrong_key");
 		try {
-			redmineMgrInvalidKey.createIssue(PROJECT_KEY, issue);
+			redmineMgrInvalidKey.createIssue(projectKey, issue);
 			fail("Must have failed with '401 Not authorized'");
 		} catch (AuthenticationException e) {
 			System.out.println("Got expected AuthenticationException.");
@@ -233,27 +262,6 @@ public class RedmineManagerTest {
 
 	}
 
-/*	@Test
-	public void testParseIssuesFromEmptyXMLUsingRedmineLoader() {
-		// issues xml with no individual issues in the list should not break the
-		// loader.
-
-		InputStream is;
-		RedmineLoader loader = new RedmineLoader();
-		try {
-			is = MyIOUtils.getResourceAsStream(FILE_EMPTY_ISSUES_XML);
-			loader.startLoading(is);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail("Error:" + e);
-		}
-		List<Issue> issuesList = loader.getIssues();
-		HashMap<Integer, Issue> issuesMap = loader.getIssuesMap();
-
-		assertTrue(issuesList.isEmpty());
-		assertTrue(issuesMap.isEmpty());
-	}*/
-
 	@Test
 	public void testUpdateIssue() {
 		try {
@@ -261,7 +269,7 @@ public class RedmineManagerTest {
 			String originalSubject = "Issue " + new Date();
 			issue.setSubject(originalSubject);
 
-			Issue newIssue = mgr.createIssue(PROJECT_KEY, issue);
+			Issue newIssue = mgr.createIssue(projectKey, issue);
 			String changedSubject = "changed subject";
 			newIssue.setSubject(changedSubject);
 
@@ -285,7 +293,7 @@ public class RedmineManagerTest {
 			String originalSubject = "Issue " + new Date();
 			issue.setSubject(originalSubject);
 
-			Issue newIssue = mgr.createIssue(PROJECT_KEY, issue);
+			Issue newIssue = mgr.createIssue(projectKey, issue);
 
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
 
@@ -306,13 +314,13 @@ public class RedmineManagerTest {
 			assertTrue(projects.size()>0);
 			boolean found = false;
 			for (Project project : projects) {
-				if (project.getIdentifier().equals(PROJECT_KEY)) {
+				if (project.getIdentifier().equals(projectKey)) {
 					found = true;
 					break;
 				}
 			}
 			if (!found) {
-				fail("Our project with key '" + PROJECT_KEY+"' is not found on the server");
+				fail("Our project with key '" + projectKey+"' is not found on the server");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -326,11 +334,10 @@ public class RedmineManagerTest {
 			// create at least 1 issue
 			Issue issueToCreate = new Issue();
 			issueToCreate.setSubject("testGetIssues: " + new Date());
-			Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 
-			Integer queryIdIssuesCreatedLast2Days = Config.getQueryId();
-			List<Issue> issues = mgr.getIssues(PROJECT_KEY, queryIdIssuesCreatedLast2Days);
-			System.out.println("getIssues() loaded " + issues.size() + " issues using query #" + queryIdIssuesCreatedLast2Days);
+			List<Issue> issues = mgr.getIssues(projectKey, null);
+			System.out.println("getIssues() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
 			assertTrue(issues.size()>0);
 			boolean found = false;
 			for (Issue issue : issues) {
@@ -340,8 +347,8 @@ public class RedmineManagerTest {
 				}
 			}
 			if (!found) {
-				fail("getIssues() didn't return the issue we just created. query #"
-						+ queryIdIssuesCreatedLast2Days + " must have returned all issues created during the last 2 days");
+				fail("getIssues() didn't return the issue we just created. The query "
+					+ " must have returned all issues created during the last 2 days");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -353,7 +360,7 @@ public class RedmineManagerTest {
 	public void testGetIssuesInvalidQueryId() {
 		try {
 			Integer invalidQueryId = 9999999;
-			mgr.getIssues(PROJECT_KEY, invalidQueryId);
+			mgr.getIssues(projectKey, invalidQueryId);
 			fail("Must have failed with NotFoundException because query ID is invalid");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException:" + e.getMessage());
@@ -365,6 +372,7 @@ public class RedmineManagerTest {
 	@Test
 	public void testCreateProject() {
 		Project projectToCreate = generateRandomProject();
+		String key = null;
 		try {
 			Project createdProject = mgr.createProject(projectToCreate);
 			
@@ -374,16 +382,19 @@ public class RedmineManagerTest {
 			assertEquals(projectToCreate.getName(), createdProject.getName());
 			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
 			
-			/* 
-			 * Redmine 1.0.5 and Trunk (pre-1.1 version) do not provide list of trackers with the project.
-			 * see enhancement request http://www.redmine.org/issues/7184
-			 */
-//			List<Tracker> trackers = createdProject.getTrackers();
-//			assertNotNull("checking that project has some trackers", trackers);
-//			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
+			List<Tracker> trackers = createdProject.getTrackers();
+			key = createdProject.getIdentifier();
+			assertNotNull("checking that project has some trackers", trackers);
+			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 		} catch (Exception e) {
-			e.printStackTrace();
 			fail(e.getMessage());
+			if (key != null) {
+				try {
+					mgr.deleteProject(key);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
 
@@ -407,6 +418,9 @@ public class RedmineManagerTest {
 			assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
 			assertEquals(newName, updatedProject.getName());
 			assertEquals(newDescr, updatedProject.getDescription());
+			List<Tracker> trackers = updatedProject.getTrackers();
+			assertNotNull("checking that project has some trackers", trackers);
+			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 			
 			mgr.deleteProject(key);
 			
@@ -428,31 +442,13 @@ public class RedmineManagerTest {
 		return project;
 	}
 	
-	// XXX not completed. this test only works with hostedredmine.com. finish this test later
-/*	@Test
-	public void testPaging() {
-		try {
-			String queryIdAllIssues = "156";
-			RedmineManager mgr104 = new RedmineManager(Config.getHost(), Config.getApiKey());
-//			mgr104.setRedmineVersion(REDMINE_VERSION.V104);
-			
-			List<Issue> issues = mgr104.getIssues(PROJECT_KEY, queryIdAllIssues);
-			System.out.println("getIssues() loaded " + issues.size() + " issues using query #" + queryIdAllIssues);
-			assertTrue(issues.size()>25);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-	}
-*/
-
 	@Test
 	public void testCreateIssueNonUnicodeSymbols() {
 		try {
 			String nonLatinSymbols = "Example with accents Ação";
 			Issue toCreate = new Issue();
 			toCreate.setSubject(nonLatinSymbols);
-			Issue created = mgr.createIssue(PROJECT_KEY, toCreate);
+			Issue created = mgr.createIssue(projectKey, toCreate);
 			assertEquals(nonLatinSymbols, created.getSubject());
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -465,7 +461,7 @@ public class RedmineManagerTest {
 			Issue issueToCreate = new Issue();
 			issueToCreate.setSubject("This is the summary line 123");
 
-			Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 			assertNotNull("Checking returned result", newIssue);
 			assertNotNull("New issue must have some ID", newIssue.getId());
 
@@ -546,5 +542,5 @@ public class RedmineManagerTest {
 			fail();
 		}
 	}
-	
+
 }
