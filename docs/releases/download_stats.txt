@@ -18,4 +18,12 @@ taskadapter-1.0.0.15-macosx.cocoa.x86_64.zip 0
 taskadapter-1.0.0.15-win32.win32.x86.zip     11
 taskadapter-1.0.0.15-win32.win32.x86_64.zip  3
 
+======== Jan 6 2011 - Jan 11 2011 ===============
  
+this statistics can be wrong because there were robots attacking the forum,
+creating fake registration accounts, etc.
+ 
+Task Adapter 1.0.0.16 Linux GTK           13 robots??
+taskadapter-1.0.0.16-macosx.cocoa.x86.zip 0
+taskadapter-1.0.0.16-macosx.cocoa.x86.zip 0
+taskadapter-1.0.0.16-win32.win32.x86.zip  43 robots?? 
