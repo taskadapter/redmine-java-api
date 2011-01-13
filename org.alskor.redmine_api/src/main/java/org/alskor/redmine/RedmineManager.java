@@ -507,18 +507,11 @@ public class RedmineManager {
 		List<Issue> issues = getIssuesV104(projectKey, queryId);
 		
 		if (trialMode) {
-			List<Issue> trialList = new ArrayList<Issue>(issues.size());
-			int maxTasks = (issues.size() > LicenseManager.TRIAL_TASKS_NUMBER_LIMIT) ? LicenseManager.TRIAL_TASKS_NUMBER_LIMIT : issues
-					.size();
-			for (int i = 0; i < maxTasks; i++) {
-				trialList.add(issues.get(i));
-			}
-			issues = trialList;
+			int tasksToLeave = Math.min(LicenseManager.TRIAL_TASKS_NUMBER_LIMIT, issues.size());
+			issues =  issues.subList(0, tasksToLeave);			
 		}
 
 		return issues; 
-//		}
-//		throw new RuntimeException("unsupported mode: " + mode);
 	}
 	
 	// XXX this method will be used soon instead of temporary getIssuesV104()
