@@ -26,4 +26,13 @@ creating fake registration accounts, etc.
 Task Adapter 1.0.0.16 Linux GTK           13 robots??
 taskadapter-1.0.0.16-macosx.cocoa.x86.zip 0
 taskadapter-1.0.0.16-macosx.cocoa.x86.zip 0
-taskadapter-1.0.0.16-win32.win32.x86.zip  43 robots?? 
+taskadapter-1.0.0.16-win32.win32.x86.zip  43 robots??
+
+======== Jan 11 2011 - Jan 12 2011 ===============
+redmine_api_1.0.0.1.zip            71 total downloads since this file was uploaded
+
+taskadapter-1.0.17-macosx.cocoa.x86.zip 0
+taskadapter-1.0.17-macosx.cocoa.x86_64.zip 0
+taskadapter-1.0.17-linux.gtk.x86.zip    2
+taskadapter-1.0.17-win32.win32.x86.zip 18
+ 
