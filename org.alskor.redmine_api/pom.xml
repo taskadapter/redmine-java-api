@@ -6,11 +6,10 @@
     <parent>
         <artifactId>main</artifactId>
         <groupId>com.taskadapter</groupId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${version}</version>
     </parent>
 
     <artifactId>redmine_api</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
     <packaging>eclipse-plugin</packaging>
 
     <!-- to generate Javadoc -->
