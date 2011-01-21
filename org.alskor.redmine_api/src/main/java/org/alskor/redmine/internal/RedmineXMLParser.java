@@ -39,7 +39,7 @@ public class RedmineXMLParser {
 
 	public static Project parseProjectFromXML(String xml)
 			throws RuntimeException {
-//		System.out.println("parseProjectFromXML:" + xml);
+		System.out.println("parseProjectFromXML:" + xml);
 		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
 				RedmineXMLParser.MAPPING_PROJECTS_LIST, Project.class);
 
@@ -117,6 +117,7 @@ public class RedmineXMLParser {
 	}
 
 	public static List<Project> parseProjectsFromXML(String xml) {
+		System.out.println("parseProjectsFromXML:" + xml);
 		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
 				RedmineXMLParser.MAPPING_PROJECTS_LIST, ArrayList.class);
 

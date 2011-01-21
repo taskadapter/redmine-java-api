@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projects total_count="12" type="array" limit="25" offset="0">
+	<project>
+		<id>11</id>
+		<name>another test project</name>
+		<identifier>test1295577045977</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:30:49-08:00</created_on>
+		<updated_on>2011-01-20T18:32:43-08:00</updated_on>
+	</project>
+	<project>
+		<id>3</id>
+		<name>project number 1294800631649</name>
+		<identifier>projkey1294800631649</identifier>
+		<description>some description for the project</description>
+		<created_on>2011-01-11T18:50:42-08:00</created_on>
+		<updated_on>2011-01-11T18:50:42-08:00</updated_on>
+	</project>
+	<project>
+		<id>6</id>
+		<name>project number 1294801040543</name>
+		<identifier>projkey1294801040543</identifier>
+		<description>some description for the project</description>
+		<created_on>2011-01-11T18:57:31-08:00</created_on>
+		<updated_on>2011-01-11T18:57:31-08:00</updated_on>
+	</project>
+	<project>
+		<id>9</id>
+		<name>project number 1294801249225</name>
+		<identifier>projkey1294801249225</identifier>
+		<description>some description for the project</description>
+		<created_on>2011-01-11T19:00:59-08:00</created_on>
+		<updated_on>2011-01-11T19:00:59-08:00</updated_on>
+	</project>
+	<project>
+		<id>1</id>
+		<name>test</name>
+		<identifier>test</identifier>
+		<description>some description for the test project</description>
+		<created_on>2011-01-10T20:51:10-08:00</created_on>
+		<updated_on>2011-01-20T17:57:47-08:00</updated_on>
+	</project>
+	<project>
+		<id>12</id>
+		<name>test project</name>
+		<identifier>test1295577109152</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:31:52-08:00</created_on>
+		<updated_on>2011-01-20T18:31:52-08:00</updated_on>
+	</project>
+	<project>
+		<id>13</id>
+		<name>test project</name>
+		<identifier>test1295577173111</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:32:56-08:00</created_on>
+		<updated_on>2011-01-20T18:32:56-08:00</updated_on>
+	</project>
+	<project>
+		<id>14</id>
+		<name>test project</name>
+		<identifier>test1295577205645</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:33:29-08:00</created_on>
+		<updated_on>2011-01-20T18:33:29-08:00</updated_on>
+	</project>
+	<project>
+		<id>15</id>
+		<name>test project</name>
+		<identifier>test1295577237142</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:34:00-08:00</created_on>
+		<updated_on>2011-01-20T18:34:00-08:00</updated_on>
+	</project>
+	<project>
+		<id>16</id>
+		<name>test project</name>
+		<identifier>test1295577489197</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:38:12-08:00</created_on>
+		<updated_on>2011-01-20T18:38:12-08:00</updated_on>
+	</project>
+	<project>
+		<id>17</id>
+		<name>test project</name>
+		<identifier>test1295577697669</identifier>
+		<description></description>
+		<created_on>2011-01-20T18:41:41-08:00</created_on>
+		<updated_on>2011-01-20T18:41:41-08:00</updated_on>
+	</project>
+	<project>
+		<id>19</id>
+		<name>test project</name>
+		<identifier>test1295648777074</identifier>
+		<description></description>
+		<created_on>2011-01-21T14:26:20-08:00</created_on>
+		<updated_on>2011-01-21T14:26:20-08:00</updated_on>
+	</project>
+</projects>
