@@ -117,7 +117,7 @@ public class RedmineXMLParser {
 	}
 
 	public static List<Project> parseProjectsFromXML(String xml) {
-		System.out.println("parseProjectsFromXML:" + xml);
+//		System.out.println("parseProjectsFromXML:" + xml);
 		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
 				RedmineXMLParser.MAPPING_PROJECTS_LIST, ArrayList.class);
 
