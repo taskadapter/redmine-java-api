@@ -6,11 +6,11 @@ import java.util.Date;
 
 import org.exolab.castor.mapping.GeneralizedFieldHandler;
 
-public class RedmineDateHandler extends GeneralizedFieldHandler {
+public abstract class RedmineDateHandler extends GeneralizedFieldHandler {
 
-	// XXX there's bug in Castor: http://jira.codehaus.org/browse/CASTOR-1878
-	private static final String FORMAT = "yyyy-MM-dd";
-
+	public abstract Date getDate(String str) throws ParseException;
+	public abstract String getString(Date date);
+	
 	/**
 	 * Creates a new MyDateHandler instance
 	 */
@@ -33,9 +33,8 @@ public class RedmineDateHandler extends GeneralizedFieldHandler {
 	public Object convertUponGet(Object value) {
 		if (value == null)
 			return null;
-		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
 		Date date = (Date) value;
-		return formatter.format(date);
+		return getString(date);
 	}
 
 	/**
@@ -50,11 +49,10 @@ public class RedmineDateHandler extends GeneralizedFieldHandler {
 	 */
 	@Override
 	public Object convertUponSet(Object value) {
-		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
 		Date date = null;
 		try {
 			if (!((String) value).isEmpty()) {
-				date = formatter.parse((String) value);
+				date = getDate((String) value);
 			}
 		} catch (ParseException px) {
 			throw new IllegalArgumentException(px.getMessage());
@@ -72,7 +70,6 @@ public class RedmineDateHandler extends GeneralizedFieldHandler {
 	@Override
 	public Class<Date> getFieldType() {
 		return Date.class;
-//		return String.class;
 	}
 
 	/**

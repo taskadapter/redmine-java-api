@@ -66,12 +66,6 @@ public class RedmineManager {
 	private String apiAccessKey;
 	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
 
-//	private static enum REDMINE_VERSION {
-//		V104, TRUNK
-//	}
-	
-//	private REDMINE_VERSION mode = REDMINE_VERSION.V104;
-	
 	private static boolean trialMode = true;
 	
 	static {
@@ -770,8 +764,4 @@ public class RedmineManager {
 		this.tasksPerPage = tasksPerPage;
 	}
 	
-/*	public void setRedmineVersion(REDMINE_VERSION v){
-		mode = v;
-	}
-*/
 }
