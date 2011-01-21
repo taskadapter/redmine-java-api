@@ -50,7 +50,7 @@ public class TestRedmineXMLParser {
 	}
 
 	@Test
-	public void testParseProjectXML() {
+	public void testParseProjectXMLRedmine_1_0() {
 		String xml;
 		try {
 			xml = MyIOUtils.getResourceAsString("project.xml");
@@ -69,6 +69,38 @@ public class TestRedmineXMLParser {
 			List<Tracker> trackers = project.getTrackers();
 			assertNotNull("Trackers list must not be NULL", trackers);
 			assertEquals(4, trackers.size());
+
+			Tracker tracker = project.getTrackerByName("Support");
+			assertNotNull("Tracker must be not null", tracker);
+			Integer expectedTrackerId = 3;
+			assertEquals("checking id of 'support' tracker", expectedTrackerId,
+					tracker.getId());
+
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+
+	@Test
+	public void testParseProjectXMLRedmine_1_1() {
+		String xml;
+		try {
+			xml = MyIOUtils.getResourceAsString("redmine_1_1_project.xml");
+			Project project = RedmineXMLParser.parseProjectFromXML(xml);
+			Integer expectedProjectID = 23;
+			String expectedName = "test project";
+			String expectedKey = "test1295649781087";
+			assertEquals(expectedProjectID, project.getId());
+			assertEquals(expectedName, project.getName());
+			assertEquals(expectedKey, project.getIdentifier());
+
+			/**
+			 * <tracker name="Feature" id="2"/> <tracker name="Support" id="3"/>
+			 * <tracker name="Bug" id="1"/> <tracker name="Task" id="4"/>
+			 */
+			List<Tracker> trackers = project.getTrackers();
+			assertNotNull("Trackers list must not be NULL", trackers);
+			assertEquals(3, trackers.size());
 
 			Tracker tracker = project.getTrackerByName("Support");
 			assertNotNull("Tracker must be not null", tracker);
