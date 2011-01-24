@@ -23,7 +23,7 @@ public class RedmineXMLParser {
 		Issue issue = null;
 		StringReader reader = null;
 		try {
-//			 System.err.println(xml);
+			 System.err.println(xml);
 			reader = new StringReader(xml);
 			issue = (Issue) unmarshaller.unmarshal(reader);
 
@@ -39,7 +39,7 @@ public class RedmineXMLParser {
 
 	public static Project parseProjectFromXML(String xml)
 			throws RuntimeException {
-		System.out.println("parseProjectFromXML:" + xml);
+//		System.out.println("parseProjectFromXML:" + xml);
 		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
 				RedmineXMLParser.MAPPING_PROJECTS_LIST, Project.class);
 
@@ -61,6 +61,7 @@ public class RedmineXMLParser {
 
 	public static List<Issue> parseIssuesFromXML(String xml)
 			throws RuntimeException {
+//		System.out.println("parseIssuesFromXML:"+xml);
 		verifyStartsAsXML(xml);
 		
 		xml = RedmineXMLParser.removeBadTags(xml);

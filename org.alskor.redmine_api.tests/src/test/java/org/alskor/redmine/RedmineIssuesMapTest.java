@@ -4,9 +4,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
@@ -20,15 +23,19 @@ import com.taskadapter.util.MyIOUtils;
 
 public class RedmineIssuesMapTest {
 
-	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";
-	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 13;
+//	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";
+//	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 13;
+	
+	private static final String REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME = "redmine_1_1_issues.xml";
+	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 25;
+	
 	private List<Issue> issuesList;
 	private HashMap<Integer, Issue> issuesMap;
 
 	@Before
 	 // Is executed before each test method
 	public void setup() throws Exception {
-		String str = MyIOUtils.getResourceAsString(FILE_1_ISSUES_XML_FILE_NAME);
+		String str = MyIOUtils.getResourceAsString(REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME);
 		this.issuesList = RedmineXMLParser.parseIssuesFromXML(str);
 		
 		RedmineIssuesMap loader = new RedmineIssuesMap(issuesList);
@@ -46,8 +53,8 @@ public class RedmineIssuesMapTest {
 	}
 	
 	@Test
-	public void testListHasIssueWithID18155() {
-		Integer id = 18155;
+	public void testListHasIssueWithID39() {
+		Integer id = 39;
 		Iterator<Issue> it = issuesList.iterator();
 		boolean found = false;
 		while (it.hasNext()) {
@@ -61,15 +68,15 @@ public class RedmineIssuesMapTest {
 	}
 
 	@Test
-	public void testMapHasIssueWithID18155() {
-		Integer id = 18155;
+	public void testMapHasIssueWithID39() {
+		Integer id = 39;
 		assertNotNull("The map must contain issue with ID " + id, issuesMap.get(id));
 	}
 	
 	@Test
 	public void testParentId(){
-		Integer childId = 18156;
-		Integer parentIdExpected = 18154;
+		Integer childId = 67;
+		Integer parentIdExpected = 66;
 		Issue child = issuesMap.get(childId);
 		assertNotNull("Issue " + childId + " must be in map", child);
 		assertNotNull("Issue " + childId + " must have a parent", child.getParentId());
@@ -86,38 +93,38 @@ public class RedmineIssuesMapTest {
 
 	@Test
 	public void testNullParentId(){
-		Integer childId = 17318;
+		Integer childId = 66;
 		Issue child = issuesMap.get(childId);
 		assertEquals("Issue " + childId + " must have NULL parent ID ", null, child.getParentId());
 	}
 	
 	@Test
 	public void testPriorityTextIsLoaded(){
-		Issue issue = issuesMap.get(18156);
-		assertEquals("Comparing 'priority' field.", "Normal", issue.getPriorityText());
+		Issue issue = issuesMap.get(39);
+		assertEquals("Comparing 'priority' field.", "High", issue.getPriorityText());
 	}
 	
 	@Test
 	public void testDoneRatioIsLoaded(){
-		Issue issue17319 = issuesMap.get(17319);
-		Integer expectedDoneRatio17319 = 60;
-		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio17319, issue17319.getDoneRatio());
+		Issue issue67 = issuesMap.get(67);
+		Integer expectedDoneRatio67 = 20;
+		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio67, issue67.getDoneRatio());
 		
-		Issue issue17318 = issuesMap.get(17318);
-		Integer expectedDoneRatio17318 = 33;
-		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio17318, issue17318.getDoneRatio());
+		Issue issue65 = issuesMap.get(65);
+		Integer expectedDoneRatio65 = 80;
+		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio65, issue65.getDoneRatio());
 
-		Issue issue17481 = issuesMap.get(17481);
-		Integer expectedDoneRatio17481 = 0;
-		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio17481, issue17481.getDoneRatio());
+		Issue issue55 = issuesMap.get(55);
+		Integer expectedDoneRatio55 = 0;
+		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio55, issue55.getDoneRatio());
 	}
 
 	@Test
 	public void testProject1(){
-		Issue issue17611 = issuesMap.get(17611);
-		Integer expectedProjectId = 9579;
-		String expectedProjectName = "ace";
-		Project actualProect = issue17611.getProject();
+		Issue issue67 = issuesMap.get(67);
+		Integer expectedProjectId = 25;
+		String expectedProjectName = "test project";
+		Project actualProect = issue67.getProject();
 		assertNotNull("Project must be not null", actualProect);
 		assertEquals("Comparing project ID", expectedProjectId, actualProect.getId());
 		assertEquals("Comparing project name", expectedProjectName, actualProect.getName());
@@ -125,9 +132,9 @@ public class RedmineIssuesMapTest {
 	
 	@Test
 	public void testAssignee(){
-		Issue issue = issuesMap.get(18156);
-		String assigneeNameExpected = "Alexey Skor";
-		Integer assigneeIdExpected = 19640;
+		Issue issue = issuesMap.get(68);
+		String assigneeNameExpected = "Redmine Admin";
+		Integer assigneeIdExpected = 1;
 		
 		User assignee = issue.getAssignee();
 		assertNotNull("Checking assignee info", assignee);
@@ -136,4 +143,35 @@ public class RedmineIssuesMapTest {
 		
 	}
 
+	@Test
+	public void testCreatedOn(){
+		Issue issue = issuesMap.get(39);
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.YEAR, 2011);
+		c.set(Calendar.MONTH, Calendar.JANUARY);
+		c.set(Calendar.DAY_OF_MONTH, 12);
+		c.set(Calendar.HOUR_OF_DAY, 16);
+		c.set(Calendar.MINUTE, 00);
+		c.set(Calendar.SECOND, 31);
+		c.set(Calendar.MILLISECOND, 0);
+		c.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+		Date expectedTime = c.getTime();
+		assertEquals("Checking 'created on' date", expectedTime, issue.getCreatedOn());
+	}
+	
+	@Test
+	public void testUpdatedOn(){
+		Issue issue = issuesMap.get(39);
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.YEAR, 2011);
+		c.set(Calendar.MONTH, Calendar.JANUARY);
+		c.set(Calendar.DAY_OF_MONTH, 17);
+		c.set(Calendar.HOUR_OF_DAY, 21);
+		c.set(Calendar.MINUTE, 28);
+		c.set(Calendar.SECOND, 45);
+		c.set(Calendar.MILLISECOND, 0);
+		c.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+		Date expectedTime = c.getTime();
+		assertEquals("Checking 'updated on' date", expectedTime, issue.getUpdatedOn());
+	}
 }
