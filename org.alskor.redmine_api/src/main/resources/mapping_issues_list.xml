@@ -47,6 +47,12 @@
 		<field name="description" type="string">
 			<bind-xml name="description" node="element" />
 		</field>
+		<field name="createdOn" type="string" handler="org.alskor.redmine.internal.RedmineLongDateHandler">
+			<bind-xml name="created_on" node="element" />
+		</field>
+		<field name="updatedOn" type="string" handler="org.alskor.redmine.internal.RedmineLongDateHandler">
+			<bind-xml name="updated_on" node="element" />
+		</field>
 
 	</class>
 	
