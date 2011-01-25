@@ -17,6 +17,7 @@ import org.xml.sax.InputSource;
 public class RedmineXMLParser {
 
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
+		verifyStartsAsXML(xml);
 		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
 				RedmineXMLParser.MAPPING_ISSUES, Issue.class);
 
