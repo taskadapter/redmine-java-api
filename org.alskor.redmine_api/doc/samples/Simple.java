@@ -1,8 +1,8 @@
 import java.io.IOException;
 import java.util.List;
 
-import org.alskor.httputils.AuthenticationException;
-import org.alskor.httputils.NotFoundException;
+import org.alskor.redmine.AuthenticationException;
+import org.alskor.redmine.NotFoundException;
 import org.alskor.redmine.RedmineManager;
 import org.alskor.redmine.beans.Issue;
 
