@@ -15,8 +15,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import org.alskor.httputils.AuthenticationException;
-import org.alskor.httputils.NotFoundException;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
@@ -44,10 +42,6 @@ import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.xml.sax.InputSource;
 
-import com.taskadapter.license.License;
-import com.taskadapter.license.LicenseManager;
-import com.taskadapter.license.LicenseValidationException;
-
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -59,16 +53,16 @@ public class RedmineManager {
 
 	private static final int DEFAULT_TASKS_PER_PAGE = 25;
 
-	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
-		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
+//	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
+//		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
 
 	private String host;
 	private String apiAccessKey;
 	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
 
-	private static boolean trialMode = true;
+//	private static boolean trialMode = true;
 	
-	static {
+/*	static {
 		trialMode = true;
 		
 		License licenseRedmineAPI = null;
@@ -98,7 +92,7 @@ public class RedmineManager {
 			System.err.println(LICENSE_ERROR_MESSAGE);
 		}
 	}
-
+*/
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are not checked at this moment.
 	 * 
@@ -500,10 +494,10 @@ public class RedmineManager {
 //		} else if (mode.equals(REDMINE_VERSION.V104)) {
 		List<Issue> issues = getIssuesV104(projectKey, queryId);
 		
-		if (trialMode) {
-			int tasksToLeave = Math.min(LicenseManager.TRIAL_TASKS_NUMBER_LIMIT, issues.size());
-			issues =  issues.subList(0, tasksToLeave);			
-		}
+//		if (trialMode) {
+//			int tasksToLeave = Math.min(LicenseManager.TRIAL_TASKS_NUMBER_LIMIT, issues.size());
+//			issues =  issues.subList(0, tasksToLeave);			
+//		}
 
 		return issues; 
 	}
