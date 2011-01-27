@@ -4,12 +4,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <artifactId>main</artifactId>
+        <groupId>org.redmine</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+
     <groupId>org.redmine</groupId>
     <artifactId>redmine_api</artifactId>
     <version>1.0.3-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>eclipse-plugin</packaging>
 
-     <dependencies>
+<!--      <dependencies>
     	<dependency>
     		<groupId>org.codehaus.castor</groupId>
     		<artifactId>castor-xml</artifactId>
@@ -26,7 +33,7 @@
     		<version>4.0.1</version>
     	</dependency>
     </dependencies>
-    
+-->    
     <!-- to generate Javadoc -->
     <build>
         <plugins>
