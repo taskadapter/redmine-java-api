@@ -9,12 +9,11 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.List;
 
+import org.alskor.redmine.MyIOUtils;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.Tracker;
 import org.junit.Test;
-
-import com.taskadapter.util.MyIOUtils;
 
 public class TestRedmineXMLParser {
 	private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
