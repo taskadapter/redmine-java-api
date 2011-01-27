@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Redmine_api
 Bundle-SymbolicName: org.alskor.redmine_api
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 1.0.3.qualifier
 Bundle-Vendor: Alskor
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
 Export-Package: org.alskor.redmine,
  org.alskor.redmine.beans
 Bundle-ClassPath: .
+Require-Bundle: org.alskor.redmine_api.deps;bundle-version="1.0.0"
