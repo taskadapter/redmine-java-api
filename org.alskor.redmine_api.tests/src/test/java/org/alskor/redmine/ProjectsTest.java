@@ -11,9 +11,6 @@ import org.alskor.redmine.internal.RedmineXMLParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.taskadapter.util.MyIOUtils;
-
-
 public class ProjectsTest {
 
 	private List<Project> projectsList;

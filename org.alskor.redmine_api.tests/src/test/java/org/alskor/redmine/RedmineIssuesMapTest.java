@@ -18,9 +18,6 @@ import org.alskor.redmine.internal.RedmineXMLParser;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.taskadapter.util.MyIOUtils;
-
-
 public class RedmineIssuesMapTest {
 
 //	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";
