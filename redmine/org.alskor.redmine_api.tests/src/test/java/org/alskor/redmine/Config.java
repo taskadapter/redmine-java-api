@@ -27,22 +27,13 @@ public class Config {
 		return properties.getProperty("redmine.host");
 	}
 
-	public static String getUser() {
-		return properties.getProperty("redmine.user");
+	public static String getUserLogin() {
+		return properties.getProperty("redmine.userlogin");
 	}
 
 	public static String getApiKey() {
 		return properties.getProperty("redmine.apikey");
 	}
-
-//	public static String getProjectKey() {
-//		return properties.getProperty("redmine.projectKey");
-//	}
-
-//	public static Integer getQueryId() {
-//		String s = properties.getProperty("redmine.queryId");
-//		return Integer.parseInt(s);
-//	}
 
 	public static String getParam(String key) {
 		return properties.getProperty(key);

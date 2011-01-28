@@ -205,7 +205,7 @@ public class RedmineManager {
 	}
 	
 	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
-//		System.out.println(request.getRequestLine());
+		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		wrapClient(httpclient);
 		
@@ -757,5 +757,29 @@ public class RedmineManager {
 	public void setTasksPerPage(int tasksPerPage) {
 		this.tasksPerPage = tasksPerPage;
 	}
-	
+
+	/**
+	 * Load the list of users on the server.
+	 * 
+	 * @return list of User objects
+	 * 
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 */
+	public List<User> getUsers() throws IOException,AuthenticationException{
+		String query = buildGetUsersURLString();
+		HttpGet http = new HttpGet(query);
+		Response response = sendRequest(http);
+		return RedmineXMLParser.parseUsersFromXML(response.getBody());
+	}
+
+	private String buildGetUsersURLString() {
+		String query = host + "/users.xml";
+		if (apiAccessKey != null) {
+			query += "?key=" + apiAccessKey;
+		}
+		return query;
+	}
+
 }

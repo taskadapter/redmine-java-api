@@ -111,14 +111,12 @@ public class RedmineManagerTest {
 			// check ASSIGNEE
 			User actualAssignee = newIssue.getAssignee();
 			assertNotNull("Checking assignee not null", actualAssignee);
-			assertEquals("Checking assignee Name", assignee.getFullName(),
-					actualAssignee.getFullName());
-			assertEquals("Checking assignee Id", assignee.getId(),
+			assertEquals("Checking assignee id", assignee.getId(),
 					actualAssignee.getId());
 			
 			// check AUTHOR
-			String EXPECTED_USER_FULL_NAME  = Config.getParam("createissue.userFirstAndLastName");
-			assertEquals(EXPECTED_USER_FULL_NAME, newIssue.getAuthor().getFullName());
+			Integer EXPECTED_AUTHOR_ID  = getOurUser().getId();
+			assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
 
 			// check ESTIMATED TIME
 			assertEquals((Float) estimatedHours, newIssue.getEstimatedHours());
@@ -223,11 +221,11 @@ public class RedmineManagerTest {
 	private static User getOurUser() {
 		Integer userId = Integer
 				.parseInt(Config.getParam("createissue.userid"));
-		String userFullName = Config.getParam("createissue.userFirstAndLastName");
+		String login = Config.getParam("redmine.userlogin");
 
 		User assignee = new User();
 		assignee.setId(userId);
-		assignee.setFullName(userFullName);
+		assignee.setLogin(login);
 		return assignee;
 	}
 
@@ -401,7 +399,8 @@ public class RedmineManagerTest {
 	public void testCreateGetUpdateDeleteProject() {
 		Project projectToCreate = generateRandomProject();
 		try {
-			projectToCreate.setIdentifier("zzz");
+			projectToCreate.setIdentifier("id" + new Date().getTime());
+			System.out.println("trying to create a project with id " + projectToCreate.getIdentifier());
 			Project createdProject = mgr.createProject(projectToCreate);
 			String key = createdProject.getIdentifier();
 			String newDescr = "NEW123";
@@ -465,8 +464,8 @@ public class RedmineManagerTest {
 			assertNotNull("New issue must have some ID", newIssue.getId());
 
 			// check AUTHOR
-			String EXPECTED_USER_FULL_NAME  = Config.getParam("createissue.userFirstAndLastName");
-			assertEquals(EXPECTED_USER_FULL_NAME, newIssue.getAuthor().getFullName());
+			Integer EXPECTED_AUTHOR_ID  = getOurUser().getId();
+			assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -542,4 +541,25 @@ public class RedmineManagerTest {
 		}
 	}
 
+	
+	@Test
+	public void testGetUsers() {
+		try {
+			List<User> users = mgr.getUsers();
+			assertTrue(users.size()>0);
+//			boolean found = false;
+//			for (Project project : projects) {
+//				if (project.getIdentifier().equals(projectKey)) {
+//					found = true;
+//					break;
+//				}
+//			}
+//			if (!found) {
+//				fail("Our project with key '" + projectKey+"' is not found on the server");
+//			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
 }
