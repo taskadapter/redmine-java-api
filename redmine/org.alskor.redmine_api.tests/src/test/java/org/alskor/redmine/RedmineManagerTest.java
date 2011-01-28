@@ -26,6 +26,7 @@ public class RedmineManagerTest {
 
 	@BeforeClass
 	public static void oneTimeSetUp() {
+		System.out.println("Running redmine tests using: " + Config.getHost());
 		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
 		Project junitTestPRoject = new Project();
 		junitTestPRoject.setName("test project");

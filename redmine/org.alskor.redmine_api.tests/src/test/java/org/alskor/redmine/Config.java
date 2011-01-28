@@ -12,6 +12,10 @@ public class Config {
 
 		InputStream is = Config.class.getClassLoader().getResourceAsStream(
 				TEST_PROPERTIES);
+		if(is == null) {
+			throw new RuntimeException("Can't find file " + TEST_PROPERTIES +
+					" in classpath. Please create it using one of the templates");
+		}
 		try {
 			properties.load(is);
 		} catch (IOException e) {
