@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -367,11 +368,12 @@ public class RedmineManagerTest {
 	}
 	
 	@Test
-	public void testCreateProject() {
+	public void testCreateProject() throws IOException, AuthenticationException, NotFoundException {
 		Project projectToCreate = generateRandomProject();
 		String key = null;
 		try {
 			Project createdProject = mgr.createProject(projectToCreate);
+			key = createdProject.getIdentifier();
 			
 			assertNotNull("checking that a non-null project is returned", createdProject);
 			
@@ -380,29 +382,26 @@ public class RedmineManagerTest {
 			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
 			
 			List<Tracker> trackers = createdProject.getTrackers();
-			key = createdProject.getIdentifier();
 			assertNotNull("checking that project has some trackers", trackers);
 			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 		} catch (Exception e) {
 			fail(e.getMessage());
+		} finally {
 			if (key != null) {
-				try {
-					mgr.deleteProject(key);
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
+				mgr.deleteProject(key);
 			}
 		}
 	}
 
 	@Test
-	public void testCreateGetUpdateDeleteProject() {
+	public void testCreateGetUpdateDeleteProject() throws IOException, AuthenticationException, NotFoundException {
 		Project projectToCreate = generateRandomProject();
+		String key = null;
 		try {
 			projectToCreate.setIdentifier("id" + new Date().getTime());
 			System.out.println("trying to create a project with id " + projectToCreate.getIdentifier());
 			Project createdProject = mgr.createProject(projectToCreate);
-			String key = createdProject.getIdentifier();
+			key = createdProject.getIdentifier();
 			String newDescr = "NEW123";
 			String newName = "new name here";
 			
@@ -420,11 +419,13 @@ public class RedmineManagerTest {
 			assertNotNull("checking that project has some trackers", trackers);
 			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 			
-			mgr.deleteProject(key);
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
+		} finally {
+			if (key != null) {
+				mgr.deleteProject(key);
+			}
 		}
 	}
 	
