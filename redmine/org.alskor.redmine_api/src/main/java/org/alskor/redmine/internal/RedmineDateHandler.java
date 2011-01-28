@@ -1,7 +1,6 @@
 package org.alskor.redmine.internal;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.exolab.castor.mapping.GeneralizedFieldHandler;
