@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.User;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Unmarshaller;
@@ -18,9 +19,11 @@ public class RedmineXMLParser {
 	private static final int UNKNOWN = -1;
 	public static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
 	public static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
+	public static final String MAPPING_USERS = "/mapping_users.xml";
 
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
 		verifyStartsAsXML(xml);
+		
 		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, Issue.class);
 
 		Issue issue = null;
@@ -63,26 +66,8 @@ public class RedmineXMLParser {
 
 	public static List<Issue> parseIssuesFromXML(String xml)
 			throws RuntimeException {
-//		System.out.println("parseIssuesFromXML:"+xml);
-		verifyStartsAsXML(xml);
-		
-		xml = RedmineXMLParser.removeBadTags(xml);
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, ArrayList.class);
-
-		List<Issue> resultList = null;
-		StringReader reader = null;
-		try {
-			reader = new StringReader(xml);
-			resultList = (List) unmarshaller.unmarshal(reader);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return resultList;
+		xml = removeBadTags(xml);
+		return parseItemsFromXML(MAPPING_ISSUES, Issue.class, xml);
 	}
 
 	// see bug https://www.hostedredmine.com/issues/8240
@@ -119,26 +104,11 @@ public class RedmineXMLParser {
 	}
 
 	public static List<Project> parseProjectsFromXML(String xml) {
-//		System.out.println("parseProjectsFromXML:" + xml);
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, ArrayList.class);
-
-		List<Project> list = null;
-		StringReader reader = null;
-		try {
-			reader = new StringReader(xml);
-			list = (ArrayList<Project>) unmarshaller.unmarshal(reader);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return list;
+		return parseItemsFromXML(MAPPING_PROJECTS_LIST, Project.class, xml);
 	}
 
 	private static Unmarshaller getUnmarshaller(String configFile,
-			Class classToUse) {
+			Class<?> classToUse) {
 		InputSource inputSource = new InputSource(
 				RedmineXMLParser.class.getResourceAsStream(configFile));
 		ClassLoader cl = RedmineXMLParser.class.getClassLoader();
@@ -174,5 +144,29 @@ public class RedmineXMLParser {
 							+ text.substring(0, charsToShow) + "...");
 		}
 
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> List<T> parseItemsFromXML(String mappingFile, Class<T> classs, String body) {
+		verifyStartsAsXML(body);
+		Unmarshaller unmarshaller = getUnmarshaller(mappingFile, ArrayList.class);
+
+		List<T> list = null;
+		StringReader reader = null;
+		try {
+			reader = new StringReader(body);
+			list = (ArrayList<T>) unmarshaller.unmarshal(reader);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				reader.close();
+			}
+		}
+		return list;
+	}
+
+	public static List<User> parseUsersFromXML(String body) {
+		return parseItemsFromXML(MAPPING_USERS, User.class, body);
 	}
 }

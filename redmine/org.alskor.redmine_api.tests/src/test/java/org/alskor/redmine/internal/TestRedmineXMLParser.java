@@ -9,10 +9,12 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.List;
 
+import org.alskor.redmine.Config;
 import org.alskor.redmine.MyIOUtils;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.Tracker;
+import org.alskor.redmine.beans.User;
 import org.junit.Test;
 
 public class TestRedmineXMLParser {
@@ -205,4 +207,18 @@ public class TestRedmineXMLParser {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testParseUsersRedmine_1_1() throws IOException {
+		String xml = MyIOUtils.getResourceAsString("redmine_1_1_users.xml");
+		List<User> users = RedmineXMLParser.parseUsersFromXML(xml);
+		boolean found = false;
+		for (User u : users) {
+			if (u.getLogin().equals(Config.getUserLogin())) {
+				found = true;
+			}
+		}
+		assertTrue("Admin user must be among all the users", found);
+	}
+
 }
