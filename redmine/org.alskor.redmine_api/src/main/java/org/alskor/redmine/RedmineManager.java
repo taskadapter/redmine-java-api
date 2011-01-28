@@ -795,5 +795,27 @@ public class RedmineManager {
 		return host + "/users.xml?key=" + apiAccessKey;
 	}
 
+	/**
+	 * This method cannot return the updated object from Redmine
+	 * because the server does not provide any XML in response.
+	 *
+	 * @param user
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 */
+	public void updateUser(User user) throws IOException,
+			AuthenticationException {
+		
+		String query = buildUpdateUserQuery(user.getId());
+		HttpPut httpRequest = new HttpPut(query);
+		String projectXML = RedmineXMLParser.convertObjectToXML(user);
+		setEntity(httpRequest, projectXML);
+		sendRequest(httpRequest);
+	}
 
+	private String buildUpdateUserQuery(Integer id) {
+		return host + "/users/" + id +".xml?key=" + apiAccessKey;
+	}
 }
