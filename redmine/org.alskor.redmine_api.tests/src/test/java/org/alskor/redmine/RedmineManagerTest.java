@@ -570,4 +570,11 @@ public class RedmineManagerTest {
 		assertEquals(getOurUser().getId(), currentUser.getId());
 		assertEquals(getOurUser().getLogin(), currentUser.getLogin());
 	}
+	
+	@Test
+	public void testGetUserById() throws IOException, AuthenticationException, NotFoundException {
+		User loadedUser = mgr.getUserById(getOurUser().getId());
+		assertEquals(getOurUser().getId(), loadedUser.getId());
+		assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
+	}
 }
