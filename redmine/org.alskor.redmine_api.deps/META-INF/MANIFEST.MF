@@ -34,3 +34,4 @@ Export-Package: org.apache.http,
  org.apache.http.util,
  org.exolab.castor.mapping,
  org.exolab.castor.xml
+Bundle-Vendor: Alskor
