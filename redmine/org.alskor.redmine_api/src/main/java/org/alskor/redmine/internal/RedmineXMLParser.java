@@ -2,7 +2,9 @@ package org.alskor.redmine.internal;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,48 +22,24 @@ public class RedmineXMLParser {
 	public static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
 	public static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 	public static final String MAPPING_USERS = "/mapping_users.xml";
+	
+	// TODO optimize : load pre-xml 
+	private static final Map<Class, String> configFilesMap = new HashMap<Class, String>() {
+		private static final long serialVersionUID = 1L;
+		{
+			put(User.class, MAPPING_USERS);
+			put(Issue.class, MAPPING_ISSUES);
+			put(Project.class, MAPPING_PROJECTS_LIST);
+		}
+	};
 
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
-		verifyStartsAsXML(xml);
-		
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, Issue.class);
-
-		Issue issue = null;
-		StringReader reader = null;
-		try {
-			 System.err.println(xml);
-			reader = new StringReader(xml);
-			issue = (Issue) unmarshaller.unmarshal(reader);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return issue;
+		return parseObjectFromXML(Issue.class, xml);
 	}
 
 	public static Project parseProjectFromXML(String xml)
 			throws RuntimeException {
-//		System.out.println("parseProjectFromXML:" + xml);
-		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, Project.class);
-
-		Project project = null;
-		StringReader reader = null;
-		try {
-			reader = new StringReader(xml);
-			project = (Project) unmarshaller.unmarshal(reader);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
-		return project;
+		return parseObjectFromXML(Project.class, xml);
 	}
 
 	public static List<Issue> parseIssuesFromXML(String xml)
@@ -109,6 +87,7 @@ public class RedmineXMLParser {
 
 	private static Unmarshaller getUnmarshaller(String configFile,
 			Class<?> classToUse) {
+//		String configFile = configFilesMap.get(classToUse);
 		InputSource inputSource = new InputSource(
 				RedmineXMLParser.class.getResourceAsStream(configFile));
 		ClassLoader cl = RedmineXMLParser.class.getClassLoader();
@@ -166,7 +145,33 @@ public class RedmineXMLParser {
 		return list;
 	}
 
+	public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
+		verifyStartsAsXML(xml);
+		String configFile = configFilesMap.get(classs);
+		Unmarshaller unmarshaller = getUnmarshaller(configFile, classs);
+
+		T obj = null;
+		StringReader reader = null;
+		try {
+//			 System.err.println(xml);
+			reader = new StringReader(xml);
+			obj = (T) unmarshaller.unmarshal(reader);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				reader.close();
+			}
+		}
+		return obj;
+	}
+
 	public static List<User> parseUsersFromXML(String body) {
 		return parseItemsFromXML(MAPPING_USERS, User.class, body);
+	}
+
+	public static User parseUserFromXML(String body) {
+		return parseObjectFromXML(User.class, body);
 	}
 }

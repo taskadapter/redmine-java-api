@@ -781,5 +781,34 @@ public class RedmineManager {
 		}
 		return query;
 	}
+	
+	public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException {
+        String query = getURLUserById(userId);
+		HttpGet http = new HttpGet(query);
+		Response response = sendRequest(http);
+		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
+			throw new NotFoundException("User with id '" + userId + "' is not found.");
+		}
+		return RedmineXMLParser.parseUserFromXML(response.getBody());
+	}
+
+	/**
+	 * <p>HTTP request:
+	 * <pre>GET /users/[id].xml</pre>
+	 */
+	private String getURLUserById(Integer id){
+        return host + "/users/" + id + ".xml?key=" +apiAccessKey;
+	}
+	
+	public User getCurrentUser() throws IOException, AuthenticationException{
+        String query = getURLCurrentUser();
+		HttpGet http = new HttpGet(query);
+		Response response = sendRequest(http);
+		return RedmineXMLParser.parseUserFromXML(response.getBody());
+	}
+
+	private String getURLCurrentUser() {
+		return host + "/users/current.xml?key=" +apiAccessKey;
+	}
 
 }
