@@ -6,6 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/httpcomponents-client-4.0.1/httpclient-4.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpcomponents-client-4.0.1/httpcore-4.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/httpcomponents-client-4.0.1/httpmime-4.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1/commons-logging-1.1.1-javadoc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1/commons-logging-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1/commons-logging-adapters-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons-logging-1.1.1/commons-logging-api-1.1.1.jar"/>
@@ -21,5 +22,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="output" path="target/classes"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>
