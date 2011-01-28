@@ -16,6 +16,7 @@ import org.alskor.redmine.beans.Tracker;
 import org.junit.Test;
 
 public class TestRedmineXMLParser {
+	private static final String REDMINE_1_1_ISSUES_XML = "redmine_1_1_issues.xml";
 	private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
 
 	@Test
@@ -39,16 +40,16 @@ public class TestRedmineXMLParser {
 	public void testCountIssues() {
 		try {
 			String xml = MyIOUtils
-					.getResourceAsString("test_issues_big_file.xml");
+					.getResourceAsString(REDMINE_1_1_ISSUES_XML);
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
-			assertEquals(40, issues.size());
+			assertEquals(26, issues.size());
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
 
 	}
 
-	@Test
+/*	@Test
 	public void testParseProjectXMLRedmine_1_0() {
 		String xml;
 		try {
@@ -61,10 +62,6 @@ public class TestRedmineXMLParser {
 			assertEquals(expectedName, project.getName());
 			assertEquals(expectedKey, project.getIdentifier());
 
-			/**
-			 * <tracker name="Feature" id="2"/> <tracker name="Support" id="3"/>
-			 * <tracker name="Bug" id="1"/> <tracker name="Task" id="4"/>
-			 */
 			List<Tracker> trackers = project.getTrackers();
 			assertNotNull("Trackers list must not be NULL", trackers);
 			assertEquals(4, trackers.size());
@@ -78,7 +75,7 @@ public class TestRedmineXMLParser {
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
-	}
+	}*/
 
 	@Test
 	public void testParseProjectXMLRedmine_1_1() {
@@ -116,7 +113,7 @@ public class TestRedmineXMLParser {
 	public void testParseProjectNoTrackerXML() {
 		String xml;
 		try {
-			xml = MyIOUtils.getResourceAsString("project_no_trackers.xml");
+			xml = MyIOUtils.getResourceAsString("redmine_1_1_project_no_trackers.xml");
 			Project project = RedmineXMLParser.parseProjectFromXML(xml);
 			List<Tracker> trackers = project.getTrackers();
 			assertNull("Trackers list must be NULL", trackers);
@@ -139,14 +136,15 @@ public class TestRedmineXMLParser {
 	public void testNullEstimatedTime() {
 		String str;
 		try {
-			str = MyIOUtils.getResourceAsString("issues.xml");
+			str = MyIOUtils.getResourceAsString(REDMINE_1_1_ISSUES_XML);
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(str);
-			Issue issue210 = findIssueInList(issues, 210);
-			assertNotNull(issue210);
+			Integer issueID = 52;
+			Issue issue52 = findIssueInList(issues, issueID);
+			assertNotNull(issue52);
 
 			// must be NULL and not "0"
 			assertNull("estimated time must be null",
-					issue210.getEstimatedHours());
+					issue52.getEstimatedHours());
 		} catch (IOException e) {
 			fail(e.getMessage());
 		}
@@ -198,11 +196,11 @@ public class TestRedmineXMLParser {
 	public void testParseDescription() {
 		try {
 			String xml = MyIOUtils
-					.getResourceAsString("issues.xml");
+					.getResourceAsString(REDMINE_1_1_ISSUES_XML);
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
-			Issue issue210 = findIssueInList(issues, 210);
-			assertTrue(issue210.getDescription().startsWith("Announcements2010/12/22 Announcing the Eclipse Mobile"));
-			assertTrue(issue210.getDescription().endsWith("series. For December 6-10, here are the DemoCamps taking place"));
+			Issue issue65 = findIssueInList(issues, 65);
+			assertTrue(issue65.getDescription().startsWith("This is the description for the new task."));
+			assertTrue(issue65.getDescription().endsWith("This is the last line."));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
