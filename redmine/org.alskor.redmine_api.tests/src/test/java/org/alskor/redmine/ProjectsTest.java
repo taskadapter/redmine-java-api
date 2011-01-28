@@ -18,22 +18,22 @@ public class ProjectsTest {
 	@Before
 	// Is executed before each test method
 	public void setup() throws Exception {
-		String text = MyIOUtils.getResourceAsString("projects.xml");
+		String text = MyIOUtils.getResourceAsString("redmine_1_1_projects.xml");
 		projectsList = RedmineXMLParser.parseProjectsFromXML(text);
 	}
 
 	@Test
 	public void testProjectsNumber() {
-		int expectedProjectsNumber = 6;
+		int expectedProjectsNumber = 12;
 		assertEquals("Checking projects number" , expectedProjectsNumber, projectsList.size());
 	}
 
 	@Test
 	public void testProjects1Info() {
 		Project aceProject = new Project();
-		aceProject.setId(7);
-		aceProject.setIdentifier("ace");
-		aceProject.setName("ace");
+		aceProject.setId(15);
+		aceProject.setIdentifier("test1295577237142");
+		aceProject.setName("test project 15");
 
 		Project projectFromList = findProjectInList(aceProject.getId());
 		assertNotNull("Checking project is loaded", projectFromList);
