@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.alskor.redmine.RedmineManager;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.exolab.castor.mapping.Mapping;
@@ -16,10 +15,13 @@ import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
 
+	private static final int UNKNOWN = -1;
+	public static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
+	public static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
+
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
 		verifyStartsAsXML(xml);
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
-				RedmineXMLParser.MAPPING_ISSUES, Issue.class);
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, Issue.class);
 
 		Issue issue = null;
 		StringReader reader = null;
@@ -41,8 +43,7 @@ public class RedmineXMLParser {
 	public static Project parseProjectFromXML(String xml)
 			throws RuntimeException {
 //		System.out.println("parseProjectFromXML:" + xml);
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
-				RedmineXMLParser.MAPPING_PROJECTS_LIST, Project.class);
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, Project.class);
 
 		Project project = null;
 		StringReader reader = null;
@@ -66,8 +67,7 @@ public class RedmineXMLParser {
 		verifyStartsAsXML(xml);
 		
 		xml = RedmineXMLParser.removeBadTags(xml);
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
-				RedmineXMLParser.MAPPING_ISSUES, ArrayList.class);
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_ISSUES, ArrayList.class);
 
 		List<Issue> resultList = null;
 		StringReader reader = null;
@@ -104,7 +104,7 @@ public class RedmineXMLParser {
 		// System.out.println(reg);
 		Pattern pattern = Pattern.compile(reg);
 		Matcher matcher = pattern.matcher(issuesXML);
-		int result = RedmineXMLParser.UNKNOWN;
+		int result = UNKNOWN;
 		if (matcher.find()) {
 
 			int indexBeginNumber = matcher.end();
@@ -120,8 +120,7 @@ public class RedmineXMLParser {
 
 	public static List<Project> parseProjectsFromXML(String xml) {
 //		System.out.println("parseProjectsFromXML:" + xml);
-		Unmarshaller unmarshaller = RedmineXMLParser.getUnmarshaller(
-				RedmineXMLParser.MAPPING_PROJECTS_LIST, ArrayList.class);
+		Unmarshaller unmarshaller = getUnmarshaller(MAPPING_PROJECTS_LIST, ArrayList.class);
 
 		List<Project> list = null;
 		StringReader reader = null;
@@ -141,7 +140,7 @@ public class RedmineXMLParser {
 	private static Unmarshaller getUnmarshaller(String configFile,
 			Class classToUse) {
 		InputSource inputSource = new InputSource(
-				RedmineManager.class.getResourceAsStream(configFile));
+				RedmineXMLParser.class.getResourceAsStream(configFile));
 		Mapping mapping = new Mapping();
 		mapping.loadMapping(inputSource);
 
@@ -154,10 +153,6 @@ public class RedmineXMLParser {
 		unmarshaller.setClass(classToUse);
 		return unmarshaller;
 	}
-
-	public static final int UNKNOWN = -1;
-	public static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
-	public static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 
 	/**
 	 * @throws  RuntimeException if the text does not start with a valid XML tag.
