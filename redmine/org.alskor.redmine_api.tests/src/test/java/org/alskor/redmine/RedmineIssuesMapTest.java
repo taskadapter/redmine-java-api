@@ -24,7 +24,7 @@ public class RedmineIssuesMapTest {
 //	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 13;
 	
 	private static final String REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME = "redmine_1_1_issues.xml";
-	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 25;
+	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 26;
 	
 	private List<Issue> issuesList;
 	private HashMap<Integer, Issue> issuesMap;

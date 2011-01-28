@@ -141,7 +141,10 @@ public class RedmineXMLParser {
 			Class classToUse) {
 		InputSource inputSource = new InputSource(
 				RedmineXMLParser.class.getResourceAsStream(configFile));
-		Mapping mapping = new Mapping();
+		ClassLoader cl = RedmineXMLParser.class.getClassLoader();
+		// Note: Castor XML is packed in a separate OSGI bundle, so
+		// must set the classloader so that Castor will see our classes
+		Mapping mapping = new Mapping(cl);
 		mapping.loadMapping(inputSource);
 
 		Unmarshaller unmarshaller;
