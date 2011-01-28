@@ -563,4 +563,11 @@ public class RedmineManagerTest {
 			fail(e.getMessage());
 		}
 	}
+	
+	@Test
+	public void testGetCurrentUser() throws IOException, AuthenticationException {
+		User currentUser = mgr.getCurrentUser();
+		assertEquals(getOurUser().getId(), currentUser.getId());
+		assertEquals(getOurUser().getLogin(), currentUser.getLogin());
+	}
 }
