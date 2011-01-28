@@ -1,6 +1,8 @@
 package org.alskor.redmine.internal;
 
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,22 +10,24 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.alskor.redmine.RedmineManager;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
 import org.alskor.redmine.beans.User;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
 
 	private static final int UNKNOWN = -1;
-	public static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
-	public static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
-	public static final String MAPPING_USERS = "/mapping_users.xml";
+	private static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
+	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
+	private static final String MAPPING_USERS = "/mapping_users.xml";
 	
-	// TODO optimize : load pre-xml 
+	// TODO optimize : pre-load xml 
 	private static final Map<Class, String> configFilesMap = new HashMap<Class, String>() {
 		private static final long serialVersionUID = 1L;
 		{
@@ -174,4 +178,33 @@ public class RedmineXMLParser {
 	public static User parseUserFromXML(String body) {
 		return parseObjectFromXML(User.class, body);
 	}
+	
+	public static String convertObjectToXML(Object obj) {
+		String configfile = configFilesMap.get(obj.getClass());
+		StringWriter writer = new StringWriter();
+		try {
+			Marshaller m = getMarshaller(configfile, writer);
+			m.marshal(obj);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return writer.toString();
+	}
+
+	private static Marshaller getMarshaller(String configFile, Writer writer) {
+		InputSource inputSource = new InputSource(
+				RedmineManager.class.getResourceAsStream(configFile));
+		Mapping mapping = new Mapping();
+		mapping.loadMapping(inputSource);
+
+		Marshaller marshaller;
+		try {
+			marshaller = new Marshaller(writer);
+			marshaller.setMapping(mapping);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return marshaller;
+	}
+
 }

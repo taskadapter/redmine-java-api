@@ -10,6 +10,7 @@ import java.util.Date;
 public class User {
 	private Integer id;
 	private String login;
+	private String password;
 	private String firstName;
 	private String lastName;
 	private String mail;
@@ -92,6 +93,8 @@ public class User {
 				+ ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((login == null) ? 0 : login.hashCode());
 		result = prime * result + ((mail == null) ? 0 : mail.hashCode());
+		result = prime * result
+				+ ((password == null) ? 0 : password.hashCode());
 		return result;
 	}
 
@@ -139,6 +142,11 @@ public class User {
 				return false;
 		} else if (!mail.equals(other.mail))
 			return false;
+		if (password == null) {
+			if (other.password != null)
+				return false;
+		} else if (!password.equals(other.password))
+			return false;
 		return true;
 	}
 
@@ -149,5 +157,12 @@ public class User {
 		return firstName + " " + lastName;
 	}
 
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
 
 }
