@@ -1,9 +1,7 @@
 package org.alskor.redmine;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.net.URLEncoder;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -38,9 +36,6 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Marshaller;
-import org.xml.sax.InputSource;
 
 
 /**
@@ -678,7 +673,7 @@ public class RedmineManager {
         query+="&include=trackers";
         
 		HttpPost httpPost = new HttpPost(query);
-		String createProjectXML = convertToXML(project);
+		String createProjectXML = RedmineXMLParser.convertObjectToXML(project);
 //		System.out.println("create project:" + createProjectXML);
 		setEntity(httpPost, createProjectXML);
 
@@ -687,39 +682,12 @@ public class RedmineManager {
 		return createdProject;
 	}
 
-	private String convertToXML(Project project) {
-		StringWriter writer = new StringWriter();
-		try {
-			Marshaller m = getMarshaller(RedmineXMLParser.MAPPING_PROJECTS_LIST, writer);
-			m.marshal(project);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return writer.toString();
-	}
-
 	private String buildCreateProjectURI() {
 		return host + "/projects.xml?key=" + apiAccessKey;
 	}
 
 	private String buildUpdateProjectURI(String key) {
 		return host + "/projects/" + key +".xml?key=" + apiAccessKey;
-	}
-
-	private static Marshaller getMarshaller(String configFile, Writer writer) {
-		InputSource inputSource = new InputSource(
-				RedmineManager.class.getResourceAsStream(configFile));
-		Mapping mapping = new Mapping();
-		mapping.loadMapping(inputSource);
-
-		Marshaller marshaller;
-		try {
-			marshaller = new Marshaller(writer);
-			marshaller.setMapping(mapping);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return marshaller;
 	}
 
 	/**
@@ -738,7 +706,7 @@ public class RedmineManager {
 		 */
 		String query = buildUpdateProjectURI(project.getIdentifier());
 		HttpPut httpRequest = new HttpPut(query);
-		String projectXML = convertToXML(project);
+		String projectXML = RedmineXMLParser.convertObjectToXML(project);
 		setEntity(httpRequest, projectXML);
 		sendRequest(httpRequest);
 	}
@@ -810,5 +778,22 @@ public class RedmineManager {
 	private String getURLCurrentUser() {
 		return host + "/users/current.xml?key=" +apiAccessKey;
 	}
+
+	
+	public User createUser(User user) throws IOException,AuthenticationException {
+        String query = buildCreateUserQuery();
+		HttpPost httpPost = new HttpPost(query);
+		String xml = RedmineXMLParser.convertObjectToXML(user);
+//		System.out.println("create :" + createProjectXML);
+		setEntity(httpPost, xml);
+
+		Response response = sendRequest(httpPost);
+		return RedmineXMLParser.parseUserFromXML(response.getBody());
+	}
+	
+	private String buildCreateUserQuery() {
+		return host + "/users.xml?key=" + apiAccessKey;
+	}
+
 
 }

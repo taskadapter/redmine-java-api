@@ -577,4 +577,30 @@ public class RedmineManagerTest {
 		assertEquals(getOurUser().getId(), loadedUser.getId());
 		assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
 	}
+	
+	@Test
+	public void testCreateUser() throws IOException, AuthenticationException, NotFoundException {
+		User userToCreate = new User();
+		userToCreate.setFirstName("fname");
+		userToCreate.setLastName("lname");
+		long randomNumber = new Date().getTime();
+		userToCreate.setLogin("login" + randomNumber);
+		userToCreate.setMail("somemail" + randomNumber + "@somedomain.com");
+		userToCreate.setPassword("zzzz");
+		try {
+			User createdUser = mgr.createUser(userToCreate);
+			
+			assertNotNull("checking that a non-null project is returned", createdUser);
+			
+			assertEquals(userToCreate.getLogin(), createdUser.getLogin());
+			assertEquals(userToCreate.getFirstName(), createdUser.getFirstName());
+			assertEquals(userToCreate.getLastName(), createdUser.getLastName());
+			Integer id = createdUser.getId();
+			assertNotNull(id);
+			
+		} catch (Exception e) {
+			fail(e.getMessage());
+		} 
+	}
+
 }
