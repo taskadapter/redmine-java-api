@@ -12,7 +12,7 @@
   </properties>
 
   <modules>
-<!--    <module>org.alskor.redmine_api.deps</module>-->
+    <module>org.alskor.redmine_api.deps</module>
     <module>org.alskor.redmine_api</module>
   </modules>
   <build>
