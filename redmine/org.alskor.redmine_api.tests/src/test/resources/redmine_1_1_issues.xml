@@ -414,4 +414,22 @@
 		<created_on>2011-01-12T16:00:31-08:00</created_on>
 		<updated_on>2011-01-17T21:28:45-08:00</updated_on>
 	</issue>
+		<issue>
+		<id>239</id>
+		<project name="test" id="1" />
+		<tracker name="Bug" id="1" />
+		<status name="New" id="1" />
+		<priority name="High" id="5" />
+		<author name="Redmine Admin" id="1" />
+		<assigned_to name="Dina TheDog" id="3" />
+		<subject>task 239</subject>
+		<description></description>
+		<start_date>2011-01-12</start_date>
+		<due_date>2011-01-30</due_date>
+		<done_ratio>0</done_ratio>
+		<estimated_hours>20.0</estimated_hours>
+		<created_on>2011-01-12T16:00:31-08:00</created_on>
+		<updated_on>2011-01-17T21:28:45-08:00</updated_on>
+	</issue>
+	
 </issues>
