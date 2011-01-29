@@ -221,4 +221,19 @@ public class TestRedmineXMLParser {
 		assertTrue("Admin user must be among all the users", found);
 	}
 
+	@Test
+	public void testParse123() throws IOException {
+		String xml = MyIOUtils.getResourceAsString("redmine_1_1_issues.xml");
+		List<Issue> objects = RedmineXMLParser.parseIssuesFromXML(xml);
+		Integer issueId = 68;
+		Issue issue68 = findIssueInList(objects, issueId);
+		assertNotNull(issue68);
+		assertEquals(issueId, issue68.getId());
+		
+		User author = issue68.getAuthor();
+		assertNotNull(author);
+		Integer userId = 1;
+		assertEquals(userId, author.getId());
+	}
+
 }

@@ -49,7 +49,7 @@ public class RedmineXMLParser {
 	public static List<Issue> parseIssuesFromXML(String xml)
 			throws RuntimeException {
 		xml = removeBadTags(xml);
-		return parseItemsFromXML(MAPPING_ISSUES, Issue.class, xml);
+		return parseObjectsFromXML(Issue.class, xml);
 	}
 
 	// see bug https://www.hostedredmine.com/issues/8240
@@ -86,7 +86,7 @@ public class RedmineXMLParser {
 	}
 
 	public static List<Project> parseProjectsFromXML(String xml) {
-		return parseItemsFromXML(MAPPING_PROJECTS_LIST, Project.class, xml);
+		return parseObjectsFromXML(Project.class, xml);
 	}
 
 	private static Unmarshaller getUnmarshaller(String configFile,
@@ -130,9 +130,11 @@ public class RedmineXMLParser {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <T> List<T> parseItemsFromXML(String mappingFile, Class<T> classs, String body) {
+	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body) {
+		System.out.println("parseObjectsFromXML:" + body);
 		verifyStartsAsXML(body);
-		Unmarshaller unmarshaller = getUnmarshaller(mappingFile, ArrayList.class);
+		String configFile = configFilesMap.get(classs);
+		Unmarshaller unmarshaller = getUnmarshaller(configFile, ArrayList.class);
 
 		List<T> list = null;
 		StringReader reader = null;
@@ -172,7 +174,7 @@ public class RedmineXMLParser {
 	}
 
 	public static List<User> parseUsersFromXML(String body) {
-		return parseItemsFromXML(MAPPING_USERS, User.class, body);
+		return parseObjectsFromXML(User.class, body);
 	}
 
 	public static User parseUserFromXML(String body) {

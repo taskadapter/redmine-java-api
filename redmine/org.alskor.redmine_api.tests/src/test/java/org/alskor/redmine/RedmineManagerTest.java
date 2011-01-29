@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -638,4 +640,55 @@ public class RedmineManagerTest {
 		} 
 	}
 
+	
+	@Test
+	public void testGetIssuesPaging() {
+		try {
+			// create 27 issues. default page size is 25.
+			createIssues(27);
+//			mgr.setObjectsPerPage(5); <-- does not work now
+			List<Issue> issues = mgr.getIssues("test1296256368758", null);//projectKey, null);
+			System.out.println("testGetIssuesNEWMETHOD() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
+			assertTrue(issues.size()>26);
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	private void createIssues(int num) throws IOException, AuthenticationException, NotFoundException {
+		for (int i=0; i<num; i++){
+			Issue issueToCreate = new Issue();
+			issueToCreate.setSubject("testGetIssues: " + i + " " + new Date());
+			mgr.createIssue(projectKey, issueToCreate);
+		}
+		
+	}
+
+	@Test
+	public void testProjectsAllPagesLoaded() throws IOException, AuthenticationException, NotFoundException, URISyntaxException{
+		int NUM = 27; // must be larger than 25, which is a default page size in Redmine
+		List<Project> projects = createProjects(NUM);
+		
+		List<Project> loadedProjects = mgr.getProjects();
+		assertTrue(loadedProjects.size()>NUM);
+		
+		deleteProjects(projects);
+	}
+	
+	private List<Project> createProjects(int num) throws IOException, AuthenticationException, NotFoundException {
+		List<Project> projects = new ArrayList<Project>(num);
+		for (int i=0; i<num; i++){
+			Project projectToCreate = generateRandomProject();
+			Project p = mgr.createProject(projectToCreate);
+			projects.add(p);
+		}
+		return projects;
+	}
+
+	private void deleteProjects(List<Project> projects) throws IOException, AuthenticationException, NotFoundException {
+		for(Project p : projects) {
+			mgr.deleteProject(p.getIdentifier());
+		}
+	}	
 }
