@@ -1,6 +1,7 @@
 package org.alskor.redmine.beans;
 
 import java.util.Date;
+import java.util.StringTokenizer;
 
 /**
  * Redmine's User.
@@ -153,10 +154,24 @@ public class User {
 	/**
 	 * @return firstName + space + lastName
 	 */
-	public Object getFullName() {
+	public String getFullName() {
 		return firstName + " " + lastName;
 	}
 
+	/**
+	 * This is a BIG HACK just to workaround the crappy Redmine REST API limitation.
+	 * see http://www.redmine.org/issues/7487
+	 */
+	public void setFullName(String fullName) {
+		StringTokenizer st = new StringTokenizer(fullName);
+		if (st.hasMoreTokens()) {
+			this.firstName = st.nextToken();
+		}
+		if (st.hasMoreTokens()) {
+			this.lastName = st.nextToken();
+		}
+	}
+	
 	public String getPassword() {
 		return password;
 	}

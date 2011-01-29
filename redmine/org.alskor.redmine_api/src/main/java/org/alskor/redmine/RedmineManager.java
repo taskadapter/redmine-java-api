@@ -2,12 +2,18 @@ package org.alskor.redmine;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -22,6 +28,7 @@ import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -29,12 +36,15 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 
@@ -45,16 +55,27 @@ import org.apache.http.util.EntityUtils;
  */
 public class RedmineManager {
 	private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
+	private static final String CHARSET = "UTF-8";
 
-	private static final int DEFAULT_TASKS_PER_PAGE = 25;
+	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
 //	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
 //		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
 
 	private String host;
 	private String apiAccessKey;
-	private int tasksPerPage = DEFAULT_TASKS_PER_PAGE;
+	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 
+	private static final Map<Class, String> urls = new HashMap<Class, String>() {
+		private static final long serialVersionUID = 1L;
+		{
+			put(User.class, "users.xml");
+			put(Issue.class, "issues.xml");
+			put(Project.class, "projects.xml");
+		}
+	};
+
+	
 //	private static boolean trialMode = true;
 	
 /*	static {
@@ -194,7 +215,7 @@ public class RedmineManager {
 	}
 	
 	private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
-		StringEntity entity = new StringEntity(xmlBody, "UTF-8");
+		StringEntity entity = new StringEntity(xmlBody, CHARSET);
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
 	}
@@ -213,6 +234,7 @@ public class RedmineManager {
 			// TODO should I show this key in the clear text?
 			throw new AuthenticationException("Authorization error for API access key = " + apiAccessKey);
 		}
+		
 		HttpEntity responseEntity = httpResponse.getEntity();
 		String responseBody = EntityUtils.toString(responseEntity);
 
@@ -301,36 +323,16 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException 
 	 */
-	public List<Project> getProjects() throws IOException,AuthenticationException{
-		String query = buildGetProjectsURLString();
-		HttpGet http = new HttpGet(query);
-		Response response = sendRequest(http);
-		return RedmineXMLParser.parseProjectsFromXML(response.getBody());
-	}
-	
-	private String buildGetProjectsURLString() {
-		String query = host + "/projects.xml";
-		if (apiAccessKey != null) {
-			query += "?key=" + apiAccessKey;
+	public List<Project> getProjects() throws IOException,AuthenticationException {
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		try {
+			return getObjectsListV104(Project.class, params);
+		} catch (NotFoundException e) {
+			throw new RuntimeException("NotFoundException received, which should never happen in this request");
 		}
-		return query;
 	}
-	
-//	public List<Issue> createIssues(String projectKey, List<Issue> tasks) {
-//		List<Issue> createdIssues = new ArrayList<Issue>();
-//		Iterator<Issue> it = tasks.iterator();
-//		while (it.hasNext()) {
-//			Issue issueToCreate = it.next();
-//			try {
-//				Issue newIssue = createIssue(projectKey, issueToCreate);
-//				createdIssues.add(newIssue);
-//			} catch (Exception e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
-//		return createdIssues;
-//	}
 	
 	/**
 	 * There could be several issues with the same summary, so the method returns List. 
@@ -342,38 +344,20 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws URISyntaxException 
+	 * @throws NotFoundException 
 	 */
-	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException {
-		String query = buildQueryIssueBySummaryURL(projectKey, summaryField);
-		HttpGet http = new HttpGet(query);
-		Response response = sendRequest(http);
+	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException, NotFoundException, URISyntaxException {
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		params.put("subject", new BasicNameValuePair("subject", summaryField));
 
-		List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(response.getBody());
-		return foundIssues;
+		if ((projectKey != null) && (!projectKey.isEmpty())) {
+			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
+		}
+
+		return getObjectsListV104(Issue.class, params);
 	}
 	
-	private String buildQueryIssueBySummaryURL(String projectKey, String issueSummary) {
-		String charset = "UTF-8";
-		String query;
-		try {
-			query = String.format("/projects/%s/issues.xml?subject=%s", 
-				     URLEncoder.encode(projectKey, charset),
-				     URLEncoder.encode(issueSummary, charset));
-		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
-		}
-		
-		if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
-			try {
-				query += String.format("&key=%s", 
-					     URLEncoder.encode(apiAccessKey, charset) );
-			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return host + query;
-	}
-
 	/**
 	 * 
 	 * @param id the Redmine issue ID
@@ -467,6 +451,39 @@ public class RedmineManager {
 		}
 	}
 
+	// XXX this method will be used soon instead of temporary getIssuesV104()
+/*	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
+		WebConnector c = new WebConnector();
+		List<Issue>  allTasks = new ArrayList<Issue>();
+		
+		int offsetIssuesNum = 0;
+		int totalIssuesFoundOnServer = RedmineXMLParser.UNKNOWN;
+		int loaded = -1;
+//		int pageNum=0;
+		
+		do {
+			URL url = buildGetIssuesByQueryURL(projectKey, queryId, offsetIssuesNum);
+
+			StringBuffer responseXML = c.loadData(url);
+
+			totalIssuesFoundOnServer = RedmineXMLParser.parseIssuesTotalCount(responseXML
+					.toString());
+			
+			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXML.toString());
+			// assuming every page has the same number of items 
+			loaded = foundIssues.size();
+			allTasks.addAll(foundIssues);
+			offsetIssuesNum+= loaded;
+			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
+			if (totalIssuesFoundOnServer == RedmineXMLParser.UNKNOWN) {
+				totalIssuesFoundOnServer = loaded;
+			}
+		} while (offsetIssuesNum < totalIssuesFoundOnServer);
+
+		return allTasks;
+	}
+*/
+
 	/**
 	 * 
 	 * @param projectKey
@@ -483,79 +500,100 @@ public class RedmineManager {
 	 *             
 	 * @see Issue
 	 */
-	public List<Issue> getIssues(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException {
-//		if (mode.equals(REDMINE_VERSION.TRUNK)) {
-//			return getIssuesTrunk(projectKey, queryId);
-//		} else if (mode.equals(REDMINE_VERSION.V104)) {
-		List<Issue> issues = getIssuesV104(projectKey, queryId);
+	public List<Issue> getIssues(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException, URISyntaxException {
+		// have to load users first because the issues response does not contain the users names
+		// see http://www.redmine.org/issues/7487
+//		List<User> users = getUsers();
+//		Map<Integer, User> idToUserMap = buildIdToUserMap(users);
 		
-//		if (trialMode) {
-//			int tasksToLeave = Math.min(LicenseManager.TRIAL_TASKS_NUMBER_LIMIT, issues.size());
-//			issues =  issues.subList(0, tasksToLeave);			
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		if (queryId != null) {
+			params.put("query_id", new BasicNameValuePair("query_id", String.valueOf(queryId)));
+		}
+
+		if ((projectKey != null) && (!projectKey.isEmpty())) {
+			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
+		}
+
+		List<Issue> issues = getObjectsListV104(Issue.class, params);
+//		setUserFields(issues, idToUserMap);
+		return issues;
+	}
+	
+//	private void setUserFields(List<Issue> issues,
+//			Map<Integer, User> idToUserMap) {
+//		for (Issue issue : issues) {
+//			User author = issue.getAuthor();
+//			if (author != null) {
+//				User completelyFilledUser = idToUserMap.get(author.getId());
+//				issue.setAuthor(completelyFilledUser);
+//			}
+//			User assignee = issue.getAssignee();
+//			if (assignee != null) {
+//				User completelyFilledUser = idToUserMap.get(author.getId());
+//				issue.setAssignee(completelyFilledUser);
+//			}
 //		}
+//	}
 
-		return issues; 
+	private Map<Integer, User> buildIdToUserMap(List<User> usersList) {
+		Map<Integer, User> idToUserMap = new HashMap<Integer, User>();
+		for (User u : usersList) {
+			idToUserMap.put(u.getId(), u);
+		}
+		return idToUserMap;
+	}
+
+	
+	/**
+	 * This ONLY works with Redmine 1.0.  Redmine 1.1 uses "objects per page" parameter instead!
+	 * @param params
+	 */
+	private void addPagingParameters(Map<String, NameValuePair> params) {
+		params.put("per_page", new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
 	}
 	
-	// XXX this method will be used soon instead of temporary getIssuesV104()
-/*	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
-		WebConnector c = new WebConnector();
-		List<Issue>  allTasks = new ArrayList<Issue>();
-		
-		int offsetIssuesNum = 0;
-		int totalIssuesFoundOnServer = RedmineXMLParser.UNKNOWN;
-		int loaded = -1;
-//		int pageNum=0;
-		
-		do {
-			URL url = buildGetIssuesByQueryURL(projectKey, queryId, offsetIssuesNum);
-
-			StringBuffer responseXML = c.loadData(url);
-//			System.err.println("RedmineManager: "  + responseXML);
-
-			totalIssuesFoundOnServer = RedmineXMLParser.parseIssuesTotalCount(responseXML
-					.toString());
-			
-			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXML.toString());
-			// assuming every page has the same number of items 
-			loaded = foundIssues.size();
-//			System.err.println("totalIssuesFoundOnServer="
-//					+ totalIssuesFoundOnServer + " loaded = "
-//					+ loaded);
-			allTasks.addAll(foundIssues);
-			offsetIssuesNum+= loaded;
-			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
-			if (totalIssuesFoundOnServer == RedmineXMLParser.UNKNOWN) {
-				totalIssuesFoundOnServer = loaded;
-			}
-		} while (offsetIssuesNum < totalIssuesFoundOnServer);
-
-		return allTasks;
+	private void addAuthParameters(Map<String, NameValuePair> params) {
+		if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
+			params.put("key", new BasicNameValuePair("key", apiAccessKey));
+		}
 	}
-*/
 	
-	// IMPORTANT!! this method works with both Redmine 1.0.4 and Redmine/TRUNK versions (Dec 22, 2010)
-	private List<Issue> getIssuesV104(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException {
-		List<Issue>  allTasks = new ArrayList<Issue>();
+	private <T> List<T> getObjectsListV104(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException {
+		List<T>  objects = new ArrayList<T>();
 		
 		final int FIRST_REDMINE_PAGE = 1;
 		int pageNum = FIRST_REDMINE_PAGE;
 		// Redmine 1.0.4 (and Trunk at this moment - Dec 22, 2010) returns the same page1 when no other pages are available!!
 		String firstPage=null;
 		
+		addPagingParameters(params);
+		addAuthParameters(params);
+		
 		do {
-			String query = buildGetIssuesByQueryURLRedmine104(projectKey, queryId,
-					pageNum);
-
-			HttpGet http = new HttpGet(query);
-			Response response = sendRequest(http);
+			params.put("page", new BasicNameValuePair("page", String.valueOf(pageNum)));
+			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
 			
-			if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
-				throw new NotFoundException("Project with key '" + projectKey + "' or query with ID " + queryId + " is not found on the server.");
+			URI uri;
+			try {
+				uri = URIUtils.createURI(getProtocol(), getHost(), getPort(), urls.get(objectClass), 
+					    URLEncodedUtils.format(paramsList, CHARSET), null);
+			} catch (URISyntaxException e) {
+				throw new RuntimeException("URISyntaxException: " + e.getMessage());
 			}
+
+			HttpGet http = new HttpGet(uri);
+// 			commented out because this only works in Redmine 1.1 !!			
+//			totalIssuesFoundOnServer = RedmineXMLParser.parseIssuesTotalCount(responseXML
+//					.toString());
+
+			Response response = sendRequest(http);
+			if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
+				throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
+			}
+
 			String body = response.getBody();
 			
-//			System.err.println(responseXmlString);
 			if (pageNum == FIRST_REDMINE_PAGE) {
 				firstPage = body;
 			} else {
@@ -566,78 +604,34 @@ public class RedmineManager {
 					break;
 				}
 			}
-			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(body);
-			if (foundIssues.size() == 0) {
+			List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
+			if (foundItems.size() == 0) {
 				// and this is to provide compatibility with Redmine 1.1.0
 				break;
 			}
-			// assuming every page has the same number of items 
-//			loaded = foundIssues.size();
-			allTasks.addAll(foundIssues);
+			objects.addAll(foundItems);
 
-//			readMore = false;
-//			if ((pageNum == 1) && loaded==tasksPerPage) {
-//				readMore = true;
-//			} else if (loaded ==loadedOnPreviousStep){
-//				readMore = true;
-//			}
 			pageNum++;
 		} while (true);
 
-		return allTasks;
+		return objects;
 	}
 
-	/**
-	 * sample: http://demo.redmine.org/projects/ace/issues.xml?query_id=302
-	 */
-//	private URL buildGetIssuesByQueryURL(String projectKey, String queryId, int offsetIssuesNum) {
-//		String charset = "UTF-8";
-//		URL url = null;
-//		try {
-//			String query = String.format("/issues.xml?project_id=%s&query_id=%s",
-//					URLEncoder.encode(projectKey, charset),
-//					URLEncoder.encode(queryId, charset));
-//			query += "&offset=" + offsetIssuesNum;
-//			query += "&limit=" + tasksPerPage;
-//			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
-//				query += String.format("&key=%s",
-//						URLEncoder.encode(apiAccessKey, charset));
-//			}
-//			url = new URL(host + query);
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//		return url;
-//
-//	}
-
-	private String buildGetIssuesByQueryURLRedmine104(String projectKey, Integer queryId, int pageNum) {
-		String charset = "UTF-8";
-//		URL url = null;
-		String query = host + "/issues.xml";
-
-		try {
-			query += "?page=" + pageNum;
-			query += "&per_page=" + tasksPerPage;
-			if ((projectKey != null) && (!projectKey.isEmpty())) {
-				query += String.format("&project_id=%s",
-						URLEncoder.encode(projectKey, charset));
-			}
-			if (queryId != null) {
-				query += "&query_id=" +	queryId.toString();
-			}
-			if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
-				query += String.format("&key=%s",
-						URLEncoder.encode(apiAccessKey, charset));
-			}
-//			url = new URL(host + query);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return query;
-
+	private String getProtocol() throws MalformedURLException {
+		URL aURL = new URL(host);
+		return aURL.getProtocol();
 	}
 
+	private String getHost() throws MalformedURLException {
+		URL aURL = new URL(host);
+		return aURL.getHost();
+	}
+	
+	private Integer getPort() throws MalformedURLException {
+		URL aURL = new URL(host);
+		return aURL.getPort();
+	}
+	
 	/**
 	 * Sample usage:
 	 * <p>
@@ -712,18 +706,18 @@ public class RedmineManager {
 	}
 
 	/**
-	 * This number of tasks will be requested from Redmine server in getIssues() call. 
+	 * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request. 
 	 */
-	public int getTasksPerPage() {
-		return tasksPerPage;
+	public int getObjectsPerPage() {
+		return objectsPerPage;
 	}
 
 	// TODO add junit test
 	/**
-	 * This number of tasks will be requested from Redmine server in getIssues() call. 
+	 * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request. 
 	 */
-	public void setTasksPerPage(int tasksPerPage) {
-		this.tasksPerPage = tasksPerPage;
+	public void setObjectsPerPage(int pageSize) {
+		this.objectsPerPage = pageSize;
 	}
 
 	/**
@@ -734,22 +728,14 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws URISyntaxException 
+	 * @throws NotFoundException 
 	 */
-	public List<User> getUsers() throws IOException,AuthenticationException{
-		String query = buildGetUsersURLString();
-		HttpGet http = new HttpGet(query);
-		Response response = sendRequest(http);
-		return RedmineXMLParser.parseUsersFromXML(response.getBody());
+	public List<User> getUsers() throws IOException,AuthenticationException, NotFoundException, URISyntaxException{
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		return getObjectsListV104(User.class, params);
 	}
 
-	private String buildGetUsersURLString() {
-		String query = host + "/users.xml";
-		if (apiAccessKey != null) {
-			query += "?key=" + apiAccessKey;
-		}
-		return query;
-	}
-	
 	public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException {
         String query = getURLUserById(userId);
 		HttpGet http = new HttpGet(query);
@@ -778,13 +764,11 @@ public class RedmineManager {
 	private String getURLCurrentUser() {
 		return host + "/users/current.xml?key=" +apiAccessKey;
 	}
-
 	
 	public User createUser(User user) throws IOException,AuthenticationException {
         String query = buildCreateUserQuery();
 		HttpPost httpPost = new HttpPost(query);
 		String xml = RedmineXMLParser.convertObjectToXML(user);
-//		System.out.println("create :" + createProjectXML);
 		setEntity(httpPost, xml);
 
 		Response response = sendRequest(httpPost);
