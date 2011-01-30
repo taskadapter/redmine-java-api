@@ -9,13 +9,6 @@ public abstract class RedmineDateHandler extends GeneralizedFieldHandler {
 
 	public abstract Date getDate(String str) throws ParseException;
 	public abstract String getString(Date date);
-	
-	/**
-	 * Creates a new MyDateHandler instance
-	 */
-	public RedmineDateHandler() {
-		super();
-	}
 
 	/**
 	 * This method is used to convert the value when the getValue method is
