@@ -370,7 +370,7 @@ public class RedmineManagerTest {
 	}
 	
 	@Test
-	public void testCreateProject() throws IOException, AuthenticationException, NotFoundException {
+	public void testCreateProject() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Project projectToCreate = generateRandomProject();
 		String key = null;
 		try {
@@ -396,7 +396,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testCreateGetUpdateDeleteProject() throws IOException, AuthenticationException, NotFoundException {
+	public void testCreateGetUpdateDeleteProject() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Project projectToCreate = generateRandomProject();
 		String key = null;
 		try {
@@ -567,14 +567,14 @@ public class RedmineManagerTest {
 	}
 	
 	@Test
-	public void testGetCurrentUser() throws IOException, AuthenticationException {
+	public void testGetCurrentUser() throws IOException, AuthenticationException, RedmineException {
 		User currentUser = mgr.getCurrentUser();
 		assertEquals(getOurUser().getId(), currentUser.getId());
 		assertEquals(getOurUser().getLogin(), currentUser.getLogin());
 	}
 	
 	@Test
-	public void testGetUserById() throws IOException, AuthenticationException, NotFoundException {
+	public void testGetUserById() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		User loadedUser = mgr.getUserById(getOurUser().getId());
 		assertEquals(getOurUser().getId(), loadedUser.getId());
 		assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
@@ -656,7 +656,7 @@ public class RedmineManagerTest {
 		}
 	}
 
-	private void createIssues(int num) throws IOException, AuthenticationException, NotFoundException {
+	private void createIssues(int num) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		for (int i=0; i<num; i++){
 			Issue issueToCreate = new Issue();
 			issueToCreate.setSubject("testGetIssues: " + i + " " + new Date());
@@ -666,7 +666,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testProjectsAllPagesLoaded() throws IOException, AuthenticationException, NotFoundException, URISyntaxException{
+	public void testProjectsAllPagesLoaded() throws IOException, AuthenticationException, NotFoundException, URISyntaxException, RedmineException{
 		int NUM = 27; // must be larger than 25, which is a default page size in Redmine
 		List<Project> projects = createProjects(NUM);
 		
@@ -676,7 +676,7 @@ public class RedmineManagerTest {
 		deleteProjects(projects);
 	}
 	
-	private List<Project> createProjects(int num) throws IOException, AuthenticationException, NotFoundException {
+	private List<Project> createProjects(int num) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<Project> projects = new ArrayList<Project>(num);
 		for (int i=0; i<num; i++){
 			Project projectToCreate = generateRandomProject();
@@ -686,7 +686,7 @@ public class RedmineManagerTest {
 		return projects;
 	}
 
-	private void deleteProjects(List<Project> projects) throws IOException, AuthenticationException, NotFoundException {
+	private void deleteProjects(List<Project> projects) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		for(Project p : projects) {
 			mgr.deleteProject(p.getIdentifier());
 		}
