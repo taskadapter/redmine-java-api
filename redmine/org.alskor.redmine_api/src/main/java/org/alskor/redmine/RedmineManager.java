@@ -11,7 +11,6 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -146,8 +145,9 @@ public class RedmineManager {
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws NotFoundException
 	 * the project with the given projectKey is not found
+	 * @throws RedmineException 
 	 */
-	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException {
+	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException, RedmineException {
         String query = getCreateIssueURI();
 		HttpPost http = new HttpPost(query);
 		String xmlBody = getIssueXML(projectKey, issue);
@@ -195,8 +195,9 @@ public class RedmineManager {
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws NotFoundException the issue with the required ID is not found
+	 * @throws RedmineException 
 	 */
-	public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException {
+	public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		/* note: This method cannot return the updated Issue from Redmine 
 		 * because the server does not provide any XML in response.
 		 */
@@ -220,7 +221,7 @@ public class RedmineManager {
 		request.setEntity(entity);
 	}
 	
-	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException {
+	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
 		System.out.println(request.getRequestLine());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		wrapClient(httpclient);
@@ -231,12 +232,24 @@ public class RedmineManager {
 		System.out.println(httpResponse.getStatusLine());
 		int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode ==	HttpStatus.SC_UNAUTHORIZED) {
-			// TODO should I show this key in the clear text?
-			throw new AuthenticationException("Authorization error for API access key = " + apiAccessKey);
+			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key in the constructor arguments");
 		}
 		
 		HttpEntity responseEntity = httpResponse.getEntity();
 		String responseBody = EntityUtils.toString(responseEntity);
+
+		if (responseCode ==	HttpStatus.SC_UNPROCESSABLE_ENTITY) {
+			List<String> errors = RedmineXMLParser.parseErrors(responseBody);   
+			throw new RedmineException(errors);
+		}
+		/* 422 "invalid"
+		<?xml version="1.0" encoding="UTF-8"?>
+		<errors>
+		  <error>Name can't be blank</error>
+		  <error>Identifier has already been taken</error>
+		</errors>
+		 */
+		
 
 		// have to fill our own object, otherwise there's no guarantee 
 		// that the request body can be retrieved later ("socket closed" exception can occur) 
@@ -282,7 +295,9 @@ public class RedmineManager {
 		if (issue.getParentId() != null) {
 			xml += "<parent_issue_id>" + issue.getParentId() + "</parent_issue_id>";
 		}
-		xml += "<subject>" + issue.getSubject() + "</subject>";
+		if (issue.getSubject()!= null) {
+			xml += "<subject>" + issue.getSubject() + "</subject>";
+		}
 
 		if (issue.getTracker() != null) {
 			xml += "<tracker_id>" + issue.getTracker().getId() + "</tracker_id>";
@@ -323,9 +338,10 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws RedmineException 
 	 * @throws NotFoundException 
 	 */
-	public List<Project> getProjects() throws IOException,AuthenticationException {
+	public List<Project> getProjects() throws IOException,AuthenticationException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		try {
 			return getObjectsListV104(Project.class, params);
@@ -346,8 +362,9 @@ public class RedmineManager {
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws URISyntaxException 
 	 * @throws NotFoundException 
+	 * @throws RedmineException 
 	 */
-	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException, NotFoundException, URISyntaxException {
+	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException, NotFoundException, URISyntaxException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		params.put("subject", new BasicNameValuePair("subject", summaryField));
 
@@ -367,8 +384,9 @@ public class RedmineManager {
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws NotFoundException the issue with the given id is not found on the server
+	 * @throws RedmineException 
 	 */
-	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException {
+	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         String query = getURLIssueById(id);
 		HttpGet http = new HttpGet(query);
 		Response response = sendRequest(http);
@@ -389,8 +407,9 @@ public class RedmineManager {
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws NotFoundException the project with the given key is not found
+	 * @throws RedmineException 
 	 */
-	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException, NotFoundException {
+	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         String query = getURLProjectByKey(projectKey);
 		// see bug http://www.redmine.org/issues/7184
         query+="&include=trackers";
@@ -410,8 +429,9 @@ public class RedmineManager {
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws NotFoundException if the project with the given key is not found
+	 * @throws RedmineException 
 	 */
-	public void deleteProject(String projectKey) throws IOException, AuthenticationException, NotFoundException {
+	public void deleteProject(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         String query = getURLProjectByKey(projectKey);
         HttpDelete http = new HttpDelete(query);
 		Response response = sendRequest(http);
@@ -497,10 +517,11 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws RedmineException 
 	 *             
 	 * @see Issue
 	 */
-	public List<Issue> getIssues(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException, URISyntaxException {
+	public List<Issue> getIssues(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException, URISyntaxException, RedmineException {
 		// have to load users first because the issues response does not contain the users names
 		// see http://www.redmine.org/issues/7487
 //		List<User> users = getUsers();
@@ -535,14 +556,13 @@ public class RedmineManager {
 //			}
 //		}
 //	}
-
-	private Map<Integer, User> buildIdToUserMap(List<User> usersList) {
-		Map<Integer, User> idToUserMap = new HashMap<Integer, User>();
-		for (User u : usersList) {
-			idToUserMap.put(u.getId(), u);
-		}
-		return idToUserMap;
-	}
+//	private Map<Integer, User> buildIdToUserMap(List<User> usersList) {
+//		Map<Integer, User> idToUserMap = new HashMap<Integer, User>();
+//		for (User u : usersList) {
+//			idToUserMap.put(u.getId(), u);
+//		}
+//		return idToUserMap;
+//	}
 
 	
 	/**
@@ -559,7 +579,7 @@ public class RedmineManager {
 		}
 	}
 	
-	private <T> List<T> getObjectsListV104(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException {
+	private <T> List<T> getObjectsListV104(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<T>  objects = new ArrayList<T>();
 		
 		final int FIRST_REDMINE_PAGE = 1;
@@ -660,8 +680,9 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws RedmineException 
 	 */
-	public Project createProject(Project project) throws IOException,AuthenticationException {
+	public Project createProject(Project project) throws IOException,AuthenticationException, RedmineException {
         String query = buildCreateProjectURI();
 		// see bug http://www.redmine.org/issues/7184
         query+="&include=trackers";
@@ -691,9 +712,10 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws RedmineException 
 	 */
 	public void updateProject(Project project) throws IOException,
-			AuthenticationException {
+			AuthenticationException, RedmineException {
 		/*
 		 * note: This method cannot return the updated object from Redmine
 		 * because the server does not provide any XML in response.
@@ -730,13 +752,14 @@ public class RedmineManager {
 	 *             requires authorization. Check the constructor arguments.
 	 * @throws URISyntaxException 
 	 * @throws NotFoundException 
+	 * @throws RedmineException 
 	 */
-	public List<User> getUsers() throws IOException,AuthenticationException, NotFoundException, URISyntaxException{
+	public List<User> getUsers() throws IOException,AuthenticationException, NotFoundException, URISyntaxException, RedmineException{
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		return getObjectsListV104(User.class, params);
 	}
 
-	public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException {
+	public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         String query = getURLUserById(userId);
 		HttpGet http = new HttpGet(query);
 		Response response = sendRequest(http);
@@ -754,7 +777,7 @@ public class RedmineManager {
         return host + "/users/" + id + ".xml?key=" +apiAccessKey;
 	}
 	
-	public User getCurrentUser() throws IOException, AuthenticationException{
+	public User getCurrentUser() throws IOException, AuthenticationException, RedmineException{
         String query = getURLCurrentUser();
 		HttpGet http = new HttpGet(query);
 		Response response = sendRequest(http);
@@ -765,7 +788,7 @@ public class RedmineManager {
 		return host + "/users/current.xml?key=" +apiAccessKey;
 	}
 	
-	public User createUser(User user) throws IOException,AuthenticationException {
+	public User createUser(User user) throws IOException,AuthenticationException, RedmineException {
         String query = buildCreateUserQuery();
 		HttpPost httpPost = new HttpPost(query);
 		String xml = RedmineXMLParser.convertObjectToXML(user);
@@ -788,9 +811,10 @@ public class RedmineManager {
 	 * @throws AuthenticationException
 	 *             invalid or no API access key is used with the server, which
 	 *             requires authorization. Check the constructor arguments.
+	 * @throws RedmineException 
 	 */
 	public void updateUser(User user) throws IOException,
-			AuthenticationException {
+			AuthenticationException, RedmineException {
 		
 		String query = buildUpdateUserQuery(user.getId());
 		HttpPut httpRequest = new HttpPut(query);

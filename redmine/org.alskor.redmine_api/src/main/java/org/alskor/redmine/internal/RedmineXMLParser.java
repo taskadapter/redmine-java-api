@@ -209,4 +209,35 @@ public class RedmineXMLParser {
 		return marshaller;
 	}
 
+	/**
+	 * sample parameter:
+	 * <pre>
+	 * 	&lt;?xml version="1.0" encoding="UTF-8"?>
+	 *	&lt;errors>
+  	 *		&lt;error>Name can't be blank&lt;/error>
+  	 *		&lt;error>Identifier has already been taken&lt;/error>
+	 *	&lt;/errors>
+	 * </pre>
+	 * @param responseBody
+	 * @return
+	 */
+	public static List<String> parseErrors(String responseBody) {
+		List<String> errors = new ArrayList<String>();
+		/* I don't want to use Castor XML here with all these "include mapping" for errors file 
+		* and making sure the mapping files are accessible in a plugin/jar/classpath and so on */
+		String lines[] = responseBody.split("\\r?\\n");
+		// skip first two lines: xml declaration and <errors> tag
+		int lineToStartWith = 2;
+		// skip last line with </errors> tag
+		int lastLine = lines.length-1;
+		String openTag = "<error>";
+		String closeTag = "</error>";
+		for (int i=lineToStartWith; i<lastLine;i++ ) {
+			int begin = lines[i].indexOf(openTag) + openTag.length();
+			int end = lines[i].indexOf(closeTag);
+			errors.add(lines[i].substring(begin, end));
+		}
+//		errors.add(responseBody);
+		return errors;
+	}
 }
