@@ -6,34 +6,16 @@
 
     <parent>
         <artifactId>main</artifactId>
-        <groupId>org.redmine</groupId>
+        <groupId>org.alskor.redmine</groupId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
-    <groupId>org.redmine</groupId>
-    <artifactId>redmine_api</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <groupId>org.alskor.redmine</groupId>
+    <artifactId>redmine-api</artifactId>
+    <version>${redmine_api.version}</version>
     <packaging>eclipse-plugin</packaging>
 
-<!--      <dependencies>
-    	<dependency>
-    		<groupId>org.codehaus.castor</groupId>
-    		<artifactId>castor-xml</artifactId>
-    		<version>1.3.1</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>commons-logging</groupId>
-    		<artifactId>commons-logging</artifactId>
-    		<version>1.1.1</version>
-    	</dependency>
-    	<dependency>
-    		<groupId>org.apache.httpcomponents</groupId>
-    		<artifactId>httpclient</artifactId>
-    		<version>4.0.1</version>
-    	</dependency>
-    </dependencies>
--->    
     <!-- to generate Javadoc -->
     <build>
         <plugins>
@@ -44,6 +26,7 @@
                 <configuration>
                     <excludePackageNames>org.alskor.redmine.internal</excludePackageNames>
                 </configuration>
+
             </plugin>
         </plugins>
     </build>

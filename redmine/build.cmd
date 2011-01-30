@@ -1,1 +1,1 @@
-mvn clean package javadoc:javadoc assembly:assembly -DdescriptorId=bin
+mvn clean package javadoc:javadoc -DdescriptorId=bin

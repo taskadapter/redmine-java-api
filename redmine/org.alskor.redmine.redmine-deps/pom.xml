@@ -5,14 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <groupId>org.alskor.redmine</groupId>
         <artifactId>main</artifactId>
-        <groupId>org.redmine</groupId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
 
-    <groupId>org.redmine</groupId>
-    <artifactId>redmine_api_deps</artifactId>
+    <groupId>org.alskor.redmine</groupId>
+    <artifactId>redmine-deps</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>eclipse-plugin</packaging>
 </project>
