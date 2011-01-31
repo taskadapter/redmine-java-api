@@ -24,6 +24,14 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../org.alskor.redmine.redmine-api.tests/src/test/java</directory>
+            <outputDirectory>samples</outputDirectory>
+            <includes>
+                <include>**/RedmineManagerTest.java</include>
+                <include>**/Simple.java</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>../org.alskor.redmine.redmine-deps/lib</directory>
             <outputDirectory>jars</outputDirectory>
             <includes>
