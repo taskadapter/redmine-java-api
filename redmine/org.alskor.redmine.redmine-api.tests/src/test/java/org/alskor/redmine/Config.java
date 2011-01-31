@@ -28,7 +28,7 @@ public class Config {
 	}
 
 	public static String getUserLogin() {
-		return properties.getProperty("redmine.userlogin");
+		return properties.getProperty("redmine.user");
 	}
 
 	public static String getApiKey() {

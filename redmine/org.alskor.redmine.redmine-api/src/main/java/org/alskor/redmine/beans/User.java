@@ -7,7 +7,7 @@ import java.util.Date;
  * 
  * @author Alexey Skorokhodov
  */
-public class User {
+public class User implements Identifiable {
 	private Integer id;
 	private String login;
 	private String password;

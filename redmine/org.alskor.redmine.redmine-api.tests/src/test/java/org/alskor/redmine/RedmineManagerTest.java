@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.TimeEntry;
 import org.alskor.redmine.beans.Tracker;
 import org.alskor.redmine.beans.User;
 import org.junit.AfterClass;
@@ -22,6 +23,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RedmineManagerTest {
+
+	// TODO We don't know activities IDs!
+	// see feature request http://www.redmine.org/issues/7506
+	private static final Integer ACTIVITY_ID = 8;
 
 	private static RedmineManager mgr;
 
@@ -224,7 +229,7 @@ public class RedmineManagerTest {
 	private static User getOurUser() {
 		Integer userId = Integer
 				.parseInt(Config.getParam("createissue.userid"));
-		String login = Config.getParam("redmine.userlogin");
+		String login = Config.getUserLogin();
 
 		User assignee = new User();
 		assignee.setId(userId);
@@ -581,6 +586,16 @@ public class RedmineManagerTest {
 	}
 	
 	@Test
+	public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException {
+		try {
+			mgr.getUserById(999999);
+			fail("Must have failed above");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException");
+		}
+	}
+	
+	@Test
 	public void testCreateUser() throws IOException, AuthenticationException, NotFoundException {
 		User userToCreate = new User();
 		userToCreate.setFirstName("fname");
@@ -656,13 +671,15 @@ public class RedmineManagerTest {
 		}
 	}
 
-	private void createIssues(int num) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	private List<Issue> createIssues(int num) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		List<Issue> issues = new ArrayList<Issue>(num);
 		for (int i=0; i<num; i++){
 			Issue issueToCreate = new Issue();
-			issueToCreate.setSubject("testGetIssues: " + i + " " + new Date());
-			mgr.createIssue(projectKey, issueToCreate);
+			issueToCreate.setSubject("some issue " + i + " " + new Date());
+			Issue issue = mgr.createIssue(projectKey, issueToCreate);
+			issues.add(issue);
 		}
-		
+		return issues;
 	}
 
 	@Test
@@ -690,5 +707,70 @@ public class RedmineManagerTest {
 		for(Project p : projects) {
 			mgr.deleteProject(p.getIdentifier());
 		}
-	}	
+	}
+	
+	@Test
+	public void testGetTimeEntries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+			List<TimeEntry> list = mgr.getTimeEntries();
+			assertNotNull(list);
+//			boolean found = false;
+//			for (Project project : projects) {
+//				if (project.getIdentifier().equals(projectKey)) {
+//					found = true;
+//					break;
+//				}
+//			}
+//			if (!found) {
+//				fail("Our project with key '" + projectKey+"' is not found on the server");
+//			}
+	}
+
+	@Test
+	public void testCreateGetTimeEntry() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		Issue issue = createIssues(1).get(0);
+		Integer issueId = issue.getId();
+		
+		TimeEntry entry = new TimeEntry();
+		Float hours = 11f;
+		entry.setHours(hours);
+		entry.setIssueId(issueId);
+		// TODO We don't know activities IDs!
+		// see feature request http://www.redmine.org/issues/7506
+		entry.setActivityId(ACTIVITY_ID);
+		TimeEntry createdEntry = mgr.createTimeEntry(entry);
+
+		assertNotNull(createdEntry);
+		System.out.println(createdEntry);
+		assertEquals(hours, createdEntry.getHours());
+		
+		Float newHours = 22f;
+		createdEntry.setHours(newHours);
+		
+		mgr.updateTimeEntry(createdEntry);
+		
+		TimeEntry updatedEntry = mgr.getTimeEntry(createdEntry.getId());
+		assertEquals(newHours, updatedEntry.getHours());
+	}
+	
+	@Test
+	public void testCreateDeleteTimeEntry() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		Issue issue = createIssues(1).get(0);
+		Integer issueId = issue.getId();
+		
+		TimeEntry entry = new TimeEntry();
+		Float hours = 4f;
+		entry.setHours(hours);
+		entry.setIssueId(issueId);
+		entry.setActivityId(ACTIVITY_ID);
+		TimeEntry createdEntry = mgr.createTimeEntry(entry);
+		assertNotNull(createdEntry);
+		
+		mgr.deleteTimeEntry(createdEntry.getId());
+		try {
+			mgr.getTimeEntry(createdEntry.getId());
+			fail("Must have failed with NotFoundException");
+		} catch (NotFoundException e) {
+			System.out.println("Got expected NotFoundException when loading TimeEntry with non-existing id");
+		}
+	}
 }
