@@ -21,7 +21,7 @@
                 <configuration>
                     <outputDirectory>../build</outputDirectory>
                     <appendAssemblyId>false</appendAssemblyId>
-                    <finalName>redmine-api-${redmine_api.version}</finalName>
+                    <finalName>redmine-api-${redmine_api.shortversion}</finalName>
                     <descriptors>
                         <descriptor>src/main/assembly/assembly.xml</descriptor>
                     </descriptors>
