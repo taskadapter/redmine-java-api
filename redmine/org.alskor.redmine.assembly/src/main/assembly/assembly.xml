@@ -24,6 +24,15 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../org.alskor.redmine.redmine-api/target/site/apidocs</directory>
+            <outputDirectory>javadoc</outputDirectory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+        </fileSet>
+
+        
+        <fileSet>
             <directory>../org.alskor.redmine.redmine-api.tests/src/test/java</directory>
             <outputDirectory>samples</outputDirectory>
             <includes>
