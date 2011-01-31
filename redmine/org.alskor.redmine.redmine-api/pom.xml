@@ -27,6 +27,17 @@
                     <excludePackageNames>org.alskor.redmine.internal</excludePackageNames>
                 </configuration>
 
+                <!-- run this goal when "package" command is executed -->
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
             </plugin>
         </plugins>
     </build>
