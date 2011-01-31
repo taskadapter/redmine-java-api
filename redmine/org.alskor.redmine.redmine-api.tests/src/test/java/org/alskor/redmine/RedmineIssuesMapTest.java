@@ -5,11 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
@@ -143,32 +141,13 @@ public class RedmineIssuesMapTest {
 	@Test
 	public void testCreatedOn(){
 		Issue issue = issuesMap.get(39);
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, 2011);
-		c.set(Calendar.MONTH, Calendar.JANUARY);
-		c.set(Calendar.DAY_OF_MONTH, 12);
-		c.set(Calendar.HOUR_OF_DAY, 16);
-		c.set(Calendar.MINUTE, 00);
-		c.set(Calendar.SECOND, 31);
-		c.set(Calendar.MILLISECOND, 0);
-		c.setTimeZone(TimeZone.getTimeZone("GMT-8"));
-		Date expectedTime = c.getTime();
-		assertEquals("Checking 'created on' date", expectedTime, issue.getCreatedOn());
+		MyIOUtils.testLongDate(issue.getCreatedOn(), 2011, Calendar.JANUARY, 12, 16, 00, 31, "GMT-8");
 	}
 	
 	@Test
 	public void testUpdatedOn(){
 		Issue issue = issuesMap.get(39);
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, 2011);
-		c.set(Calendar.MONTH, Calendar.JANUARY);
-		c.set(Calendar.DAY_OF_MONTH, 17);
-		c.set(Calendar.HOUR_OF_DAY, 21);
-		c.set(Calendar.MINUTE, 28);
-		c.set(Calendar.SECOND, 45);
-		c.set(Calendar.MILLISECOND, 0);
-		c.setTimeZone(TimeZone.getTimeZone("GMT-8"));
-		Date expectedTime = c.getTime();
-		assertEquals("Checking 'updated on' date", expectedTime, issue.getUpdatedOn());
+		MyIOUtils.testLongDate(issue.getUpdatedOn(), 2011, Calendar.JANUARY, 17, 21, 28, 45, "GMT-8");
 	}
+
 }

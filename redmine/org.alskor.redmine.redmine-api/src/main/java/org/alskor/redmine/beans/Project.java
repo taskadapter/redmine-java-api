@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Redmine's Project.
  */
-public class Project {
+public class Project implements Identifiable{
 	
 	/**
 	 * database ID

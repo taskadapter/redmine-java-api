@@ -1,5 +1,7 @@
 package org.alskor.redmine;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
@@ -11,6 +13,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 public class MyIOUtils {
 
@@ -92,4 +97,25 @@ public class MyIOUtils {
 		in.close();
 		return buffer.toString();
 	}
+	
+	public static void testLongDate(Date expectedDate, int year, int month, int day, int hour, int min, int sec, String timeZone){
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.YEAR, year);
+		c.set(Calendar.MONTH, month);
+		c.set(Calendar.DAY_OF_MONTH, day);
+		c.set(Calendar.HOUR_OF_DAY, hour);
+		c.set(Calendar.MINUTE, min);
+		c.set(Calendar.SECOND, sec);
+		c.set(Calendar.MILLISECOND, 0);
+		if (! timeZone.isEmpty()) {
+			c.setTimeZone(TimeZone.getTimeZone(timeZone));
+		}
+		Date expectedTime = c.getTime();
+		assertEquals("Checking date", expectedTime, expectedDate);
+	}
+
+	public static void testShortDate(Date expectedDate, int year, int month, int day){
+		testLongDate(expectedDate, year, month, day, 0,0,0, "");
+	}
+
 }

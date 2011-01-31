@@ -7,12 +7,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 
-import org.alskor.redmine.Config;
 import org.alskor.redmine.MyIOUtils;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.TimeEntry;
 import org.alskor.redmine.beans.Tracker;
 import org.alskor.redmine.beans.User;
 import org.junit.Test;
@@ -162,6 +163,16 @@ public class TestRedmineXMLParser {
 		return result;
 	}
 
+	private static TimeEntry findTimeEntry(List<TimeEntry> list, Integer id) {
+		TimeEntry result = null;
+		for (TimeEntry obj : list) {
+			if (obj.getId().equals(id)) {
+				result = obj;
+			}
+		}
+		return result;
+	}
+	
 	@Test
 	public void testParseIssueNonUnicodeSymbols() {
 		try {
@@ -214,7 +225,7 @@ public class TestRedmineXMLParser {
 		List<User> users = RedmineXMLParser.parseUsersFromXML(xml);
 		boolean found = false;
 		for (User u : users) {
-			if (u.getLogin().equals(Config.getUserLogin())) {
+			if (u.getLogin().equals("dina")) {
 				found = true;
 			}
 		}
@@ -236,4 +247,40 @@ public class TestRedmineXMLParser {
 		assertEquals(userId, author.getId());
 	}
 
+	@Test
+	public void testParseTimeEntries() throws IOException {
+		String xml = MyIOUtils.getResourceAsString("redmine_1_1_time_entries.xml");
+		List<TimeEntry> objects = RedmineXMLParser.parseTimeEntries(xml);
+		for (TimeEntry timeEntry : objects) {
+			System.out.println(timeEntry);
+		}
+		Integer objId = 2;
+		TimeEntry obj2 = findTimeEntry(objects, objId);
+		assertNotNull(obj2);
+		
+		Integer expectedIssueId = 44;
+		String expectedProjectName = "Permanent test project for Task Adapter";
+		Integer expectedProjectId = 1;
+		String expectedUserName ="Redmine Admin";
+		Integer expectedUserId = 1;
+		String expectedActivityName = "Design";
+		Integer expectedActivityId = 8;
+		Float expectedHours = 2f;
+		
+		assertEquals(objId, obj2.getId());
+		assertEquals(expectedIssueId, obj2.getIssueId());
+		assertEquals(expectedProjectName, obj2.getProjectName());
+		assertEquals(expectedProjectId, obj2.getProjectId());
+		assertEquals(expectedUserName, obj2.getUserName());
+		assertEquals(expectedUserId, obj2.getUserId());
+		assertEquals(expectedActivityName, obj2.getActivityName());
+		assertEquals(expectedActivityId, obj2.getActivityId());
+		assertEquals(expectedHours, obj2.getHours());
+		assertEquals("spent 2 hours working on ABC", obj2.getComment());
+		
+		MyIOUtils.testLongDate(obj2.getCreatedOn(), 2011, Calendar.JANUARY, 31, 11, 10, 40, "GMT-8");
+		MyIOUtils.testLongDate(obj2.getUpdatedOn(), 2011, Calendar.JANUARY, 31, 11, 12, 32, "GMT-8");
+
+		MyIOUtils.testShortDate(obj2.getSpentOn(), 2011, Calendar.JANUARY, 30);
+	}
 }

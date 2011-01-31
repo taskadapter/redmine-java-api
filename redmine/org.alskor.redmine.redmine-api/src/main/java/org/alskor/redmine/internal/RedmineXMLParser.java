@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.alskor.redmine.RedmineManager;
 import org.alskor.redmine.beans.Issue;
 import org.alskor.redmine.beans.Project;
+import org.alskor.redmine.beans.TimeEntry;
 import org.alskor.redmine.beans.User;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -43,12 +44,27 @@ public class RedmineXMLParser {
 	private static final String MAPPING_USERS = "/mapping_users.xml";
 	
 	// TODO optimize : pre-load xml 
-	private static final Map<Class, String> configFilesMap = new HashMap<Class, String>() {
+	private static final Map<Class, String> fromRedmineMap = new HashMap<Class, String>() {
 		private static final long serialVersionUID = 1L;
 		{
 			put(User.class, MAPPING_USERS);
 			put(Issue.class, MAPPING_ISSUES);
 			put(Project.class, MAPPING_PROJECTS_LIST);
+			put(TimeEntry.class, "/mapping_time_entries.xml");
+		}
+	};
+
+	// have to use different config files for "load" and "save" operations
+	// because Redmine REST API expects different XML formats...
+	
+	// TODO use this map instead of getIssueXML() method in RedmineManager
+	private static final Map<Class, String> toRedmineMap = new HashMap<Class, String>() {
+		private static final long serialVersionUID = 1L;
+		{
+			put(User.class, MAPPING_USERS);
+			put(Issue.class, MAPPING_ISSUES);
+			put(Project.class, MAPPING_PROJECTS_LIST);
+			put(TimeEntry.class, "/mapping_time_entries_save.xml");
 		}
 	};
 
@@ -146,9 +162,9 @@ public class RedmineXMLParser {
 
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body) {
-		System.out.println("parseObjectsFromXML:" + body);
+//		System.out.println("parseObjectsFromXML:" + body);
 		verifyStartsAsXML(body);
-		String configFile = configFilesMap.get(classs);
+		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, ArrayList.class);
 
 		List<T> list = null;
@@ -168,7 +184,7 @@ public class RedmineXMLParser {
 
 	public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
 		verifyStartsAsXML(xml);
-		String configFile = configFilesMap.get(classs);
+		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, classs);
 
 		T obj = null;
@@ -197,7 +213,7 @@ public class RedmineXMLParser {
 	}
 	
 	public static String convertObjectToXML(Object obj) {
-		String configfile = configFilesMap.get(obj.getClass());
+		String configfile = toRedmineMap.get(obj.getClass());
 		StringWriter writer = new StringWriter();
 		try {
 			Marshaller m = getMarshaller(configfile, writer);
@@ -252,7 +268,10 @@ public class RedmineXMLParser {
 			int end = lines[i].indexOf(closeTag);
 			errors.add(lines[i].substring(begin, end));
 		}
-//		errors.add(responseBody);
 		return errors;
+	}
+
+	public static List<TimeEntry> parseTimeEntries(String xml) {
+		return parseObjectsFromXML(TimeEntry.class, xml);
 	}
 }
