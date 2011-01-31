@@ -1,4 +1,7 @@
+package org.alskor.redmine;
+
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import org.alskor.redmine.AuthenticationException;
@@ -17,12 +20,11 @@ public class Simple {
 		try {
 			tryGetIssues(mgr);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	private static void tryGetIssues(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException {
+	private static void tryGetIssues(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, URISyntaxException, RedmineException {
 		List<Issue> issues = mgr.getIssues(projectKey, queryId);
 		for (Issue issue : issues) {
 			System.out.println(issue.toString());
