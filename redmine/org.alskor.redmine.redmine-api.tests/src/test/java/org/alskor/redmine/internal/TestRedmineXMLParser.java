@@ -233,13 +233,16 @@ public class TestRedmineXMLParser {
 	}
 
 	@Test
-	public void testParse123() throws IOException {
+	public void testParseIssues() throws IOException {
 		String xml = MyIOUtils.getResourceAsString("redmine_1_1_issues.xml");
 		List<Issue> objects = RedmineXMLParser.parseIssuesFromXML(xml);
 		Integer issueId = 68;
 		Issue issue68 = findIssueInList(objects, issueId);
 		assertNotNull(issue68);
 		assertEquals(issueId, issue68.getId());
+		Integer statusId = 1;
+		assertEquals(statusId, issue68.getStatusId());
+		assertEquals("New", issue68.getStatusName());
 		
 		User author = issue68.getAuthor();
 		assertNotNull(author);

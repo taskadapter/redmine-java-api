@@ -24,8 +24,9 @@ public class Issue {
 	private String description;
 	private Date createdOn;
 	private Date updatedOn;
+	private Integer statusId;
+	private String statusName;
 
-	
 	public Project getProject() {
 		return project;
 	}
@@ -161,6 +162,22 @@ public class Issue {
 		this.updatedOn = updatedOn;
 	}
 
+	public Integer getStatusId() {
+		return statusId;
+	}
+
+	public void setStatusId(Integer statusId) {
+		this.statusId = statusId;
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -185,6 +202,10 @@ public class Issue {
 		result = prime * result + ((project == null) ? 0 : project.hashCode());
 		result = prime * result
 				+ ((startDate == null) ? 0 : startDate.hashCode());
+		result = prime * result
+				+ ((statusId == null) ? 0 : statusId.hashCode());
+		result = prime * result
+				+ ((statusName == null) ? 0 : statusName.hashCode());
 		result = prime * result + ((subject == null) ? 0 : subject.hashCode());
 		result = prime * result + ((tracker == null) ? 0 : tracker.hashCode());
 		result = prime * result
@@ -194,122 +215,98 @@ public class Issue {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null) {
+		if (obj == null)
 			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
 		Issue other = (Issue) obj;
 		if (assignee == null) {
-			if (other.assignee != null) {
+			if (other.assignee != null)
 				return false;
-			}
-		} else if (!assignee.equals(other.assignee)) {
+		} else if (!assignee.equals(other.assignee))
 			return false;
-		}
 		if (author == null) {
-			if (other.author != null) {
+			if (other.author != null)
 				return false;
-			}
-		} else if (!author.equals(other.author)) {
+		} else if (!author.equals(other.author))
 			return false;
-		}
 		if (createdOn == null) {
-			if (other.createdOn != null) {
+			if (other.createdOn != null)
 				return false;
-			}
-		} else if (!createdOn.equals(other.createdOn)) {
+		} else if (!createdOn.equals(other.createdOn))
 			return false;
-		}
 		if (description == null) {
-			if (other.description != null) {
+			if (other.description != null)
 				return false;
-			}
-		} else if (!description.equals(other.description)) {
+		} else if (!description.equals(other.description))
 			return false;
-		}
 		if (doneRatio == null) {
-			if (other.doneRatio != null) {
+			if (other.doneRatio != null)
 				return false;
-			}
-		} else if (!doneRatio.equals(other.doneRatio)) {
+		} else if (!doneRatio.equals(other.doneRatio))
 			return false;
-		}
 		if (dueDate == null) {
-			if (other.dueDate != null) {
+			if (other.dueDate != null)
 				return false;
-			}
-		} else if (!dueDate.equals(other.dueDate)) {
+		} else if (!dueDate.equals(other.dueDate))
 			return false;
-		}
 		if (estimatedHours == null) {
-			if (other.estimatedHours != null) {
+			if (other.estimatedHours != null)
 				return false;
-			}
-		} else if (!estimatedHours.equals(other.estimatedHours)) {
+		} else if (!estimatedHours.equals(other.estimatedHours))
 			return false;
-		}
 		if (id == null) {
-			if (other.id != null) {
+			if (other.id != null)
 				return false;
-			}
-		} else if (!id.equals(other.id)) {
+		} else if (!id.equals(other.id))
 			return false;
-		}
 		if (parentId == null) {
-			if (other.parentId != null) {
+			if (other.parentId != null)
 				return false;
-			}
-		} else if (!parentId.equals(other.parentId)) {
+		} else if (!parentId.equals(other.parentId))
 			return false;
-		}
 		if (priorityText == null) {
-			if (other.priorityText != null) {
+			if (other.priorityText != null)
 				return false;
-			}
-		} else if (!priorityText.equals(other.priorityText)) {
+		} else if (!priorityText.equals(other.priorityText))
 			return false;
-		}
 		if (project == null) {
-			if (other.project != null) {
+			if (other.project != null)
 				return false;
-			}
-		} else if (!project.equals(other.project)) {
+		} else if (!project.equals(other.project))
 			return false;
-		}
 		if (startDate == null) {
-			if (other.startDate != null) {
+			if (other.startDate != null)
 				return false;
-			}
-		} else if (!startDate.equals(other.startDate)) {
+		} else if (!startDate.equals(other.startDate))
 			return false;
-		}
+		if (statusId == null) {
+			if (other.statusId != null)
+				return false;
+		} else if (!statusId.equals(other.statusId))
+			return false;
+		if (statusName == null) {
+			if (other.statusName != null)
+				return false;
+		} else if (!statusName.equals(other.statusName))
+			return false;
 		if (subject == null) {
-			if (other.subject != null) {
+			if (other.subject != null)
 				return false;
-			}
-		} else if (!subject.equals(other.subject)) {
+		} else if (!subject.equals(other.subject))
 			return false;
-		}
 		if (tracker == null) {
-			if (other.tracker != null) {
+			if (other.tracker != null)
 				return false;
-			}
-		} else if (!tracker.equals(other.tracker)) {
+		} else if (!tracker.equals(other.tracker))
 			return false;
-		}
 		if (updatedOn == null) {
-			if (other.updatedOn != null) {
+			if (other.updatedOn != null)
 				return false;
-			}
-		} else if (!updatedOn.equals(other.updatedOn)) {
+		} else if (!updatedOn.equals(other.updatedOn))
 			return false;
-		}
 		return true;
 	}
-	
 }
