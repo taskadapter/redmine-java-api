@@ -27,7 +27,26 @@
                 <version>${tycho.version}</version>
                 <extensions>true</extensions>
             </plugin>
+            <plugin>
+                <groupId>org.sonatype.tycho</groupId>
+                <artifactId>target-platform-configuration</artifactId>
+                <version>${tycho.version}</version>
+                <configuration>
+                    <!-- p2 will use the repositories listed in this file. search for "repositories" node -->
+                    <resolver>p2</resolver>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
+
+
+    <repositories>
+        <repository>
+            <id>helios</id>
+            <layout>p2</layout>
+            <url>http://download.eclipse.org/releases/helios</url>
+        </repository>
+    </repositories>
 
 </project>
