@@ -53,6 +53,12 @@
 		<field name="updatedOn" type="string" handler="org.alskor.redmine.internal.RedmineLongDateHandler">
 			<bind-xml name="updated_on" node="element" />
 		</field>
+		<field name="statusId" type="integer">
+			<bind-xml location="status" node="attribute" name="id" />
+		</field>
+		<field name="statusName" type="string">
+			<bind-xml location="status" node="attribute" name="name" />
+		</field>
 
 	</class>
 	
