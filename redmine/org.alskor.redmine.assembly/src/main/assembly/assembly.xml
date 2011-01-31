@@ -17,6 +17,20 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../org.alskor.redmine.redmine-api/doc</directory>
+            <outputDirectory>.</outputDirectory>
+            <includes>
+                <include>**/*.*</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <directory>../org.alskor.redmine.redmine-deps/lib</directory>
+            <outputDirectory>jars</outputDirectory>
+            <includes>
+                <include>**/*.jar</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <directory>../org.alskor.redmine.redmine-deps/target</directory>
             <outputDirectory>jars</outputDirectory>
             <includes>
