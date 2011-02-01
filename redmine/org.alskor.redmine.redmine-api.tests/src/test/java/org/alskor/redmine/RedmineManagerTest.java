@@ -773,4 +773,37 @@ public class RedmineManagerTest {
 			System.out.println("Got expected NotFoundException when loading TimeEntry with non-existing id");
 		}
 	}
+	
+	@Test
+	public void testGetTimeEntriesForIssue() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		Issue issue = createIssues(1).get(0);
+		Integer issueId = issue.getId();
+		Float hours1 = 2f;
+		Float hours2 = 7f;
+		Float totalHoursExpected = hours1 + hours2; 
+		TimeEntry createdEntry1 = createTimeEntry(issueId, hours1);
+		TimeEntry createdEntry2 = createTimeEntry(issueId, hours2);
+		assertNotNull(createdEntry1);
+		assertNotNull(createdEntry2);
+		
+		List<TimeEntry> entries = mgr.getTimeEntriesForIssue(issueId);
+		assertEquals(2, entries.size());
+		Float totalTime = 0f;
+		for (TimeEntry timeEntry : entries) {
+			totalTime += timeEntry.getHours();
+		}
+		assertEquals(totalHoursExpected, totalTime);
+	}
+
+	private TimeEntry createTimeEntry(Integer issueId, float hours) throws IOException,
+			AuthenticationException, NotFoundException, RedmineException {
+		TimeEntry entry = new TimeEntry();
+		entry.setHours(hours);
+		entry.setIssueId(issueId);
+		entry.setActivityId(ACTIVITY_ID);
+		TimeEntry createdEntry = mgr.createTimeEntry(entry);
+		return createdEntry;
+	}
+	
+	
 }

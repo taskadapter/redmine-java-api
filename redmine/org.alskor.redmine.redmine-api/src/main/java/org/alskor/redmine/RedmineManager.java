@@ -867,10 +867,26 @@ public class RedmineManager {
 		return getObjectsListV104(TimeEntry.class, params);
 	}
 	
+	/**
+	 * 
+	 * @param id the database Id of the TimeEntry record
+	 * @return
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 * @throws NotFoundException
+	 * @throws RedmineException
+	 */
 	public TimeEntry getTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		return getObject(TimeEntry.class, id);
 	}
 
+	public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws IOException,AuthenticationException, NotFoundException, RedmineException{
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		params.put("issue_id", new BasicNameValuePair("issue_id", Integer.toString(issueId)));
+
+		return getObjectsListV104(TimeEntry.class, params);
+	}
+	
 	public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		return createObject(TimeEntry.class, obj);
 	}
