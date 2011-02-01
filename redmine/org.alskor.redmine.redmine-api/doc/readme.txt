@@ -8,8 +8,8 @@ Redmine Java API can be used in both OSGI and regular Java environment.
 
 1.==== Use as OSGI bundle ====
   Use the following two OSGI bundles:
-  redmine-api-1.0.3.qualifier.jar
-  redmine-deps-1.0.0-SNAPSHOT.jar
+  redmine-api-<version>.jar
+  redmine-deps-<version>.jar
 
   ==== Use as a regular JAR file ====
   Add the Redmine API Jar (redmine-api-1.0.3.qualifier.jar) and all jars from 
