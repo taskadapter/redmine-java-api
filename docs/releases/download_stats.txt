@@ -2,7 +2,6 @@ Downloads statistics.
 
 ======== Dec 27 2010 - Jan 3 2011 ===============
 
-redmine_api_1.0.0.1.zip                      46 downloads
 taskadapter-1.0.0.14-linux.gtk.x86.zip       4 
 taskadapter-1.0.0.14-linux.gtk.x86_64.zip    0
 taskadapter-1.0.0.14-macosx.cocoa.x86.zip    3
@@ -29,13 +28,17 @@ taskadapter-1.0.0.16-macosx.cocoa.x86.zip 0
 taskadapter-1.0.0.16-win32.win32.x86.zip  43 robots??
 
 ======== Jan 11 2011 - Jan 12 2011 ===============
-redmine_api_1.0.0.1.zip            71 total downloads since this file was uploaded
 
 taskadapter-1.0.17-macosx.cocoa.x86.zip 0
 taskadapter-1.0.17-macosx.cocoa.x86_64.zip 0
 taskadapter-1.0.17-linux.gtk.x86.zip    2
 taskadapter-1.0.17-win32.win32.x86.zip 18
  
-======== Jan 12 2011 - Jan 30 2011 ===============
+======== Jan 12 2011 - Feb 2 2011 (21 day) ===============
+
+taskadapter-1.0.18-win32.win32.x86.zip     379 downloads
+taskadapter-1.0.18-linux.gtk.x86.zip       28
+taskadapter-1.0.18-macosx.cocoa.x86.zip    4
+taskadapter-1.0.18-macosx.cocoa.x86_64.zip 3
+
  
-redmine_api_1.0.0.2.zip      23 
