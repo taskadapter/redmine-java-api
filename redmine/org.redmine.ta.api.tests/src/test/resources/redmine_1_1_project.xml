@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+	<id>23</id>
+	<name>test project</name>
+	<identifier>test1295649781087</identifier>
+	<description></description>
+	<homepage></homepage>
+	<created_on>2011-01-21T14:43:04-08:00</created_on>
+	<updated_on>2011-01-21T14:43:04-08:00</updated_on>
+	<trackers type="array">
+		<tracker name="Bug" id="1" />
+		<tracker name="Feature" id="2" />
+		<tracker name="Support" id="3" />
+	</trackers>
+</project>

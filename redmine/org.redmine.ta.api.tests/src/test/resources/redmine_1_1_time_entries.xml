@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<time_entries type="array">
+	<time_entry>
+		<id>3</id>
+		<project name="Permanent test project for Task Adapter" id="1" />
+		<issue id="31" />
+		<user name="Redmine Admin" id="1" />
+		<activity name="Development" id="9" />
+		<hours>5.0</hours>
+		<comments>come comment</comments>
+		<spent_on>2011-01-31</spent_on>
+		<created_on>2011-01-31T11:11:07-08:00</created_on>
+		<updated_on>2011-01-31T11:11:07-08:00</updated_on>
+	</time_entry>
+	<time_entry>
+		<id>2</id>
+		<project name="Permanent test project for Task Adapter" id="1" />
+		<issue id="44" />
+		<user name="Redmine Admin" id="1" />
+		<activity name="Design" id="8" />
+		<hours>2.0</hours>
+		<comments>spent 2 hours working on ABC</comments>
+		<spent_on>2011-01-30</spent_on>
+		<created_on>2011-01-31T11:10:40-08:00</created_on>
+		<updated_on>2011-01-31T11:12:32-08:00</updated_on>
+	</time_entry>
+	<time_entry>
+		<id>1</id>
+		<project name="Permanent test project for Task Adapter" id="1" />
+		<issue id="34" />
+		<user name="Redmine Admin" id="1" />
+		<activity name="Development" id="9" />
+		<hours>10.0</hours>
+		<comments>10 hours spent on something</comments>
+		<spent_on>2011-01-30</spent_on>
+		<created_on>2011-01-30T12:47:08-08:00</created_on>
+		<updated_on>2011-01-30T12:49:01-08:00</updated_on>
+	</time_entry>
+</time_entries>
