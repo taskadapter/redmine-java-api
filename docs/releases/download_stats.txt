@@ -36,7 +36,7 @@ taskadapter-1.0.17-win32.win32.x86.zip 18
  
 ======== Jan 12 2011 - Feb 2 2011 (21 day) ===============
 
-taskadapter-1.0.18-win32.win32.x86.zip     379 downloads
+taskadapter-1.0.18-win32.win32.x86.zip     380 downloads
 taskadapter-1.0.18-linux.gtk.x86.zip       28
 taskadapter-1.0.18-macosx.cocoa.x86.zip    4
 taskadapter-1.0.18-macosx.cocoa.x86_64.zip 3
