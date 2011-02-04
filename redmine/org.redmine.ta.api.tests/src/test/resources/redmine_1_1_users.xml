@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users total_count="2" type="array" limit="25" offset="0">
+	<user>
+		<id>1</id>
+		<login>admin</login>
+		<firstname>Redmine</firstname>
+		<lastname>Admin</lastname>
+		<mail>admin@example.net</mail>
+		<created_on>2011-01-10T20:44:56-08:00</created_on>
+		<last_login_on>2011-01-28T10:54:22-08:00</last_login_on>
+	</user>
+	<user>
+		<id>3</id>
+		<login>dina</login>
+		<firstname>Dina</firstname>
+		<lastname>TheDog</lastname>
+		<mail>thedog@domain.com</mail>
+		<created_on>2011-01-10T20:52:22-08:00</created_on>
+		<last_login_on></last_login_on>
+	</user>
+</users>

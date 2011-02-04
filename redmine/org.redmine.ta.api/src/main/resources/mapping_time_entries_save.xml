@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                         "http://castor.org/mapping.dtd">
+<mapping>
+	<description>Redmine XML -> Java API binding. see
+		http://taskadapter.com</description>
+
+	<class name="org.redmine.ta.beans.TimeEntry">
+		<map-to xml="time_entry" />
+
+		<field name="id" type="integer">
+			<bind-xml name="id" node="element" />
+		</field>
+		<field name="issueId" type="integer">
+			<bind-xml name="issue_id" node="element" />
+		</field>
+		<field name="projectId" type="integer">
+			<bind-xml name="project_id" node="element"/>
+		</field>
+<!-- 		<field name="projectName" type="string">
+			<bind-xml location="project" node="attribute" name="name" />
+		</field> -->
+		<field name="userId" type="integer">
+			<bind-xml name="user_id" node="element" />
+		</field>
+<!-- 		<field name="userName" type="string">
+			<bind-xml location="user" node="attribute" name="name" />
+		</field>
+		<field name="activityName" type="string">
+			<bind-xml location="activity" node="attribute" name="name" />
+		</field>-->
+		<field name="activityId" type="integer">
+			<bind-xml name="activity_id" node="element" />
+		</field>
+		<field name="hours" type="float">
+			<bind-xml name="hours" node="element" />
+		</field>
+		<field name="comment" type="string">
+			<bind-xml name="comments" node="element" />
+		</field>
+		<field name="spentOn" type="string" handler="org.redmine.ta.internal.RedmineShortDateHandler">
+			<bind-xml name="spent_on" node="element" />
+		</field>
+<!-- 		<field name="createdOn" type="string"
+			handler="org.redmine.ta.internal.RedmineLongDateHandler">
+			<bind-xml name="created_on" node="element" />
+		</field>
+		<field name="updatedOn" type="string"
+			handler="org.redmine.ta.internal.RedmineLongDateHandler">
+			<bind-xml name="updated_on" node="element" />
+		</field> -->
+	</class>
+</mapping>

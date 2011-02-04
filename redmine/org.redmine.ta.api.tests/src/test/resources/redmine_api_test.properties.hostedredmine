@@ -1,0 +1,11 @@
+# test config for Redmine API
+redmine.host=https://www.hostedredmine.com
+redmine.apikey=a3221bfcef5750219bd0a2df69519416dba17fc9
+redmine.user=ta_client
+
+##redmine.projectKey=taskconnector-test
+# query 40: "created last 2 days" issues
+##redmine.queryId=40
+
+createissue.userid=421
+createissue.userFirstAndLastName=Alexey Java
