@@ -8,3 +8,6 @@ redmine_api_1.0.0.2.zip      23
 
 ======== Jan 30 2011 - Jan 31 2011 (1 day) ===============
 redmine_api_1.0.3.zip      13
+
+======== Jan 31 2011 - Feb 9 2011 (9 days) ===============
+redmine-api-1.0.4.zip    118
