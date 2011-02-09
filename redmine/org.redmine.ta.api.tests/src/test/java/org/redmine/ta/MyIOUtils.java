@@ -107,7 +107,7 @@ public class MyIOUtils {
 		c.set(Calendar.MINUTE, min);
 		c.set(Calendar.SECOND, sec);
 		c.set(Calendar.MILLISECOND, 0);
-		if (! timeZone.isEmpty()) {
+		if (timeZone.length()>0) {
 			c.setTimeZone(TimeZone.getTimeZone(timeZone));
 		}
 		Date expectedTime = c.getTime();
