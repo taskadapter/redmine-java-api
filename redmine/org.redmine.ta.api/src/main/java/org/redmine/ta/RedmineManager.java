@@ -337,7 +337,7 @@ public class RedmineManager {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		params.put("subject", new BasicNameValuePair("subject", summaryField));
 
-		if ((projectKey != null) && (!projectKey.isEmpty())) {
+		if ((projectKey != null) && (projectKey.length()>0)) {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
 
@@ -494,7 +494,7 @@ public class RedmineManager {
 			params.put("query_id", new BasicNameValuePair("query_id", String.valueOf(queryId)));
 		}
 
-		if ((projectKey != null) && (!projectKey.isEmpty())) {
+		if ((projectKey != null) && (projectKey.length()>0)) {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
 
@@ -536,7 +536,7 @@ public class RedmineManager {
 	}
 	
 	private void addAuthParameters(Map<String, NameValuePair> params) {
-		if ((apiAccessKey != null) && (!apiAccessKey.isEmpty())) {
+		if ((apiAccessKey != null) && (apiAccessKey.length()>0)) {
 			params.put("key", new BasicNameValuePair("key", apiAccessKey));
 		}
 	}

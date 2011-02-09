@@ -58,7 +58,7 @@ public abstract class RedmineDateHandler extends GeneralizedFieldHandler {
 	public Object convertUponSet(Object value) {
 		Date date = null;
 		try {
-			if (!((String) value).isEmpty()) {
+			if (((String) value).length()>0) {
 				date = getDate((String) value);
 			}
 		} catch (ParseException px) {
