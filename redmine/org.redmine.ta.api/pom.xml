@@ -12,7 +12,7 @@
     </parent>
 
     <groupId>org.redmine.ta</groupId>
-    <artifactId>api</artifactId>
+    <artifactId>redmine-api</artifactId>
     <version>${redmine_api.version}</version>
     <packaging>eclipse-plugin</packaging>
 
