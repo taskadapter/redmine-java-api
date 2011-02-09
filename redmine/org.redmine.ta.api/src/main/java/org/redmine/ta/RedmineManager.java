@@ -22,24 +22,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-
-import org.redmine.ta.beans.Identifiable;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.User;
-import org.redmine.ta.internal.RedmineXMLParser;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpRequest;
@@ -55,14 +43,16 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.redmine.ta.beans.Identifiable;
+import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.TimeEntry;
+import org.redmine.ta.beans.User;
+import org.redmine.ta.internal.HttpUtil;
+import org.redmine.ta.internal.RedmineXMLParser;
 
 
 /**
@@ -202,8 +192,9 @@ public class RedmineManager {
 	
 	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
 		System.out.println(request.getRequestLine());
-		DefaultHttpClient httpclient = new DefaultHttpClient();
-		wrapClient(httpclient);
+//		DefaultHttpClient httpclient = new DefaultHttpClient();
+//		wrapClient(httpclient);
+		HttpClient httpclient = HttpUtil.getNewHttpClient();
 		
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
 		
@@ -411,36 +402,36 @@ public class RedmineManager {
 		}
 	}
 	
-	private static HttpClient wrapClient(HttpClient base) {
-		try {
-			SSLContext ctx = SSLContext.getInstance("TLS");
-			X509TrustManager tm = new X509TrustManager() {
-
-				public void checkClientTrusted(X509Certificate[] xcs,
-						String string) throws CertificateException {
-				}
-
-				public void checkServerTrusted(X509Certificate[] xcs,
-						String string) throws CertificateException {
-				}
-
-				public X509Certificate[] getAcceptedIssuers() {
-					return null;
-				}
-			};
-			ctx.init(null, new TrustManager[] { tm }, null);
-			SSLSocketFactory ssf = new SSLSocketFactory(ctx);
-			ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-			ClientConnectionManager ccm = base.getConnectionManager();
-			SchemeRegistry sr = ccm.getSchemeRegistry();
-			// XXX support other ports, not just 443?
-			sr.register(new Scheme("https", ssf, 443));
-			return new DefaultHttpClient(ccm, base.getParams());
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
-		}
-	}
+//	private static HttpClient wrapClient(HttpClient base) {
+//		try {
+//			SSLContext ctx = SSLContext.getInstance("TLS");
+//			X509TrustManager tm = new X509TrustManager() {
+//
+//				public void checkClientTrusted(X509Certificate[] xcs,
+//						String string) throws CertificateException {
+//				}
+//
+//				public void checkServerTrusted(X509Certificate[] xcs,
+//						String string) throws CertificateException {
+//				}
+//
+//				public X509Certificate[] getAcceptedIssuers() {
+//					return null;
+//				}
+//			};
+//			ctx.init(null, new TrustManager[] { tm }, null);
+//			SSLSocketFactory ssf = new SSLSocketFactory(ctx);
+//			ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+//			ClientConnectionManager ccm = base.getConnectionManager();
+//			SchemeRegistry sr = ccm.getSchemeRegistry();
+//			// XXX support other ports, not just 443?
+//			sr.register(new Scheme("https", ssf, 443));
+//			return new DefaultHttpClient(ccm, base.getParams());
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//			return null;
+//		}
+//	}
 
 	// XXX this method will be used soon instead of temporary getIssuesV104()
 /*	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
