@@ -66,9 +66,6 @@ public class RedmineManager {
 
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
-//	private static final String LICENSE_ERROR_MESSAGE = "Redmine Java API: license is not found. Working in ----TRIAL---- mode."
-//		+ "\nPlease buy a license on " + LicenseManager.PRODUCT_WEBSITE_URL;
-
 	private String host;
 	private String apiAccessKey;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
@@ -558,11 +555,10 @@ public class RedmineManager {
 			
 			URI uri;
 			try {
-				String url = urls.get(objectClass) + URL_POSTFIX;
-				uri = URIUtils.createURI(getProtocol(), getHost(), getPort(), url, 
-					    URLEncodedUtils.format(paramsList, CHARSET), null);
-			} catch (URISyntaxException e) {
-				throw new RuntimeException("URISyntaxException: " + e.getMessage());
+				String query = urls.get(objectClass) + URL_POSTFIX;
+				uri = getURI(query, paramsList);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException("MalformedURLException: " + e.getMessage());
 			}
 
 			HttpGet http = new HttpGet(uri);
@@ -675,11 +671,16 @@ public class RedmineManager {
 		return getURI(url, paramsList);
 	}
 	
-	private <T> URI getURI(String url, List<NameValuePair> paramsList) throws MalformedURLException {
+	private URI getURI(String url, List<NameValuePair> paramsList) throws MalformedURLException {
 		URI uri = null;
 
 		try {
-			uri = URIUtils.createURI(getProtocol(), getHost(), getPort(), url, 
+			String path = url;
+			URL aURL = new URL(host);
+			if (aURL.getPath().length()>0){
+				path = aURL.getPath() + "/" + path;
+			}
+			uri = URIUtils.createURI(getProtocol(), getHost(), getPort(), path, 
 				    URLEncodedUtils.format(paramsList, CHARSET), null);
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("URISyntaxException: " + e.getMessage());
@@ -692,10 +693,9 @@ public class RedmineManager {
 		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
 		URI uri;
 		try {
-			uri = URIUtils.createURI(getProtocol(), getHost(), getPort(), url, 
-				    URLEncodedUtils.format(paramsList, CHARSET), null);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException("URISyntaxException: " + e.getMessage());
+			uri = getURI(url, paramsList);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("MalformedURLException:" + e.getMessage());
 		}
 
 		HttpGet http = new HttpGet(uri);
@@ -720,6 +720,15 @@ public class RedmineManager {
 	private Integer getPort() throws MalformedURLException {
 		URL aURL = new URL(host);
 		return aURL.getPort();
+	}
+	
+	/**
+	 * optional path, used when redmine is installed NOT at the server root.
+	 * e.g. at http://myserver:8080/redmine
+	 */
+	private String getPath() throws MalformedURLException {
+		URL aURL = new URL(host);
+		return aURL.getPath();
 	}
 	
 	/**
