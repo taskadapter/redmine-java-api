@@ -54,9 +54,6 @@ public class RedmineXMLParser {
 		}
 	};
 
-	// have to use different config files for "load" and "save" operations
-	// because Redmine REST API expects different XML formats...
-	
 	// TODO use this map instead of getIssueXML() method in RedmineManager
 	private static final Map<Class, String> toRedmineMap = new HashMap<Class, String>() {
 		private static final long serialVersionUID = 1L;
@@ -64,6 +61,8 @@ public class RedmineXMLParser {
 			put(User.class, MAPPING_USERS);
 			put(Issue.class, MAPPING_ISSUES);
 			put(Project.class, MAPPING_PROJECTS_LIST);
+			// have to use different config files for "load" and "save" operations
+			// because Redmine REST API expects different XML formats...
 			put(TimeEntry.class, "/mapping_time_entries_save.xml");
 		}
 	};
