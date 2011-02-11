@@ -7,7 +7,7 @@ import java.util.Date;
  * 
  * @author Alexey Skorokhodov
  */
-public class Issue {
+public class Issue implements Identifiable {
 
 	private Integer id;
 	private String subject;
@@ -80,6 +80,7 @@ public class Issue {
 		this.parentId = parentId;
 	}
 
+	@Override
 	/**
 	 * @return id. can be NULL for Issues not added to Redmine yet
 	 */
@@ -101,9 +102,7 @@ public class Issue {
 
 	@Override
 	public String toString() {
-//		return id + "  (parent=" + parentId + ")";
-		
-		return "issue: id=" +id + " assignee:" + ((assignee == null) ? "" : assignee.toString()) + " subject:" + subject;
+		return "{issue: id=" +id + " assignee:" + ((assignee == null) ? "" : assignee.toString()) + " subject:" + subject + "}";
 	}
 
 	public User getAuthor() {

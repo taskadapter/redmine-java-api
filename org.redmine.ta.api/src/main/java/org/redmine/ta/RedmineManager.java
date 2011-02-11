@@ -398,7 +398,12 @@ public class RedmineManager {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
 		}
 	}
-	
+
+	public void deleteIssue(Integer id) throws IOException,
+			AuthenticationException, NotFoundException, RedmineException {
+		deleteObject(Issue.class, id);
+	}
+
 //	private static HttpClient wrapClient(HttpClient base) {
 //		try {
 //			SSLContext ctx = SSLContext.getInstance("TLS");

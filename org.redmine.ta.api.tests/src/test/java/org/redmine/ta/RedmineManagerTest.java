@@ -52,7 +52,9 @@ public class RedmineManagerTest {
 	@AfterClass
 	public static void oneTimeTearDown() {
 		try {
-			mgr.deleteProject(projectKey);
+			if (mgr != null) {
+				mgr.deleteProject(projectKey);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail("can't delete the test project '" + projectKey + ". reason: "
@@ -671,9 +673,9 @@ public class RedmineManagerTest {
 		}
 	}
 
-	private List<Issue> createIssues(int num) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		List<Issue> issues = new ArrayList<Issue>(num);
-		for (int i=0; i<num; i++){
+	private List<Issue> createIssues(int issuesNumber) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		List<Issue> issues = new ArrayList<Issue>(issuesNumber);
+		for (int i=0; i<issuesNumber; i++){
 			Issue issueToCreate = new Issue();
 			issueToCreate.setSubject("some issue " + i + " " + new Date());
 			Issue issue = mgr.createIssue(projectKey, issueToCreate);
@@ -805,5 +807,19 @@ public class RedmineManagerTest {
 		return createdEntry;
 	}
 	
-	
+	@Test
+	public void testDeleteIssue() throws IOException, AuthenticationException,
+			NotFoundException, RedmineException {
+		Issue issue = createIssues(1).get(0);
+		Issue retrievedIssue = mgr.getIssueById(issue.getId());
+		assertEquals(issue, retrievedIssue);
+
+		mgr.deleteIssue(issue.getId());
+		try {
+			mgr.getIssueById(issue.getId());
+			fail("Must have failed with NotFoundException");
+		} catch (NotFoundException ignore) {
+			System.out.println("Got expected NotFoundException for deleted Issue");
+		}
+	}
 }
