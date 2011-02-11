@@ -368,7 +368,7 @@ public class RedmineManager {
 	 * @throws NotFoundException the project with the given key is not found
 	 * @throws RedmineException 
 	 */
-	public Project getProjectByIdentifier(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	public Project getProjectByKey(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         String query = getURLProjectByKey(projectKey);
 		// see bug http://www.redmine.org/issues/7184
         query+="&include=trackers";
@@ -391,49 +391,13 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public void deleteProject(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        String query = getURLProjectByKey(projectKey);
-        HttpDelete http = new HttpDelete(query);
-		Response response = sendRequest(http);
-		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
-			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
-		}
+		deleteObject(Project.class, projectKey);
 	}
 
 	public void deleteIssue(Integer id) throws IOException,
 			AuthenticationException, NotFoundException, RedmineException {
-		deleteObject(Issue.class, id);
+		deleteObject(Issue.class, Integer.toString(id));
 	}
-
-//	private static HttpClient wrapClient(HttpClient base) {
-//		try {
-//			SSLContext ctx = SSLContext.getInstance("TLS");
-//			X509TrustManager tm = new X509TrustManager() {
-//
-//				public void checkClientTrusted(X509Certificate[] xcs,
-//						String string) throws CertificateException {
-//				}
-//
-//				public void checkServerTrusted(X509Certificate[] xcs,
-//						String string) throws CertificateException {
-//				}
-//
-//				public X509Certificate[] getAcceptedIssuers() {
-//					return null;
-//				}
-//			};
-//			ctx.init(null, new TrustManager[] { tm }, null);
-//			SSLSocketFactory ssf = new SSLSocketFactory(ctx);
-//			ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-//			ClientConnectionManager ccm = base.getConnectionManager();
-//			SchemeRegistry sr = ccm.getSchemeRegistry();
-//			// XXX support other ports, not just 443?
-//			sr.register(new Scheme("https", ssf, 443));
-//			return new DefaultHttpClient(ccm, base.getParams());
-//		} catch (Exception ex) {
-//			ex.printStackTrace();
-//			return null;
-//		}
-//	}
 
 	// XXX this method will be used soon instead of temporary getIssuesV104()
 /*	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
@@ -637,7 +601,7 @@ public class RedmineManager {
 		addAuthParameters(params);
 		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
 
-		URI uri = getUpdateURI(obj.getClass(), obj.getId(), paramsList);
+		URI uri = getUpdateURI(obj.getClass(), Integer.toString(obj.getId()), paramsList);
 		HttpPut http = new HttpPut(uri);
 		
 		String xml = RedmineXMLParser.convertObjectToXML(obj);
@@ -649,7 +613,7 @@ public class RedmineManager {
 		}
 	}
 	
-	private <T extends Identifiable> void deleteObject(Class<T> classs, Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		addAuthParameters(params);
 		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
@@ -671,7 +635,7 @@ public class RedmineManager {
 		return getURI(url, paramsList);
 	}
 
-	private URI getUpdateURI(Class zz, Integer id, List<NameValuePair> paramsList) throws MalformedURLException {
+	private URI getUpdateURI(Class zz, String id, List<NameValuePair> paramsList) throws MalformedURLException {
 		String url = urls.get(zz) + "/" + id + URL_POSTFIX;
 		return getURI(url, paramsList);
 	}
@@ -877,7 +841,7 @@ public class RedmineManager {
 	}
 
 	public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		deleteObject(TimeEntry.class, id);
+		deleteObject(TimeEntry.class, Integer.toString(id));
 	}
 
 }

@@ -418,7 +418,7 @@ public class RedmineManagerTest {
 			createdProject.setDescription(newDescr);
 			mgr.updateProject(createdProject);
 			
-			Project updatedProject = mgr.getProjectByIdentifier(key);
+			Project updatedProject = mgr.getProjectByKey(key);
 			assertNotNull(updatedProject);
 			
 			assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
@@ -502,7 +502,7 @@ public class RedmineManagerTest {
 	@Test
 	public void testGetProjectNonExistingId() {
 		try {
-			mgr.getProjectByIdentifier("some-non-existing-key");
+			mgr.getProjectByKey("some-non-existing-key");
 			fail("Must have failed with NotFoundException");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
