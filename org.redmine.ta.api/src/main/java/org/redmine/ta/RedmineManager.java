@@ -680,7 +680,7 @@ public class RedmineManager {
 			if (aURL.getPath().length()>0){
 				path = aURL.getPath() + "/" + path;
 			}
-			uri = URIUtils.createURI(getProtocol(), getHost(), getPort(), path, 
+			uri = URIUtils.createURI(aURL.getProtocol(), aURL.getHost(), aURL.getPort(), path, 
 				    URLEncodedUtils.format(paramsList, CHARSET), null);
 		} catch (URISyntaxException e) {
 			throw new RuntimeException("URISyntaxException: " + e.getMessage());
@@ -707,30 +707,6 @@ public class RedmineManager {
 		return response.getBody();
 	}
 
-	private String getProtocol() throws MalformedURLException {
-		URL aURL = new URL(host);
-		return aURL.getProtocol();
-	}
-
-	private String getHost() throws MalformedURLException {
-		URL aURL = new URL(host);
-		return aURL.getHost();
-	}
-	
-	private Integer getPort() throws MalformedURLException {
-		URL aURL = new URL(host);
-		return aURL.getPort();
-	}
-	
-	/**
-	 * optional path, used when redmine is installed NOT at the server root.
-	 * e.g. at http://myserver:8080/redmine
-	 */
-	private String getPath() throws MalformedURLException {
-		URL aURL = new URL(host);
-		return aURL.getPath();
-	}
-	
 	/**
 	 * Sample usage:
 	 * <p>
