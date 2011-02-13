@@ -179,7 +179,8 @@ public class TestRedmineXMLParser {
 			String xml = MyIOUtils
 					.getResourceAsString("issues_foreign_symbols.xml");
 
-			String nonLatinSymbols = "Example with accents A��o";
+//			String nonLatinSymbols = "Example with accents Ação";
+			String nonLatinSymbols = "Example with russian text: Привет";
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
 			// must be 1 issue in the file
 			assertTrue(issues.size() == 1);
