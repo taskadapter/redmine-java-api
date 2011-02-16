@@ -23,7 +23,7 @@ public class User implements Identifiable {
 
 	@Override
 	public String toString() {
-		return login;
+		return getFullName();
 	}
 
 	public void setId(Integer id) {
