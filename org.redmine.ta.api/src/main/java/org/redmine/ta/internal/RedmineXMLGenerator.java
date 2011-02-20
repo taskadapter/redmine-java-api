@@ -108,10 +108,19 @@ public class RedmineXMLGenerator {
 			if (value instanceof Date) {
 				// always use Short Date Format for now!
 				b.append(sdf.format(value));
+			} if (value instanceof String) {
+				b.append(encodeXML((String)value));
 			} else {
 				b.append(value);
 			}
 			b.append("</" + tag + ">");
 		}
 	}
+	
+	private static String encodeXML(String value) {
+		return value.replace("&", "&amp;").replace("'", "&apos;")
+				.replace("\"", "&quot;").replace("<", "&lt;")
+				.replace(">", "&gt;");
+	}
+
 }
