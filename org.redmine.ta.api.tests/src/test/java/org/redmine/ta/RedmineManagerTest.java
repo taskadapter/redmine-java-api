@@ -822,4 +822,19 @@ public class RedmineManagerTest {
 			System.out.println("Got expected NotFoundException for deleted Issue");
 		}
 	}
+	
+	@Test
+	public void testUpdateIssueSpecialXMLtags() throws Exception {
+		Issue issue = createIssues(1).get(0);
+		String newSubject = "\"text in quotes\" and <xml> tags";
+		String newDescription="<teghere>\"abc\"</here>";
+		issue.setSubject(newSubject);
+		issue.setDescription(newDescription);
+		mgr.updateIssue(issue);
+
+		Issue updatedIssue = mgr.getIssueById(issue.getId());
+		assertEquals(newSubject, updatedIssue.getSubject());
+		assertEquals(newDescription, updatedIssue.getDescription());
+	}
+
 }
