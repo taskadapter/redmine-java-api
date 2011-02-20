@@ -28,67 +28,26 @@ public class RedmineXMLGenerator {
 
 	private final static String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
-	// // TODO use this map instead of getIssueXML() method in RedmineManager
-	// private static final Map<Class, String> toRedmineMap = new HashMap<Class,
-	// String>() {
-	// private static final long serialVersionUID = 1L;
-	// {
-	// put(User.class, MAPPING_USERS);
-	// put(Issue.class, MAPPING_ISSUES);
-	// put(Project.class, MAPPING_PROJECTS_LIST);
-	// // have to use different config files for "load" and "save" operations
-	// // because Redmine REST API expects different XML formats...
-	// put(TimeEntry.class, "/mapping_time_entries_save.xml");
-	// }
-	// };
-
-	// XXX unify with the new toXML() mechanism!
 	public static String toXML(String projectKey, Issue issue) {
-		String xml = "<issue>";
-		if (projectKey != null) {
-			// projectKey is required for "new issue" request, but not for
-			// "update issue" one.
-			xml += "<project_id>" + projectKey + "</project_id>";
-		}
-		if (issue.getParentId() != null) {
-			xml += "<parent_issue_id>" + issue.getParentId()
-					+ "</parent_issue_id>";
-		}
-		if (issue.getSubject() != null) {
-			xml += "<subject>" + issue.getSubject() + "</subject>";
-		}
-
+		StringBuilder b = new StringBuilder(XML_PREFIX + "<issue>");
+		// projectKey is required for "new issue" request, but not for
+		// "update issue" one.
+		append(b, "project_id", projectKey);
+		append(b, "parent_issue_id", issue.getParentId());
+		append(b, "subject", issue.getSubject());
 		if (issue.getTracker() != null) {
-			xml += "<tracker_id>" + issue.getTracker().getId()
-					+ "</tracker_id>";
+			append(b, "tracker_id", issue.getTracker().getId());
 		}
-
-		if (issue.getStartDate() != null) {
-			String strDate = sdf.format(issue.getStartDate());
-			xml += "<start_date>" + strDate + "</start_date>";
-		}
-
-		if (issue.getDueDate() != null) {
-			String strDate = sdf.format(issue.getDueDate());
-			xml += "<due_date>" + strDate + "</due_date>";
-		}
-
+		append(b, "start_date", issue.getStartDate());
+		append(b, "due_date", issue.getDueDate());
+		append(b, "estimated_hours", issue.getEstimatedHours());
+		append(b, "description", issue.getDescription());
 		User ass = issue.getAssignee();
 		if (ass != null) {
-			xml += "<assigned_to_id>" + ass.getId() + "</assigned_to_id>";
+			append(b, "assigned_to_id", ass.getId());
 		}
-
-		if (issue.getEstimatedHours() != null) {
-			xml += "<estimated_hours>" + issue.getEstimatedHours()
-					+ "</estimated_hours>";
-		}
-
-		if (issue.getDescription() != null) {
-			xml += "<description>" + issue.getDescription() + "</description>";
-		}
-
-		xml += "</issue>";
-		return xml;
+		b.append("</issue>");
+		return b.toString();
 	}
 
 	public static String toXML(Object o) {
