@@ -99,6 +99,7 @@ public class RedmineXMLGenerator {
 		b.append("</user>");
 		return b.toString();
 	}
+	
 	/**
 	 * append, if the value is not NULL
 	 */
@@ -108,8 +109,8 @@ public class RedmineXMLGenerator {
 			if (value instanceof Date) {
 				// always use Short Date Format for now!
 				b.append(sdf.format(value));
-			} if (value instanceof String) {
-				b.append(encodeXML((String)value));
+			} else if (value instanceof String) {
+				b.append(encodeXML((String) value));
 			} else {
 				b.append(value);
 			}
