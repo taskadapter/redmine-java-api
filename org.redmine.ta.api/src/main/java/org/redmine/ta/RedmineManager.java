@@ -22,7 +22,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +51,7 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.internal.HttpUtil;
+import org.redmine.ta.internal.RedmineXMLGenerator;
 import org.redmine.ta.internal.RedmineXMLParser;
 
 
@@ -123,7 +123,7 @@ public class RedmineManager {
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException, RedmineException {
         String query = getCreateIssueURI();
 		HttpPost http = new HttpPost(query);
-		String xmlBody = getIssueXML(projectKey, issue);
+		String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
 		
 		setEntity(http, xmlBody);
 		Response response = sendRequest(http);
@@ -172,7 +172,7 @@ public class RedmineManager {
 
 		// XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
 		String NO_PROJECT_KEY = null;
-		String xmlBody = getIssueXML(NO_PROJECT_KEY, issue);
+		String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
 
 		setEntity(httpRequest, xmlBody);
 		Response response = sendRequest(httpRequest);
@@ -248,54 +248,7 @@ public class RedmineManager {
 		
 	}
 	
-	static String REDMINE_START_DATE_FORMAT = "yyyy-MM-dd";
-	static SimpleDateFormat sdf =       new SimpleDateFormat(REDMINE_START_DATE_FORMAT);
 
-	// Can't use Castor here because this "post" format differs from "get" one.
-	// see http://www.redmine.org/issues/6128#note-2 for details
-	private String getIssueXML(String projectKey, Issue issue) {
-		String xml = "<issue>";
-		if (projectKey != null) {
-			// projectKey is required for "new issue" request, but not for "update issue" one.
-			xml += "<project_id>" + projectKey + "</project_id>";
-		}
-		if (issue.getParentId() != null) {
-			xml += "<parent_issue_id>" + issue.getParentId() + "</parent_issue_id>";
-		}
-		if (issue.getSubject()!= null) {
-			xml += "<subject>" + issue.getSubject() + "</subject>";
-		}
-
-		if (issue.getTracker() != null) {
-			xml += "<tracker_id>" + issue.getTracker().getId() + "</tracker_id>";
-		}
-
-		if (issue.getStartDate() != null) {
-			String strDate = sdf.format(issue.getStartDate());
-			xml += "<start_date>" + strDate + "</start_date>";
-		}
-		
-		if (issue.getDueDate() != null) {
-			String strDate = sdf.format(issue.getDueDate());
-			xml += "<due_date>" + strDate + "</due_date>";
-		}
-
-		User ass = issue.getAssignee();
-		if (ass != null) {
-			xml += "<assigned_to_id>" + ass.getId() + "</assigned_to_id>";
-		}
-
-		if (issue.getEstimatedHours() != null) {
-			xml += "<estimated_hours>" + issue.getEstimatedHours() + "</estimated_hours>";
-		}
-		
-		if (issue.getDescription() != null) {
-			xml += "<description>" + issue.getDescription() + "</description>";
-		}
-		
-		xml += "</issue>";
-		return xml;
-	}
 	
 	/**
 	 * Load the list of projects available to the user, which is represented by the API access key.
@@ -581,7 +534,7 @@ public class RedmineManager {
 		URI uri = getCreateURI(obj.getClass(), paramsList);
 		HttpPost http = new HttpPost(uri);
 		
-		String xml = RedmineXMLParser.convertObjectToXML(obj);
+		String xml = RedmineXMLGenerator.toXML(obj);
 		setEntity((HttpEntityEnclosingRequest)http, xml);
 
 		Response response = sendRequest(http);
@@ -604,7 +557,7 @@ public class RedmineManager {
 		URI uri = getUpdateURI(obj.getClass(), Integer.toString(obj.getId()), paramsList);
 		HttpPut http = new HttpPut(uri);
 		
-		String xml = RedmineXMLParser.convertObjectToXML(obj);
+		String xml = RedmineXMLGenerator.toXML(obj);
 		setEntity((HttpEntityEnclosingRequest)http, xml);
 
 		Response response = sendRequest(http);
@@ -712,7 +665,7 @@ public class RedmineManager {
         query+="&include=trackers";
         
 		HttpPost httpPost = new HttpPost(query);
-		String createProjectXML = RedmineXMLParser.convertObjectToXML(project);
+		String createProjectXML = RedmineXMLGenerator.toXML(project);
 //		System.out.println("create project:" + createProjectXML);
 		setEntity(httpPost, createProjectXML);
 

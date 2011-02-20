@@ -16,8 +16,6 @@
 package org.redmine.ta.internal;
 
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,15 +23,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.redmine.ta.RedmineManager;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.Unmarshaller;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.Unmarshaller;
 import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
@@ -51,19 +47,6 @@ public class RedmineXMLParser {
 			put(Issue.class, MAPPING_ISSUES);
 			put(Project.class, MAPPING_PROJECTS_LIST);
 			put(TimeEntry.class, "/mapping_time_entries.xml");
-		}
-	};
-
-	// TODO use this map instead of getIssueXML() method in RedmineManager
-	private static final Map<Class, String> toRedmineMap = new HashMap<Class, String>() {
-		private static final long serialVersionUID = 1L;
-		{
-			put(User.class, MAPPING_USERS);
-			put(Issue.class, MAPPING_ISSUES);
-			put(Project.class, MAPPING_PROJECTS_LIST);
-			// have to use different config files for "load" and "save" operations
-			// because Redmine REST API expects different XML formats...
-			put(TimeEntry.class, "/mapping_time_entries_save.xml");
 		}
 	};
 
@@ -211,33 +194,33 @@ public class RedmineXMLParser {
 		return parseObjectFromXML(User.class, body);
 	}
 	
-	public static String convertObjectToXML(Object obj) {
-		String configfile = toRedmineMap.get(obj.getClass());
-		StringWriter writer = new StringWriter();
-		try {
-			Marshaller m = getMarshaller(configfile, writer);
-			m.marshal(obj);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return writer.toString();
-	}
-
-	private static Marshaller getMarshaller(String configFile, Writer writer) {
-		InputSource inputSource = new InputSource(
-				RedmineManager.class.getResourceAsStream(configFile));
-		Mapping mapping = new Mapping();
-		mapping.loadMapping(inputSource);
-
-		Marshaller marshaller;
-		try {
-			marshaller = new Marshaller(writer);
-			marshaller.setMapping(mapping);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-		return marshaller;
-	}
+//	private static Marshaller getMarshaller(String configFile, Writer writer) {
+//		InputSource inputSource = new InputSource(
+//				RedmineManager.class.getResourceAsStream(configFile));
+//		Mapping mapping = new Mapping();
+//		mapping.loadMapping(inputSource);
+//		
+//		XMLContext c = new XMLContext();
+//		// this is required to support Android, where standard XML factory is not available
+//		// see http://code.google.com/p/redmine-java-api/issues/detail?id=17
+////		c.setProperty("org.exolab.castor.xml.serializer.factory", "org.exolab.castor.xml.XercesXMLSerializerFactory");
+////		c.setProperty("org.exolab.castor.parser", "org.xml.sax.helpers.XMLReaderAdapter");
+////		c.setProperty("org.exolab.castor.parser", "com.sun.org.apache.xerces.internal.parsers.SAXParser");
+//		// MUST disable "pretty-printing"
+//		c.setProperty("org.exolab.castor.indent", "false");
+//		
+//		Marshaller marshaller;
+//		try {
+//			c.addMapping(mapping);
+////			marshaller = new Marshaller(writer);
+////			marshaller.setMapping(mapping);
+//			marshaller = c.createMarshaller();
+//			marshaller.setWriter(writer);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//		return marshaller;
+//	}
 
 	/**
 	 * sample parameter:
