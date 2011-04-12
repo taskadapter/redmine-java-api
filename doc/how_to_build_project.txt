@@ -1,5 +1,6 @@
 #summary How to build the project from source code.
 
+  * Subscribe to developers list: http://groups.google.com/group/redmine-java-api-dev
   * Install software
   * Checkout the source code
   * Build the distributive in command-line mode
@@ -10,11 +11,11 @@
  2) Maven 3: http://maven.apache.org/download.html
 
 = Checkout the source code =
-get Redmine Java API from here https://redmine-java-api.googlecode.com/svn/trunk
+Repository: https://redmine-java-api.googlecode.com/svn/trunk
 
 = Build the distributive in command-line mode =
 
-make sure you have Maven's "bin" folder in your path.
+Make sure you have Maven's "bin" folder in your path.
 Run this command in the project root folder:
   mvn clean package
 This will create distributives in "_project_root\build_" folder.
