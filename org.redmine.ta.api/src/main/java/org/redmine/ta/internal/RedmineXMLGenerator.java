@@ -3,6 +3,7 @@ package org.redmine.ta.internal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
@@ -45,6 +46,15 @@ public class RedmineXMLGenerator {
 		User ass = issue.getAssignee();
 		if (ass != null) {
 			append(b, "assigned_to_id", ass.getId());
+		}
+		if (!issue.getCustomFields().isEmpty()) {
+			b.append("<custom_fields type=\"array\">");
+			for (CustomField field : issue.getCustomFields()) {
+				b.append("<custom_field id=\"" + field.getId() + "\" name=\"" + field.getName() +"\">");
+				b.append("<value>" + field.getValue() +"</value>");
+				b.append("</custom_field>");
+			}
+			b.append("</custom_fields>");
 		}
 		b.append("</issue>");
 		return b.toString();

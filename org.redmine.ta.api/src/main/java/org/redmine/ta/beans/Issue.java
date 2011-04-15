@@ -1,6 +1,8 @@
 package org.redmine.ta.beans;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Redmine's Issue
@@ -26,6 +28,7 @@ public class Issue implements Identifiable {
 	private Date updatedOn;
 	private Integer statusId;
 	private String statusName;
+    private List<CustomField> customFields = new ArrayList<CustomField>();
 
 	public Project getProject() {
 		return project;
@@ -177,6 +180,22 @@ public class Issue implements Identifiable {
 		this.statusName = statusName;
 	}
 
+	/**
+	 * list of Custom Field objects, NEVER NULL.
+	 * @return
+	 */
+    public List<CustomField> getCustomFields() {
+        return customFields;
+    }
+
+    /**
+     * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
+     * @param customFields
+     */
+    public void setCustomFields(List<CustomField> customFields) {
+        this.customFields = customFields;
+    }
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -307,5 +326,19 @@ public class Issue implements Identifiable {
 		} else if (!updatedOn.equals(other.updatedOn))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * 
+	 * @param fieldName
+	 * @return the value or NULL if the field is not found
+	 */
+	public String getCustomField(String fieldName) {
+		for (CustomField f : customFields) {
+			if (f.getName().equals(fieldName)) {
+				return f.getValue();
+			}
+		}
+		return null;
 	}
 }
