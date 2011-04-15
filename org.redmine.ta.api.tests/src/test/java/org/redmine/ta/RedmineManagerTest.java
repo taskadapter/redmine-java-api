@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
@@ -835,6 +836,37 @@ public class RedmineManagerTest {
 		Issue updatedIssue = mgr.getIssueById(issue.getId());
 		assertEquals(newSubject, updatedIssue.getSubject());
 		assertEquals(newDescription, updatedIssue.getDescription());
+	}
+
+	/**
+	 * The custom fields used here MUST ALREADY EXIST on the server and be 
+	 * associated with the required task type (bug/feature/task/..).
+	 */
+	@Test
+	public void testCustomFields() throws Exception {
+		Issue issue = createIssues(1).get(0);
+		// default empty values
+		assertEquals(2, issue.getCustomFields().size());
+
+		
+		int id1 = 1; // TODO this is pretty much a hack, we don't generally know these ids!
+		String custom1FieldName = "my_custom_1";
+		String custom1Value = "some value 123";
+
+		int id2 = 2;
+		String custom2FieldName = "custom_boolean_1";
+		String custom2Value = "true";
+		
+		issue.setCustomFields(new ArrayList<CustomField>());
+		
+		issue.getCustomFields().add(new CustomField(id1, custom1FieldName, custom1Value));
+		issue.getCustomFields().add(new CustomField(id2, custom2FieldName, custom2Value));
+		mgr.updateIssue(issue);
+
+		Issue updatedIssue = mgr.getIssueById(issue.getId());
+		assertEquals(2, updatedIssue.getCustomFields().size());
+		assertEquals(custom1Value, updatedIssue.getCustomField(custom1FieldName));
+		assertEquals(custom2Value, updatedIssue.getCustomField(custom2FieldName));
 	}
 
 }

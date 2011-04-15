@@ -173,7 +173,7 @@ public class RedmineManager {
 		// XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
 		String NO_PROJECT_KEY = null;
 		String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
-
+		System.out.println(xmlBody);
 		setEntity(httpRequest, xmlBody);
 		Response response = sendRequest(httpRequest);
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
