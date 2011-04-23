@@ -51,7 +51,9 @@ public class RedmineXMLParser {
 	};
 
 	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
-		return parseObjectFromXML(Issue.class, xml);
+		StringBuilder b = new StringBuilder(xml);
+		removeBadTags(b);
+		return parseObjectFromXML(Issue.class, b.toString());
 	}
 
 	public static Project parseProjectFromXML(String xml)
@@ -59,15 +61,24 @@ public class RedmineXMLParser {
 		return parseObjectFromXML(Project.class, xml);
 	}
 
-	public static List<Issue> parseIssuesFromXML(String xml)
-			throws RuntimeException {
-		xml = removeBadTags(xml);
-		return parseObjectsFromXML(Issue.class, xml);
+	public static List<Issue> parseIssuesFromXML(String xml) throws RuntimeException {
+		StringBuilder b = new StringBuilder(xml);
+		removeBadTags(b);
+		return parseObjectsFromXML(Issue.class, b.toString());
 	}
 
 	// see bug https://www.hostedredmine.com/issues/8240
-	private static String removeBadTags(String xml) {
-		return xml.replaceAll("<estimated_hours></estimated_hours>", "");
+	private static void removeBadTags(StringBuilder xml) {
+		replaceAll(xml, "<estimated_hours></estimated_hours>", "");
+	}
+
+	public static void replaceAll(StringBuilder builder, String from, String to) {
+		int index = builder.indexOf(from);
+		while (index != -1) {
+			builder.replace(index, index + from.length(), to);
+			index += to.length(); // Move to the end of the replacement
+			index = builder.indexOf(from, index);
+		}
 	}
 
 	/**
@@ -168,16 +179,17 @@ public class RedmineXMLParser {
 
 	public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
 		verifyStartsAsXML(xml);
+		StringBuilder b = new StringBuilder(xml);
+		removeBadTags(b);
+		
 		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, classs);
 
 		T obj = null;
 		StringReader reader = null;
 		try {
-//			 System.err.println(xml);
-			reader = new StringReader(xml);
+			reader = new StringReader(b.toString());
 			obj = (T) unmarshaller.unmarshal(reader);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -196,34 +208,6 @@ public class RedmineXMLParser {
 		return parseObjectFromXML(User.class, body);
 	}
 	
-//	private static Marshaller getMarshaller(String configFile, Writer writer) {
-//		InputSource inputSource = new InputSource(
-//				RedmineManager.class.getResourceAsStream(configFile));
-//		Mapping mapping = new Mapping();
-//		mapping.loadMapping(inputSource);
-//		
-//		XMLContext c = new XMLContext();
-//		// this is required to support Android, where standard XML factory is not available
-//		// see http://code.google.com/p/redmine-java-api/issues/detail?id=17
-////		c.setProperty("org.exolab.castor.xml.serializer.factory", "org.exolab.castor.xml.XercesXMLSerializerFactory");
-////		c.setProperty("org.exolab.castor.parser", "org.xml.sax.helpers.XMLReaderAdapter");
-////		c.setProperty("org.exolab.castor.parser", "com.sun.org.apache.xerces.internal.parsers.SAXParser");
-//		// MUST disable "pretty-printing"
-//		c.setProperty("org.exolab.castor.indent", "false");
-//		
-//		Marshaller marshaller;
-//		try {
-//			c.addMapping(mapping);
-////			marshaller = new Marshaller(writer);
-////			marshaller.setMapping(mapping);
-//			marshaller = c.createMarshaller();
-//			marshaller.setWriter(writer);
-//		} catch (Exception e) {
-//			throw new RuntimeException(e);
-//		}
-//		return marshaller;
-//	}
-
 	/**
 	 * sample parameter:
 	 * <pre>

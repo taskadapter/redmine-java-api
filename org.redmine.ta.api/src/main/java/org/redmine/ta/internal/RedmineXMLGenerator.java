@@ -41,7 +41,9 @@ public class RedmineXMLGenerator {
 		}
 		append(b, "start_date", issue.getStartDate());
 		append(b, "due_date", issue.getDueDate());
-		append(b, "estimated_hours", issue.getEstimatedHours());
+		if (issue.getEstimatedHours() != null) {
+			append(b, "estimated_hours", issue.getEstimatedHours());
+		}
 		append(b, "description", issue.getDescription());
 		User ass = issue.getAssignee();
 		if (ass != null) {
