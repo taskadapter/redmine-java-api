@@ -872,4 +872,23 @@ public class RedmineManagerTest {
 		assertEquals(custom2Value, updatedIssue.getCustomField(custom2FieldName));
 	}
 
+	@Test
+	public void testUpdateIssueDoesNotChangeEstimatedTime() {
+		try {
+			Issue issue = new Issue();
+			String originalSubject = "Issue " + new Date();
+			issue.setSubject(originalSubject);
+
+			Issue newIssue = mgr.createIssue(projectKey, issue);
+			assertEquals("Estimated hours must be NULL", null, newIssue.getEstimatedHours());
+			
+			mgr.updateIssue(newIssue);
+
+			Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
+			assertEquals("Estimated hours must be NULL", null, reloadedFromRedmineIssue.getEstimatedHours());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
 }
