@@ -128,14 +128,19 @@ public class TestRedmineXMLParser {
 
 	@Test
 	public void testParseIssuesTotalCount() {
-		String tmp = "...xml... <issues type=\"array\" limit=\"25\" total_count=\"155\" offset=\"0\">....";
-		int x = RedmineXMLParser.parseIssuesTotalCount(tmp);
+		String tmp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issues type=\"array\" limit=\"25\" total_count=\"155\" offset=\"0\">....";
+		int x = RedmineXMLParser.parseObjectsTotalCount(tmp);
 		assertEquals(155, x);
-		System.out
-				.println("success: parsed total_count attribute from issues xml. value= "
-						+ x);
 	}
 
+	@Test
+	public void testParseProjectsTotalCount() {
+		String tmp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><projects type=\"array\" total_count=\"112\" limit=\"25\" offset=\"0\"><project><";
+		int x = RedmineXMLParser.parseObjectsTotalCount(tmp);
+		assertEquals(112, x);
+	}
+		
+	
 	@Test
 	public void testNullEstimatedTime() {
 		String str;

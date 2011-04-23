@@ -65,10 +65,16 @@ public class RedmineManager {
 	private static final String CHARSET = "UTF-8";
 
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
+	
+	private static enum MODE {
+		REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2, 
+	}
 
 	private String host;
 	private String apiAccessKey;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
+	
+	private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
 
 	private static final Map<Class, String> urls = new HashMap<Class, String>() {
 		private static final long serialVersionUID = 1L;
@@ -264,7 +270,7 @@ public class RedmineManager {
 	public List<Project> getProjects() throws IOException,AuthenticationException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		try {
-			return getObjectsListV104(Project.class, params);
+			return getObjectsList(Project.class, params);
 		} catch (NotFoundException e) {
 			throw new RuntimeException("NotFoundException received, which should never happen in this request");
 		}
@@ -291,7 +297,7 @@ public class RedmineManager {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
 
-		return getObjectsListV104(Issue.class, params);
+		return getObjectsList(Issue.class, params);
 	}
 	
 	/**
@@ -417,7 +423,8 @@ public class RedmineManager {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
 
-		List<Issue> issues = getObjectsListV104(Issue.class, params);
+//		List<Issue> issues = getObjectsListV104(Issue.class, params);
+		List<Issue> issues = getObjectsListV11(Issue.class, params);
 //		setUserFields(issues, idToUserMap);
 		return issues;
 	}
@@ -460,6 +467,9 @@ public class RedmineManager {
 		}
 	}
 	
+	/**
+	 * Redmine 1.0 - specific version
+	 */
 	private <T> List<T> getObjectsListV104(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<T>  objects = new ArrayList<T>();
 		
@@ -514,6 +524,74 @@ public class RedmineManager {
 
 			pageNum++;
 		} while (true);
+
+		return objects;
+	}
+
+	private <T> List<T> getObjectsList(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
+			return getObjectsListV11(objectClass, params);
+		} else if (currentMode.equals(MODE.REDMINE_1_0)) {
+			return getObjectsListV104(objectClass, params);
+		} else {
+			throw new RuntimeException("unsupported mode:" + currentMode + ". supported modes are: " + 
+					MODE.REDMINE_1_0 + " and " + MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2);
+		}
+	}
+	
+	/**
+	 * Redmine 1.1 / Chiliproject 1.2 - specific version
+	 */
+	private <T> List<T> getObjectsListV11(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		List<T>  objects = new ArrayList<T>();
+		
+		addAuthParameters(params);
+		int limit = 25;
+		params.put("limit", new BasicNameValuePair("limit", String.valueOf(limit)));
+		int offset = 0;
+		int totalIssuesFoundOnServer;
+		do {
+			params.put("offset", new BasicNameValuePair("offset", String.valueOf(offset)));
+			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
+			
+			URI uri;
+			try {
+				String query = urls.get(objectClass) + URL_POSTFIX;
+				uri = getURI(query, paramsList);
+			} catch (MalformedURLException e) {
+				throw new RuntimeException("MalformedURLException: " + e.getMessage());
+			}
+
+			HttpGet http = new HttpGet(uri);
+
+			Response response = sendRequest(http);
+			if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
+				throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
+			}
+// 			commented out because this only works in Redmine 1.1 !!			
+
+			String body = response.getBody();
+			totalIssuesFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(body);
+			
+/*			if (pageNum == FIRST_REDMINE_PAGE) {
+				firstPage = body;
+			} else {
+				// check that the response is NOT equal to the First Page
+				// - this would indicate that no more pages are available (for Redmine 1.0.*);
+				if (firstPage.equals(body)) {
+					// done, no more pages. exit the loop
+					break;
+				}
+			}*/
+			List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
+			if (foundItems.size() == 0) {
+				// and this is to provide compatibility with Redmine 1.1.0
+				break;
+			}
+			objects.addAll(foundItems);
+
+			offset+= foundItems.size();
+		} while (offset<totalIssuesFoundOnServer);
 
 		return objects;
 	}
@@ -721,7 +799,7 @@ public class RedmineManager {
 	 */
 	public List<User> getUsers() throws IOException,AuthenticationException, NotFoundException, RedmineException{
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		return getObjectsListV104(User.class, params);
+		return getObjectsList(User.class, params);
 	}
 
 	public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException, RedmineException {
@@ -762,17 +840,11 @@ public class RedmineManager {
 
 	public List<TimeEntry> getTimeEntries() throws IOException,AuthenticationException, NotFoundException, RedmineException{
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		return getObjectsListV104(TimeEntry.class, params);
+		return getObjectsList(TimeEntry.class, params);
 	}
 	
 	/**
-	 * 
 	 * @param id the database Id of the TimeEntry record
-	 * @return
-	 * @throws IOException
-	 * @throws AuthenticationException
-	 * @throws NotFoundException
-	 * @throws RedmineException
 	 */
 	public TimeEntry getTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		return getObject(TimeEntry.class, id);
@@ -782,7 +854,7 @@ public class RedmineManager {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		params.put("issue_id", new BasicNameValuePair("issue_id", Integer.toString(issueId)));
 
-		return getObjectsListV104(TimeEntry.class, params);
+		return getObjectsList(TimeEntry.class, params);
 	}
 	
 	public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {

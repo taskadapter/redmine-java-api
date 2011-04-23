@@ -665,8 +665,8 @@ public class RedmineManagerTest {
 			// create 27 issues. default page size is 25.
 			createIssues(27);
 //			mgr.setObjectsPerPage(5); <-- does not work now
-			List<Issue> issues = mgr.getIssues("test1296256368758", null);//projectKey, null);
-			System.out.println("testGetIssuesNEWMETHOD() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
+			List<Issue> issues = mgr.getIssues(projectKey, null);
+			System.out.println("testGetIssuesPaging() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
 			assertTrue(issues.size()>26);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -691,7 +691,10 @@ public class RedmineManagerTest {
 		List<Project> projects = createProjects(NUM);
 		
 		List<Project> loadedProjects = mgr.getProjects();
-		assertTrue(loadedProjects.size()>NUM);
+		assertTrue(
+				"Number of projects loaded from the server must be bigger than "
+						+ NUM + ", but it's " + loadedProjects.size(),
+				loadedProjects.size() > NUM);
 		
 		deleteProjects(projects);
 	}
