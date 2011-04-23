@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class Config {
-	private static final String TEST_PROPERTIES = "redmine_api_test.properties";
+	private static final String TEST_PROPERTIES = "api_test.properties";
 
 	private static Properties properties = new Properties();
 	static {
@@ -24,15 +24,15 @@ public class Config {
 	}
 
 	public static String getHost() {
-		return properties.getProperty("redmine.host");
+		return properties.getProperty("host");
 	}
 
 	public static String getUserLogin() {
-		return properties.getProperty("redmine.user");
+		return properties.getProperty("user");
 	}
 
 	public static String getApiKey() {
-		return properties.getProperty("redmine.apikey");
+		return properties.getProperty("apikey");
 	}
 
 	public static String getParam(String key) {
