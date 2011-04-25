@@ -159,6 +159,8 @@ public class RedmineManager {
 	}
 	
 	/**
+	 * Note: This method cannot return the updated Issue from Redmine 
+	 * because the server does not provide any XML in response.
 	 * 
 	 * @param issue the Issue to update on the server. issue.getId() is used for identification.
 	 *  
@@ -170,9 +172,6 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		/* note: This method cannot return the updated Issue from Redmine 
-		 * because the server does not provide any XML in response.
-		 */
 		String query = getUpdateIssueURI(issue.getId());
 		HttpPut httpRequest = new HttpPut(query);
 
@@ -195,13 +194,10 @@ public class RedmineManager {
 	
 	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
 		System.out.println(request.getRequestLine());
-//		DefaultHttpClient httpclient = new DefaultHttpClient();
-//		wrapClient(httpclient);
 		HttpClient httpclient = HttpUtil.getNewHttpClient();
 		
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
 		
-		// System.out.println("----------------------------------------");
 		System.out.println(httpResponse.getStatusLine());
 		int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode ==	HttpStatus.SC_UNAUTHORIZED) {
@@ -227,11 +223,6 @@ public class RedmineManager {
 		// have to fill our own object, otherwise there's no guarantee 
 		// that the request body can be retrieved later ("socket closed" exception can occur) 
 		Response r = new Response(responseCode, responseBody);
-//		if (responseEntity != null) {
-//			System.out.println("Response content length: "
-//					+ responseEntity.getContentLength());
-//		}
-		// System.out.println(responseBody);
 		httpclient.getConnectionManager().shutdown();
 //		String responseBody = EntityUtils.toString(responseEntity);
 		return r;
@@ -358,39 +349,6 @@ public class RedmineManager {
 		deleteObject(Issue.class, Integer.toString(id));
 	}
 
-	// XXX this method will be used soon instead of temporary getIssuesV104()
-/*	private List<Issue> getIssuesTrunk(String projectKey, String queryId) throws IOException, AuthenticationException {
-		WebConnector c = new WebConnector();
-		List<Issue>  allTasks = new ArrayList<Issue>();
-		
-		int offsetIssuesNum = 0;
-		int totalIssuesFoundOnServer = RedmineXMLParser.UNKNOWN;
-		int loaded = -1;
-//		int pageNum=0;
-		
-		do {
-			URL url = buildGetIssuesByQueryURL(projectKey, queryId, offsetIssuesNum);
-
-			StringBuffer responseXML = c.loadData(url);
-
-			totalIssuesFoundOnServer = RedmineXMLParser.parseIssuesTotalCount(responseXML
-					.toString());
-			
-			List<Issue> foundIssues = RedmineXMLParser.parseIssuesFromXML(responseXML.toString());
-			// assuming every page has the same number of items 
-			loaded = foundIssues.size();
-			allTasks.addAll(foundIssues);
-			offsetIssuesNum+= loaded;
-			// stop after 1st page if we don't know how many pages total (this required Redmine trunk version, it's not part of 1.0.4!)
-			if (totalIssuesFoundOnServer == RedmineXMLParser.UNKNOWN) {
-				totalIssuesFoundOnServer = loaded;
-			}
-		} while (offsetIssuesNum < totalIssuesFoundOnServer);
-
-		return allTasks;
-	}
-*/
-
 	/**
 	 * 
 	 * @param projectKey
@@ -423,8 +381,7 @@ public class RedmineManager {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
 
-//		List<Issue> issues = getObjectsListV104(Issue.class, params);
-		List<Issue> issues = getObjectsListV11(Issue.class, params);
+		List<Issue> issues = getObjectsList(Issue.class, params);
 //		setUserFields(issues, idToUserMap);
 		return issues;
 	}
@@ -452,7 +409,6 @@ public class RedmineManager {
 //		return idToUserMap;
 //	}
 
-	
 	/**
 	 * This ONLY works with Redmine 1.0.  Redmine 1.1 uses "objects per page" parameter instead!
 	 * @param params
@@ -494,10 +450,6 @@ public class RedmineManager {
 			}
 
 			HttpGet http = new HttpGet(uri);
-// 			commented out because this only works in Redmine 1.1 !!			
-//			totalIssuesFoundOnServer = RedmineXMLParser.parseIssuesTotalCount(responseXML
-//					.toString());
-
 			Response response = sendRequest(http);
 			if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
 				throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
@@ -517,7 +469,6 @@ public class RedmineManager {
 			}
 			List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
 			if (foundItems.size() == 0) {
-				// and this is to provide compatibility with Redmine 1.1.0
 				break;
 			}
 			objects.addAll(foundItems);
@@ -568,24 +519,11 @@ public class RedmineManager {
 			if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
 				throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
 			}
-// 			commented out because this only works in Redmine 1.1 !!			
-
 			String body = response.getBody();
 			totalIssuesFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(body);
 			
-/*			if (pageNum == FIRST_REDMINE_PAGE) {
-				firstPage = body;
-			} else {
-				// check that the response is NOT equal to the First Page
-				// - this would indicate that no more pages are available (for Redmine 1.0.*);
-				if (firstPage.equals(body)) {
-					// done, no more pages. exit the loop
-					break;
-				}
-			}*/
 			List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
 			if (foundItems.size() == 0) {
-				// and this is to provide compatibility with Redmine 1.1.0
 				break;
 			}
 			objects.addAll(foundItems);
@@ -652,9 +590,6 @@ public class RedmineManager {
 		URI uri = getUpdateURI(classs, id, paramsList);
 		HttpDelete http = new HttpDelete(uri);
 		
-//		String xml = RedmineXMLParser.convertObjectToXML(obj);
-//		setEntity((HttpEntityEnclosingRequest)http, xml);
-
 		Response response = sendRequest(http);
 		if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
