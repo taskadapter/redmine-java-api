@@ -127,8 +127,12 @@ public class Project implements Identifiable{
 		this.updatedOn = updatedOn;
 	}
 
-	/* Redmine's REST API "get project" operation does NOT return the parent project ID. 
+	/** <b>Redmine's REST API "get project" operation does NOT return the parent project ID. </b> 
 	 * see bug http://www.redmine.org/issues/8229
+	 * Which means calling getParentId() of the project loaded from Redmine server will
+	 * return <b>NULL</b>!
+	 * 
+	 * @return the parent project Id if it was set programmatically or NULL (!!!) if the project was loaded from the server.
 	 */ 
 	public Integer getParentId() {
 		return parentId;
