@@ -96,6 +96,9 @@ public class RedmineXMLGenerator {
 		append(b, "name", o.getName());
 		append(b, "identifier", o.getIdentifier());
 		append(b, "description", o.getDescription());
+		if (o.getParentId() != null) {
+			append(b, "parent_id", o.getParentId());
+		}
 		b.append("</project>");
 		return b.toString();
 	}
