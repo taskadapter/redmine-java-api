@@ -10,6 +10,9 @@
 		<field name="id" type="integer">
 			<bind-xml name="id" node="element" />
 		</field>
+		<field name="parentId" type="integer">
+			<bind-xml name="parent_id" node="element" />
+		</field>
 		<field name="name" type="string">
 			<bind-xml name="name" node="element" />
 		</field>

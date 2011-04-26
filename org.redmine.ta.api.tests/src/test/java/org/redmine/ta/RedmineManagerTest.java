@@ -21,6 +21,7 @@ import org.redmine.ta.beans.User;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class RedmineManagerTest {
@@ -889,6 +890,51 @@ public class RedmineManagerTest {
 		} catch (Exception e) {
 			fail();
 		}
+	}
+	
+	/* this test fails because Redmine's getproject() response does NOT
+	 * include parent ID. see bug http://www.redmine.org/issues/8229 
+	 */
+	@Ignore
+	@Test
+	public void testCreateSubProject() {
+		Project createdMainProject = null;
+		Project createdSubProject = null;
+		try {
+			Project mainProject = new Project();
+			long id = new Date().getTime();
+			mainProject.setName("project" + id);
+			mainProject.setIdentifier("project" + id);
+			createdMainProject = mgr.createProject(mainProject);
+			
+			Project subProject = new Project();
+			long subId = new Date().getTime()+1;
+			subProject.setName("subproject" + subId);
+			subProject.setIdentifier("subproject" + subId);
+			createdSubProject = mgr.createProject(subProject);
+			assertEquals(
+					"update this code when http://www.redmine.org/issues/8229 is resolved. Must have correct parent ID",
+					createdMainProject.getId(), createdSubProject.getParentId());
+		} catch (Exception e) {
+			fail();
+		} finally {
+			if (createdMainProject != null) {
+				try {
+					mgr.deleteProject(createdMainProject.getIdentifier());
+				} catch (Exception e) {
+					fail();
+				}
+			}
+			if (createdSubProject != null) {
+				try {
+					mgr.deleteProject(createdSubProject.getIdentifier());
+				} catch (Exception e) {
+					fail();
+				}
+			}
+
+		}
+
 	}
 
 }
