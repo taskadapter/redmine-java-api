@@ -33,22 +33,25 @@ public class RedmineXMLGenerator {
 		StringBuilder b = new StringBuilder(XML_PREFIX + "<issue>");
 		// projectKey is required for "new issue" request, but not for
 		// "update issue" one.
-		append(b, "project_id", projectKey);
-		append(b, "parent_issue_id", issue.getParentId());
-		append(b, "subject", issue.getSubject());
+		appendIfNotNull(b, "project_id", projectKey);
+		appendIfNotNull(b, "parent_issue_id", issue.getParentId());
+		appendIfNotNull(b, "subject", issue.getSubject());
 		if (issue.getTracker() != null) {
-			append(b, "tracker_id", issue.getTracker().getId());
+			appendIfNotNull(b, "tracker_id", issue.getTracker().getId());
 		}
-		append(b, "start_date", issue.getStartDate());
-		append(b, "due_date", issue.getDueDate());
+		appendIfNotNull(b, "start_date", issue.getStartDate());
+		appendIfNotNull(b, "due_date", issue.getDueDate());
 		if (issue.getEstimatedHours() != null) {
-			append(b, "estimated_hours", issue.getEstimatedHours());
+			appendIfNotNull(b, "estimated_hours", issue.getEstimatedHours());
 		}
-		append(b, "description", issue.getDescription());
+		appendIfNotNull(b, "description", issue.getDescription());
 		User ass = issue.getAssignee();
 		if (ass != null) {
-			append(b, "assigned_to_id", ass.getId());
+			appendIfNotNull(b, "assigned_to_id", ass.getId());
 		}
+		
+		appendIfNotNull(b, "done_ratio", issue.getDoneRatio());
+		
 		if (!issue.getCustomFields().isEmpty()) {
 			b.append("<custom_fields type=\"array\">");
 			for (CustomField field : issue.getCustomFields()) {
@@ -78,26 +81,26 @@ public class RedmineXMLGenerator {
 
 	public static String toXML(TimeEntry timeEntry) {
 		StringBuilder b = new StringBuilder(XML_PREFIX + "<time_entry>");
-		append(b, "id", timeEntry.getId());
-		append(b, "issue_id", timeEntry.getIssueId());
-		append(b, "project_id", timeEntry.getProjectId());
-		append(b, "user_id", timeEntry.getUserId());
-		append(b, "activity_id", timeEntry.getActivityId());
-		append(b, "hours", timeEntry.getHours());
-		append(b, "comments", timeEntry.getComment());
-		append(b, "spent_on", timeEntry.getSpentOn());
+		appendIfNotNull(b, "id", timeEntry.getId());
+		appendIfNotNull(b, "issue_id", timeEntry.getIssueId());
+		appendIfNotNull(b, "project_id", timeEntry.getProjectId());
+		appendIfNotNull(b, "user_id", timeEntry.getUserId());
+		appendIfNotNull(b, "activity_id", timeEntry.getActivityId());
+		appendIfNotNull(b, "hours", timeEntry.getHours());
+		appendIfNotNull(b, "comments", timeEntry.getComment());
+		appendIfNotNull(b, "spent_on", timeEntry.getSpentOn());
 		b.append("</time_entry>");
 		return b.toString();
 	}
 
 	public static String toXML(Project o) {
 		StringBuilder b = new StringBuilder(XML_PREFIX + "<project>");
-		append(b, "id", o.getId());
-		append(b, "name", o.getName());
-		append(b, "identifier", o.getIdentifier());
-		append(b, "description", o.getDescription());
+		appendIfNotNull(b, "id", o.getId());
+		appendIfNotNull(b, "name", o.getName());
+		appendIfNotNull(b, "identifier", o.getIdentifier());
+		appendIfNotNull(b, "description", o.getDescription());
 		if (o.getParentId() != null) {
-			append(b, "parent_id", o.getParentId());
+			appendIfNotNull(b, "parent_id", o.getParentId());
 		}
 		b.append("</project>");
 		return b.toString();
@@ -105,12 +108,12 @@ public class RedmineXMLGenerator {
 
 	public static String toXML(User o) {
 		StringBuilder b = new StringBuilder(XML_PREFIX + "<user>");
-		append(b, "id", o.getId());
-		append(b, "login", o.getLogin());
-		append(b, "password", o.getPassword());
-		append(b, "firstname", o.getFirstName());
-		append(b, "lastname", o.getLastName());
-		append(b, "mail", o.getMail());
+		appendIfNotNull(b, "id", o.getId());
+		appendIfNotNull(b, "login", o.getLogin());
+		appendIfNotNull(b, "password", o.getPassword());
+		appendIfNotNull(b, "firstname", o.getFirstName());
+		appendIfNotNull(b, "lastname", o.getLastName());
+		appendIfNotNull(b, "mail", o.getMail());
 		b.append("</user>");
 		return b.toString();
 	}
@@ -118,7 +121,7 @@ public class RedmineXMLGenerator {
 	/**
 	 * append, if the value is not NULL
 	 */
-	private static final void append(StringBuilder b, String tag, Object value) {
+	private static final void appendIfNotNull(StringBuilder b, String tag, Object value) {
 		if (value != null) {
 			b.append("<" + tag + ">");
 			if (value instanceof Date) {
