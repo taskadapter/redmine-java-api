@@ -974,4 +974,37 @@ public class RedmineManagerTest {
 		}
 	}
 
+	@Test
+	public void testIssueNullDescriptionDoesNotEraseIt() {
+		try {
+			Issue issue = new Issue();
+			String subject = "Issue " + new Date();
+			String descr = "Some description";
+			issue.setSubject(subject);
+			issue.setDescription(descr);
+			
+
+			Issue createdIssue = mgr.createIssue(projectKey, issue);
+			assertEquals("Checking description", descr, createdIssue.getDescription());
+			
+			createdIssue.setDescription(null);
+			mgr.updateIssue(createdIssue);
+
+			Integer issueId = createdIssue.getId();
+			Issue reloadedFromRedmineIssue = mgr.getIssueById(issueId);
+			assertEquals(
+					"Description must not be erased",
+					descr, reloadedFromRedmineIssue.getDescription());
+
+			reloadedFromRedmineIssue.setDescription("");
+			mgr.updateIssue(reloadedFromRedmineIssue);
+
+			Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
+			assertEquals(
+					"Description must be erased",
+					"", reloadedFromRedmineIssueUnchanged.getDescription());
+		} catch (Exception e) {
+			fail();
+		}
+	}
 }
