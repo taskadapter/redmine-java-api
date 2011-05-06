@@ -1,10 +1,10 @@
-Redmine Java API.
+Redmine & Chiliproject Java API.
 http://taskadapter.com/redmine_java_api
 
 Author: Alexey Skorokhodov (alskor@gmail.gom)
 
 USAGE.
-Redmine Java API can be used in both OSGI and regular Java environment. 
+Redmine & Chiliproject Java API can be used in both OSGI and regular Java environment. 
 
 1.==== Use as OSGI bundle ====
   Use the following two OSGI bundles:
