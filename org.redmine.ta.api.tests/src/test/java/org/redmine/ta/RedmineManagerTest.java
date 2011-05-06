@@ -937,4 +937,41 @@ public class RedmineManagerTest {
 
 	}
 
+	@Test
+	public void testIssueDoneRatio() {
+		try {
+			Issue issue = new Issue();
+			String subject = "Issue " + new Date();
+			issue.setSubject(subject);
+
+			Issue createdIssue = mgr.createIssue(projectKey, issue);
+			assertEquals("Initial 'done ratio' must be 0", (Integer) 0, createdIssue.getDoneRatio());
+			Integer doneRatio = 50;
+			createdIssue.setDoneRatio(doneRatio);
+			mgr.updateIssue(createdIssue);
+
+			Integer issueId = createdIssue.getId();
+			Issue reloadedFromRedmineIssue = mgr.getIssueById(issueId);
+			assertEquals(
+					"Checking if 'update issue' operation changed 'done ratio' field",
+					doneRatio, reloadedFromRedmineIssue.getDoneRatio());
+
+			Integer invalidDoneRatio = 130;
+			reloadedFromRedmineIssue.setDoneRatio(invalidDoneRatio);
+			try {
+				mgr.updateIssue(reloadedFromRedmineIssue);
+			} catch (RedmineException e) {
+				assertEquals("Must be 1 error", 1, e.getErrors().size());
+				assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0).toString());
+			}
+
+			Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
+			assertEquals(
+					"'done ratio' must have remained unchanged after invalid value",
+					doneRatio, reloadedFromRedmineIssueUnchanged.getDoneRatio());
+		} catch (Exception e) {
+			fail();
+		}
+	}
+
 }
