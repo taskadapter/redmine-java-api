@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.redmine.ta.MyIOUtils;
+import org.redmine.ta.RedmineTestUtils;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
@@ -148,7 +149,7 @@ public class TestRedmineXMLParser {
 			str = MyIOUtils.getResourceAsString(REDMINE_1_1_ISSUES_XML);
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(str);
 			Integer issueID = 52;
-			Issue issue52 = findIssueInList(issues, issueID);
+			Issue issue52 = RedmineTestUtils.findIssueInList(issues, issueID);
 			assertNotNull(issue52);
 
 			// must be NULL and not "0"
@@ -159,26 +160,6 @@ public class TestRedmineXMLParser {
 		}
 	}
 
-	private static Issue findIssueInList(List<Issue> list, Integer id) {
-		Issue result = null;
-		for (Issue issue : list) {
-			if (issue.getId().equals(id)) {
-				result = issue;
-			}
-		}
-		return result;
-	}
-
-	private static TimeEntry findTimeEntry(List<TimeEntry> list, Integer id) {
-		TimeEntry result = null;
-		for (TimeEntry obj : list) {
-			if (obj.getId().equals(id)) {
-				result = obj;
-			}
-		}
-		return result;
-	}
-	
 	@Test
 	@Ignore
 	public void testParseIssueNonUnicodeSymbols() {
@@ -219,7 +200,7 @@ public class TestRedmineXMLParser {
 			String xml = MyIOUtils
 					.getResourceAsString(REDMINE_1_1_ISSUES_XML);
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
-			Issue issue65 = findIssueInList(issues, 65);
+			Issue issue65 = RedmineTestUtils.findIssueInList(issues, 65);
 			assertTrue(issue65.getDescription().startsWith("This is the description for the new task."));
 			assertTrue(issue65.getDescription().endsWith("This is the last line."));
 		} catch (Exception e) {
@@ -245,7 +226,7 @@ public class TestRedmineXMLParser {
 		String xml = MyIOUtils.getResourceAsString("redmine_1_1_issues.xml");
 		List<Issue> objects = RedmineXMLParser.parseIssuesFromXML(xml);
 		Integer issueId = 68;
-		Issue issue68 = findIssueInList(objects, issueId);
+		Issue issue68 = RedmineTestUtils.findIssueInList(objects, issueId);
 		assertNotNull(issue68);
 		assertEquals(issueId, issue68.getId());
 		Integer statusId = 1;
@@ -266,7 +247,7 @@ public class TestRedmineXMLParser {
 			System.out.println(timeEntry);
 		}
 		Integer objId = 2;
-		TimeEntry obj2 = findTimeEntry(objects, objId);
+		TimeEntry obj2 = RedmineTestUtils.findTimeEntry(objects, objId);
 		assertNotNull(obj2);
 		
 		Integer expectedIssueId = 44;

@@ -38,12 +38,12 @@ public class RedmineManagerTest {
 	public static void oneTimeSetUp() {
 		System.out.println("Running redmine tests using: " + Config.getHost());
 		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
-		Project junitTestPRoject = new Project();
-		junitTestPRoject.setName("test project");
-		junitTestPRoject.setIdentifier("test"
+		Project junitTestProject = new Project();
+		junitTestProject.setName("test project");
+		junitTestProject.setIdentifier("test"
 				+ Calendar.getInstance().getTimeInMillis());
 		try {
-			Project createdProject = mgr.createProject(junitTestPRoject);
+			Project createdProject = mgr.createProject(junitTestProject);
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -193,13 +193,15 @@ public class RedmineManagerTest {
 			// try to find the issue
 			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey,
 					summary);
-//			System.out.println("foundIssues: " + foundIssues);
 
 			assertNotNull("Checking if search results is not NULL", foundIssues);
 			assertTrue("Search results must be not empty",
 					!(foundIssues.isEmpty()));
-			// assertNotNull("New issue must have some ID", newIssue.getId());
-
+			
+			Issue loadedIssue1 = RedmineTestUtils.findIssueInList(foundIssues, newIssue.getId());
+			assertNotNull(loadedIssue1);
+			assertEquals(summary, loadedIssue1.getSubject());
+			
 			// User actualAssignee = newIssue.getAssignee();
 
 			// assertNotNull("Checking assignee not null", actualAssignee);
