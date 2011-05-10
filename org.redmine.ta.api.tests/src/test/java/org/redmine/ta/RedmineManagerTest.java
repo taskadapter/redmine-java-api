@@ -440,6 +440,29 @@ public class RedmineManagerTest {
 		}
 	}
 	
+	@Test
+	public void testCreateProjectFailsWithReservedIdentifier() throws Exception {
+		Project projectToCreate = new Project();
+		projectToCreate.setName("new");
+		projectToCreate.setIdentifier("new");
+		String key = null;
+		try {
+			Project createdProject = mgr.createProject(projectToCreate);
+			// in case if the creation haven't failed (although it should have had!),
+			// need to cleanup - delete this project 
+			key = createdProject.getIdentifier();
+			
+		} catch (RedmineException e) {
+			assertNotNull(e.getErrors());
+			assertEquals(1, e.getErrors().size());
+			assertEquals("Identifier is reserved", e.getErrors().get(0)); 
+		} finally {
+			if (key != null) {
+				mgr.deleteProject(key);
+			}
+		}
+	}
+
 	private static Project generateRandomProject() {
 		Project project = new Project();
 		Long timeStamp = Calendar.getInstance().getTimeInMillis();
