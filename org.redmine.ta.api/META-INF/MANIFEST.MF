@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Redmine_api
+Bundle-Name: Redmine Java API
 Bundle-SymbolicName: org.redmine.ta.api
-Bundle-Version: 1.0.7.qualifier
+Bundle-Version: 1.0.8.qualifier
 Require-Bundle: org.redmine.ta.deps;bundle-version="1.0.0"
-Bundle-Vendor: Alskor
+Bundle-Vendor: Alexey Skorokhodov
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.redmine.ta,
  org.redmine.ta.beans
