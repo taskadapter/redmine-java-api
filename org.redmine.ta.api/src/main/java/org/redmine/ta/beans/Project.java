@@ -25,6 +25,8 @@ public class Project implements Identifiable{
 	
 	private String description;
 	
+	private String homepage;
+	
 	private Date createdOn;
 	
 	private Date updatedOn;
@@ -39,6 +41,14 @@ public class Project implements Identifiable{
 	 */
 	private Integer parentId;
 	
+	public String getHomepage() {
+		return homepage;
+	}
+
+	public void setHomepage(String homepage) {
+		this.homepage = homepage;
+	}
+
 	/**
 	 * @return project's string "key" (not a numeric database id!). Example: "project_ABC"
 	 */
@@ -150,6 +160,8 @@ public class Project implements Identifiable{
 				+ ((createdOn == null) ? 0 : createdOn.hashCode());
 		result = prime * result
 				+ ((description == null) ? 0 : description.hashCode());
+		result = prime * result
+				+ ((homepage == null) ? 0 : homepage.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
 				+ ((identifier == null) ? 0 : identifier.hashCode());
@@ -165,53 +177,79 @@ public class Project implements Identifiable{
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Project other = (Project) obj;
 		if (createdOn == null) {
-			if (other.createdOn != null)
+			if (other.createdOn != null) {
 				return false;
-		} else if (!createdOn.equals(other.createdOn))
+			}
+		} else if (!createdOn.equals(other.createdOn)) {
 			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
+		if (homepage == null) {
+			if (other.homepage != null) {
+				return false;
+			}
+		} else if (!homepage.equals(other.homepage)) {
+			return false;
+		}
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
 		if (identifier == null) {
-			if (other.identifier != null)
+			if (other.identifier != null) {
 				return false;
-		} else if (!identifier.equals(other.identifier))
+			}
+		} else if (!identifier.equals(other.identifier)) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		if (parentId == null) {
-			if (other.parentId != null)
+			if (other.parentId != null) {
 				return false;
-		} else if (!parentId.equals(other.parentId))
+			}
+		} else if (!parentId.equals(other.parentId)) {
 			return false;
+		}
 		if (trackers == null) {
-			if (other.trackers != null)
+			if (other.trackers != null) {
 				return false;
-		} else if (!trackers.equals(other.trackers))
+			}
+		} else if (!trackers.equals(other.trackers)) {
 			return false;
+		}
 		if (updatedOn == null) {
-			if (other.updatedOn != null)
+			if (other.updatedOn != null) {
 				return false;
-		} else if (!updatedOn.equals(other.updatedOn))
+			}
+		} else if (!updatedOn.equals(other.updatedOn)) {
 			return false;
+		}
 		return true;
 	}
 	

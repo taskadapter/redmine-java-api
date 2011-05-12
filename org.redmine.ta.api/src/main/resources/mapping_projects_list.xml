@@ -22,6 +22,9 @@
 		<field name="description" type="string">
 			<bind-xml name="description" node="element" />
 		</field>
+		<field name="homepage" type="string">
+			<bind-xml name="homepage" node="element" />
+		</field>
 		<field name="createdOn" type="string" handler="org.redmine.ta.internal.RedmineLongDateHandler">
 			<bind-xml name="created_on" node="element" />
 		</field>

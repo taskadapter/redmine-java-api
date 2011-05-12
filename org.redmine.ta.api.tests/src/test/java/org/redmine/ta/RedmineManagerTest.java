@@ -393,6 +393,7 @@ public class RedmineManagerTest {
 			assertEquals(projectToCreate.getIdentifier(), createdProject.getIdentifier());
 			assertEquals(projectToCreate.getName(), createdProject.getName());
 			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
+			assertEquals(projectToCreate.getHomepage(), createdProject.getHomepage());
 			
 			List<Tracker> trackers = createdProject.getTrackers();
 			assertNotNull("checking that project has some trackers", trackers);
@@ -474,6 +475,7 @@ public class RedmineManagerTest {
 		project.setIdentifier(key);
 		project.setName(name);
 		project.setDescription(description);
+		project.setHomepage("www.randompage" + timeStamp + ".com");
 		return project;
 	}
 	
