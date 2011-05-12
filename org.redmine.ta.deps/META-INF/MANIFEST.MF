@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Deps
+Bundle-Name: Redmine Java API dependencies
 Bundle-SymbolicName: org.redmine.ta.deps
 Bundle-Version: 1.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
@@ -27,3 +27,4 @@ Export-Package: org.apache.http,
  org.apache.http.util,
  org.exolab.castor.mapping,
  org.exolab.castor.xml
+Bundle-Vendor: Alexey Skorokhodov
