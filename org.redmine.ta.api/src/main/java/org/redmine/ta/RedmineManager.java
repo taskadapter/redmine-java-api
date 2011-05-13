@@ -193,7 +193,7 @@ public class RedmineManager {
 	}
 	
 	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
-		System.out.println(request.getRequestLine());
+//		System.out.println(request.getRequestLine());
 		HttpClient httpclient = HttpUtil.getNewHttpClient();
 		
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
@@ -201,7 +201,10 @@ public class RedmineManager {
 		System.out.println(httpResponse.getStatusLine());
 		int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode ==	HttpStatus.SC_UNAUTHORIZED) {
-			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key in the constructor arguments");
+			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key.");
+		}
+		if (responseCode ==	HttpStatus.SC_FORBIDDEN) {
+			throw new AuthenticationException("Forbidden. The API access key you used does not allow this operation. Please check the user has proper permissions.");
 		}
 		
 		HttpEntity responseEntity = httpResponse.getEntity();
