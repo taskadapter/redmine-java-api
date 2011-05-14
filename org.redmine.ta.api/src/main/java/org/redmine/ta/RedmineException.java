@@ -6,6 +6,8 @@ public class RedmineException extends Exception {
 	private List<String> errors;
 	private String text = "";
 
+	// TODO Refactor this to get rid of adding "\n".
+	// it should be up to the UI layer how to format all this
 	public RedmineException(List<String> errors) {
 		this.errors = errors;
 		for(String s : errors) {

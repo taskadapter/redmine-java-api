@@ -198,7 +198,7 @@ public class RedmineManager {
 		
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
 		
-		System.out.println(httpResponse.getStatusLine());
+//		System.out.println(httpResponse.getStatusLine());
 		int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode ==	HttpStatus.SC_UNAUTHORIZED) {
 			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key.");
