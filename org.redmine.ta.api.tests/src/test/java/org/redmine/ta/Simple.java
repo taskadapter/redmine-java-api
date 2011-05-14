@@ -1,5 +1,6 @@
 package org.redmine.ta;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -12,16 +13,18 @@ import org.redmine.ta.internal.RedmineXMLParser;
 public class Simple {
 //	private static String redmineHost = "https://www.hostedredmine.com";
 //	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
+//	private static String projectKey = "taskconnector-test";
     
 	private static String redmineHost = "http://192.168.0.30:3000";
     private static String apiAccessKey = "cf6de1494fcca2b5c9206179f6621abeea15c6c7";
+	private static String projectKey = "test";
 
-	private static String projectKey = "taskconnector-test";
 	private static Integer queryId = null; // any
 
 	public static void main(String[] args) {
 		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
 		try {
+			tryCreateIssue(mgr);
 //			tryGetIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
@@ -29,6 +32,11 @@ public class Simple {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void tryCreateIssue(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		Issue issue = new Issue();
+		mgr.createIssue(projectKey, issue);
 	}
 
 	private static void generateXMLForTimeEntry() {
