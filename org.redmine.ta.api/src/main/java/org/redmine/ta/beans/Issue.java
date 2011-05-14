@@ -103,11 +103,6 @@ public class Issue implements Identifiable {
 		this.subject = subject;
 	}
 
-	@Override
-	public String toString() {
-		return "{issue: id=" +id + " assignee:" + ((assignee == null) ? "" : assignee.toString()) + " subject:" + subject + "}";
-	}
-
 	public User getAuthor() {
 		return author;
 	}
@@ -329,7 +324,6 @@ public class Issue implements Identifiable {
 	}
 	
 	/**
-	 * 
 	 * @param fieldName
 	 * @return the value or NULL if the field is not found
 	 */
@@ -341,4 +335,10 @@ public class Issue implements Identifiable {
 		}
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return "Issue [id=" + id + ", subject=" + subject + "]";
+	}
+
 }
