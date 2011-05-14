@@ -4,7 +4,7 @@ import java.util.List;
 
 public class RedmineException extends Exception {
 	private List<String> errors;
-	private String text;
+	private String text = "";
 
 	public RedmineException(List<String> errors) {
 		this.errors = errors;
