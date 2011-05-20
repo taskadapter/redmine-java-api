@@ -17,6 +17,7 @@ Repository: https://redmine-java-api.googlecode.com/svn/trunk
 
 Make sure you have Maven's "bin" folder in your path.
 Run this command in the project root folder:
-  mvn clean package
-This will create distributives in "_project_root\build_" folder.
+  mvn clean integration-test
+This will create the distributive in "_project_root\build_" folder.
+
 
