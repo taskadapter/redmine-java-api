@@ -12,17 +12,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.redmine.ta.beans.CustomField;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.Tracker;
-import org.redmine.ta.beans.User;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.redmine.ta.beans.CustomField;
+import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.Journal;
+import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.TimeEntry;
+import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.beans.User;
 
 public class RedmineManagerTest {
 
@@ -236,11 +237,14 @@ public class RedmineManagerTest {
 		Integer userId = Integer
 				.parseInt(Config.getParam("createissue.userid"));
 		String login = Config.getUserLogin();
-
-		User assignee = new User();
-		assignee.setId(userId);
-		assignee.setLogin(login);
-		return assignee;
+		String fName = Config.getParam("userFName");
+		String lName = Config.getParam("userLName");
+		User user = new User();
+		user.setId(userId);
+		user.setLogin(login);
+		user.setFirstName(fName);
+		user.setLastName(lName);
+		return user;
 	}
 
 	@Test
@@ -1034,4 +1038,38 @@ public class RedmineManagerTest {
 			fail();
 		}
 	}
+	
+	@Test
+	public void testIssueJournals() {
+		try {
+			// create at least 1 issue
+			Issue issueToCreate = new Issue();
+			issueToCreate.setSubject("testGetIssues: " + new Date());
+			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
+
+			Issue loadedIssueWithJournals = mgr.getIssueById(newIssue.getId(), true);
+			assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
+			
+			String commentDescribingTheUpdate = "some comment describing the issue update"; 
+			loadedIssueWithJournals.setSubject("new subject");
+			loadedIssueWithJournals.setNotes(commentDescribingTheUpdate);
+			mgr.updateIssue(loadedIssueWithJournals);
+			
+			Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(), true);
+			assertEquals(1, loadedIssueWithJournals2.getJournals().size());
+			
+			Journal journalItem = loadedIssueWithJournals2.getJournals().get(0);
+			assertEquals(commentDescribingTheUpdate, journalItem.getNotes());
+			User ourUser = getOurUser();
+			// can't compare User objects because either of them is not completely filled
+			assertEquals(ourUser.getId(), journalItem.getUser().getId());
+			assertEquals(ourUser.getFirstName(), journalItem.getUser().getFirstName());
+			assertEquals(ourUser.getLastName(), journalItem.getUser().getLastName());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
 }
