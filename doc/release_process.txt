@@ -1,0 +1,9 @@
+Release process for Redmine Java API.
+-------------------------------------
+
+Change version in \pom.xml file.
+
+Commit to repository, wait for the new auto-build. Verify all tests pass.
+
+Upload the build artifact (build\redmine-api-xxxx.zip) to Google Code webpage:
+https://code.google.com/p/redmine-java-api/downloads/list  

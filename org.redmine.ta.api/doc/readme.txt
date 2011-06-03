@@ -1,5 +1,5 @@
 Redmine & Chiliproject Java API.
-http://taskadapter.com/redmine_java_api
+https://code.google.com/p/redmine-java-api/
 
 Author: Alexey Skorokhodov (alskor@gmail.gom)
 
