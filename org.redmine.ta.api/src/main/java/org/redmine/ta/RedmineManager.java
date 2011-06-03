@@ -295,6 +295,7 @@ public class RedmineManager {
 	}
 	
 	/**
+	 * Does not include "journal" entries. Equivalent to calling getIssueById(id, false). 
 	 * 
 	 * @param id the Redmine issue ID
 	 * @return Issue object
@@ -306,7 +307,30 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		return getObject(Issue.class, id);
+		return getIssueById(id, false);
+	}
+
+	/**
+	 * 
+	 * @param id  the Redmine issue ID
+	 * @param includeJournals get issue journals
+	 * @return Issue object
+	 * @throws IOException
+	 * @throws AuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException
+	 *             the issue with the given id is not found on the server
+	 * @throws RedmineException
+	 */
+	public Issue getIssueById(Integer id, boolean includeJournals)
+			throws IOException, AuthenticationException, NotFoundException,
+			RedmineException {
+		String includeText = null;
+		if (includeJournals) {
+			includeText = "include=journals";
+		}
+		return getObject(Issue.class, id, includeText);
 	}
 	
 	/**
@@ -537,8 +561,25 @@ public class RedmineManager {
 		return objects;
 	}
 
-	private <T> T getObject(Class<T> objectClass, Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	private <T> T getObject(Class<T> objectClass, Integer id)
+			throws IOException, AuthenticationException, NotFoundException,
+			RedmineException {
+		return getObject(objectClass, id, null);
+	}
+
+	private <T> T getObject(Class<T> objectClass, Integer id, String queryParams)
+			throws IOException, AuthenticationException, NotFoundException,
+			RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		if (queryParams != null) {
+			for (String entry : queryParams.split("&")) {
+				String[] kv = entry.split("=", 2);
+				if (kv.length == 2) {
+					params.put(kv[0], new BasicNameValuePair(kv[0], kv[1]));
+				}
+			}
+		}
+
 		String url = urls.get(objectClass) + "/" + id + URL_POSTFIX;
 		String body = sendGet(url, params);
 		return RedmineXMLParser.parseObjectFromXML(objectClass, body);

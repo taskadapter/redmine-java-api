@@ -62,6 +62,9 @@
         <field name="customFields" type="org.redmine.ta.beans.CustomField" collection="arraylist" >
             <bind-xml name="custom_field" location="custom_fields"/>
 		</field>
+        <field name="journals" type="org.redmine.ta.beans.Journal" collection="arraylist" >
+            <bind-xml name="journal" location="journals"/>
+        </field>
 
 	</class>
 	
@@ -108,4 +111,19 @@
         </field>
     </class>
 	
+    <class name="org.redmine.ta.beans.Journal">
+        <field name="id" type="integer">
+            <bind-xml name="id" node="attribute"/>
+        </field>
+        <field name="user" type="org.redmine.ta.beans.User">
+            <bind-xml name="user" />
+        </field>
+        <field name="notes" type="string">
+            <bind-xml name="notes" node="element"/>
+        </field>
+        <field name="createdOn" type="string" handler="org.redmine.ta.internal.RedmineLongDateHandler">
+            <bind-xml name="created_on" node="element" />
+        </field>
+    </class>
+
 </mapping>

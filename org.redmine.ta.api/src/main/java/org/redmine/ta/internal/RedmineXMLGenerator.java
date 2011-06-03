@@ -39,6 +39,8 @@ public class RedmineXMLGenerator {
 		if (issue.getTracker() != null) {
 			appendIfNotNull(b, "tracker_id", issue.getTracker().getId());
 		}
+		appendIfNotNull(b, "notes", issue.getNotes());
+		appendIfNotNull(b, "status_id", issue.getStatusId());
 		appendIfNotNull(b, "start_date", issue.getStartDate());
 		appendIfNotNull(b, "due_date", issue.getDueDate());
 		if (issue.getEstimatedHours() != null) {

@@ -28,7 +28,13 @@ public class Issue implements Identifiable {
 	private Date updatedOn;
 	private Integer statusId;
 	private String statusName;
+	
+	/**
+	 * Some comment describing the issue update 
+	 */
+	private String notes;
     private List<CustomField> customFields = new ArrayList<CustomField>();
+    private List<Journal> journals = new ArrayList<Journal>();
 
 	public Project getProject() {
 		return project;
@@ -189,6 +195,25 @@ public class Issue implements Identifiable {
      */
     public void setCustomFields(List<CustomField> customFields) {
         this.customFields = customFields;
+    }
+
+    public String getNotes() {
+    	return notes;
+    }
+
+	/**
+	 * @param notes Some comment describing the issue update 
+	 */
+    public void setNotes(String notes) {
+    	this.notes = notes;
+    }
+
+    public List<Journal> getJournals() {
+        return journals;
+    }
+
+    public void setJournals(List<Journal> journals) {
+        this.journals = journals;
     }
 
 	@Override
