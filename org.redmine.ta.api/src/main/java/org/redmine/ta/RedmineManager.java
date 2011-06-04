@@ -767,6 +767,7 @@ public class RedmineManager {
 
 	/**
 	 * Load the list of users on the server.
+	 * <p><b>This operation requires "Redmine Administrator" permission.</b>
 	 * 
 	 * @return list of User objects
 	 * 
