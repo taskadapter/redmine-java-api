@@ -3,7 +3,6 @@ package org.redmine.ta.internal;
 import java.security.KeyStore;
 
 import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -17,7 +16,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 public class HttpUtil {
-	public static HttpClient getNewHttpClient() {
+	public static DefaultHttpClient getNewHttpClient() {
 	    try {
 	        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
 	        trustStore.load(null, null);

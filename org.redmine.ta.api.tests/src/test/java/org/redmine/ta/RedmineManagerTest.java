@@ -38,7 +38,8 @@ public class RedmineManagerTest {
 	@BeforeClass
 	public static void oneTimeSetUp() {
 		System.out.println("Running redmine tests using: " + Config.getHost());
-		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
+//		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
+		mgr = new RedmineManager(Config.getHost(), Config.getLogin(), Config.getPassword());
 		Project junitTestProject = new Project();
 		junitTestProject.setName("test project");
 		junitTestProject.setIdentifier("test"
@@ -236,7 +237,7 @@ public class RedmineManagerTest {
 	private static User getOurUser() {
 		Integer userId = Integer
 				.parseInt(Config.getParam("createissue.userid"));
-		String login = Config.getUserLogin();
+		String login = Config.getLogin();
 		String fName = Config.getParam("userFName");
 		String lName = Config.getParam("userLName");
 		User user = new User();

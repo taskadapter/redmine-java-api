@@ -27,8 +27,12 @@ public class Config {
 		return properties.getProperty("host");
 	}
 
-	public static String getUserLogin() {
+	public static String getLogin() {
 		return properties.getProperty("user");
+	}
+
+	public static String getPassword() {
+		return properties.getProperty("password");
 	}
 
 	public static String getApiKey() {
