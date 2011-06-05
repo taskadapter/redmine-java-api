@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,8 +32,9 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -43,6 +43,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.redmine.ta.beans.Identifiable;
@@ -72,6 +73,10 @@ public class RedmineManager {
 
 	private String host;
 	private String apiAccessKey;
+	private String login;
+	private String password;
+	private boolean useBasicAuth = false;
+	
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 	
 	private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
@@ -101,6 +106,14 @@ public class RedmineManager {
 		this.apiAccessKey = apiAccessKey;
 	}
 
+	public RedmineManager(String host, String login, String password) {
+		super();
+		this.host = host;
+		this.login = login;
+		this.password = password;
+		this.useBasicAuth = true;
+	}
+	
 	/**
 	 * Sample usage:
 	 * <p>
@@ -127,8 +140,8 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException, RedmineException {
-        String query = getCreateIssueURI();
-		HttpPost http = new HttpPost(query);
+        URI uri = createURI("/issues.xml");
+		HttpPost http = new HttpPost(uri);
 		String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
 		
 		setEntity(http, xmlBody);
@@ -140,22 +153,35 @@ public class RedmineManager {
 		return newIssue;
 	}
 	
-	/**
-	 * update_issue    = PUT  ${host}/issues/${id}.xml?key=${apiAccessKey}
-	 */
-	private String getUpdateIssueURI(Integer id) {
-        return host + "/issues/" + id + ".xml?key=" + apiAccessKey;
+	private URI createURI(String query) {
+		return createURI(query, new ArrayList<NameValuePair>());
+	}
+
+	private URI createURI(String query, NameValuePair... param) {
+		List<NameValuePair> list =  new ArrayList<NameValuePair>();
+		for (NameValuePair p : param) {
+			list.add(p);
+		}
+		return createURI(query, list);
 	}
 
 	/**
-	 * create_issue    = POST ${host}/issues.xml?key=${apiAccessKey}
+	 * @param query e.g. "/issues.xml"
+	 * @return URI with auth parameter "key" if not in "basic auth mode.
 	 */
-	private String getCreateIssueURI(){
-        return host + "/issues.xml?key=" + apiAccessKey;
-	}
-
-	private String getURLProjectByKey(String key){
-        return host + "/projects/" + key + ".xml?key=" +apiAccessKey;
+	private URI createURI(String query, List<NameValuePair> params) {
+		if (!useBasicAuth) {
+			params.add(new BasicNameValuePair("key", apiAccessKey));
+		}
+		URI uri;
+		try {
+			URL url = new URL(host);
+			uri = URIUtils.createURI(url.getProtocol(), url.getHost(), url.getPort(), query, 
+				    URLEncodedUtils.format(params, "UTF-8"), null);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return uri;
 	}
 	
 	/**
@@ -172,13 +198,13 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		String query = getUpdateIssueURI(issue.getId());
-		HttpPut httpRequest = new HttpPut(query);
+		URI uri = createURI("/issues/" + issue.getId() + ".xml");
+		HttpPut httpRequest = new HttpPut(uri);
 
 		// XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
 		String NO_PROJECT_KEY = null;
 		String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
-		System.out.println(xmlBody);
+//		System.out.println(xmlBody);
 		setEntity(httpRequest, xmlBody);
 		Response response = sendRequest(httpRequest);
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
@@ -194,14 +220,20 @@ public class RedmineManager {
 	
 	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
 //		System.out.println(request.getRequestLine());
-		HttpClient httpclient = HttpUtil.getNewHttpClient();
+		DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
+		
+		if (useBasicAuth) {
+			httpclient.getCredentialsProvider().setCredentials(
+                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+                new UsernamePasswordCredentials(login, password));
+		}
 		
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
 		
 //		System.out.println(httpResponse.getStatusLine());
 		int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode ==	HttpStatus.SC_UNAUTHORIZED) {
-			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key.");
+			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key or Login&Password.");
 		}
 		if (responseCode ==	HttpStatus.SC_FORBIDDEN) {
 			throw new AuthenticationException("Forbidden. The API access key you used does not allow this operation. Please check the user has proper permissions.");
@@ -326,11 +358,7 @@ public class RedmineManager {
 	public Issue getIssueById(Integer id, boolean includeJournals)
 			throws IOException, AuthenticationException, NotFoundException,
 			RedmineException {
-		String includeText = null;
-		if (includeJournals) {
-			includeText = "include=journals";
-		}
-		return getObject(Issue.class, id, includeText);
+		return getObject(Issue.class, id, new BasicNameValuePair("include", "journals"));
 	}
 	
 	/**
@@ -346,10 +374,8 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Project getProjectByKey(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        String query = getURLProjectByKey(projectKey);
-		// see bug http://www.redmine.org/issues/7184
-        query+="&include=trackers";
-		HttpGet http = new HttpGet(query);
+        URI uri = createURI("/projects/" + projectKey + ".xml", new BasicNameValuePair("include", "trackers"));
+		HttpGet http = new HttpGet(uri);
 		Response response = sendRequest(http);
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
@@ -438,16 +464,9 @@ public class RedmineManager {
 
 	/**
 	 * This ONLY works with Redmine 1.0.  Redmine 1.1 uses "objects per page" parameter instead!
-	 * @param params
 	 */
 	private void addPagingParameters(Map<String, NameValuePair> params) {
 		params.put("per_page", new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
-	}
-	
-	private void addAuthParameters(Map<String, NameValuePair> params) {
-		if ((apiAccessKey != null) && (apiAccessKey.length()>0)) {
-			params.put("key", new BasicNameValuePair("key", apiAccessKey));
-		}
 	}
 	
 	/**
@@ -462,19 +481,14 @@ public class RedmineManager {
 		String firstPage=null;
 		
 		addPagingParameters(params);
-		addAuthParameters(params);
+//		addAuthParameters(params);
 		
 		do {
 			params.put("page", new BasicNameValuePair("page", String.valueOf(pageNum)));
 			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
 			
-			URI uri;
-			try {
-				String query = urls.get(objectClass) + URL_POSTFIX;
-				uri = getURI(query, paramsList);
-			} catch (MalformedURLException e) {
-				throw new RuntimeException("MalformedURLException: " + e.getMessage());
-			}
+			String query = urls.get(objectClass) + URL_POSTFIX;
+			URI uri = createURI(query, paramsList);
 
 			HttpGet http = new HttpGet(uri);
 			Response response = sendRequest(http);
@@ -523,7 +537,6 @@ public class RedmineManager {
 	private <T> List<T> getObjectsListV11(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<T>  objects = new ArrayList<T>();
 		
-		addAuthParameters(params);
 		int limit = 25;
 		params.put("limit", new BasicNameValuePair("limit", String.valueOf(limit)));
 		int offset = 0;
@@ -532,13 +545,8 @@ public class RedmineManager {
 			params.put("offset", new BasicNameValuePair("offset", String.valueOf(offset)));
 			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
 			
-			URI uri;
-			try {
-				String query = urls.get(objectClass) + URL_POSTFIX;
-				uri = getURI(query, paramsList);
-			} catch (MalformedURLException e) {
-				throw new RuntimeException("MalformedURLException: " + e.getMessage());
-			}
+			String query = urls.get(objectClass) + URL_POSTFIX;
+			URI uri = createURI(query, paramsList);
 
 			HttpGet http = new HttpGet(uri);
 
@@ -561,37 +569,20 @@ public class RedmineManager {
 		return objects;
 	}
 
-	private <T> T getObject(Class<T> objectClass, Integer id)
+	private <T> T getObject(Class<T> objectClass, Integer id, NameValuePair... params)
 			throws IOException, AuthenticationException, NotFoundException,
 			RedmineException {
-		return getObject(objectClass, id, null);
-	}
 
-	private <T> T getObject(Class<T> objectClass, Integer id, String queryParams)
-			throws IOException, AuthenticationException, NotFoundException,
-			RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		if (queryParams != null) {
-			for (String entry : queryParams.split("&")) {
-				String[] kv = entry.split("=", 2);
-				if (kv.length == 2) {
-					params.put(kv[0], new BasicNameValuePair(kv[0], kv[1]));
-				}
-			}
-		}
-
-		String url = urls.get(objectClass) + "/" + id + URL_POSTFIX;
-		String body = sendGet(url, params);
+		String query = urls.get(objectClass) + "/" + id + URL_POSTFIX;
+		URI uri = createURI(query, params);
+		String body = sendGet(uri);
 		return RedmineXMLParser.parseObjectFromXML(objectClass, body);
 	}
 
 	// TODO is there a way to get rid of the 1st parameter and use generics?
 	private <T> T createObject(Class<T> classs, T obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		addAuthParameters(params);
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
 
-		URI uri = getCreateURI(obj.getClass(), paramsList);
+		URI uri = getCreateURI(obj.getClass());
 		HttpPost http = new HttpPost(uri);
 		
 		String xml = RedmineXMLGenerator.toXML(obj);
@@ -610,11 +601,7 @@ public class RedmineManager {
 	 * because the server does not provide any XML in response.
 	 */
 	private <T extends Identifiable> void updateObject(Class<T> classs, T obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		addAuthParameters(params);
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
-
-		URI uri = getUpdateURI(obj.getClass(), Integer.toString(obj.getId()), paramsList);
+		URI uri = getUpdateURI(obj.getClass(), Integer.toString(obj.getId()));
 		HttpPut http = new HttpPut(uri);
 		
 		String xml = RedmineXMLGenerator.toXML(obj);
@@ -627,11 +614,7 @@ public class RedmineManager {
 	}
 	
 	private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		addAuthParameters(params);
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
-
-		URI uri = getUpdateURI(classs, id, paramsList);
+		URI uri = getUpdateURI(classs, id);
 		HttpDelete http = new HttpDelete(uri);
 		
 		Response response = sendRequest(http);
@@ -640,43 +623,17 @@ public class RedmineManager {
 		}
 	}
 
-	private URI getCreateURI(Class zz, List<NameValuePair> paramsList) throws MalformedURLException {
-		String url =urls.get(zz) + URL_POSTFIX; 
-		return getURI(url, paramsList);
+	private URI getCreateURI(Class zz) throws MalformedURLException {
+		String query =urls.get(zz) + URL_POSTFIX; 
+		return createURI(query);
 	}
 
-	private URI getUpdateURI(Class zz, String id, List<NameValuePair> paramsList) throws MalformedURLException {
-		String url = urls.get(zz) + "/" + id + URL_POSTFIX;
-		return getURI(url, paramsList);
-	}
-	
-	private URI getURI(String url, List<NameValuePair> paramsList) throws MalformedURLException {
-		URI uri = null;
-
-		try {
-			String path = url;
-			URL aURL = new URL(host);
-			if (aURL.getPath().length()>0){
-				path = aURL.getPath() + "/" + path;
-			}
-			uri = URIUtils.createURI(aURL.getProtocol(), aURL.getHost(), aURL.getPort(), path, 
-				    URLEncodedUtils.format(paramsList, CHARSET), null);
-		} catch (URISyntaxException e) {
-			throw new RuntimeException("URISyntaxException: " + e.getMessage());
-		}
-		return uri;
+	private URI getUpdateURI(Class zz, String id) throws MalformedURLException {
+		String query = urls.get(zz) + "/" + id + URL_POSTFIX;
+		return createURI(query);
 	}
 	
-	private String sendGet(String url, Map<String, NameValuePair> params) throws NotFoundException, IOException, AuthenticationException, RedmineException {
-		addAuthParameters(params);
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
-		URI uri;
-		try {
-			uri = getURI(url, paramsList);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException("MalformedURLException:" + e.getMessage());
-		}
-
+	private String sendGet(URI uri) throws NotFoundException, IOException, AuthenticationException, RedmineException {
 		HttpGet http = new HttpGet(uri);
 		Response response = sendRequest(http);
 		if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
@@ -694,7 +651,7 @@ public class RedmineManager {
 	 * {@code
 	 * 	Project project = new Project();
 	 * 	Long timeStamp = Calendar.getInstance().getTimeInMillis();
-	 * 	String key = &quot;projkey&quot; + timeStamp;
+	 * 	String key = "projkey" + timeStamp;
 	 * 	String name = &quot;project number &quot; + timeStamp;
 	 * 	String description = &quot;some description for the project&quot;;
 	 * 	project.setIdentifier(key);
@@ -717,11 +674,10 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Project createProject(Project project) throws IOException,AuthenticationException, RedmineException {
-        String query = buildCreateProjectURI();
 		// see bug http://www.redmine.org/issues/7184
-        query+="&include=trackers";
+        URI uri = createURI("/projects.xml", new BasicNameValuePair("include", "trackers"));
         
-		HttpPost httpPost = new HttpPost(query);
+		HttpPost httpPost = new HttpPost(uri);
 		String createProjectXML = RedmineXMLGenerator.toXML(project);
 //		System.out.println("create project:" + createProjectXML);
 		setEntity(httpPost, createProjectXML);
@@ -729,10 +685,6 @@ public class RedmineManager {
 		Response response = sendRequest(httpPost);
 		Project createdProject = RedmineXMLParser.parseProjectFromXML(response.getBody());
 		return createdProject;
-	}
-
-	private String buildCreateProjectURI() {
-		return host + "/projects.xml?key=" + apiAccessKey;
 	}
 
 	/**
@@ -787,16 +739,12 @@ public class RedmineManager {
 	}
 
 	public User getCurrentUser() throws IOException, AuthenticationException, RedmineException{
-        String query = getURLCurrentUser();
-		HttpGet http = new HttpGet(query);
+        URI uri = createURI("/users/current.xml");
+		HttpGet http = new HttpGet(uri);
 		Response response = sendRequest(http);
 		return RedmineXMLParser.parseUserFromXML(response.getBody());
 	}
 
-	private String getURLCurrentUser() {
-		return host + "/users/current.xml?key=" +apiAccessKey;
-	}
-	
 	public User createUser(User user) throws IOException,AuthenticationException, RedmineException, NotFoundException {
 		return createObject(User.class, user);
 	}
