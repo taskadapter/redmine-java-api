@@ -1078,4 +1078,23 @@ public class RedmineManagerTest {
 		}
 	}
 
+	// Redmine ignores this parameter for "get projects" request. see bug http://www.redmine.org/issues/8545
+	@Ignore
+	@Test
+	public void testGetProjectsIncludesTrackers() {
+		try {
+			List<Project> projects = mgr.getProjects();
+			assertTrue(projects.size()>0);
+			Project p1 = projects.get(0);
+			assertNotNull(p1.getTrackers());
+			// XXX there could be a case when a project does not have any trackers
+			// need to create a project with some trackers to make this test deterministic
+			assertTrue(! p1.getTrackers().isEmpty());
+			System.out.println(p1.getTrackers());
+		} catch (Exception e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
 }
