@@ -295,6 +295,7 @@ public class RedmineManager {
 	 */
 	public List<Project> getProjects() throws IOException,AuthenticationException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		params.put("include", new BasicNameValuePair("include", "trackers"));
 		try {
 			return getObjectsList(Project.class, params);
 		} catch (NotFoundException e) {
@@ -520,6 +521,7 @@ public class RedmineManager {
 		return objects;
 	}
 
+	// XXX fix this: why it is Map of string->pair? should be a flat set of params! 
 	private <T> List<T> getObjectsList(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
 			return getObjectsListV11(objectClass, params);
