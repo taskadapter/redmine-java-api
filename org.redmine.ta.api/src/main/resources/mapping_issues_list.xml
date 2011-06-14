@@ -22,6 +22,9 @@
 		<field name="estimatedHours" type="float">
 			<bind-xml name="estimated_hours" node="element" />
 		</field>
+		<field name="spentHours" type="float">
+			<bind-xml name="spent_hours" node="element" />
+		</field>
 		<field name="doneRatio" type="integer">
 			<bind-xml name="done_ratio" node="element" />
 		</field>

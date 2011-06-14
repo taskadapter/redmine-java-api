@@ -101,6 +101,9 @@ public class RedmineManagerTest {
 			float estimatedHours = 44;
 			issueToCreate.setEstimatedHours(estimatedHours);
 			
+			float spentHours = 12.5f;
+			issueToCreate.setSpentHours(spentHours);
+
 			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 //			System.out.println("created: " + newIssue);
 			assertNotNull("Checking returned result", newIssue);
@@ -135,6 +138,9 @@ public class RedmineManagerTest {
 			// check ESTIMATED TIME
 			assertEquals((Float) estimatedHours, newIssue.getEstimatedHours());
 			
+			// check SOENT TIME
+			assertEquals((Float) spentHours, newIssue.getSpentHours());
+
 			// check multi-line DESCRIPTION
 			String regexpStripExtra = "\\r|\\n|\\s";
 			description = description.replaceAll(regexpStripExtra, "");

@@ -15,6 +15,7 @@ public class Issue implements Identifiable {
 	private String subject;
 	private Integer parentId;
 	private Float estimatedHours;
+	private Float spentHours;
 	private User assignee;
 	private String priorityText;
 	private Integer doneRatio;
@@ -74,6 +75,14 @@ public class Issue implements Identifiable {
 
 	public void setEstimatedHours(Float estimatedTime) {
 		this.estimatedHours = estimatedTime;
+	}
+
+	public Float getSpentHours() {
+		return spentHours;
+	}
+
+	public void setSpentHours(Float spentTime) {
+		this.spentHours = spentTime;
 	}
 
 	/**
@@ -232,6 +241,8 @@ public class Issue implements Identifiable {
 		result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
 		result = prime * result
 				+ ((estimatedHours == null) ? 0 : estimatedHours.hashCode());
+		result = prime * result
+				+ ((spentHours == null) ? 0 : spentHours.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
 				+ ((parentId == null) ? 0 : parentId.hashCode());
@@ -294,6 +305,11 @@ public class Issue implements Identifiable {
 			if (other.estimatedHours != null)
 				return false;
 		} else if (!estimatedHours.equals(other.estimatedHours))
+			return false;
+		if (spentHours == null) {
+			if (other.spentHours != null)
+				return false;
+		} else if (!spentHours.equals(other.spentHours))
 			return false;
 		if (id == null) {
 			if (other.id != null)
