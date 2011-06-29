@@ -91,6 +91,13 @@ public class RedmineManager {
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
+
+	public RedmineManager(String host) {
+		if (host == null || host.isEmpty()) {
+			throw new IllegalArgumentException("The host parameter is NULL or empty");
+		}
+		this.host = host;
+	}
 	
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are not checked at this moment.
@@ -101,14 +108,12 @@ public class RedmineManager {
 	 *   This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public". 
 	 */
 	public RedmineManager(String host, String apiAccessKey) {
-		super();
-		this.host = host;
+		this(host);
 		this.apiAccessKey = apiAccessKey;
 	}
 
 	public RedmineManager(String host, String login, String password) {
-		super();
-		this.host = host;
+		this(host);
 		this.login = login;
 		this.password = password;
 		this.useBasicAuth = true;

@@ -249,6 +249,32 @@ public class RedmineManagerTest {
 	}
 
 	@Test
+	public void testNULLHostParameter() throws RuntimeException {
+		try {
+			new RedmineManager(null, null); 
+			fail("Must have failed with IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			System.out.println("Got expected IllegalArgumentException.");
+		} catch (Exception e) {
+			fail("Got unexpected exception : " + e);
+		}
+		
+	}
+
+	@Test
+	public void testEmptyHostParameter() throws RuntimeException {
+		try {
+			new RedmineManager("", null); 
+			fail("Must have failed with IllegalArgumentException");
+		} catch (IllegalArgumentException e) {
+			System.out.println("Got expected IllegalArgumentException.");
+		} catch (Exception e) {
+			fail("Got unexpected exception : " + e);
+		}
+		
+	}
+	
+	@Test
 	public void testWrongCredentialsOnCreateIssue() throws RuntimeException {
 		
 		RedmineManager redmineMgrEmpty = new RedmineManager(Config.getHost(), null);
