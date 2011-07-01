@@ -36,6 +36,7 @@ public class Issue implements Identifiable {
 	private String notes;
     private List<CustomField> customFields = new ArrayList<CustomField>();
     private List<Journal> journals = new ArrayList<Journal>();
+    private List<Issue> relations = new ArrayList<Issue>();
 
 	public Project getProject() {
 		return project;
@@ -231,20 +232,27 @@ public class Issue implements Identifiable {
 		result = prime * result
 				+ ((createdOn == null) ? 0 : createdOn.hashCode());
 		result = prime * result
+				+ ((customFields == null) ? 0 : customFields.hashCode());
+		result = prime * result
 				+ ((description == null) ? 0 : description.hashCode());
 		result = prime * result
 				+ ((doneRatio == null) ? 0 : doneRatio.hashCode());
 		result = prime * result + ((dueDate == null) ? 0 : dueDate.hashCode());
 		result = prime * result
 				+ ((estimatedHours == null) ? 0 : estimatedHours.hashCode());
-		result = prime * result
-				+ ((spentHours == null) ? 0 : spentHours.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((journals == null) ? 0 : journals.hashCode());
+		result = prime * result + ((notes == null) ? 0 : notes.hashCode());
 		result = prime * result
 				+ ((parentId == null) ? 0 : parentId.hashCode());
 		result = prime * result
 				+ ((priorityText == null) ? 0 : priorityText.hashCode());
 		result = prime * result + ((project == null) ? 0 : project.hashCode());
+		result = prime * result
+				+ ((relations == null) ? 0 : relations.hashCode());
+		result = prime * result
+				+ ((spentHours == null) ? 0 : spentHours.hashCode());
 		result = prime * result
 				+ ((startDate == null) ? 0 : startDate.hashCode());
 		result = prime * result
@@ -260,103 +268,170 @@ public class Issue implements Identifiable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Issue other = (Issue) obj;
 		if (assignee == null) {
-			if (other.assignee != null)
+			if (other.assignee != null) {
 				return false;
-		} else if (!assignee.equals(other.assignee))
+			}
+		} else if (!assignee.equals(other.assignee)) {
 			return false;
+		}
 		if (author == null) {
-			if (other.author != null)
+			if (other.author != null) {
 				return false;
-		} else if (!author.equals(other.author))
+			}
+		} else if (!author.equals(other.author)) {
 			return false;
+		}
 		if (createdOn == null) {
-			if (other.createdOn != null)
+			if (other.createdOn != null) {
 				return false;
-		} else if (!createdOn.equals(other.createdOn))
+			}
+		} else if (!createdOn.equals(other.createdOn)) {
 			return false;
+		}
+		if (customFields == null) {
+			if (other.customFields != null) {
+				return false;
+			}
+		} else if (!customFields.equals(other.customFields)) {
+			return false;
+		}
 		if (description == null) {
-			if (other.description != null)
+			if (other.description != null) {
 				return false;
-		} else if (!description.equals(other.description))
+			}
+		} else if (!description.equals(other.description)) {
 			return false;
+		}
 		if (doneRatio == null) {
-			if (other.doneRatio != null)
+			if (other.doneRatio != null) {
 				return false;
-		} else if (!doneRatio.equals(other.doneRatio))
+			}
+		} else if (!doneRatio.equals(other.doneRatio)) {
 			return false;
+		}
 		if (dueDate == null) {
-			if (other.dueDate != null)
+			if (other.dueDate != null) {
 				return false;
-		} else if (!dueDate.equals(other.dueDate))
+			}
+		} else if (!dueDate.equals(other.dueDate)) {
 			return false;
+		}
 		if (estimatedHours == null) {
-			if (other.estimatedHours != null)
+			if (other.estimatedHours != null) {
 				return false;
-		} else if (!estimatedHours.equals(other.estimatedHours))
+			}
+		} else if (!estimatedHours.equals(other.estimatedHours)) {
 			return false;
-		if (spentHours == null) {
-			if (other.spentHours != null)
-				return false;
-		} else if (!spentHours.equals(other.spentHours))
-			return false;
+		}
 		if (id == null) {
-			if (other.id != null)
+			if (other.id != null) {
 				return false;
-		} else if (!id.equals(other.id))
+			}
+		} else if (!id.equals(other.id)) {
 			return false;
+		}
+		if (journals == null) {
+			if (other.journals != null) {
+				return false;
+			}
+		} else if (!journals.equals(other.journals)) {
+			return false;
+		}
+		if (notes == null) {
+			if (other.notes != null) {
+				return false;
+			}
+		} else if (!notes.equals(other.notes)) {
+			return false;
+		}
 		if (parentId == null) {
-			if (other.parentId != null)
+			if (other.parentId != null) {
 				return false;
-		} else if (!parentId.equals(other.parentId))
+			}
+		} else if (!parentId.equals(other.parentId)) {
 			return false;
+		}
 		if (priorityText == null) {
-			if (other.priorityText != null)
+			if (other.priorityText != null) {
 				return false;
-		} else if (!priorityText.equals(other.priorityText))
+			}
+		} else if (!priorityText.equals(other.priorityText)) {
 			return false;
+		}
 		if (project == null) {
-			if (other.project != null)
+			if (other.project != null) {
 				return false;
-		} else if (!project.equals(other.project))
+			}
+		} else if (!project.equals(other.project)) {
 			return false;
+		}
+		if (relations == null) {
+			if (other.relations != null) {
+				return false;
+			}
+		} else if (!relations.equals(other.relations)) {
+			return false;
+		}
+		if (spentHours == null) {
+			if (other.spentHours != null) {
+				return false;
+			}
+		} else if (!spentHours.equals(other.spentHours)) {
+			return false;
+		}
 		if (startDate == null) {
-			if (other.startDate != null)
+			if (other.startDate != null) {
 				return false;
-		} else if (!startDate.equals(other.startDate))
+			}
+		} else if (!startDate.equals(other.startDate)) {
 			return false;
+		}
 		if (statusId == null) {
-			if (other.statusId != null)
+			if (other.statusId != null) {
 				return false;
-		} else if (!statusId.equals(other.statusId))
+			}
+		} else if (!statusId.equals(other.statusId)) {
 			return false;
+		}
 		if (statusName == null) {
-			if (other.statusName != null)
+			if (other.statusName != null) {
 				return false;
-		} else if (!statusName.equals(other.statusName))
+			}
+		} else if (!statusName.equals(other.statusName)) {
 			return false;
+		}
 		if (subject == null) {
-			if (other.subject != null)
+			if (other.subject != null) {
 				return false;
-		} else if (!subject.equals(other.subject))
+			}
+		} else if (!subject.equals(other.subject)) {
 			return false;
+		}
 		if (tracker == null) {
-			if (other.tracker != null)
+			if (other.tracker != null) {
 				return false;
-		} else if (!tracker.equals(other.tracker))
+			}
+		} else if (!tracker.equals(other.tracker)) {
 			return false;
+		}
 		if (updatedOn == null) {
-			if (other.updatedOn != null)
+			if (other.updatedOn != null) {
 				return false;
-		} else if (!updatedOn.equals(other.updatedOn))
+			}
+		} else if (!updatedOn.equals(other.updatedOn)) {
 			return false;
+		}
 		return true;
 	}
 	
@@ -377,5 +452,13 @@ public class Issue implements Identifiable {
 	public String toString() {
 		return "Issue [id=" + id + ", subject=" + subject + "]";
 	}
+
+	public List<Issue> getRelations() {
+		return relations;
+	}
+
+//	public void setRelations(List<Issue> relations) {
+//		this.relations = relations;
+//	}
 
 }

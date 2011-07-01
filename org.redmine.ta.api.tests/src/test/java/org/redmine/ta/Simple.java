@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
+import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
@@ -24,14 +25,21 @@ public class Simple {
 	public static void main(String[] args) {
 		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
 		try {
-			tryCreateIssue(mgr);
+			getIssueWithRelations(mgr);
+//			tryCreateIssue(mgr);
 //			tryGetIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
-			generateXMLForTimeEntry();
+//			generateXMLForTimeEntry();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void getIssueWithRelations(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		Issue issue = mgr.getIssueById(24580, INCLUDE.relations);
+		System.out.println(issue.getRelations());
+		
 	}
 
 	private static void tryCreateIssue(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
