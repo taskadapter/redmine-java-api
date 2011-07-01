@@ -18,6 +18,7 @@ public class Issue implements Identifiable {
 	private Float spentHours;
 	private User assignee;
 	private String priorityText;
+	private Integer priorityId;
 	private Integer doneRatio;
 	private Project project;
 	private User author;
@@ -247,6 +248,8 @@ public class Issue implements Identifiable {
 		result = prime * result
 				+ ((parentId == null) ? 0 : parentId.hashCode());
 		result = prime * result
+				+ ((priorityId == null) ? 0 : priorityId.hashCode());
+		result = prime * result
 				+ ((priorityText == null) ? 0 : priorityText.hashCode());
 		result = prime * result + ((project == null) ? 0 : project.hashCode());
 		result = prime * result
@@ -362,6 +365,13 @@ public class Issue implements Identifiable {
 		} else if (!parentId.equals(other.parentId)) {
 			return false;
 		}
+		if (priorityId == null) {
+			if (other.priorityId != null) {
+				return false;
+			}
+		} else if (!priorityId.equals(other.priorityId)) {
+			return false;
+		}
 		if (priorityText == null) {
 			if (other.priorityText != null) {
 				return false;
@@ -457,8 +467,12 @@ public class Issue implements Identifiable {
 		return relations;
 	}
 
-//	public void setRelations(List<Issue> relations) {
-//		this.relations = relations;
-//	}
+	public Integer getPriorityId() {
+		return priorityId;
+	}
+
+	public void setPriorityId(Integer priorityId) {
+		this.priorityId = priorityId;
+	}
 
 }

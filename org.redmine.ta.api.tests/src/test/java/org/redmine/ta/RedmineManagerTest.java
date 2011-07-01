@@ -142,6 +142,10 @@ public class RedmineManagerTest {
 			String actualDescription = newIssue.getDescription();
 			actualDescription = actualDescription.replaceAll(regexpStripExtra, "");
 			assertEquals(description, actualDescription);
+			
+			// PRIORITY
+			assertNotNull(newIssue.getPriorityId());
+			assertTrue(newIssue.getPriorityId()>0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail();
