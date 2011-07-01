@@ -39,7 +39,10 @@
 		</field>
 
 		<field name="priorityText" type="string">
-			<bind-xml name="name" node="attribute" location="priority" />
+			<bind-xml location="priority" node="attribute" name="name"/>
+		</field>
+		<field name="priorityId" type="integer">
+			<bind-xml location="priority" node="attribute" name="id" />
 		</field>
 		<field name="startDate" type="string" handler="org.redmine.ta.internal.RedmineShortDateHandler">
 			<bind-xml name="start_date" node="element" />
