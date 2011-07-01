@@ -352,9 +352,9 @@ public class RedmineManager {
 	 * @throws NotFoundException the issue with the given id is not found on the server
 	 * @throws RedmineException 
 	 */
-	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		return getIssueById(id);
-	}
+//	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+//		return getIssueById(id);
+//	}
 
 	/**
 	 * 
