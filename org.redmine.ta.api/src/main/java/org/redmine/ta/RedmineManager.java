@@ -67,6 +67,14 @@ public class RedmineManager {
 
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	
+	// TODO add tests for "relations" to RedmineManagerTest class
+	public static enum INCLUDE {
+		// these values MUST BE exactly as they are written here,
+		// can't use capital letters or rename.
+		// they are provided in "?include=..." HTTP request
+		journals, relations
+	}
+	
 	private static enum MODE {
 		REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2, 
 	}
@@ -345,7 +353,7 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		return getIssueById(id, false);
+		return getIssueById(id);
 	}
 
 	/**
@@ -360,11 +368,28 @@ public class RedmineManager {
 	 * @throws NotFoundException
 	 *             the issue with the given id is not found on the server
 	 * @throws RedmineException
+	 * @deprecated use getIssueById(Integer id, INCLUDE... include)
 	 */
 	public Issue getIssueById(Integer id, boolean includeJournals)
 			throws IOException, AuthenticationException, NotFoundException,
 			RedmineException {
 		return getObject(Issue.class, id, new BasicNameValuePair("include", "journals"));
+	}
+
+	public Issue getIssueById(Integer id, INCLUDE... include) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		String value = join(",", include);
+		// there's no harm in adding "include" parameter even if it's empty
+		return getObject(Issue.class, id, new BasicNameValuePair("include", value));
+	}
+	
+	private static String join(String delimToUse, INCLUDE... include) {
+		String delim = "";
+		StringBuilder sb = new StringBuilder();
+	    for (INCLUDE i : include) {
+			sb.append(delim).append(i);
+	        delim = delimToUse;
+	    }
+	    return sb.toString();
 	}
 	
 	/**

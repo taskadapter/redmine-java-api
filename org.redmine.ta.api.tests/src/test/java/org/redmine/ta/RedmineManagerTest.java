@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Journal;
@@ -1079,7 +1080,7 @@ public class RedmineManagerTest {
 			issueToCreate.setSubject("testGetIssues: " + new Date());
 			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 
-			Issue loadedIssueWithJournals = mgr.getIssueById(newIssue.getId(), true);
+			Issue loadedIssueWithJournals = mgr.getIssueById(newIssue.getId(), INCLUDE.journals);
 			assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
 			
 			String commentDescribingTheUpdate = "some comment describing the issue update"; 
@@ -1087,7 +1088,7 @@ public class RedmineManagerTest {
 			loadedIssueWithJournals.setNotes(commentDescribingTheUpdate);
 			mgr.updateIssue(loadedIssueWithJournals);
 			
-			Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(), true);
+			Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(), INCLUDE.journals);
 			assertEquals(1, loadedIssueWithJournals2.getJournals().size());
 			
 			Journal journalItem = loadedIssueWithJournals2.getJournals().get(0);
@@ -1097,7 +1098,10 @@ public class RedmineManagerTest {
 			assertEquals(ourUser.getId(), journalItem.getUser().getId());
 			assertEquals(ourUser.getFirstName(), journalItem.getUser().getFirstName());
 			assertEquals(ourUser.getLastName(), journalItem.getUser().getLastName());
-			
+
+			Issue loadedIssueWithoutJournals = mgr.getIssueById(newIssue.getId());
+			assertTrue(loadedIssueWithoutJournals.getJournals().isEmpty());
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
