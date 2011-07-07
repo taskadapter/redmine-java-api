@@ -43,7 +43,7 @@ public class Simple {
 		}
 	}
 
-	private static void getSavedQueries(RedmineManager mgr) {
+	private static void getSavedQueries(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<SavedQuery> savedQueries = mgr.getSavedQueries("test");
 		System.out.println(savedQueries);
 		

@@ -836,18 +836,14 @@ public class RedmineManager {
 	 *
 	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
 	 */
-	public List<SavedQuery> getSavedQueries(String projectKey) {
+	public List<SavedQuery> getSavedQueries(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 
 		if ((projectKey != null) && (projectKey.length()>0)) {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
 
-		try {
-			return getObjectsList(SavedQuery.class, params);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return getObjectsList(SavedQuery.class, params);
 	}
 	
 	/**
@@ -855,13 +851,9 @@ public class RedmineManager {
 	 * 
 	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
 	 */
-	public List<SavedQuery> getSavedQueries() {
+	public List<SavedQuery> getSavedQueries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		try {
-			return getObjectsList(SavedQuery.class, params);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return getObjectsList(SavedQuery.class, params);
 	}
 
 }
