@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                         "http://castor.org/mapping.dtd">
+<mapping>
+	<description>Redmine XML -> Java API binding. https://code.google.com/p/redmine-java-api</description>
+
+	<class name="org.redmine.ta.beans.SavedQuery">
+		<map-to xml="query"/>
+
+		<field name="id" type="integer">
+			<bind-xml name="id" node="element" />
+		</field>
+		<field name="projectId" type="integer">
+			<bind-xml name="project_id" node="element"  />
+		</field>
+		<field name="name" type="string">
+			<bind-xml name="name" node="element" />
+		</field>
+		<field name="publicQuery" type="boolean">
+			<bind-xml name="is_public" node="element" />
+		</field>
+	</class>
+</mapping>

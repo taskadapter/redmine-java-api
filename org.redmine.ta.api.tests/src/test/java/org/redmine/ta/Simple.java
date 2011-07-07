@@ -6,39 +6,53 @@ import java.util.List;
 
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.internal.RedmineXMLGenerator;
-import org.redmine.ta.internal.RedmineXMLParser;
 
 public class Simple {
 //	private static String redmineHost = "https://www.hostedredmine.com";
 //	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
 //	private static String projectKey = "taskconnector-test";
     
-	private static String redmineHost = "http://192.168.0.30:3000";
-    private static String apiAccessKey = "cf6de1494fcca2b5c9206179f6621abeea15c6c7";
+//	private static String redmineHost = "http://192.168.0.30:3000";
+//    private static String apiAccessKey = "cf6de1494fcca2b5c9206179f6621abeea15c6c7";
+	
+	private static String redmineHost = "http://192.168.0.64:3000";
+    private static String login = "admin";
+    private static String password = "admin";
+	
 	private static String projectKey = "test";
 
 	private static Integer queryId = null; // any
 
 	public static void main(String[] args) {
-		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
+		RedmineManager mgr = new RedmineManager(redmineHost, login, password);
 		try {
-			getIssueWithRelations(mgr);
+//			getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
 //			tryGetIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
 //			generateXMLForTimeEntry();
+			getSavedQueries(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	private static void getSavedQueries(RedmineManager mgr) {
+		List<SavedQuery> savedQueries = mgr.getSavedQueries("test");
+		System.out.println(savedQueries);
+		
+	}
+
 	private static void getIssueWithRelations(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Issue issue = mgr.getIssueById(24580, INCLUDE.relations);
-		System.out.println(issue.getRelations());
+		List<IssueRelation> r = issue.getRelations();
+		System.out.println(r);
 		
 	}
 

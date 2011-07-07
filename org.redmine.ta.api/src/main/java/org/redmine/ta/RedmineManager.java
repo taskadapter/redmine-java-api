@@ -49,6 +49,7 @@ import org.apache.http.util.EntityUtils;
 import org.redmine.ta.beans.Identifiable;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.internal.HttpUtil;
@@ -96,6 +97,7 @@ public class RedmineManager {
 			put(Issue.class, "issues");
 			put(Project.class, "projects");
 			put(TimeEntry.class, "time_entries");
+			put(SavedQuery.class, "queries");
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
@@ -572,7 +574,7 @@ public class RedmineManager {
 		int limit = 25;
 		params.put("limit", new BasicNameValuePair("limit", String.valueOf(limit)));
 		int offset = 0;
-		int totalIssuesFoundOnServer;
+		int totalObjectsFoundOnServer;
 		do {
 			params.put("offset", new BasicNameValuePair("offset", String.valueOf(offset)));
 			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
@@ -587,7 +589,7 @@ public class RedmineManager {
 				throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
 			}
 			String body = response.getBody();
-			totalIssuesFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(body);
+			totalObjectsFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(body);
 			
 			List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
 			if (foundItems.size() == 0) {
@@ -596,7 +598,7 @@ public class RedmineManager {
 			objects.addAll(foundItems);
 
 			offset+= foundItems.size();
-		} while (offset<totalIssuesFoundOnServer);
+		} while (offset<totalObjectsFoundOnServer);
 
 		return objects;
 	}
@@ -827,6 +829,39 @@ public class RedmineManager {
 
 	public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		deleteObject(TimeEntry.class, Integer.toString(id));
+	}
+
+	/**
+	 * Get "saved queries" for the given project available to the current user.
+	 *
+	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
+	 */
+	public List<SavedQuery> getSavedQueries(String projectKey) {
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+
+		if ((projectKey != null) && (projectKey.length()>0)) {
+			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
+		}
+
+		try {
+			return getObjectsList(SavedQuery.class, params);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * Get all "saved queries" available to the current user.
+	 * 
+	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
+	 */
+	public List<SavedQuery> getSavedQueries() {
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		try {
+			return getObjectsList(SavedQuery.class, params);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
