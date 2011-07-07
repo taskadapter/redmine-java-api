@@ -28,6 +28,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
 import org.xml.sax.InputSource;
@@ -47,6 +48,7 @@ public class RedmineXMLParser {
 			put(Issue.class, MAPPING_ISSUES);
 			put(Project.class, MAPPING_PROJECTS_LIST);
 			put(TimeEntry.class, "/mapping_time_entries.xml");
+			put(SavedQuery.class, "/mapping_queries.xml");
 		}
 	};
 

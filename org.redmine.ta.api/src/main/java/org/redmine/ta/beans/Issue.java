@@ -37,7 +37,7 @@ public class Issue implements Identifiable {
 	private String notes;
     private List<CustomField> customFields = new ArrayList<CustomField>();
     private List<Journal> journals = new ArrayList<Journal>();
-    private List<Issue> relations = new ArrayList<Issue>();
+    private List<IssueRelation> relations = new ArrayList<IssueRelation>();
 
 	public Project getProject() {
 		return project;
@@ -463,7 +463,7 @@ public class Issue implements Identifiable {
 		return "Issue [id=" + id + ", subject=" + subject + "]";
 	}
 
-	public List<Issue> getRelations() {
+	public List<IssueRelation> getRelations() {
 		return relations;
 	}
 

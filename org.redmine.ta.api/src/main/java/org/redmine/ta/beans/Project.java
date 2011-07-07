@@ -1,12 +1,13 @@
 package org.redmine.ta.beans;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
 /**
  * Redmine's Project.
  */
-public class Project implements Identifiable{
+public class Project implements Identifiable, Serializable {
 	
 	/**
 	 * database ID
