@@ -101,7 +101,7 @@ public class RedmineManager {
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
-	private static final boolean PRINT_DEBUG = true;
+	private static final boolean PRINT_DEBUG = false;
 
 	public RedmineManager(String uri) {
 		if (uri == null || uri.isEmpty()) {
