@@ -101,12 +101,13 @@ public class RedmineManager {
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
+	private static final boolean PRINT_DEBUG = true;
 
-	public RedmineManager(String host) {
-		if (host == null || host.isEmpty()) {
+	public RedmineManager(String uri) {
+		if (uri == null || uri.isEmpty()) {
 			throw new IllegalArgumentException("The host parameter is NULL or empty");
 		}
-		this.host = host;
+		this.host = uri;
 	}
 	
 	/**
@@ -191,7 +192,11 @@ public class RedmineManager {
 		URI uri;
 		try {
 			URL url = new URL(host);
-			uri = URIUtils.createURI(url.getProtocol(), url.getHost(), url.getPort(), query, 
+			String path = url.getPath();
+			if (!query.isEmpty()) {
+				path += "/" + query;
+			}
+			uri = URIUtils.createURI(url.getProtocol(), url.getHost(), url.getPort(), path, 
 				    URLEncodedUtils.format(params, "UTF-8"), null);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -581,7 +586,7 @@ public class RedmineManager {
 			
 			String query = urls.get(objectClass) + URL_POSTFIX;
 			URI uri = createURI(query, paramsList);
-
+			debug("URI = " + uri);
 			HttpGet http = new HttpGet(uri);
 
 			Response response = sendRequest(http);
@@ -854,6 +859,12 @@ public class RedmineManager {
 	public List<SavedQuery> getSavedQueries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 		return getObjectsList(SavedQuery.class, params);
+	}
+
+	private static void debug(String string) {
+		if (PRINT_DEBUG) {
+			System.out.println(string);
+		}
 	}
 
 }
