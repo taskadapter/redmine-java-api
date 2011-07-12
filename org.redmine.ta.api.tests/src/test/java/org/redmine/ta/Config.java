@@ -23,8 +23,8 @@ public class Config {
 		}
 	}
 
-	public static String getHost() {
-		return properties.getProperty("host");
+	public static String getURI() {
+		return properties.getProperty("uri");
 	}
 
 	public static String getLogin() {

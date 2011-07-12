@@ -38,9 +38,9 @@ public class RedmineManagerTest {
 
 	@BeforeClass
 	public static void oneTimeSetUp() {
-		System.out.println("Running redmine tests using: " + Config.getHost());
+		System.out.println("Running redmine tests using: " + Config.getURI());
 //		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
-		mgr = new RedmineManager(Config.getHost(), Config.getLogin(), Config.getPassword());
+		mgr = new RedmineManager(Config.getURI(), Config.getLogin(), Config.getPassword());
 		Project junitTestProject = new Project();
 		junitTestProject.setName("test project");
 		junitTestProject.setIdentifier("test"
@@ -282,7 +282,7 @@ public class RedmineManagerTest {
 	@Test
 	public void testWrongCredentialsOnCreateIssue() throws RuntimeException {
 		
-		RedmineManager redmineMgrEmpty = new RedmineManager(Config.getHost(), null);
+		RedmineManager redmineMgrEmpty = new RedmineManager(Config.getURI(), null);
 
 		// NO API access key set
 		Issue issue = new Issue();
@@ -297,7 +297,7 @@ public class RedmineManagerTest {
 		}
 		
 		// set invalid API access key
-		RedmineManager redmineMgrInvalidKey = new RedmineManager(Config.getHost(), "wrong_key");
+		RedmineManager redmineMgrInvalidKey = new RedmineManager(Config.getURI(), "wrong_key");
 		try {
 			redmineMgrInvalidKey.createIssue(projectKey, issue);
 			fail("Must have failed with '401 Not authorized'");
