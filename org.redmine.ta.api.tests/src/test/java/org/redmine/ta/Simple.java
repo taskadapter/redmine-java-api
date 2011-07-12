@@ -7,6 +7,7 @@ import java.util.List;
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
@@ -17,12 +18,14 @@ public class Simple {
 //	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
 //	private static String projectKey = "taskconnector-test";
     
-//	private static String redmineHost = "http://192.168.0.30:3000";
+	private static String redmineHost = "http://192.168.0.30:3000";
 //    private static String apiAccessKey = "cf6de1494fcca2b5c9206179f6621abeea15c6c7";
+  private static String login = "admin";
+  private static String password = "zzz666";
 	
-	private static String redmineHost = "http://192.168.0.64:3000";
-    private static String login = "admin";
-    private static String password = "admin";
+//	private static String redmineHost = "http://192.168.0.64:3000";
+//    private static String login = "admin";
+//    private static String password = "admin";
 	
 	private static String projectKey = "test";
 
@@ -33,14 +36,21 @@ public class Simple {
 		try {
 //			getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
-//			tryGetIssues(mgr);
+			tryGetIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
 //			generateXMLForTimeEntry();
-			getSavedQueries(mgr);
+//			getSavedQueries(mgr);
+//			getProjects(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void getProjects(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException {
+		List<Project> projects = mgr.getProjects();
+		System.out.println(projects);
+		
 	}
 
 	private static void getSavedQueries(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
