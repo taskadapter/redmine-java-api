@@ -63,6 +63,8 @@ import org.redmine.ta.internal.RedmineXMLParser;
  * @author Alexey Skorokhodov
  */
 public class RedmineManager {
+	private static final boolean PRINT_DEBUG = true;
+
 	private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
 	private static final String CHARSET = "UTF-8";
 
@@ -101,7 +103,6 @@ public class RedmineManager {
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
-	private static final boolean PRINT_DEBUG = false;
 
 	public RedmineManager(String uri) {
 		if (uri == null || uri.isEmpty()) {
@@ -123,8 +124,8 @@ public class RedmineManager {
 		this.apiAccessKey = apiAccessKey;
 	}
 
-	public RedmineManager(String host, String login, String password) {
-		this(host);
+	public RedmineManager(String uri, String login, String password) {
+		this(uri);
 		this.login = login;
 		this.password = password;
 		this.useBasicAuth = true;
@@ -156,7 +157,7 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Issue createIssue(String projectKey, Issue issue) throws IOException,AuthenticationException, NotFoundException, RedmineException {
-        URI uri = createURI("/issues.xml");
+        URI uri = createURI("issues.xml");
 		HttpPost http = new HttpPost(uri);
 		String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
 		
@@ -218,7 +219,7 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		URI uri = createURI("/issues/" + issue.getId() + ".xml");
+		URI uri = createURI("issues/" + issue.getId() + ".xml");
 		HttpPut httpRequest = new HttpPut(uri);
 
 		// XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
@@ -412,7 +413,7 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public Project getProjectByKey(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = createURI("/projects/" + projectKey + ".xml", new BasicNameValuePair("include", "trackers"));
+        URI uri = createURI("projects/" + projectKey + ".xml", new BasicNameValuePair("include", "trackers"));
 		HttpGet http = new HttpGet(uri);
 		Response response = sendRequest(http);
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
@@ -714,7 +715,7 @@ public class RedmineManager {
 	 */
 	public Project createProject(Project project) throws IOException,AuthenticationException, RedmineException {
 		// see bug http://www.redmine.org/issues/7184
-        URI uri = createURI("/projects.xml", new BasicNameValuePair("include", "trackers"));
+        URI uri = createURI("projects.xml", new BasicNameValuePair("include", "trackers"));
         
 		HttpPost httpPost = new HttpPost(uri);
 		String createProjectXML = RedmineXMLGenerator.toXML(project);
@@ -778,7 +779,7 @@ public class RedmineManager {
 	}
 
 	public User getCurrentUser() throws IOException, AuthenticationException, RedmineException{
-        URI uri = createURI("/users/current.xml");
+        URI uri = createURI("users/current.xml");
 		HttpGet http = new HttpGet(uri);
 		Response response = sendRequest(http);
 		return RedmineXMLParser.parseUserFromXML(response.getBody());
