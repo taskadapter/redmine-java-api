@@ -39,7 +39,7 @@ public class RedmineManagerTest {
 	@BeforeClass
 	public static void oneTimeSetUp() {
 		System.out.println("Running redmine tests using: " + Config.getURI());
-//		mgr = new RedmineManager(Config.getHost(), Config.getApiKey());
+//		mgr = new RedmineManager(Config.getURI(), Config.getApiKey());
 		mgr = new RedmineManager(Config.getURI(), Config.getLogin(), Config.getPassword());
 		Project junitTestProject = new Project();
 		junitTestProject.setName("test project");
@@ -57,7 +57,7 @@ public class RedmineManagerTest {
 	@AfterClass
 	public static void oneTimeTearDown() {
 		try {
-			if (mgr != null) {
+			if (mgr != null && projectKey != null) {
 				mgr.deleteProject(projectKey);
 			}
 		} catch (Exception e) {
@@ -920,7 +920,7 @@ public class RedmineManagerTest {
 		// default empty values
 		assertEquals(2, issue.getCustomFields().size());
 
-		
+		// TODO update this!
 		int id1 = 1; // TODO this is pretty much a hack, we don't generally know these ids!
 		String custom1FieldName = "my_custom_1";
 		String custom1Value = "some value 123";
@@ -960,29 +960,18 @@ public class RedmineManagerTest {
 		}
 	}
 	
-	/* this test fails because Redmine's getproject() response does NOT
-	 * include parent ID. see bug http://www.redmine.org/issues/8229 
+	/* This tests finally PASSES after Redmine bug http://www.redmine.org/issues/8229
+	 * was fixed  
 	 */
-	@Ignore
 	@Test
 	public void testCreateSubProject() {
 		Project createdMainProject = null;
-		Project createdSubProject = null;
 		try {
-			Project mainProject = new Project();
-			long id = new Date().getTime();
-			mainProject.setName("project" + id);
-			mainProject.setIdentifier("project" + id);
-			createdMainProject = mgr.createProject(mainProject);
+			createdMainProject = createProject();			
+			Project subProject = createSubProject(createdMainProject);
 			
-			Project subProject = new Project();
-			long subId = new Date().getTime()+1;
-			subProject.setName("subproject" + subId);
-			subProject.setIdentifier("subproject" + subId);
-			createdSubProject = mgr.createProject(subProject);
-			assertEquals(
-					"update this code when http://www.redmine.org/issues/8229 is resolved. Must have correct parent ID",
-					createdMainProject.getId(), createdSubProject.getParentId());
+			assertEquals("Must have correct parent ID",
+					createdMainProject.getId(), subProject.getParentId());
 		} catch (Exception e) {
 			fail();
 		} finally {
@@ -993,16 +982,25 @@ public class RedmineManagerTest {
 					fail();
 				}
 			}
-			if (createdSubProject != null) {
-				try {
-					mgr.deleteProject(createdSubProject.getIdentifier());
-				} catch (Exception e) {
-					fail();
-				}
-			}
-
 		}
 
+	}
+
+	private Project createProject() throws IOException, AuthenticationException, RedmineException {
+		Project mainProject = new Project();
+		long id = new Date().getTime();
+		mainProject.setName("project" + id);
+		mainProject.setIdentifier("project" + id);
+		return mgr.createProject(mainProject);
+	}
+	
+	private Project createSubProject(Project parent) throws IOException, AuthenticationException, RedmineException {
+		Project project = new Project();
+		long id = new Date().getTime();
+		project.setName("sub_pr" + id);
+		project.setIdentifier("subpr" + id);
+		project.setParentId(parent.getId());
+		return mgr.createProject(project);
 	}
 
 	@Test
