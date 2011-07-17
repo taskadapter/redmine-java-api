@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -348,22 +349,32 @@ public class RedmineManager {
 		return getObjectsList(Issue.class, params);
 	}
 	
-	/**
-	 * Does not include "journal" entries. Equivalent to calling getIssueById(id, false). 
-	 * 
-	 * @param id the Redmine issue ID
-	 * @return Issue object
-	 * @throws IOException
-	 * @throws AuthenticationException
-	 *             invalid or no API access key is used with the server, which
-	 *             requires authorization. Check the constructor arguments.
-	 * @throws NotFoundException the issue with the given id is not found on the server
-	 * @throws RedmineException 
-	 */
-//	public Issue getIssueById(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-//		return getIssueById(id);
-//	}
+	  /**
+	   * Generic method to search for issues.
+	   * 
+	   * @param pParameters the http parameters key/value pairs to append to the rest api request
+	   * 
+	   * @return empty list if not issues with this summary field exist, never NULL
+	   * 
+	   * @throws AuthenticationException
+	   *             invalid or no API access key is used with the server, which
+	   *             requires authorization. Check the constructor arguments.
+	   * @throws NotFoundException 
+	   * @throws RedmineException 
+	   */
+	public List<Issue> getIssues(Map<String, String> pParameters)
+			throws IOException, AuthenticationException, NotFoundException,
+			RedmineException {
+		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
 
+		for (final Entry<String, String> param : pParameters.entrySet()) {
+			params.put(param.getKey(), new BasicNameValuePair(param.getKey(),
+					param.getValue()));
+		}
+
+		return getObjectsList(Issue.class, params);
+	}
+	
 	/**
 	 * 
 	 * @param id  the Redmine issue ID
@@ -376,7 +387,7 @@ public class RedmineManager {
 	 * @throws NotFoundException
 	 *             the issue with the given id is not found on the server
 	 * @throws RedmineException
-	 * @deprecated use getIssueById(Integer id, INCLUDE... include)
+	 * @deprecated use getIssueById(Integer id, INCLUDE... include). This method can be REMOVED in the next releases.
 	 */
 	public Issue getIssueById(Integer id, boolean includeJournals)
 			throws IOException, AuthenticationException, NotFoundException,
