@@ -6,6 +6,7 @@ public class IssueRelation {
 	private Integer id;
 	private Integer issueId;
 	private String type;
+	
 	public Integer getId() {
 		return id;
 	}

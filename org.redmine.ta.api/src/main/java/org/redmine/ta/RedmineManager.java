@@ -469,7 +469,7 @@ public class RedmineManager {
 	 *             
 	 * @see Issue
 	 */
-	public List<Issue> getIssues(String projectKey, Integer queryId) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		// have to load users first because the issues response does not contain the users names
 		// see http://www.redmine.org/issues/7487
 //		List<User> users = getUsers();
@@ -483,6 +483,8 @@ public class RedmineManager {
 		if ((projectKey != null) && (projectKey.length()>0)) {
 			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
 		}
+		String includeStr = join(",", include);
+		params.put("include", new BasicNameValuePair("include", includeStr));
 
 		List<Issue> issues = getObjectsList(Issue.class, params);
 //		setUserFields(issues, idToUserMap);
