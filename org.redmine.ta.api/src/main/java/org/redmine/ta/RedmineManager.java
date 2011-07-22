@@ -49,6 +49,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.redmine.ta.beans.Identifiable;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
@@ -241,7 +242,7 @@ public class RedmineManager {
 	}
 	
 	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
-//		System.out.println(request.getRequestLine());
+		debug(request.getRequestLine().toString());
 		DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 		
 		if (useBasicAuth) {
@@ -879,6 +880,23 @@ public class RedmineManager {
 		if (PRINT_DEBUG) {
 			System.out.println(string);
 		}
+	}
+
+	public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException,AuthenticationException, NotFoundException, RedmineException {
+//		NameValuePair paramId = new BasicNameValuePair("issue_to_id", issueToId.toString());
+//		NameValuePair paramType = new BasicNameValuePair("relation_type", type);
+//		URI uri = createURI("issues/" + issueId + "/relations.xml", paramId, paramType);
+		URI uri = createURI("issues/" + issueId + "/relations.xml");
+
+		HttpPost http = new HttpPost(uri);
+		http.getParams().setParameter("issue_to_id", issueToId.toString());
+		http.getParams().setParameter("relation_type", type);
+		Response response = sendRequest(http);
+//		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
+//			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
+//		}
+		IssueRelation relation = RedmineXMLParser.parseRelationFromXML(response.getBody());
+		return relation;
 	}
 
 }

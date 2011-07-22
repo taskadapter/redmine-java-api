@@ -18,8 +18,8 @@ public class Simple {
 //	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
 //	private static String projectKey = "taskconnector-test";
     
-	private static String redmineHost = "http://192.168.0.30:3000";
-//    private static String apiAccessKey = "cf6de1494fcca2b5c9206179f6621abeea15c6c7";
+	private static String redmineHost = "http://192.168.0.30:3030";
+//    private static String apiAccessKey = "e4e0fa8083e85ff787f2fd30e28ff7e285bff346";
   private static String login = "admin";
   private static String password = "zzz666";
 	
@@ -33,18 +33,25 @@ public class Simple {
 
 	public static void main(String[] args) {
 		RedmineManager mgr = new RedmineManager(redmineHost, login, password);
+//		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
 		try {
 //			getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
-			tryGetIssues(mgr);
+//			tryGetIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
 //			generateXMLForTimeEntry();
 //			getSavedQueries(mgr);
 //			getProjects(mgr);
+			tryRelation(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void tryRelation(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		mgr.createRelation(projectKey, 49, 50, IssueRelation.TYPE.precedes.toString());
+		
 	}
 
 	private static void getProjects(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException {
@@ -68,6 +75,7 @@ public class Simple {
 
 	private static void tryCreateIssue(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Issue issue = new Issue();
+		issue.setSubject("test123");
 		mgr.createIssue(projectKey, issue);
 	}
 
