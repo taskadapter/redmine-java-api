@@ -18,7 +18,8 @@ public class Simple {
 //	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
 //	private static String projectKey = "taskconnector-test";
     
-	private static String redmineHost = "http://192.168.0.30:3030";
+//	private static String redmineHost = "http://192.168.0.30:3030";
+	private static String redmineHost = "http://ta-dev.dyndns.biz:3030";
 //    private static String apiAccessKey = "e4e0fa8083e85ff787f2fd30e28ff7e285bff346";
   private static String login = "admin";
   private static String password = "zzz666";
