@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
@@ -78,6 +79,9 @@ public class RedmineXMLGenerator {
 		if (o instanceof User) {
 			return toXML((User) o);
 		}
+		if (o instanceof IssueRelation) {
+			return toXML((IssueRelation) o);
+		}
 		throw new RuntimeException("Object type is not supported.");
 	}
 
@@ -119,6 +123,14 @@ public class RedmineXMLGenerator {
 		return b.toString();
 	}
 	
+	public static String toXML(IssueRelation o) {
+		StringBuilder b = new StringBuilder(XML_PREFIX + "<relation>");
+		appendIfNotNull(b, "issue_to_id", o.getIssueToId());
+		appendIfNotNull(b, "relation_type", o.getType());
+		b.append("</relation>");
+		return b.toString();
+	}
+
 	/**
 	 * append, if the value is not NULL
 	 */

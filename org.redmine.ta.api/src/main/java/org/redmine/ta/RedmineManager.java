@@ -889,8 +889,13 @@ public class RedmineManager {
 		URI uri = createURI("issues/" + issueId + "/relations.xml");
 
 		HttpPost http = new HttpPost(uri);
-		http.getParams().setParameter("issue_to_id", issueToId.toString());
-		http.getParams().setParameter("relation_type", type);
+		IssueRelation toCreate = new IssueRelation();
+		toCreate.setIssueId(issueId);
+		toCreate.setIssueToId(issueToId);
+		toCreate.setType(type);
+		String xml = RedmineXMLGenerator.toXML(toCreate);
+		setEntity((HttpEntityEnclosingRequest)http, xml);
+
 		Response response = sendRequest(http);
 //		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 //			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");

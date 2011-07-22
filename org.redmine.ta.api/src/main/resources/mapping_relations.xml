@@ -16,7 +16,7 @@
 		<field name="issueToId" type="integer">
 			<bind-xml name="issue_to_id" node="element"  />
 		</field>
-		<field name="type" type="String">
+		<field name="type" type="string">
 			<bind-xml name="relation_type" node="element"  />
 		</field>
 	</class>
