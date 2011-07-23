@@ -883,9 +883,6 @@ public class RedmineManager {
 	}
 
 	public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException,AuthenticationException, NotFoundException, RedmineException {
-//		NameValuePair paramId = new BasicNameValuePair("issue_to_id", issueToId.toString());
-//		NameValuePair paramType = new BasicNameValuePair("relation_type", type);
-//		URI uri = createURI("issues/" + issueId + "/relations.xml", paramId, paramType);
 		URI uri = createURI("issues/" + issueId + "/relations.xml");
 
 		HttpPost http = new HttpPost(uri);
