@@ -39,12 +39,13 @@ public class Simple {
 //			getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
 //			tryGetIssues(mgr);
+			tryGetAllIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
 //			generateXMLForTimeEntry();
 //			getSavedQueries(mgr);
 //			getProjects(mgr);
-			tryCreateRelation(mgr);
+//			tryCreateRelation(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -104,6 +105,13 @@ public class Simple {
 
 	private static void tryGetIssues(RedmineManager mgr) throws Exception {
 		List<Issue> issues = mgr.getIssues(projectKey, queryId);
+		for (Issue issue : issues) {
+			System.out.println(issue.toString());
+		}
+	}
+
+	private static void tryGetAllIssues(RedmineManager mgr) throws Exception {
+		List<Issue> issues = mgr.getIssues(projectKey, null);
 		for (Issue issue : issues) {
 			System.out.println(issue.toString());
 		}
