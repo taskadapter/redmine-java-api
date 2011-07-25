@@ -379,7 +379,8 @@ public class RedmineManager {
 	/**
 	 * 
 	 * @param id  the Redmine issue ID
-	 * @param includeJournals get issue journals
+	 * @param include list of "includes". e.g. "relations", "journals", ... 
+	 * 
 	 * @return Issue object
 	 * @throws IOException
 	 * @throws AuthenticationException
@@ -388,14 +389,7 @@ public class RedmineManager {
 	 * @throws NotFoundException
 	 *             the issue with the given id is not found on the server
 	 * @throws RedmineException
-	 * @deprecated use getIssueById(Integer id, INCLUDE... include). This method can be REMOVED in the next releases.
 	 */
-	public Issue getIssueById(Integer id, boolean includeJournals)
-			throws IOException, AuthenticationException, NotFoundException,
-			RedmineException {
-		return getObject(Issue.class, id, new BasicNameValuePair("include", "journals"));
-	}
-
 	public Issue getIssueById(Integer id, INCLUDE... include) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		String value = join(",", include);
 		// there's no harm in adding "include" parameter even if it's empty
