@@ -44,17 +44,17 @@ public class Simple {
 //			generateXMLForTimeEntry();
 //			getSavedQueries(mgr);
 //			getProjects(mgr);
-			tryRelation(mgr);
+			tryCreateRelation(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	private static void tryRelation(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		mgr.createRelation(projectKey, 49, 50, IssueRelation.TYPE.precedes.toString());
-		
+	private static void tryCreateRelation(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		IssueRelation r = mgr.createRelation(projectKey, 49, 50, IssueRelation.TYPE.precedes.toString());
+		System.out.println(r);
 	}
-
+	
 	private static void getProjects(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException {
 		List<Project> projects = mgr.getProjects();
 		System.out.println(projects);
