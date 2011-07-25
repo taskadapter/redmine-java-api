@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.Journal;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
@@ -1110,6 +1111,56 @@ public class RedmineManagerTest {
 		}
 	}
 
+	@Test
+	public void testCreateRelation() {
+		try {
+			List<Issue> issues = createIssues(2);
+			Issue src = issues.get(0);
+			Issue target = issues.get(1);
+			
+			String relationText = IssueRelation.TYPE.precedes.toString();
+			IssueRelation r = mgr.createRelation(projectKey, src.getId(), target.getId(), relationText);
+			assertEquals(src.getId(), r.getIssueId());
+			assertEquals(target.getId(), r.getIssueToId());
+			assertEquals(relationText, r.getType());
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+
+	private IssueRelation createTwoRelatedIssues() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		List<Issue> issues = createIssues(2);
+		Issue src = issues.get(0);
+		Issue target = issues.get(1);
+		
+		String relationText = IssueRelation.TYPE.precedes.toString();
+		IssueRelation r = mgr.createRelation(projectKey, src.getId(), target.getId(), relationText);
+		return r;
+	}
+	
+	@Test
+	public void testLoadRelation() {
+		try {
+			IssueRelation relation = createTwoRelatedIssues();
+			Issue issue = mgr.getIssueById(relation.getIssueId(), INCLUDE.relations);
+			Issue issueTarget = mgr.getIssueById(relation.getIssueToId(), INCLUDE.relations);
+			
+			assertEquals(1, issue.getRelations().size());
+			assertEquals(1, issueTarget.getRelations().size());
+			
+			IssueRelation relation1 = issue.getRelations().get(0);
+			assertEquals(issue.getId(), relation1.getIssueId());
+			assertEquals(issueTarget.getId(), relation1.getIssueToId());
+			assertEquals((Integer) 0, relation1.getDelay());
+
+			IssueRelation reverseRelation = issueTarget.getRelations().get(0);
+			// both forward and reverse relations are the same!
+			assertEquals(relation1, reverseRelation);
+		} catch (Exception e) {
+			fail(e.toString());
+		}
+	}
+	
 	// Redmine ignores this parameter for "get projects" request. see bug http://www.redmine.org/issues/8545
 	@Ignore
 	@Test
