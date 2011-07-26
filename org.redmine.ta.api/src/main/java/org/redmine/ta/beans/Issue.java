@@ -463,6 +463,9 @@ public class Issue implements Identifiable {
 		return "Issue [id=" + id + ", subject=" + subject + "]";
 	}
 
+	/**
+	 * @return list of relations or EMPTY list if no relations, never returns NULL
+	 */
 	public List<IssueRelation> getRelations() {
 		return relations;
 	}
