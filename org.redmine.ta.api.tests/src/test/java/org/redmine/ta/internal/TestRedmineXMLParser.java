@@ -8,8 +8,11 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.redmine.ta.MyIOUtils;
 import org.redmine.ta.RedmineTestUtils;
 import org.redmine.ta.beans.Issue;
@@ -17,8 +20,6 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class TestRedmineXMLParser {
 	private static final String REDMINE_1_1_ISSUES_XML = "redmine_1_1_issues.xml";
@@ -44,9 +45,7 @@ public class TestRedmineXMLParser {
 	@Test
 	public void testCountIssues() {
 		try {
-			String xml = MyIOUtils
-					.getResourceAsString(REDMINE_1_1_ISSUES_XML);
-			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
+			List<Issue> issues = loadRedmine11IssuesXml();
 			assertEquals(26, issues.size());
 		} catch (Exception e) {
 			fail(e.getMessage());
@@ -144,10 +143,8 @@ public class TestRedmineXMLParser {
 	
 	@Test
 	public void testNullEstimatedTime() {
-		String str;
 		try {
-			str = MyIOUtils.getResourceAsString(REDMINE_1_1_ISSUES_XML);
-			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(str);
+			List<Issue> issues = loadRedmine11IssuesXml();
 			Integer issueID = 52;
 			Issue issue52 = RedmineTestUtils.findIssueInList(issues, issueID);
 			assertNotNull(issue52);
@@ -197,9 +194,7 @@ public class TestRedmineXMLParser {
 	@Test
 	public void testParseDescription() {
 		try {
-			String xml = MyIOUtils
-					.getResourceAsString(REDMINE_1_1_ISSUES_XML);
-			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
+			List<Issue> issues = loadRedmine11IssuesXml();
 			Issue issue65 = RedmineTestUtils.findIssueInList(issues, 65);
 			assertTrue(issue65.getDescription().startsWith("This is the description for the new task."));
 			assertTrue(issue65.getDescription().endsWith("This is the last line."));
@@ -223,8 +218,7 @@ public class TestRedmineXMLParser {
 
 	@Test
 	public void testParseIssues() throws IOException {
-		String xml = MyIOUtils.getResourceAsString("redmine_1_1_issues.xml");
-		List<Issue> objects = RedmineXMLParser.parseIssuesFromXML(xml);
+		List<Issue> objects = loadRedmine11IssuesXml();
 		Integer issueId = 68;
 		Issue issue68 = RedmineTestUtils.findIssueInList(objects, issueId);
 		assertNotNull(issue68);
@@ -270,10 +264,10 @@ public class TestRedmineXMLParser {
 		assertEquals(expectedHours, obj2.getHours());
 		assertEquals("spent 2 hours working on ABC", obj2.getComment());
 		
-		MyIOUtils.testLongDate(obj2.getCreatedOn(), 2011, Calendar.JANUARY, 31, 11, 10, 40, "GMT-8");
-		MyIOUtils.testLongDate(obj2.getUpdatedOn(), 2011, Calendar.JANUARY, 31, 11, 12, 32, "GMT-8");
+		MyIOUtils.testLongDate(2011, Calendar.JANUARY, 31, 11, 10, 40, "GMT-8", obj2.getCreatedOn());
+		MyIOUtils.testLongDate(2011, Calendar.JANUARY, 31, 11, 12, 32, "GMT-8", obj2.getUpdatedOn());
 
-		MyIOUtils.testShortDate(obj2.getSpentOn(), 2011, Calendar.JANUARY, 30);
+		MyIOUtils.testShortDate(2011, Calendar.JANUARY, 30, obj2.getSpentOn());
 	}
 	
 	@Test
@@ -283,5 +277,25 @@ public class TestRedmineXMLParser {
 		final Issue issue = RedmineXMLParser.parseIssueFromXML(xml);
 		assertEquals("This is a description \nwith more than \n\n\none line.",
 				issue.getDescription());
+	}
+
+	@Test
+	public void testCreatedOn() throws IOException{
+		List<Issue> redmine11Issues = loadRedmine11IssuesXml();
+		Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
+		MyIOUtils.testLongDate(2011, Calendar.FEBRUARY, 12, 16, 00, 31, "GMT-8", issue.getCreatedOn());
+	}
+	
+	@Test
+	public void testUpdatedOn() throws IOException{
+		List<Issue> redmine11Issues = loadRedmine11IssuesXml();
+		Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
+		MyIOUtils.testLongDate(2011, Calendar.SEPTEMBER, 17, 21, 28, 45, "GMT-8", issue.getUpdatedOn());
+	}
+
+	
+	private List<Issue> loadRedmine11IssuesXml() throws IOException {
+		String xml = MyIOUtils.getResourceAsString(REDMINE_1_1_ISSUES_XML);
+		return RedmineXMLParser.parseIssuesFromXML(xml);
 	}
 }

@@ -98,7 +98,7 @@ public class MyIOUtils {
 		return buffer.toString();
 	}
 	
-	public static void testLongDate(Date expectedDate, int year, int month, int day, int hour, int min, int sec, String timeZone){
+	public static void testLongDate(int year, int month, int day, int hour, int min, int sec, String timeZone, Date expectedDate){
 		Calendar c = Calendar.getInstance();
 		c.set(Calendar.YEAR, year);
 		c.set(Calendar.MONTH, month);
@@ -110,12 +110,12 @@ public class MyIOUtils {
 		if (timeZone.length()>0) {
 			c.setTimeZone(TimeZone.getTimeZone(timeZone));
 		}
-		Date expectedTime = c.getTime();
-		assertEquals("Checking date", expectedTime, expectedDate);
+		Date actualDate = c.getTime();
+		assertEquals("Checking date", actualDate, expectedDate);
 	}
 
-	public static void testShortDate(Date expectedDate, int year, int month, int day){
-		testLongDate(expectedDate, year, month, day, 0,0,0, "");
+	public static void testShortDate(int year, int month, int day, Date expectedDate){
+		testLongDate(year, month, day, 0,0,0, "", expectedDate);
 	}
 
 }

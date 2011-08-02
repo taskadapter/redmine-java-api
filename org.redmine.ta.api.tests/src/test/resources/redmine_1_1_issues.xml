@@ -29,8 +29,8 @@
 		<due_date></due_date>
 		<done_ratio>0</done_ratio>
 		<estimated_hours></estimated_hours>
-		<created_on>2011-01-24T13:57:59-08:00</created_on>
-		<updated_on>2011-01-24T13:57:59-08:00</updated_on>
+		<created_on>2011-03-24T14:58:59-08:00</created_on>
+		<updated_on>2011-04-24T16:57:59-08:00</updated_on>
 	</issue>
 	<issue>
 		<id>70</id>
@@ -411,8 +411,8 @@
 		<due_date>2011-01-30</due_date>
 		<done_ratio>0</done_ratio>
 		<estimated_hours>20.0</estimated_hours>
-		<created_on>2011-01-12T16:00:31-08:00</created_on>
-		<updated_on>2011-01-17T21:28:45-08:00</updated_on>
+		<created_on>2011-02-12T16:00:31-08:00</created_on>
+		<updated_on>2011-09-17T21:28:45-08:00</updated_on>
 	</issue>
 		<issue>
 		<id>239</id>
