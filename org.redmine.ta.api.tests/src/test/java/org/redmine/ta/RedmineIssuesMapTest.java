@@ -138,16 +138,4 @@ public class RedmineIssuesMapTest {
 		
 	}
 
-	@Test
-	public void testCreatedOn(){
-		Issue issue = issuesMap.get(39);
-		MyIOUtils.testLongDate(issue.getCreatedOn(), 2011, Calendar.JANUARY, 12, 16, 00, 31, "GMT-8");
-	}
-	
-	@Test
-	public void testUpdatedOn(){
-		Issue issue = issuesMap.get(39);
-		MyIOUtils.testLongDate(issue.getUpdatedOn(), 2011, Calendar.JANUARY, 17, 21, 28, 45, "GMT-8");
-	}
-
 }

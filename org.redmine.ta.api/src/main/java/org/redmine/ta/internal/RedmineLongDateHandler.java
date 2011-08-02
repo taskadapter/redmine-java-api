@@ -31,7 +31,7 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
 	 * <p>2011-01-20T18:33:29-08:00
 	 * <p>see Redmine's bug: http://www.redmine.org/issues/7394
 	 */
-	private static final String FORMAT_REDMINE_1_1 = "yyyy-mm-dd'T'HH:mm:ssZ";
+	private static final String FORMAT_REDMINE_1_1 = "yyyy-MM-dd'T'HH:mm:ssZ";
 	
 	private static SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_REDMINE_1_1);
 	private static final int SHIFT = 3;
