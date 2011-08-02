@@ -275,4 +275,13 @@ public class TestRedmineXMLParser {
 
 		MyIOUtils.testShortDate(obj2.getSpentOn(), 2011, Calendar.JANUARY, 30);
 	}
+	
+	@Test
+	public void testMultilineIssueDescription() throws IOException {
+		final String xml = MyIOUtils
+				.getResourceAsString("chiliproject_2_0_0_issue_with_multiline_description.xml");
+		final Issue issue = RedmineXMLParser.parseIssueFromXML(xml);
+		assertEquals("This is a description \nwith more than \n\n\none line.",
+				issue.getDescription());
+	}
 }
