@@ -65,7 +65,7 @@ import org.redmine.ta.internal.RedmineXMLParser;
  * @author Alexey Skorokhodov
  */
 public class RedmineManager {
-	private static final boolean PRINT_DEBUG = true;
+	private static final boolean PRINT_DEBUG = false;
 
 	private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
 	private static final String CHARSET = "UTF-8";
