@@ -140,6 +140,7 @@ public class RedmineXMLParser {
 			throw new RuntimeException(e);
 		}
 		unmarshaller.setClass(classToUse);
+		unmarshaller.setWhitespacePreserve(true);
 		return unmarshaller;
 	}
 
