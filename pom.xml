@@ -18,7 +18,7 @@
     <modules>
         <module>org.redmine.ta.deps</module>
         <module>org.redmine.ta.api</module>
-<!--        <module>org.redmine.ta.api.tests</module> -->
+        <module>org.redmine.ta.api.tests</module>
 <!--        <module>org.redmine.ta.assembly</module> -->
         <module>org.redmine.ta.site</module>
     </modules>
