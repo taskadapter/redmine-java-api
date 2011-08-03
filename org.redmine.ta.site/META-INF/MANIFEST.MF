@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Site
+Bundle-SymbolicName: org.redmine.ta.site
+Bundle-Version: 1.0.0.qualifier
+Bundle-Vendor: Alexey Skorokhodov
+Require-Bundle: org.redmine.ta.api;bundle-version="1.2.0",
+ org.redmine.ta.deps;bundle-version="1.0.0"

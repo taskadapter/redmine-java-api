@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.redmine.ta</groupId>
+	<artifactId>update_site</artifactId>
+	<version>1.66</version>
+	<packaging>eclipse-repository</packaging>
+
+	<parent>
+		<groupId>org.redmine.ta</groupId>
+		<artifactId>main</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>${tycho.groupid}</groupId>
+				<artifactId>tycho-p2-director-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<executions>
+					<execution>
+						<id>materialize-products</id>
+						<goals>
+							<goal>materialize-products</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>archive-products</id>
+						<goals>
+							<goal>archive-products</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<products>
+						<product>
+							<id>org.redmine.ta.product</id>
+							<!-- optional parameters (with default values) -->
+							<rootFolder>redmine_java_api_${redmine_api.shortversion}</rootFolder>
+						</product>
+					</products>
+					<!-- global optional parameters (with default values) -->
+<!-- 					<installFeatures>true</installFeatures> -->
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
