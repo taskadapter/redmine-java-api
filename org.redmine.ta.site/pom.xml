@@ -41,7 +41,7 @@
 					<products>
 						<product>
 							<id>org.redmine.ta.product</id>
-							<!-- optional parameters (with default values) -->
+							<!-- root folder inside the archive  -->
 							<rootFolder>redmine_java_api_${redmine_api.shortversion}</rootFolder>
 						</product>
 					</products>
