@@ -10,7 +10,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>assembly</artifactId>
+<!-- This Maven script creates Redmine Java API distributive (ZIP file) -->
+    <artifactId>build_distributive_zip</artifactId>
 
     <build>
         <plugins>
