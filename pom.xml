@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <redmine_api.shortversion>1.2.0</redmine_api.shortversion>
+        <redmine_api.shortversion>1.3.0</redmine_api.shortversion>
         <redmine_api.version>${redmine_api.shortversion}.qualifier</redmine_api.version>
         <tycho.version>0.12.0</tycho.version>
 		    <tycho.groupid>org.eclipse.tycho</tycho.groupid>
