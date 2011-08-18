@@ -30,6 +30,7 @@ public class Issue implements Identifiable {
 	private Date updatedOn;
 	private Integer statusId;
 	private String statusName;
+	private Version targetVersion;
 	
 	/**
 	 * Some comment describing the issue update 
@@ -478,4 +479,13 @@ public class Issue implements Identifiable {
 		this.priorityId = priorityId;
 	}
 
+	public Version getTargetVersion() {
+		return targetVersion;
+	}
+
+	public void setTargetVersion(Version version) {
+		this.targetVersion = version;
+	}
+
+	
 }
