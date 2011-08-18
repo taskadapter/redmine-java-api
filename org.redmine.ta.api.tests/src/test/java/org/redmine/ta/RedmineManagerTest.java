@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 import org.junit.AfterClass;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -26,6 +28,7 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Version;
 
 public class RedmineManagerTest {
 
@@ -755,6 +758,18 @@ public class RedmineManagerTest {
 		return issues;
 	}
 
+	private Issue createIssue() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+		List<Issue> createIssues = createIssues(1);
+		return createIssues.get(0);
+	}
+	
+	private Issue generateRandomIssue() {
+		Random r = new Random();
+		Issue issue = new Issue();
+		issue.setSubject("some issue " + r.nextInt() + " " + new Date());
+		return issue;
+	}
+
 	@Test
 	public void testProjectsAllPagesLoaded() throws IOException, AuthenticationException, NotFoundException, URISyntaxException, RedmineException{
 		int NUM = 27; // must be larger than 25, which is a default page size in Redmine
@@ -1160,7 +1175,28 @@ public class RedmineManagerTest {
 			fail(e.toString());
 		}
 	}
-	
+
+	/** this test is ignored because:
+	 * 1) we can't create Versions. see http://www.redmine.org/issues/9088
+	 * 2) we don't currently set versions when creating issues.   
+	 */
+	@Ignore
+	@Test
+	public void issueFixVersionIsSet() throws Exception {
+
+		String existingProjectKey = "test";
+		Issue toCreate = generateRandomIssue();
+		Version v = new Version();
+		String versionName = "1.0";
+		v.setName("1.0");
+		v.setId(1);
+		toCreate.setTargetVersion(v);
+		Issue createdIssue = mgr.createIssue(existingProjectKey, toCreate);
+
+		assertNotNull(createdIssue.getTargetVersion());
+		assertEquals(createdIssue.getTargetVersion().getName(), versionName);
+	}
+
 	// Redmine ignores this parameter for "get projects" request. see bug http://www.redmine.org/issues/8545
 	@Ignore
 	@Test
