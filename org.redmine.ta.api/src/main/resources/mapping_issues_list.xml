@@ -152,12 +152,16 @@
         <field name="id" type="integer">
             <bind-xml name="id" node="attribute"/>
         </field>
-        <field name="issueId" type="integer">
+<!--        <field name="issueId" type="integer">
             <bind-xml name="issue_id" node="attribute"/>
         </field>
         <field name="issueToId" type="integer">
             <bind-xml name="issue_to_id" node="attribute"/>
         </field>
+-->
+		<field name="issueToId" type="integer">
+			<bind-xml name="issue_id" node="attribute"  />
+		</field>
         <field name="type" type="string">
             <bind-xml name="relation_type" node="attribute"/>
         </field>

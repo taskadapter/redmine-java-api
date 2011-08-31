@@ -10,11 +10,15 @@
 		<field name="id" type="integer">
 			<bind-xml name="id" node="element" />
 		</field>
-		<field name="issueId" type="integer">
+<!--		<field name="issueId" type="integer">
 			<bind-xml name="issue_id" node="element"  />
 		</field>
 		<field name="issueToId" type="integer">
 			<bind-xml name="issue_to_id" node="element"  />
+		</field>
+-->
+		<field name="issueToId" type="integer">
+			<bind-xml name="issue_id" node="element"  />
 		</field>
 		<field name="delay" type="integer">
 			<bind-xml name="delay" node="element"  />
