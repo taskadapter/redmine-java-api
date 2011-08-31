@@ -1163,8 +1163,9 @@ public class RedmineManagerTest {
 			assertEquals(1, issueTarget.getRelations().size());
 			
 			IssueRelation relation1 = issue.getRelations().get(0);
-			assertEquals(issue.getId(), relation1.getIssueId());
-			assertEquals(issueTarget.getId(), relation1.getIssueToId());
+//			assertEquals(issue.getId(), relation1.getIssueId());
+			assertEquals(issue.getId(), relation1.getIssueToId());
+			assertEquals("precedes", relation1.getType());
 			assertEquals((Integer) 0, relation1.getDelay());
 
 			IssueRelation reverseRelation = issueTarget.getRelations().get(0);
