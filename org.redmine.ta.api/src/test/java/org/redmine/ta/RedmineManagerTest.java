@@ -1,30 +1,16 @@
 package org.redmine.ta;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.*;
+import org.redmine.ta.RedmineManager.INCLUDE;
+import org.redmine.ta.beans.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
-import org.junit.*;
-import org.redmine.ta.RedmineManager.INCLUDE;
-import org.redmine.ta.beans.CustomField;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.IssueRelation;
-import org.redmine.ta.beans.Journal;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.Tracker;
-import org.redmine.ta.beans.User;
-import org.redmine.ta.beans.Version;
-
+/**
+ * This class and its dependencies are located in org.redmine.ta.api project.
+ */
 public class RedmineManagerTest {
 
 	// TODO We don't know activities IDs!
@@ -34,12 +20,14 @@ public class RedmineManagerTest {
 	private static RedmineManager mgr;
 
 	private static String projectKey;
+    private static TestConfig testConfig;
 
 	@BeforeClass
 	public static void oneTimeSetUp() {
-		System.out.println("Running redmine tests using: " + Config.getURI());
-//		mgr = new RedmineManager(Config.getURI(), Config.getApiKey());
-		mgr = new RedmineManager(Config.getURI(), Config.getLogin(), Config.getPassword());
+        testConfig = new TestConfig();
+		System.out.println("Running redmine tests using: " + testConfig.getURI());
+//		mgr = new RedmineManager(TestConfig.getURI(), TestConfig.getApiKey());
+		mgr = new RedmineManager(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
 		Project junitTestProject = new Project();
 		junitTestProject.setName("test project");
 		junitTestProject.setIdentifier("test"
@@ -240,10 +228,10 @@ public class RedmineManagerTest {
 
 	private static User getOurUser() {
 		Integer userId = Integer
-				.parseInt(Config.getParam("createissue.userid"));
-		String login = Config.getLogin();
-		String fName = Config.getParam("userFName");
-		String lName = Config.getParam("userLName");
+				.parseInt(testConfig.getParam("createissue.userid"));
+		String login = testConfig.getLogin();
+		String fName = testConfig.getParam("userFName");
+		String lName = testConfig.getParam("userLName");
 		User user = new User();
 		user.setId(userId);
 		user.setLogin(login);
@@ -281,7 +269,7 @@ public class RedmineManagerTest {
 	@Test
 	public void testWrongCredentialsOnCreateIssue() throws RuntimeException {
 		
-		RedmineManager redmineMgrEmpty = new RedmineManager(Config.getURI(), null);
+		RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI(), null);
 
 		// NO API access key set
 		Issue issue = new Issue();
@@ -296,7 +284,7 @@ public class RedmineManagerTest {
 		}
 		
 		// set invalid API access key
-		RedmineManager redmineMgrInvalidKey = new RedmineManager(Config.getURI(), "wrong_key");
+		RedmineManager redmineMgrInvalidKey = new RedmineManager(testConfig.getURI(), "wrong_key");
 		try {
 			redmineMgrInvalidKey.createIssue(projectKey, issue);
 			Assert.fail("Must have failed with '401 Not authorized'");
