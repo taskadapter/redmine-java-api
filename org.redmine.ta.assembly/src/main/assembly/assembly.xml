@@ -11,7 +11,7 @@
     <fileSets>
         <fileSet>
             <directory>../org.redmine.ta.api/target</directory>
-            <outputDirectory>jars</outputDirectory>
+            <outputDirectory>.</outputDirectory>
             <includes>
                 <include>**/*.jar</include>
             </includes>
@@ -30,28 +30,14 @@
                 <include>**/*.*</include>
             </includes>
         </fileSet>
-
-        
         <fileSet>
-            <directory>../org.redmine.ta.api.tests/src/test/java</directory>
+            <directory>../org.redmine.ta.api/src/test/java</directory>
             <outputDirectory>samples</outputDirectory>
             <includes>
+                <include>**/TestConfig.java</include>
                 <include>**/RedmineManagerTest.java</include>
+                <include>**/RedmineTestUtils.java</include>
                 <include>**/Simple.java</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../org.redmine.ta.deps/lib</directory>
-            <outputDirectory>jars</outputDirectory>
-            <includes>
-                <include>**/*.jar</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <directory>../org.redmine.ta.deps/target</directory>
-            <outputDirectory>jars</outputDirectory>
-            <includes>
-                <include>**/*.jar</include>
             </includes>
         </fileSet>
     </fileSets>
