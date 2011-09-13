@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Assert;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.internal.RedmineXMLParser;
 import org.junit.Before;
@@ -25,7 +26,7 @@ public class ProjectsTest {
 	@Test
 	public void testProjectsNumber() {
 		int expectedProjectsNumber = 12;
-		assertEquals("Checking projects number" , expectedProjectsNumber, projectsList.size());
+		Assert.assertEquals("Checking projects number", expectedProjectsNumber, projectsList.size());
 	}
 
 	@Test
@@ -36,12 +37,12 @@ public class ProjectsTest {
 		aceProject.setName("test project 15");
 
 		Project projectFromList = findProjectInList(aceProject.getId());
-		assertNotNull("Checking project is loaded", projectFromList);
+		Assert.assertNotNull("Checking project is loaded", projectFromList);
 		
 		// could use project.equals later when it's implemented in the class
-		assertEquals("Checking the loaded project info" , aceProject.getId(), projectFromList.getId());
-		assertEquals("Checking the loaded project info" , aceProject.getName(), projectFromList.getName());
-		assertEquals("Checking the loaded project info" , aceProject.getIdentifier(), projectFromList.getIdentifier());
+		Assert.assertEquals("Checking the loaded project info", aceProject.getId(), projectFromList.getId());
+		Assert.assertEquals("Checking the loaded project info", aceProject.getName(), projectFromList.getName());
+		Assert.assertEquals("Checking the loaded project info", aceProject.getIdentifier(), projectFromList.getIdentifier());
 	}
 
 	/*

@@ -5,52 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.redmine.ta</groupId>
     <artifactId>main</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>pom</packaging>
 
     <properties>
         <redmine_api.shortversion>1.4.0</redmine_api.shortversion>
         <redmine_api.version>${redmine_api.shortversion}.qualifier</redmine_api.version>
-        <tycho.version>0.12.0</tycho.version>
-		    <tycho.groupid>org.eclipse.tycho</tycho.groupid>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
-        <module>org.redmine.ta.deps</module>
         <module>org.redmine.ta.api</module>
-        <module>org.redmine.ta.api.tests</module>
-        <module>org.redmine.ta.site</module>
-        <module>org.redmine.ta.assembly</module>
+        <!--<module>org.redmine.ta.site</module>-->
+        <!--<module>org.redmine.ta.assembly</module>-->
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>tycho-maven-plugin</artifactId>
-                <version>${tycho.version}</version>
-                <extensions>true</extensions>
-            </plugin>
-            <plugin>
-                <groupId>org.eclipse.tycho</groupId>
-                <artifactId>target-platform-configuration</artifactId>
-                <version>${tycho.version}</version>
-                <configuration>
-                     <!-- p2 will use the repositories listed in this file. search for "repositories" node -->
-                     <resolver>p2</resolver>
-          </configuration>
-            </plugin>
-
-        </plugins>
-    </build>
-
-
-    <repositories>
-        <repository>
-            <id>helios</id>
-            <layout>p2</layout>
-            <url>http://download.eclipse.org/releases/helios</url>
-        </repository>
-    </repositories>
 
 </project>

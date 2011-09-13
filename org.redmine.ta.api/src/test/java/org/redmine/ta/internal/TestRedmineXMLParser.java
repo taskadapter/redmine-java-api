@@ -8,9 +8,9 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.redmine.ta.MyIOUtils;
@@ -34,10 +34,10 @@ public class TestRedmineXMLParser {
 		try {
 			String str = MyIOUtils.getResourceAsString(FILE_EMPTY_ISSUES_XML);
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(str);
-			assertTrue(issues.isEmpty());
+			Assert.assertTrue(issues.isEmpty());
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail("Error:" + e);
+			Assert.fail("Error:" + e);
 		}
 
 	}
@@ -46,9 +46,9 @@ public class TestRedmineXMLParser {
 	public void testCountIssues() {
 		try {
 			List<Issue> issues = loadRedmine11IssuesXml();
-			assertEquals(26, issues.size());
+			Assert.assertEquals(26, issues.size());
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 
 	}
@@ -90,26 +90,26 @@ public class TestRedmineXMLParser {
 			Integer expectedProjectID = 23;
 			String expectedName = "test project";
 			String expectedKey = "test1295649781087";
-			assertEquals(expectedProjectID, project.getId());
-			assertEquals(expectedName, project.getName());
-			assertEquals(expectedKey, project.getIdentifier());
+			Assert.assertEquals(expectedProjectID, project.getId());
+			Assert.assertEquals(expectedName, project.getName());
+			Assert.assertEquals(expectedKey, project.getIdentifier());
 
 			/**
 			 * <tracker name="Feature" id="2"/> <tracker name="Support" id="3"/>
 			 * <tracker name="Bug" id="1"/> <tracker name="Task" id="4"/>
 			 */
 			List<Tracker> trackers = project.getTrackers();
-			assertNotNull("Trackers list must not be NULL", trackers);
-			assertEquals(3, trackers.size());
+			Assert.assertNotNull("Trackers list must not be NULL", trackers);
+			Assert.assertEquals(3, trackers.size());
 
 			Tracker tracker = project.getTrackerByName("Support");
-			assertNotNull("Tracker must be not null", tracker);
+			Assert.assertNotNull("Tracker must be not null", tracker);
 			Integer expectedTrackerId = 3;
-			assertEquals("checking id of 'support' tracker", expectedTrackerId,
-					tracker.getId());
+			Assert.assertEquals("checking id of 'support' tracker", expectedTrackerId,
+                    tracker.getId());
 
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 
@@ -120,9 +120,9 @@ public class TestRedmineXMLParser {
 			xml = MyIOUtils.getResourceAsString("redmine_1_1_project_no_trackers.xml");
 			Project project = RedmineXMLParser.parseProjectFromXML(xml);
 			List<Tracker> trackers = project.getTrackers();
-			assertNull("Trackers list must be NULL", trackers);
+			Assert.assertNull("Trackers list must be NULL", trackers);
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 
@@ -130,14 +130,14 @@ public class TestRedmineXMLParser {
 	public void testParseIssuesTotalCount() {
 		String tmp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><issues type=\"array\" limit=\"25\" total_count=\"155\" offset=\"0\">....";
 		int x = RedmineXMLParser.parseObjectsTotalCount(tmp);
-		assertEquals(155, x);
+		Assert.assertEquals(155, x);
 	}
 
 	@Test
 	public void testParseProjectsTotalCount() {
 		String tmp = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><projects type=\"array\" total_count=\"112\" limit=\"25\" offset=\"0\"><project><";
 		int x = RedmineXMLParser.parseObjectsTotalCount(tmp);
-		assertEquals(112, x);
+		Assert.assertEquals(112, x);
 	}
 		
 	
@@ -147,13 +147,13 @@ public class TestRedmineXMLParser {
 			List<Issue> issues = loadRedmine11IssuesXml();
 			Integer issueID = 52;
 			Issue issue52 = RedmineTestUtils.findIssueInList(issues, issueID);
-			assertNotNull(issue52);
+			Assert.assertNotNull(issue52);
 
 			// must be NULL and not "0"
-			assertNull("estimated time must be null",
-					issue52.getEstimatedHours());
+			Assert.assertNull("estimated time must be null",
+                    issue52.getEstimatedHours());
 		} catch (IOException e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 
@@ -168,12 +168,12 @@ public class TestRedmineXMLParser {
 			String nonLatinSymbols = "Example with russian text: Привет";
 			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
 			// must be 1 issue in the file
-			assertTrue(issues.size() == 1);
+			Assert.assertTrue(issues.size() == 1);
 			Issue issue = issues.get(0);
-			assertEquals(nonLatinSymbols, issue.getSubject());
+			Assert.assertEquals(nonLatinSymbols, issue.getSubject());
 
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -183,9 +183,9 @@ public class TestRedmineXMLParser {
 			String text = MyIOUtils
 					.getResourceAsString("invalid_page.txt");
 			RedmineXMLParser.parseIssuesFromXML(text);
-			fail("Must have failed with RuntimeException");
+			Assert.fail("Must have failed with RuntimeException");
 		} catch (IOException e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		} catch (RuntimeException e) {
 			System.out.println("Got expected RuntimeException when parsing invalid xml");
 		}
@@ -196,10 +196,10 @@ public class TestRedmineXMLParser {
 		try {
 			List<Issue> issues = loadRedmine11IssuesXml();
 			Issue issue65 = RedmineTestUtils.findIssueInList(issues, 65);
-			assertTrue(issue65.getDescription().startsWith("This is the description for the new task."));
-			assertTrue(issue65.getDescription().endsWith("This is the last line."));
+			Assert.assertTrue(issue65.getDescription().startsWith("This is the description for the new task."));
+			Assert.assertTrue(issue65.getDescription().endsWith("This is the last line."));
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -213,7 +213,7 @@ public class TestRedmineXMLParser {
 				found = true;
 			}
 		}
-		assertTrue("Admin user must be among all the users", found);
+		Assert.assertTrue("Admin user must be among all the users", found);
 	}
 
 	@Test
@@ -221,16 +221,16 @@ public class TestRedmineXMLParser {
 		List<Issue> objects = loadRedmine11IssuesXml();
 		Integer issueId = 68;
 		Issue issue68 = RedmineTestUtils.findIssueInList(objects, issueId);
-		assertNotNull(issue68);
-		assertEquals(issueId, issue68.getId());
+		Assert.assertNotNull(issue68);
+		Assert.assertEquals(issueId, issue68.getId());
 		Integer statusId = 1;
-		assertEquals(statusId, issue68.getStatusId());
-		assertEquals("New", issue68.getStatusName());
+		Assert.assertEquals(statusId, issue68.getStatusId());
+		Assert.assertEquals("New", issue68.getStatusName());
 		
 		User author = issue68.getAuthor();
-		assertNotNull(author);
+		Assert.assertNotNull(author);
 		Integer userId = 1;
-		assertEquals(userId, author.getId());
+		Assert.assertEquals(userId, author.getId());
 	}
 
 	@Test
@@ -242,7 +242,7 @@ public class TestRedmineXMLParser {
 		}
 		Integer objId = 2;
 		TimeEntry obj2 = RedmineTestUtils.findTimeEntry(objects, objId);
-		assertNotNull(obj2);
+		Assert.assertNotNull(obj2);
 		
 		Integer expectedIssueId = 44;
 		String expectedProjectName = "Permanent test project for Task Adapter";
@@ -253,16 +253,16 @@ public class TestRedmineXMLParser {
 		Integer expectedActivityId = 8;
 		Float expectedHours = 2f;
 		
-		assertEquals(objId, obj2.getId());
-		assertEquals(expectedIssueId, obj2.getIssueId());
-		assertEquals(expectedProjectName, obj2.getProjectName());
-		assertEquals(expectedProjectId, obj2.getProjectId());
-		assertEquals(expectedUserName, obj2.getUserName());
-		assertEquals(expectedUserId, obj2.getUserId());
-		assertEquals(expectedActivityName, obj2.getActivityName());
-		assertEquals(expectedActivityId, obj2.getActivityId());
-		assertEquals(expectedHours, obj2.getHours());
-		assertEquals("spent 2 hours working on ABC", obj2.getComment());
+		Assert.assertEquals(objId, obj2.getId());
+		Assert.assertEquals(expectedIssueId, obj2.getIssueId());
+		Assert.assertEquals(expectedProjectName, obj2.getProjectName());
+		Assert.assertEquals(expectedProjectId, obj2.getProjectId());
+		Assert.assertEquals(expectedUserName, obj2.getUserName());
+		Assert.assertEquals(expectedUserId, obj2.getUserId());
+		Assert.assertEquals(expectedActivityName, obj2.getActivityName());
+		Assert.assertEquals(expectedActivityId, obj2.getActivityId());
+		Assert.assertEquals(expectedHours, obj2.getHours());
+		Assert.assertEquals("spent 2 hours working on ABC", obj2.getComment());
 		
 		MyIOUtils.testLongDate(2011, Calendar.JANUARY, 31, 11, 10, 40, "GMT-8", obj2.getCreatedOn());
 		MyIOUtils.testLongDate(2011, Calendar.JANUARY, 31, 11, 12, 32, "GMT-8", obj2.getUpdatedOn());
@@ -275,8 +275,8 @@ public class TestRedmineXMLParser {
 		final String xml = MyIOUtils
 				.getResourceAsString("chiliproject_2_0_0_issue_with_multiline_description.xml");
 		final Issue issue = RedmineXMLParser.parseIssueFromXML(xml);
-		assertEquals("This is a description \nwith more than \n\n\none line.",
-				issue.getDescription());
+		Assert.assertEquals("This is a description \nwith more than \n\n\none line.",
+                issue.getDescription());
 	}
 
 	@Test

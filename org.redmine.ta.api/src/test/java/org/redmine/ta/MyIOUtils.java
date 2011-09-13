@@ -1,5 +1,7 @@
 package org.redmine.ta;
 
+import org.junit.Assert;
+
 import static org.junit.Assert.assertEquals;
 
 import java.io.BufferedReader;
@@ -111,7 +113,7 @@ public class MyIOUtils {
 			c.setTimeZone(TimeZone.getTimeZone(timeZone));
 		}
 		Date actualDate = c.getTime();
-		assertEquals("Checking date", actualDate, expectedDate);
+		Assert.assertEquals("Checking date", actualDate, expectedDate);
 	}
 
 	public static void testShortDate(int year, int month, int day, Date expectedDate){
