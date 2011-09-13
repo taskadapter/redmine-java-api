@@ -13,11 +13,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
@@ -53,7 +49,7 @@ public class RedmineManagerTest {
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail("can't create a test project" + e.getMessage());
+			Assert.fail("can't create a test project" + e.getMessage());
 		}
 	}
 
@@ -65,8 +61,8 @@ public class RedmineManagerTest {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail("can't delete the test project '" + projectKey + ". reason: "
-					+ e.getMessage());
+			Assert.fail("can't delete the test project '" + projectKey + ". reason: "
+                    + e.getMessage());
 		}
 	}
       
@@ -107,51 +103,51 @@ public class RedmineManagerTest {
 
 			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 //			System.out.println("created: " + newIssue);
-			assertNotNull("Checking returned result", newIssue);
-			assertNotNull("New issue must have some ID", newIssue.getId());
+			Assert.assertNotNull("Checking returned result", newIssue);
+			Assert.assertNotNull("New issue must have some ID", newIssue.getId());
 
 			// check startDate
 			Calendar returnedStartCal = Calendar.getInstance();
 			returnedStartCal.setTime(newIssue.getStartDate());
 			
-			assertEquals(startCal.get(Calendar.YEAR), returnedStartCal.get(Calendar.YEAR));
-			assertEquals(startCal.get(Calendar.MONTH), returnedStartCal.get(Calendar.MONTH));
-			assertEquals(startCal.get(Calendar.DAY_OF_MONTH), returnedStartCal.get(Calendar.DAY_OF_MONTH));
+			Assert.assertEquals(startCal.get(Calendar.YEAR), returnedStartCal.get(Calendar.YEAR));
+			Assert.assertEquals(startCal.get(Calendar.MONTH), returnedStartCal.get(Calendar.MONTH));
+			Assert.assertEquals(startCal.get(Calendar.DAY_OF_MONTH), returnedStartCal.get(Calendar.DAY_OF_MONTH));
 
 			// check dueDate
 			Calendar returnedDueCal = Calendar.getInstance();
 			returnedDueCal.setTime(newIssue.getDueDate());
 			
-			assertEquals(due.get(Calendar.YEAR), returnedDueCal.get(Calendar.YEAR));
-			assertEquals(due.get(Calendar.MONTH), returnedDueCal.get(Calendar.MONTH));
-			assertEquals(due.get(Calendar.DAY_OF_MONTH), returnedDueCal.get(Calendar.DAY_OF_MONTH));
+			Assert.assertEquals(due.get(Calendar.YEAR), returnedDueCal.get(Calendar.YEAR));
+			Assert.assertEquals(due.get(Calendar.MONTH), returnedDueCal.get(Calendar.MONTH));
+			Assert.assertEquals(due.get(Calendar.DAY_OF_MONTH), returnedDueCal.get(Calendar.DAY_OF_MONTH));
 			
 			// check ASSIGNEE
 			User actualAssignee = newIssue.getAssignee();
-			assertNotNull("Checking assignee not null", actualAssignee);
-			assertEquals("Checking assignee id", assignee.getId(),
-					actualAssignee.getId());
+			Assert.assertNotNull("Checking assignee not null", actualAssignee);
+			Assert.assertEquals("Checking assignee id", assignee.getId(),
+                    actualAssignee.getId());
 			
 			// check AUTHOR
 			Integer EXPECTED_AUTHOR_ID  = getOurUser().getId();
-			assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
+			Assert.assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
 
 			// check ESTIMATED TIME
-			assertEquals((Float) estimatedHours, newIssue.getEstimatedHours());
+			Assert.assertEquals((Float) estimatedHours, newIssue.getEstimatedHours());
 			
 			// check multi-line DESCRIPTION
 			String regexpStripExtra = "\\r|\\n|\\s";
 			description = description.replaceAll(regexpStripExtra, "");
 			String actualDescription = newIssue.getDescription();
 			actualDescription = actualDescription.replaceAll(regexpStripExtra, "");
-			assertEquals(description, actualDescription);
+			Assert.assertEquals(description, actualDescription);
 			
 			// PRIORITY
-			assertNotNull(newIssue.getPriorityId());
-			assertTrue(newIssue.getPriorityId()>0);
+			Assert.assertNotNull(newIssue.getPriorityId());
+			Assert.assertTrue(newIssue.getPriorityId() > 0);
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -163,9 +159,9 @@ public class RedmineManagerTest {
 			Issue newParentIssue = mgr.createIssue(projectKey, parentIssue);
 			System.out.println("created parent: " + newParentIssue);
 
-			assertNotNull("Checking parent was created", newParentIssue);
-			assertNotNull("Checking ID of parent issue is not null",
-					newParentIssue.getId());
+			Assert.assertNotNull("Checking parent was created", newParentIssue);
+			Assert.assertNotNull("Checking ID of parent issue is not null",
+                    newParentIssue.getId());
 
 			// Integer parentId = 46;
 			Integer parentId = newParentIssue.getId();
@@ -177,12 +173,12 @@ public class RedmineManagerTest {
 			Issue newChildIssue = mgr.createIssue(projectKey, childIssue);
 			System.out.println("created child: " + newChildIssue);
 
-			assertEquals("Checking parent ID of the child issue", parentId,
-					newChildIssue.getParentId());
+			Assert.assertEquals("Checking parent ID of the child issue", parentId,
+                    newChildIssue.getParentId());
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -197,20 +193,20 @@ public class RedmineManagerTest {
 
 			Issue newIssue = mgr.createIssue(projectKey, issue);
 			System.out.println("created: " + newIssue);
-			assertNotNull("Checking returned result", newIssue);
-			assertNotNull("New issue must have some ID", newIssue.getId());
+			Assert.assertNotNull("Checking returned result", newIssue);
+			Assert.assertNotNull("New issue must have some ID", newIssue.getId());
 
 			// try to find the issue
 			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey,
 					summary);
 
-			assertNotNull("Checking if search results is not NULL", foundIssues);
-			assertTrue("Search results must be not empty",
-					!(foundIssues.isEmpty()));
+			Assert.assertNotNull("Checking if search results is not NULL", foundIssues);
+			Assert.assertTrue("Search results must be not empty",
+                    !(foundIssues.isEmpty()));
 			
 			Issue loadedIssue1 = RedmineTestUtils.findIssueInList(foundIssues, newIssue.getId());
-			assertNotNull(loadedIssue1);
-			assertEquals(summary, loadedIssue1.getSubject());
+			Assert.assertNotNull(loadedIssue1);
+			Assert.assertEquals(summary, loadedIssue1.getSubject());
 			
 			// User actualAssignee = newIssue.getAssignee();
 
@@ -222,7 +218,7 @@ public class RedmineManagerTest {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -233,12 +229,12 @@ public class RedmineManagerTest {
 			// try to find the issue
 			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey,
 					summary);
-			assertNotNull("Search result must be not null", foundIssues);
-			assertTrue("Search result list must be empty",
-					foundIssues.isEmpty());
+			Assert.assertNotNull("Search result must be not null", foundIssues);
+			Assert.assertTrue("Search result list must be empty",
+                    foundIssues.isEmpty());
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -260,11 +256,11 @@ public class RedmineManagerTest {
 	public void testNULLHostParameter() throws RuntimeException {
 		try {
 			new RedmineManager(null, null); 
-			fail("Must have failed with IllegalArgumentException");
+			Assert.fail("Must have failed with IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			System.out.println("Got expected IllegalArgumentException.");
 		} catch (Exception e) {
-			fail("Got unexpected exception : " + e);
+			Assert.fail("Got unexpected exception : " + e);
 		}
 		
 	}
@@ -273,11 +269,11 @@ public class RedmineManagerTest {
 	public void testEmptyHostParameter() throws RuntimeException {
 		try {
 			new RedmineManager("", null); 
-			fail("Must have failed with IllegalArgumentException");
+			Assert.fail("Must have failed with IllegalArgumentException");
 		} catch (IllegalArgumentException e) {
 			System.out.println("Got expected IllegalArgumentException.");
 		} catch (Exception e) {
-			fail("Got unexpected exception : " + e);
+			Assert.fail("Got unexpected exception : " + e);
 		}
 		
 	}
@@ -292,22 +288,22 @@ public class RedmineManagerTest {
 		issue.setSubject("test zzx");
 		try {
 			redmineMgrEmpty.createIssue(projectKey, issue);
-			fail("Must have failed with '401 Not authorized'");
+			Assert.fail("Must have failed with '401 Not authorized'");
 		} catch (AuthenticationException e) {
 			System.out.println("Got expected AuthenticationException.");
 		} catch (Exception e) {
-			fail("Got unexpected exception : " + e);
+			Assert.fail("Got unexpected exception : " + e);
 		}
 		
 		// set invalid API access key
 		RedmineManager redmineMgrInvalidKey = new RedmineManager(Config.getURI(), "wrong_key");
 		try {
 			redmineMgrInvalidKey.createIssue(projectKey, issue);
-			fail("Must have failed with '401 Not authorized'");
+			Assert.fail("Must have failed with '401 Not authorized'");
 		} catch (AuthenticationException e) {
 			System.out.println("Got expected AuthenticationException.");
 		} catch (Exception e) {
-			fail("Got unexpected exception : " + e);
+			Assert.fail("Got unexpected exception : " + e);
 		}
 
 	}
@@ -327,12 +323,12 @@ public class RedmineManagerTest {
 
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
 
-			assertEquals(
-					"Checking if 'update issue' operation changed the 'subject' field",
-					changedSubject, reloadedFromRedmineIssue.getSubject());
+			Assert.assertEquals(
+                    "Checking if 'update issue' operation changed the 'subject' field",
+                    changedSubject, reloadedFromRedmineIssue.getSubject());
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -347,13 +343,13 @@ public class RedmineManagerTest {
 
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
 
-			assertEquals(
-					"Checking if 'get issue by ID' operation returned issue with same 'subject' field",
-					originalSubject, reloadedFromRedmineIssue.getSubject());
+			Assert.assertEquals(
+                    "Checking if 'get issue by ID' operation returned issue with same 'subject' field",
+                    originalSubject, reloadedFromRedmineIssue.getSubject());
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 	
@@ -361,7 +357,7 @@ public class RedmineManagerTest {
 	public void testGetProjects() {
 		try {
 			List<Project> projects = mgr.getProjects();
-			assertTrue(projects.size()>0);
+			Assert.assertTrue(projects.size() > 0);
 			boolean found = false;
 			for (Project project : projects) {
 				if (project.getIdentifier().equals(projectKey)) {
@@ -370,11 +366,11 @@ public class RedmineManagerTest {
 				}
 			}
 			if (!found) {
-				fail("Our project with key '" + projectKey+"' is not found on the server");
+				Assert.fail("Our project with key '" + projectKey + "' is not found on the server");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -388,7 +384,7 @@ public class RedmineManagerTest {
 
 			List<Issue> issues = mgr.getIssues(projectKey, null);
 			System.out.println("getIssues() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
-			assertTrue(issues.size()>0);
+			Assert.assertTrue(issues.size() > 0);
 			boolean found = false;
 			for (Issue issue : issues) {
 				if (issue.getId().equals(newIssue.getId())) {
@@ -397,12 +393,12 @@ public class RedmineManagerTest {
 				}
 			}
 			if (!found) {
-				fail("getIssues() didn't return the issue we just created. The query "
-					+ " must have returned all issues created during the last 2 days");
+				Assert.fail("getIssues() didn't return the issue we just created. The query "
+                        + " must have returned all issues created during the last 2 days");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -411,11 +407,11 @@ public class RedmineManagerTest {
 		try {
 			Integer invalidQueryId = 9999999;
 			mgr.getIssues(projectKey, invalidQueryId);
-			fail("Must have failed with NotFoundException because query ID is invalid");
+			Assert.fail("Must have failed with NotFoundException because query ID is invalid");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException:" + e.getMessage());
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -427,18 +423,18 @@ public class RedmineManagerTest {
 			Project createdProject = mgr.createProject(projectToCreate);
 			key = createdProject.getIdentifier();
 			
-			assertNotNull("checking that a non-null project is returned", createdProject);
+			Assert.assertNotNull("checking that a non-null project is returned", createdProject);
 			
-			assertEquals(projectToCreate.getIdentifier(), createdProject.getIdentifier());
-			assertEquals(projectToCreate.getName(), createdProject.getName());
-			assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
-			assertEquals(projectToCreate.getHomepage(), createdProject.getHomepage());
+			Assert.assertEquals(projectToCreate.getIdentifier(), createdProject.getIdentifier());
+			Assert.assertEquals(projectToCreate.getName(), createdProject.getName());
+			Assert.assertEquals(projectToCreate.getDescription(), createdProject.getDescription());
+			Assert.assertEquals(projectToCreate.getHomepage(), createdProject.getHomepage());
 			
 			List<Tracker> trackers = createdProject.getTrackers();
-			assertNotNull("checking that project has some trackers", trackers);
-			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
+			Assert.assertNotNull("checking that project has some trackers", trackers);
+			Assert.assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		} finally {
 			if (key != null) {
 				mgr.deleteProject(key);
@@ -463,18 +459,18 @@ public class RedmineManagerTest {
 			mgr.updateProject(createdProject);
 			
 			Project updatedProject = mgr.getProjectByKey(key);
-			assertNotNull(updatedProject);
+			Assert.assertNotNull(updatedProject);
 			
-			assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
-			assertEquals(newName, updatedProject.getName());
-			assertEquals(newDescr, updatedProject.getDescription());
+			Assert.assertEquals(createdProject.getIdentifier(), updatedProject.getIdentifier());
+			Assert.assertEquals(newName, updatedProject.getName());
+			Assert.assertEquals(newDescr, updatedProject.getDescription());
 			List<Tracker> trackers = updatedProject.getTrackers();
-			assertNotNull("checking that project has some trackers", trackers);
-			assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
+			Assert.assertNotNull("checking that project has some trackers", trackers);
+			Assert.assertTrue("checking that project has some trackers", !(trackers.isEmpty()));
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		} finally {
 			if (key != null) {
 				mgr.deleteProject(key);
@@ -495,9 +491,9 @@ public class RedmineManagerTest {
 			key = createdProject.getIdentifier();
 			
 		} catch (RedmineException e) {
-			assertNotNull(e.getErrors());
-			assertEquals(1, e.getErrors().size());
-			assertEquals("Identifier is reserved", e.getErrors().get(0)); 
+			Assert.assertNotNull(e.getErrors());
+			Assert.assertEquals(1, e.getErrors().size());
+			Assert.assertEquals("Identifier is reserved", e.getErrors().get(0));
 		} finally {
 			if (key != null) {
 				mgr.deleteProject(key);
@@ -521,13 +517,13 @@ public class RedmineManagerTest {
 	@Test
 	public void testCreateIssueNonUnicodeSymbols() {
 		try {
-			String nonLatinSymbols = "Example with accents Ação";
+			String nonLatinSymbols = "Example with accents Aï¿½ï¿½o";
 			Issue toCreate = new Issue();
 			toCreate.setSubject(nonLatinSymbols);
 			Issue created = mgr.createIssue(projectKey, toCreate);
-			assertEquals(nonLatinSymbols, created.getSubject());
+			Assert.assertEquals(nonLatinSymbols, created.getSubject());
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -538,16 +534,16 @@ public class RedmineManagerTest {
 			issueToCreate.setSubject("This is the summary line 123");
 
 			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
-			assertNotNull("Checking returned result", newIssue);
-			assertNotNull("New issue must have some ID", newIssue.getId());
+			Assert.assertNotNull("Checking returned result", newIssue);
+			Assert.assertNotNull("New issue must have some ID", newIssue.getId());
 
 			// check AUTHOR
 			Integer EXPECTED_AUTHOR_ID  = getOurUser().getId();
-			assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
+			Assert.assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -559,11 +555,11 @@ public class RedmineManagerTest {
 			String invalidProjectKey = "someNotExistingProjectKey";
 			mgr.createIssue(invalidProjectKey, issueToCreate);
 			
-			fail("Must have failed with NotFoundException because we provided invalid project key.");
+			Assert.fail("Must have failed with NotFoundException because we provided invalid project key.");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException: " + e.getMessage());
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -571,11 +567,11 @@ public class RedmineManagerTest {
 	public void testGetProjectNonExistingId() {
 		try {
 			mgr.getProjectByKey("some-non-existing-key");
-			fail("Must have failed with NotFoundException");
+			Assert.fail("Must have failed with NotFoundException");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -583,11 +579,11 @@ public class RedmineManagerTest {
 	public void testDeleteNonExistingProject() {
 		try {
 			mgr.deleteProject("some-non-existing-key");
-			fail("Must have failed with NotFoundException");
+			Assert.fail("Must have failed with NotFoundException");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
@@ -596,11 +592,11 @@ public class RedmineManagerTest {
 		try {
 			int someNonExistingID = 999999;
 			mgr.getIssueById(someNonExistingID);
-			fail("Must have failed with NotFoundException.");
+			Assert.fail("Must have failed with NotFoundException.");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -611,11 +607,11 @@ public class RedmineManagerTest {
 			Issue issue = new Issue();
 			issue.setId(nonExistingId);
 			mgr.updateIssue(issue);
-			fail("Must have failed with NotFoundException because we provided invalid issue ID.");
+			Assert.fail("Must have failed with NotFoundException because we provided invalid issue ID.");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException.");
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -624,7 +620,7 @@ public class RedmineManagerTest {
 	public void testGetUsers() {
 		try {
 			List<User> users = mgr.getUsers();
-			assertTrue(users.size()>0);
+			Assert.assertTrue(users.size() > 0);
 //			boolean found = false;
 //			for (Project project : projects) {
 //				if (project.getIdentifier().equals(projectKey)) {
@@ -637,29 +633,29 @@ public class RedmineManagerTest {
 //			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 	
 	@Test
 	public void testGetCurrentUser() throws IOException, AuthenticationException, RedmineException {
 		User currentUser = mgr.getCurrentUser();
-		assertEquals(getOurUser().getId(), currentUser.getId());
-		assertEquals(getOurUser().getLogin(), currentUser.getLogin());
+		Assert.assertEquals(getOurUser().getId(), currentUser.getId());
+		Assert.assertEquals(getOurUser().getLogin(), currentUser.getLogin());
 	}
 	
 	@Test
 	public void testGetUserById() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		User loadedUser = mgr.getUserById(getOurUser().getId());
-		assertEquals(getOurUser().getId(), loadedUser.getId());
-		assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
+		Assert.assertEquals(getOurUser().getId(), loadedUser.getId());
+		Assert.assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
 	}
 	
 	@Test
 	public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException {
 		try {
 			mgr.getUserById(999999);
-			fail("Must have failed above");
+			Assert.fail("Must have failed above");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException");
 		}
@@ -671,16 +667,16 @@ public class RedmineManagerTest {
 			User userToCreate = generateRandomUser();
 			User createdUser = mgr.createUser(userToCreate );
 			
-			assertNotNull("checking that a non-null project is returned", createdUser);
+			Assert.assertNotNull("checking that a non-null project is returned", createdUser);
 			
-			assertEquals(userToCreate.getLogin(), createdUser.getLogin());
-			assertEquals(userToCreate.getFirstName(), createdUser.getFirstName());
-			assertEquals(userToCreate.getLastName(), createdUser.getLastName());
+			Assert.assertEquals(userToCreate.getLogin(), createdUser.getLogin());
+			Assert.assertEquals(userToCreate.getFirstName(), createdUser.getFirstName());
+			Assert.assertEquals(userToCreate.getLastName(), createdUser.getLastName());
 			Integer id = createdUser.getId();
-			assertNotNull(id);
+			Assert.assertNotNull(id);
 			
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		} 
 	}
 
@@ -707,7 +703,7 @@ public class RedmineManagerTest {
 		try {
 			User createdUser = mgr.createUser(userToCreate);
 			Integer userId = createdUser.getId();
-			assertNotNull("checking that a non-null project is returned", createdUser);
+			Assert.assertNotNull("checking that a non-null project is returned", createdUser);
 			
 			String newFirstName = "fnameNEW";
 			String newLastName = "lnameNEW";
@@ -720,13 +716,13 @@ public class RedmineManagerTest {
 			
 			User updatedUser = mgr.getUserById(userId);
 			
-			assertEquals(newFirstName, updatedUser.getFirstName());
-			assertEquals(newLastName, updatedUser.getLastName());
-			assertEquals(newMail, updatedUser.getMail());
-			assertEquals(userId, updatedUser.getId());
+			Assert.assertEquals(newFirstName, updatedUser.getFirstName());
+			Assert.assertEquals(newLastName, updatedUser.getLastName());
+			Assert.assertEquals(newMail, updatedUser.getMail());
+			Assert.assertEquals(userId, updatedUser.getId());
 			
 		} catch (Exception e) {
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		} 
 	}
 
@@ -739,10 +735,10 @@ public class RedmineManagerTest {
 //			mgr.setObjectsPerPage(5); <-- does not work now
 			List<Issue> issues = mgr.getIssues(projectKey, null);
 			System.out.println("testGetIssuesPaging() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
-			assertTrue(issues.size()>26);
+			Assert.assertTrue(issues.size() > 26);
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 
@@ -775,10 +771,10 @@ public class RedmineManagerTest {
 		List<Project> projects = createProjects(NUM);
 		
 		List<Project> loadedProjects = mgr.getProjects();
-		assertTrue(
-				"Number of projects loaded from the server must be bigger than "
-						+ NUM + ", but it's " + loadedProjects.size(),
-				loadedProjects.size() > NUM);
+		Assert.assertTrue(
+                "Number of projects loaded from the server must be bigger than "
+                        + NUM + ", but it's " + loadedProjects.size(),
+                loadedProjects.size() > NUM);
 		
 		deleteProjects(projects);
 	}
@@ -802,7 +798,7 @@ public class RedmineManagerTest {
 	@Test
 	public void testGetTimeEntries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 			List<TimeEntry> list = mgr.getTimeEntries();
-			assertNotNull(list);
+			Assert.assertNotNull(list);
 //			boolean found = false;
 //			for (Project project : projects) {
 //				if (project.getIdentifier().equals(projectKey)) {
@@ -829,9 +825,9 @@ public class RedmineManagerTest {
 		entry.setActivityId(ACTIVITY_ID);
 		TimeEntry createdEntry = mgr.createTimeEntry(entry);
 
-		assertNotNull(createdEntry);
+		Assert.assertNotNull(createdEntry);
 		System.out.println(createdEntry);
-		assertEquals(hours, createdEntry.getHours());
+		Assert.assertEquals(hours, createdEntry.getHours());
 		
 		Float newHours = 22f;
 		createdEntry.setHours(newHours);
@@ -839,7 +835,7 @@ public class RedmineManagerTest {
 		mgr.updateTimeEntry(createdEntry);
 		
 		TimeEntry updatedEntry = mgr.getTimeEntry(createdEntry.getId());
-		assertEquals(newHours, updatedEntry.getHours());
+		Assert.assertEquals(newHours, updatedEntry.getHours());
 	}
 	
 	@Test
@@ -853,12 +849,12 @@ public class RedmineManagerTest {
 		entry.setIssueId(issueId);
 		entry.setActivityId(ACTIVITY_ID);
 		TimeEntry createdEntry = mgr.createTimeEntry(entry);
-		assertNotNull(createdEntry);
+		Assert.assertNotNull(createdEntry);
 		
 		mgr.deleteTimeEntry(createdEntry.getId());
 		try {
 			mgr.getTimeEntry(createdEntry.getId());
-			fail("Must have failed with NotFoundException");
+			Assert.fail("Must have failed with NotFoundException");
 		} catch (NotFoundException e) {
 			System.out.println("Got expected NotFoundException when loading TimeEntry with non-existing id");
 		}
@@ -873,16 +869,16 @@ public class RedmineManagerTest {
 		Float totalHoursExpected = hours1 + hours2; 
 		TimeEntry createdEntry1 = createTimeEntry(issueId, hours1);
 		TimeEntry createdEntry2 = createTimeEntry(issueId, hours2);
-		assertNotNull(createdEntry1);
-		assertNotNull(createdEntry2);
+		Assert.assertNotNull(createdEntry1);
+		Assert.assertNotNull(createdEntry2);
 		
 		List<TimeEntry> entries = mgr.getTimeEntriesForIssue(issueId);
-		assertEquals(2, entries.size());
+		Assert.assertEquals(2, entries.size());
 		Float totalTime = 0f;
 		for (TimeEntry timeEntry : entries) {
 			totalTime += timeEntry.getHours();
 		}
-		assertEquals(totalHoursExpected, totalTime);
+		Assert.assertEquals(totalHoursExpected, totalTime);
 	}
 
 	private TimeEntry createTimeEntry(Integer issueId, float hours) throws IOException,
@@ -900,12 +896,12 @@ public class RedmineManagerTest {
 			NotFoundException, RedmineException {
 		Issue issue = createIssues(1).get(0);
 		Issue retrievedIssue = mgr.getIssueById(issue.getId());
-		assertEquals(issue, retrievedIssue);
+		Assert.assertEquals(issue, retrievedIssue);
 
 		mgr.deleteIssue(issue.getId());
 		try {
 			mgr.getIssueById(issue.getId());
-			fail("Must have failed with NotFoundException");
+			Assert.fail("Must have failed with NotFoundException");
 		} catch (NotFoundException ignore) {
 			System.out.println("Got expected NotFoundException for deleted Issue");
 		}
@@ -921,8 +917,8 @@ public class RedmineManagerTest {
 		mgr.updateIssue(issue);
 
 		Issue updatedIssue = mgr.getIssueById(issue.getId());
-		assertEquals(newSubject, updatedIssue.getSubject());
-		assertEquals(newDescription, updatedIssue.getDescription());
+		Assert.assertEquals(newSubject, updatedIssue.getSubject());
+		Assert.assertEquals(newDescription, updatedIssue.getDescription());
 	}
 
 	/**
@@ -933,7 +929,7 @@ public class RedmineManagerTest {
 	public void testCustomFields() throws Exception {
 		Issue issue = createIssues(1).get(0);
 		// default empty values
-		assertEquals(2, issue.getCustomFields().size());
+		Assert.assertEquals(2, issue.getCustomFields().size());
 
 		// TODO update this!
 		int id1 = 1; // TODO this is pretty much a hack, we don't generally know these ids!
@@ -951,9 +947,9 @@ public class RedmineManagerTest {
 		mgr.updateIssue(issue);
 
 		Issue updatedIssue = mgr.getIssueById(issue.getId());
-		assertEquals(2, updatedIssue.getCustomFields().size());
-		assertEquals(custom1Value, updatedIssue.getCustomField(custom1FieldName));
-		assertEquals(custom2Value, updatedIssue.getCustomField(custom2FieldName));
+		Assert.assertEquals(2, updatedIssue.getCustomFields().size());
+		Assert.assertEquals(custom1Value, updatedIssue.getCustomField(custom1FieldName));
+		Assert.assertEquals(custom2Value, updatedIssue.getCustomField(custom2FieldName));
 	}
 
 	@Test
@@ -964,14 +960,14 @@ public class RedmineManagerTest {
 			issue.setSubject(originalSubject);
 
 			Issue newIssue = mgr.createIssue(projectKey, issue);
-			assertEquals("Estimated hours must be NULL", null, newIssue.getEstimatedHours());
+			Assert.assertEquals("Estimated hours must be NULL", null, newIssue.getEstimatedHours());
 			
 			mgr.updateIssue(newIssue);
 
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
-			assertEquals("Estimated hours must be NULL", null, reloadedFromRedmineIssue.getEstimatedHours());
+			Assert.assertEquals("Estimated hours must be NULL", null, reloadedFromRedmineIssue.getEstimatedHours());
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		}
 	}
 	
@@ -985,16 +981,16 @@ public class RedmineManagerTest {
 			createdMainProject = createProject();			
 			Project subProject = createSubProject(createdMainProject);
 			
-			assertEquals("Must have correct parent ID",
-					createdMainProject.getId(), subProject.getParentId());
+			Assert.assertEquals("Must have correct parent ID",
+                    createdMainProject.getId(), subProject.getParentId());
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		} finally {
 			if (createdMainProject != null) {
 				try {
 					mgr.deleteProject(createdMainProject.getIdentifier());
 				} catch (Exception e) {
-					fail();
+					Assert.fail();
 				}
 			}
 		}
@@ -1026,32 +1022,32 @@ public class RedmineManagerTest {
 			issue.setSubject(subject);
 
 			Issue createdIssue = mgr.createIssue(projectKey, issue);
-			assertEquals("Initial 'done ratio' must be 0", (Integer) 0, createdIssue.getDoneRatio());
+			Assert.assertEquals("Initial 'done ratio' must be 0", (Integer) 0, createdIssue.getDoneRatio());
 			Integer doneRatio = 50;
 			createdIssue.setDoneRatio(doneRatio);
 			mgr.updateIssue(createdIssue);
 
 			Integer issueId = createdIssue.getId();
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(issueId);
-			assertEquals(
-					"Checking if 'update issue' operation changed 'done ratio' field",
-					doneRatio, reloadedFromRedmineIssue.getDoneRatio());
+			Assert.assertEquals(
+                    "Checking if 'update issue' operation changed 'done ratio' field",
+                    doneRatio, reloadedFromRedmineIssue.getDoneRatio());
 
 			Integer invalidDoneRatio = 130;
 			reloadedFromRedmineIssue.setDoneRatio(invalidDoneRatio);
 			try {
 				mgr.updateIssue(reloadedFromRedmineIssue);
 			} catch (RedmineException e) {
-				assertEquals("Must be 1 error", 1, e.getErrors().size());
-				assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0).toString());
+				Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
+				Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0).toString());
 			}
 
 			Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
-			assertEquals(
-					"'done ratio' must have remained unchanged after invalid value",
-					doneRatio, reloadedFromRedmineIssueUnchanged.getDoneRatio());
+			Assert.assertEquals(
+                    "'done ratio' must have remained unchanged after invalid value",
+                    doneRatio, reloadedFromRedmineIssueUnchanged.getDoneRatio());
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		}
 	}
 
@@ -1066,26 +1062,26 @@ public class RedmineManagerTest {
 			
 
 			Issue createdIssue = mgr.createIssue(projectKey, issue);
-			assertEquals("Checking description", descr, createdIssue.getDescription());
+			Assert.assertEquals("Checking description", descr, createdIssue.getDescription());
 			
 			createdIssue.setDescription(null);
 			mgr.updateIssue(createdIssue);
 
 			Integer issueId = createdIssue.getId();
 			Issue reloadedFromRedmineIssue = mgr.getIssueById(issueId);
-			assertEquals(
-					"Description must not be erased",
-					descr, reloadedFromRedmineIssue.getDescription());
+			Assert.assertEquals(
+                    "Description must not be erased",
+                    descr, reloadedFromRedmineIssue.getDescription());
 
 			reloadedFromRedmineIssue.setDescription("");
 			mgr.updateIssue(reloadedFromRedmineIssue);
 
 			Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
-			assertEquals(
-					"Description must be erased",
-					"", reloadedFromRedmineIssueUnchanged.getDescription());
+			Assert.assertEquals(
+                    "Description must be erased",
+                    "", reloadedFromRedmineIssueUnchanged.getDescription());
 		} catch (Exception e) {
-			fail();
+			Assert.fail();
 		}
 	}
 	
@@ -1098,7 +1094,7 @@ public class RedmineManagerTest {
 			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 
 			Issue loadedIssueWithJournals = mgr.getIssueById(newIssue.getId(), INCLUDE.journals);
-			assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
+			Assert.assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
 			
 			String commentDescribingTheUpdate = "some comment describing the issue update"; 
 			loadedIssueWithJournals.setSubject("new subject");
@@ -1106,22 +1102,22 @@ public class RedmineManagerTest {
 			mgr.updateIssue(loadedIssueWithJournals);
 			
 			Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(), INCLUDE.journals);
-			assertEquals(1, loadedIssueWithJournals2.getJournals().size());
+			Assert.assertEquals(1, loadedIssueWithJournals2.getJournals().size());
 			
 			Journal journalItem = loadedIssueWithJournals2.getJournals().get(0);
-			assertEquals(commentDescribingTheUpdate, journalItem.getNotes());
+			Assert.assertEquals(commentDescribingTheUpdate, journalItem.getNotes());
 			User ourUser = getOurUser();
 			// can't compare User objects because either of them is not completely filled
-			assertEquals(ourUser.getId(), journalItem.getUser().getId());
-			assertEquals(ourUser.getFirstName(), journalItem.getUser().getFirstName());
-			assertEquals(ourUser.getLastName(), journalItem.getUser().getLastName());
+			Assert.assertEquals(ourUser.getId(), journalItem.getUser().getId());
+			Assert.assertEquals(ourUser.getFirstName(), journalItem.getUser().getFirstName());
+			Assert.assertEquals(ourUser.getLastName(), journalItem.getUser().getLastName());
 
 			Issue loadedIssueWithoutJournals = mgr.getIssueById(newIssue.getId());
-			assertTrue(loadedIssueWithoutJournals.getJournals().isEmpty());
+			Assert.assertTrue(loadedIssueWithoutJournals.getJournals().isEmpty());
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 
@@ -1135,10 +1131,10 @@ public class RedmineManagerTest {
 			String relationText = IssueRelation.TYPE.precedes.toString();
 			IssueRelation r = mgr.createRelation(projectKey, src.getId(), target.getId(), relationText);
 //			assertEquals(src.getId(), r.getIssueId());
-			assertEquals(target.getId(), r.getIssueToId());
-			assertEquals(relationText, r.getType());
+			Assert.assertEquals(target.getId(), r.getIssueToId());
+			Assert.assertEquals(relationText, r.getType());
 		} catch (Exception e) {
-			fail(e.toString());
+			Assert.fail(e.toString());
 		}
 	}
 
@@ -1159,20 +1155,20 @@ public class RedmineManagerTest {
 			Issue issue = mgr.getIssueById(relation.getIssueId(), INCLUDE.relations);
 			Issue issueTarget = mgr.getIssueById(relation.getIssueToId(), INCLUDE.relations);
 			
-			assertEquals(1, issue.getRelations().size());
-			assertEquals(1, issueTarget.getRelations().size());
+			Assert.assertEquals(1, issue.getRelations().size());
+			Assert.assertEquals(1, issueTarget.getRelations().size());
 			
 			IssueRelation relation1 = issue.getRelations().get(0);
 //			assertEquals(issue.getId(), relation1.getIssueId());
-			assertEquals(issue.getId(), relation1.getIssueToId());
-			assertEquals("precedes", relation1.getType());
-			assertEquals((Integer) 0, relation1.getDelay());
+			Assert.assertEquals(issue.getId(), relation1.getIssueToId());
+			Assert.assertEquals("precedes", relation1.getType());
+			Assert.assertEquals((Integer) 0, relation1.getDelay());
 
 			IssueRelation reverseRelation = issueTarget.getRelations().get(0);
 			// both forward and reverse relations are the same!
-			assertEquals(relation1, reverseRelation);
+			Assert.assertEquals(relation1, reverseRelation);
 		} catch (Exception e) {
-			fail(e.toString());
+			Assert.fail(e.toString());
 		}
 	}
 
@@ -1193,8 +1189,8 @@ public class RedmineManagerTest {
 		toCreate.setTargetVersion(v);
 		Issue createdIssue = mgr.createIssue(existingProjectKey, toCreate);
 
-		assertNotNull(createdIssue.getTargetVersion());
-		assertEquals(createdIssue.getTargetVersion().getName(), versionName);
+		Assert.assertNotNull(createdIssue.getTargetVersion());
+		Assert.assertEquals(createdIssue.getTargetVersion().getName(), versionName);
 	}
 
 	// Redmine ignores this parameter for "get projects" request. see bug http://www.redmine.org/issues/8545
@@ -1203,16 +1199,16 @@ public class RedmineManagerTest {
 	public void testGetProjectsIncludesTrackers() {
 		try {
 			List<Project> projects = mgr.getProjects();
-			assertTrue(projects.size()>0);
+			Assert.assertTrue(projects.size() > 0);
 			Project p1 = projects.get(0);
-			assertNotNull(p1.getTrackers());
+			Assert.assertNotNull(p1.getTrackers());
 			// XXX there could be a case when a project does not have any trackers
 			// need to create a project with some trackers to make this test deterministic
-			assertTrue(! p1.getTrackers().isEmpty());
+			Assert.assertTrue(!p1.getTrackers().isEmpty());
 			System.out.println(p1.getTrackers());
 		} catch (Exception e) {
 			e.printStackTrace();
-			fail(e.getMessage());
+			Assert.fail(e.getMessage());
 		}
 	}
 

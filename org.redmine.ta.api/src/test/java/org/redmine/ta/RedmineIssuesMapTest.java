@@ -4,11 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.junit.Assert;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.User;
@@ -39,12 +39,12 @@ public class RedmineIssuesMapTest {
 	
 	@Test
 	public void testAllIssuesAreLoadedToList() {
-		assertEquals("There must be " + FILE_1_REQUIRED_ISSUES_NUMBER + " issues loaded to the list.", FILE_1_REQUIRED_ISSUES_NUMBER, issuesList.size());
+		Assert.assertEquals("There must be " + FILE_1_REQUIRED_ISSUES_NUMBER + " issues loaded to the list.", FILE_1_REQUIRED_ISSUES_NUMBER, issuesList.size());
 	}
 
 	@Test
 	public void testMapHasSameSizeAsList() {
-		assertEquals("There must be equal number of issues in map and list", issuesList.size(), issuesMap.size());
+		Assert.assertEquals("There must be equal number of issues in map and list", issuesList.size(), issuesMap.size());
 	}
 	
 	@Test
@@ -59,13 +59,13 @@ public class RedmineIssuesMapTest {
 				break;
 			}
 		}
-		assertTrue("The list does not contain issue with ID " + id, found);
+		Assert.assertTrue("The list does not contain issue with ID " + id, found);
 	}
 
 	@Test
 	public void testMapHasIssueWithID39() {
 		Integer id = 39;
-		assertNotNull("The map must contain issue with ID " + id, issuesMap.get(id));
+		Assert.assertNotNull("The map must contain issue with ID " + id, issuesMap.get(id));
 	}
 	
 	@Test
@@ -73,45 +73,45 @@ public class RedmineIssuesMapTest {
 		Integer childId = 67;
 		Integer parentIdExpected = 66;
 		Issue child = issuesMap.get(childId);
-		assertNotNull("Issue " + childId + " must be in map", child);
-		assertNotNull("Issue " + childId + " must have a parent", child.getParentId());
+		Assert.assertNotNull("Issue " + childId + " must be in map", child);
+		Assert.assertNotNull("Issue " + childId + " must have a parent", child.getParentId());
 		
 		// XXX getParent() looks very ugly. need to change the XSD file to generate a better set of java classes
 		Integer actualParentId = child.getParentId();
-		assertEquals("Issue " + childId + " must have parent ID " + parentIdExpected, parentIdExpected, actualParentId);
+		Assert.assertEquals("Issue " + childId + " must have parent ID " + parentIdExpected, parentIdExpected, actualParentId);
 		
 		Issue parent = issuesMap.get(actualParentId);
-		assertNotNull("Parent Issue " + parentIdExpected + " must be present in map", parent);
+		Assert.assertNotNull("Parent Issue " + parentIdExpected + " must be present in map", parent);
 		
-		assertEquals("Parent Issue id " + parentIdExpected + " must be equal to the value provided by getId()", parentIdExpected, parent.getId());
+		Assert.assertEquals("Parent Issue id " + parentIdExpected + " must be equal to the value provided by getId()", parentIdExpected, parent.getId());
 	}
 
 	@Test
 	public void testNullParentId(){
 		Integer childId = 66;
 		Issue child = issuesMap.get(childId);
-		assertEquals("Issue " + childId + " must have NULL parent ID ", null, child.getParentId());
+		Assert.assertEquals("Issue " + childId + " must have NULL parent ID ", null, child.getParentId());
 	}
 	
 	@Test
 	public void testPriorityTextIsLoaded(){
 		Issue issue = issuesMap.get(39);
-		assertEquals("Comparing 'priority' field.", "High", issue.getPriorityText());
+		Assert.assertEquals("Comparing 'priority' field.", "High", issue.getPriorityText());
 	}
 	
 	@Test
 	public void testDoneRatioIsLoaded(){
 		Issue issue67 = issuesMap.get(67);
 		Integer expectedDoneRatio67 = 20;
-		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio67, issue67.getDoneRatio());
+		Assert.assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio67, issue67.getDoneRatio());
 		
 		Issue issue65 = issuesMap.get(65);
 		Integer expectedDoneRatio65 = 80;
-		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio65, issue65.getDoneRatio());
+		Assert.assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio65, issue65.getDoneRatio());
 
 		Issue issue55 = issuesMap.get(55);
 		Integer expectedDoneRatio55 = 0;
-		assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio55, issue55.getDoneRatio());
+		Assert.assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio55, issue55.getDoneRatio());
 	}
 
 	@Test
@@ -120,9 +120,9 @@ public class RedmineIssuesMapTest {
 		Integer expectedProjectId = 25;
 		String expectedProjectName = "test project";
 		Project actualProect = issue67.getProject();
-		assertNotNull("Project must be not null", actualProect);
-		assertEquals("Comparing project ID", expectedProjectId, actualProect.getId());
-		assertEquals("Comparing project name", expectedProjectName, actualProect.getName());
+		Assert.assertNotNull("Project must be not null", actualProect);
+		Assert.assertEquals("Comparing project ID", expectedProjectId, actualProect.getId());
+		Assert.assertEquals("Comparing project name", expectedProjectName, actualProect.getName());
 	}
 	
 	@Test
@@ -132,9 +132,9 @@ public class RedmineIssuesMapTest {
 		Integer assigneeIdExpected = 1;
 		
 		User assignee = issue.getAssignee();
-		assertNotNull("Checking assignee info", assignee);
+		Assert.assertNotNull("Checking assignee info", assignee);
 //		assertEquals("Checking assignee info: login", assigneeFullNameExpected, assignee.getFullName());
-		assertEquals("Checking assignee info: id", assigneeIdExpected, assignee.getId());
+		Assert.assertEquals("Checking assignee info: id", assigneeIdExpected, assignee.getId());
 		
 	}
 
