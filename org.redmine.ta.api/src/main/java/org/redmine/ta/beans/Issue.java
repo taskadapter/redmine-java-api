@@ -191,7 +191,6 @@ public class Issue implements Identifiable {
 
 	/**
 	 * list of Custom Field objects, NEVER NULL.
-	 * @return
 	 */
     public List<CustomField> getCustomFields() {
         return customFields;
@@ -199,7 +198,6 @@ public class Issue implements Identifiable {
 
     /**
      * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
-     * @param customFields
      */
     public void setCustomFields(List<CustomField> customFields) {
         this.customFields = customFields;
