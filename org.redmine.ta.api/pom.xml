@@ -13,6 +13,26 @@
     <artifactId>redmine-api</artifactId>
     <version>1.5.0</version>
 
+    <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
+    <url>http://code.google.com/p/redmine-java-api</url>
+    <scm>
+      <url>http://redmine-java-api.googlecode.com/svn/trunk</url>
+    </scm>
+
+    <licenses>
+      <license>
+        <name>The Apache Software License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        <distribution>repo</distribution>
+      </license>
+    </licenses>
+    <developers>
+      <developer>
+        <name>Alexey Skorokhodov</name>
+        <email>alskor@gmail.com</email>
+      </developer>
+    </developers>
+
     <!-- to generate Javadoc -->
     <build>
         <plugins>

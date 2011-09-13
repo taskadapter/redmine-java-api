@@ -14,7 +14,7 @@
 
     <modules>
         <module>org.redmine.ta.api</module>
-        <!--<module>org.redmine.ta.assembly</module>-->
+        <module>org.redmine.ta.assembly</module>
     </modules>
 
 </project>
