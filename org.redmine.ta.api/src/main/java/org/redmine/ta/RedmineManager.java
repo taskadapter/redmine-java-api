@@ -21,10 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.http.HttpEntity;
@@ -317,8 +314,8 @@ public class RedmineManager {
 	 * @throws NotFoundException 
 	 */
 	public List<Project> getProjects() throws IOException,AuthenticationException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		params.put("include", new BasicNameValuePair("include", "trackers"));
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
+		params.add(new BasicNameValuePair("include", "trackers"));
 		try {
 			return getObjectsList(Project.class, params);
 		} catch (NotFoundException e) {
@@ -340,11 +337,11 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		params.put("subject", new BasicNameValuePair("subject", summaryField));
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
+		params.add(new BasicNameValuePair("subject", summaryField));
 
 		if ((projectKey != null) && (projectKey.length()>0)) {
-			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
+			params.add(new BasicNameValuePair("project_id", projectKey));
 		}
 
 		return getObjectsList(Issue.class, params);
@@ -366,11 +363,10 @@ public class RedmineManager {
 	public List<Issue> getIssues(Map<String, String> pParameters)
 			throws IOException, AuthenticationException, NotFoundException,
 			RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
 
 		for (final Entry<String, String> param : pParameters.entrySet()) {
-			params.put(param.getKey(), new BasicNameValuePair(param.getKey(),
-					param.getValue()));
+			params.add(new BasicNameValuePair(param.getKey(), param.getValue()));
 		}
 
 		return getObjectsList(Issue.class, params);
@@ -425,8 +421,7 @@ public class RedmineManager {
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
 		}
-		Project projectFromServer = RedmineXMLParser.parseProjectFromXML(response.getBody());
-		return projectFromServer;
+        return RedmineXMLParser.parseProjectFromXML(response.getBody());
 	}
 
 	/**
@@ -470,16 +465,16 @@ public class RedmineManager {
 //		List<User> users = getUsers();
 //		Map<Integer, User> idToUserMap = buildIdToUserMap(users);
 		
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
 		if (queryId != null) {
-			params.put("query_id", new BasicNameValuePair("query_id", String.valueOf(queryId)));
+			params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
 		}
 
 		if ((projectKey != null) && (projectKey.length()>0)) {
-			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
+			params.add(new BasicNameValuePair("project_id", projectKey));
 		}
 		String includeStr = join(",", include);
-		params.put("include", new BasicNameValuePair("include", includeStr));
+		params.add(new BasicNameValuePair("include", includeStr));
 
 		List<Issue> issues = getObjectsList(Issue.class, params);
 //		setUserFields(issues, idToUserMap);
@@ -512,14 +507,14 @@ public class RedmineManager {
 	/**
 	 * This ONLY works with Redmine 1.0.  Redmine 1.1 uses "objects per page" parameter instead!
 	 */
-	private void addPagingParameters(Map<String, NameValuePair> params) {
-		params.put("per_page", new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
+	private void addPagingParameters(Set<NameValuePair> params) {
+		params.add(new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
 	}
 	
 	/**
 	 * Redmine 1.0 - specific version
 	 */
-	private <T> List<T> getObjectsListV104(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<T>  objects = new ArrayList<T>();
 		
 		final int FIRST_REDMINE_PAGE = 1;
@@ -531,8 +526,8 @@ public class RedmineManager {
 //		addAuthParameters(params);
 		
 		do {
-			params.put("page", new BasicNameValuePair("page", String.valueOf(pageNum)));
-			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
+			params.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
+			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
 			
 			String query = urls.get(objectClass) + URL_POSTFIX;
 			URI uri = createURI(query, paramsList);
@@ -568,7 +563,7 @@ public class RedmineManager {
 	}
 
 	// XXX fix this: why it is Map of string->pair? should be a flat set of params! 
-	private <T> List<T> getObjectsList(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
 			return getObjectsListV11(objectClass, params);
 		} else if (currentMode.equals(MODE.REDMINE_1_0)) {
@@ -582,17 +577,17 @@ public class RedmineManager {
 	/**
 	 * Redmine 1.1 / Chiliproject 1.2 - specific version
 	 */
-	private <T> List<T> getObjectsListV11(Class<T> objectClass, Map<String, NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+	private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		List<T>  objects = new ArrayList<T>();
 		
 		int limit = 25;
-		params.put("limit", new BasicNameValuePair("limit", String.valueOf(limit)));
+		params.add(new BasicNameValuePair("limit", String.valueOf(limit)));
 		int offset = 0;
 		int totalObjectsFoundOnServer;
 		do {
-			params.put("offset", new BasicNameValuePair("offset", String.valueOf(offset)));
-			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params.values());
-			
+			params.add(new BasicNameValuePair("offset", String.valueOf(offset)));
+			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
+
 			String query = urls.get(objectClass) + URL_POSTFIX;
 			URI uri = createURI(query, paramsList);
 			debug("URI = " + uri);
@@ -778,8 +773,7 @@ public class RedmineManager {
 	 * @throws RedmineException 
 	 */
 	public List<User> getUsers() throws IOException,AuthenticationException, NotFoundException, RedmineException{
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		return getObjectsList(User.class, params);
+		return getObjectsList(User.class, new HashSet<NameValuePair>());
 	}
 
 	public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException, RedmineException {
@@ -815,8 +809,7 @@ public class RedmineManager {
 	}
 
 	public List<TimeEntry> getTimeEntries() throws IOException,AuthenticationException, NotFoundException, RedmineException{
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		return getObjectsList(TimeEntry.class, params);
+		return getObjectsList(TimeEntry.class, new HashSet<NameValuePair>());
 	}
 	
 	/**
@@ -827,8 +820,8 @@ public class RedmineManager {
 	}
 
 	public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws IOException,AuthenticationException, NotFoundException, RedmineException{
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		params.put("issue_id", new BasicNameValuePair("issue_id", Integer.toString(issueId)));
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
+		params.add(new BasicNameValuePair("issue_id", Integer.toString(issueId)));
 
 		return getObjectsList(TimeEntry.class, params);
 	}
@@ -851,10 +844,10 @@ public class RedmineManager {
 	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
 	 */
 	public List<SavedQuery> getSavedQueries(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
 
 		if ((projectKey != null) && (projectKey.length()>0)) {
-			params.put("project_id", new BasicNameValuePair("project_id", projectKey));
+			params.add(new BasicNameValuePair("project_id", projectKey));
 		}
 
 		return getObjectsList(SavedQuery.class, params);
@@ -866,8 +859,7 @@ public class RedmineManager {
 	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
 	 */
 	public List<SavedQuery> getSavedQueries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		Map<String, NameValuePair> params = new HashMap<String, NameValuePair>();
-		return getObjectsList(SavedQuery.class, params);
+		return getObjectsList(SavedQuery.class, new HashSet<NameValuePair>());
 	}
 
 	private static void debug(String string) {
