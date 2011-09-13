@@ -16,7 +16,10 @@
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
     <url>http://code.google.com/p/redmine-java-api</url>
     <scm>
-      <url>http://redmine-java-api.googlecode.com/svn/trunk</url>
+        <connection>scm:svn:http://redmine-java-api.googlecode.com/svn/trunk</connection>
+        <tag>HEAD</tag>
+        <!-- A publicly browsable repository. For example, via ViewCVS -->
+        <url>http://code.google.com/p/redmine-java-api/source/browse</url>
     </scm>
 
     <licenses>
