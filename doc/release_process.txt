@@ -1,9 +1,7 @@
 Release process for Redmine Java API.
 -------------------------------------
 
-Change version in TWO files:
-\pom.xml
-org.redmine.ta.api/META-INF/MANIFEST.MF
+Change version number in   \org.redmine.ta.api\pom.xml
 
 Commit to SVN, wait for the new auto-build. Verify all tests pass.
 
