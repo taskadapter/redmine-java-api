@@ -11,7 +11,7 @@
 
     <groupId>org.redmine.ta</groupId>
     <artifactId>redmine-api</artifactId>
-    <version>${redmine_api.version}</version>
+    <version>1.5.0</version>
 
     <!-- to generate Javadoc -->
     <build>
