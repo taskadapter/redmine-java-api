@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="FacetManager">
-    <facet type="Osmorc" name="OSGi">
-      <configuration osmorcControlsManifest="false" manifestLocation="META-INF/MANIFEST.MF" jarfileLocation="redmine-api.jar" outputPathType="CompilerOutputPath" useBndFile="false" bndFileLocation="" useBundlorFile="false" bundlorFileLocation="" bundleActivator="" bundleSymbolicName="" bundleVersion="1.0.0" ignoreFilePattern="" useProjectDefaultManifestFileLocation="false" alwaysRebuildBundleJAR="false">
-        <additionalProperties />
-        <additionalJARContents />
-      </configuration>
-    </facet>
-  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
