@@ -3,14 +3,10 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.redmine.ta</groupId>
-    <artifactId>main</artifactId>
+    <groupId>com.googlecode</groupId>
+    <artifactId>redmine-java-api-rootmain</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <modules>
         <module>org.redmine.ta.api</module>
