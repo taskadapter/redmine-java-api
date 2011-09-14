@@ -3,14 +3,13 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>main</artifactId>
-        <groupId>org.redmine.ta</groupId>
-        <version>1.0</version>
-    </parent>
 
-    <groupId>org.redmine.ta</groupId>
-    <artifactId>redmine-api</artifactId>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <groupId>com.googlecode</groupId>
+    <artifactId>redmine-java-api</artifactId>
     <version>1.5.0</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
