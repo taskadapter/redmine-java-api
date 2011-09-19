@@ -1,1 +1,1 @@
-mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2 -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/redmine-java-api-1.5.0.jar
+mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2 -DrepositoryId=sonatype-nexus-staging -DpomFile=pom.xml -Dfile=target/redmine-java-api-1.5.0.jar -Dfile=target/redmine-java-api-1.5.0-sources.jar
