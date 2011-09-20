@@ -1,14 +1,9 @@
 package org.redmine.ta.internal;
 
+import org.redmine.ta.beans.*;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import org.redmine.ta.beans.CustomField;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.IssueRelation;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.User;
 
 /**
  * Can't use Castor here because this "post" format differs from "get" one. see
@@ -42,7 +37,18 @@ public class RedmineXMLGenerator {
 		}
 		appendIfNotNull(b, "notes", issue.getNotes());
 		appendIfNotNull(b, "status_id", issue.getStatusId());
-		appendIfNotNull(b, "start_date", issue.getStartDate());
+
+        //have to make such ugly solution
+        //cause dy default redmine the start date field of new issue is set as today
+        //redmine promises to include this patch into next major version
+        //http://www.redmine.org/issues/2277
+        if (issue.getStartDate() == null) {
+            appendNull(b, "start_date");
+        }
+        else {
+            appendIfNotNull(b, "start_date", issue.getStartDate());
+        }
+
 		appendIfNotNull(b, "due_date", issue.getDueDate());
 		if (issue.getEstimatedHours() != null) {
 			appendIfNotNull(b, "estimated_hours", issue.getEstimatedHours());
@@ -148,7 +154,14 @@ public class RedmineXMLGenerator {
 			b.append("</" + tag + ">");
 		}
 	}
-	
+
+    /**
+     * append NULL value
+     */
+    private static final void appendNull(StringBuilder b, String tag) {
+        b.append("<" + tag + ">null</" + tag + ">");
+    }
+
 	private static String encodeXML(String value) {
 		return value.replace("&", "&amp;").replace("'", "&apos;")
 				.replace("\"", "&quot;").replace("<", "&lt;")
