@@ -10,7 +10,7 @@
 
     <groupId>com.googlecode</groupId>
     <artifactId>redmine-java-api</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
     <url>http://code.google.com/p/redmine-java-api</url>
@@ -93,4 +93,19 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Sonatype Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <uniqueVersion>false</uniqueVersion>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshot Repository</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
