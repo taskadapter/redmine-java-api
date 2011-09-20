@@ -170,6 +170,23 @@ public class RedmineManagerTest {
 		}
 	}
 
+    @Test
+    public void testStartDateNull() {
+        try {
+            Issue issue = new Issue();
+            issue.setSubject("test start date");
+            issue.setStartDate(null);
+
+            Issue newIssue = mgr.createIssue(projectKey, issue);
+
+            Issue loadedIssue = mgr.getIssueById(newIssue.getId());
+            Assert.assertNull(loadedIssue.getStartDate());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
+    }
+
 	@Test
 	public void testGetIssuesBySummary() {
 		String summary = "issue with subject ABC";
