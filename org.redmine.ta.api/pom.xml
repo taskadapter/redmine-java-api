@@ -10,7 +10,7 @@
 
     <groupId>com.googlecode</groupId>
     <artifactId>redmine-java-api</artifactId>
-    <version>1.5.0</version>
+    <version>1.5.1</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
     <url>http://code.google.com/p/redmine-java-api</url>
@@ -35,9 +35,9 @@
         </developer>
     </developers>
 
-    <!-- to generate Javadoc -->
     <build>
         <plugins>
+            <!-- to generate Javadoc -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -53,10 +53,12 @@
                         <phase>package</phase>
                         <goals>
                             <goal>javadoc</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
+            <!-- create JAR with sources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
