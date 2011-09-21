@@ -16,6 +16,22 @@
 
 package org.redmine.ta;
 
+import org.apache.http.*;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.*;
+import org.apache.http.client.utils.URIUtils;
+import org.apache.http.client.utils.URLEncodedUtils;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.redmine.ta.beans.*;
+import org.redmine.ta.internal.HttpUtil;
+import org.redmine.ta.internal.RedmineXMLGenerator;
+import org.redmine.ta.internal.RedmineXMLParser;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -23,37 +39,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.redmine.ta.beans.Identifiable;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.IssueRelation;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.SavedQuery;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.User;
-import org.redmine.ta.internal.HttpUtil;
-import org.redmine.ta.internal.RedmineXMLGenerator;
-import org.redmine.ta.internal.RedmineXMLParser;
 
 
 /**
@@ -526,8 +511,9 @@ public class RedmineManager {
 //		addAuthParameters(params);
 		
 		do {
-			params.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
+			//params.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
 			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
+			paramsList.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
 			
 			String query = urls.get(objectClass) + URL_POSTFIX;
 			URI uri = createURI(query, paramsList);
@@ -585,8 +571,9 @@ public class RedmineManager {
 		int offset = 0;
 		int totalObjectsFoundOnServer;
 		do {
-			params.add(new BasicNameValuePair("offset", String.valueOf(offset)));
+			//params.add(new BasicNameValuePair("offset", String.valueOf(offset)));
 			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
+			paramsList.add(new BasicNameValuePair("offset", String.valueOf(offset)));
 
 			String query = urls.get(objectClass) + URL_POSTFIX;
 			URI uri = createURI(query, paramsList);
