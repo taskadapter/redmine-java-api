@@ -741,6 +741,9 @@ public class RedmineManagerTest {
 			List<Issue> issues = mgr.getIssues(projectKey, null);
 			System.out.println("testGetIssuesPaging() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
 			Assert.assertTrue(issues.size() > 26);
+
+            Set<Issue> issueSet = new HashSet<Issue>(issues);
+            Assert.assertEquals(issues.size(), issueSet.size());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail(e.getMessage());
