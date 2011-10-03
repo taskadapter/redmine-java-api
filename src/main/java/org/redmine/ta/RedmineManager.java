@@ -812,20 +812,35 @@ public class RedmineManager {
 
 		return getObjectsList(TimeEntry.class, params);
 	}
-	
-	public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		return createObject(TimeEntry.class, obj);
-	}
 
-	public void updateTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-		updateObject(TimeEntry.class, obj);
-	}
+    public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+        if (!isValidTimeEntry(obj)) {
+            throw createIllegalTimeEntryException();
+        }
+        return createObject(TimeEntry.class, obj);
+    }
 
-	public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void updateTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+        if (!isValidTimeEntry(obj)) {
+            throw createIllegalTimeEntryException();
+        }
+        updateObject(TimeEntry.class, obj);
+    }
+
+    public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		deleteObject(TimeEntry.class, Integer.toString(id));
 	}
 
-	/**
+    private boolean isValidTimeEntry(TimeEntry obj) {
+        return obj.getProjectId() != null || obj.getIssueId() != null;
+    }
+
+    private IllegalArgumentException createIllegalTimeEntryException() {
+        return new IllegalArgumentException("You have to either define a Project or Issue ID for a Time Entry. "
+                + "The given Time Entry object has neither defined.");
+    }
+
+    /**
 	 * Get "saved queries" for the given project available to the current user.
 	 *
 	 * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
