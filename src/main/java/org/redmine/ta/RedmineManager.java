@@ -27,6 +27,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.castor.core.util.Base64Encoder;
 import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.HttpUtil;
 import org.redmine.ta.internal.RedmineXMLGenerator;
@@ -223,14 +224,17 @@ public class RedmineManager {
 		request.setEntity(entity);
 	}
 	
-	private Response sendRequest(HttpRequest request) throws ClientProtocolException, IOException, AuthenticationException, RedmineException {
+	private Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException {
 		debug(request.getRequestLine().toString());
 		DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 		
 		if (useBasicAuth) {
-			httpclient.getCredentialsProvider().setCredentials(
-                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-                new UsernamePasswordCredentials(login, password));
+            // replaced because of http://code.google.com/p/redmine-java-api/issues/detail?id=72
+//			httpclient.getCredentialsProvider().setCredentials(
+//                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
+//                new UsernamePasswordCredentials(login, password));
+            final String credentials = String.valueOf(Base64Encoder.encode((login + ':' + password).getBytes(CHARSET)));
+	        request.addHeader("Authorization", "Basic: " + credentials);
 		}
 		
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
