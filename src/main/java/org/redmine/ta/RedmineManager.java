@@ -237,6 +237,7 @@ public class RedmineManager {
 	        request.addHeader("Authorization", "Basic: " + credentials);
 		}
 		
+		request.addHeader("Accept-Encoding", "gzip,deflate");
 		HttpResponse httpResponse = httpclient.execute((HttpUriRequest)request);
 		
 //		System.out.println(httpResponse.getStatusLine());
