@@ -8,6 +8,7 @@ import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.ContentEncodingHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
@@ -34,9 +35,9 @@ public class HttpUtil {
 
 	        ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
 
-	        return new DefaultHttpClient(ccm, params);
+	        return new ContentEncodingHttpClient(ccm, params);
 	    } catch (Exception e) {
-	        return new DefaultHttpClient();
+	        return new ContentEncodingHttpClient();
 	    }
 	}
 }
