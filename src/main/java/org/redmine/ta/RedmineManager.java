@@ -223,11 +223,8 @@ public class RedmineManager {
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
 	}
-	
-	private Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException {
-		debug(request.getRequestLine().toString());
-		DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
-		
+
+	private void configureProxy(DefaultHttpClient httpclient) {
 		String proxyHost = System.getProperty("http.proxyHost");
 		String proxyPort = System.getProperty("http.proxyPort");
 		if (proxyHost != null && proxyPort != null) {
@@ -242,7 +239,14 @@ public class RedmineManager {
 						new UsernamePasswordCredentials(proxyUser, proxyPassword));
 			}
 		}
-		
+	}
+
+	private Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException {
+		debug(request.getRequestLine().toString());
+		DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
+
+		configureProxy(httpclient);
+
 		if (useBasicAuth) {
             // replaced because of http://code.google.com/p/redmine-java-api/issues/detail?id=72
 //			httpclient.getCredentialsProvider().setCredentials(
