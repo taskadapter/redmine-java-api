@@ -1,7 +1,7 @@
 Release process for Redmine Java API.
 -------------------------------------
 
-Change version number in   \org.redmine.ta.api\pom.xml
+Change version number in   \pom.xml
 ! Make sure it does not have "-SNAPSHOP" at the end.
 
 Commit to SVN, wait for the new auto-build. Verify all tests pass.
