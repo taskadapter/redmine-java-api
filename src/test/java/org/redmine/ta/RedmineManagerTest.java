@@ -932,6 +932,8 @@ public class RedmineManagerTest {
 	/**
 	 * The custom fields used here MUST ALREADY EXIST on the server and be 
 	 * associated with the required task type (bug/feature/task/..).
+     *
+     * See feature request http://www.redmine.org/issues/9664
 	 */
 	@Test
 	public void testCustomFields() throws Exception {
