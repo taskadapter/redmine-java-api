@@ -265,7 +265,7 @@ public class RedmineManager {
 			throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
 		}
 		if (responseCode ==	HttpStatus.SC_FORBIDDEN) {
-			throw new AuthenticationException("Forbidden. The API access key you used does not allow this operation. Please check the user has proper permissions.");
+			throw new AuthenticationException("Forbidden. Please check the user has proper permissions.");
 		}
 		
 		HttpEntity responseEntity = httpResponse.getEntity();
