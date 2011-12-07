@@ -54,12 +54,6 @@ public class RedmineXMLParser {
 		}
 	};
 
-	public static Issue parseIssueFromXML(String xml) throws RuntimeException {
-		StringBuilder b = new StringBuilder(xml);
-		removeBadTags(b);
-		return parseObjectFromXML(Issue.class, b.toString());
-	}
-
 	public static Project parseProjectFromXML(String xml)
 			throws RuntimeException {
 		return parseObjectFromXML(Project.class, xml);
@@ -160,7 +154,6 @@ public class RedmineXMLParser {
 
 	@SuppressWarnings("unchecked")
 	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body) {
-//		System.out.println("parseObjectsFromXML:" + body);
 		verifyStartsAsXML(body);
         StringBuilder builder = new StringBuilder(body);
         removeBadTags(builder);
