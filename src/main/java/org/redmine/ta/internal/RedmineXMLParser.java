@@ -60,12 +60,14 @@ public class RedmineXMLParser {
 	}
 
 	// see bug https://www.hostedredmine.com/issues/8240
-	private static void removeBadTags(StringBuilder xml) {
-        replaceAll(xml, "<estimated_hours></estimated_hours>", "");
-        replaceAll(xml, "<estimated_hours/>", "");
+	private static void removeBadTags(Class redmineClass, StringBuilder xml) {
+        if (redmineClass.equals(Issue.class)) {
+            replaceAll(xml, "<estimated_hours></estimated_hours>", "");
+            replaceAll(xml, "<estimated_hours/>", "");
+        }
 	}
 
-	public static void replaceAll(StringBuilder builder, String from, String to) {
+	private static void replaceAll(StringBuilder builder, String from, String to) {
 		int index = builder.indexOf(from);
 		while (index != -1) {
 			builder.replace(index, index + from.length(), to);
@@ -156,7 +158,7 @@ public class RedmineXMLParser {
 	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body) {
 		verifyStartsAsXML(body);
         StringBuilder builder = new StringBuilder(body);
-        removeBadTags(builder);
+        removeBadTags(classs, builder);
 
 		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, ArrayList.class);
@@ -179,7 +181,7 @@ public class RedmineXMLParser {
 	public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
 		verifyStartsAsXML(xml);
 		StringBuilder builder = new StringBuilder(xml);
-		removeBadTags(builder);
+		removeBadTags(classs, builder);
 		
 		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, classs);
