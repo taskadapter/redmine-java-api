@@ -65,15 +65,10 @@ public class RedmineXMLParser {
 		return parseObjectFromXML(Project.class, xml);
 	}
 
-//	public static List<Issue> parseIssuesFromXML(String xml) throws RuntimeException {
-//		StringBuilder b = new StringBuilder(xml);
-//		removeBadTags(b);
-//		return parseObjectsFromXML(Issue.class, b.toString());
-//	}
-
 	// see bug https://www.hostedredmine.com/issues/8240
 	private static void removeBadTags(StringBuilder xml) {
-		replaceAll(xml, "<estimated_hours></estimated_hours>", "");
+        replaceAll(xml, "<estimated_hours></estimated_hours>", "");
+        replaceAll(xml, "<estimated_hours/>", "");
 	}
 
 	public static void replaceAll(StringBuilder builder, String from, String to) {
