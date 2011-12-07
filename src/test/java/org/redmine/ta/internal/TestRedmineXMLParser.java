@@ -33,7 +33,7 @@ public class TestRedmineXMLParser {
 
 		try {
 			String str = MyIOUtils.getResourceAsString(FILE_EMPTY_ISSUES_XML);
-			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(str);
+			List<Issue> issues = RedmineXMLParser.parseObjectsFromXML(Issue.class, str);
 			Assert.assertTrue(issues.isEmpty());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -140,9 +140,8 @@ public class TestRedmineXMLParser {
 		Assert.assertEquals(112, x);
 	}
 		
-	
 	@Test
-	public void testNullEstimatedTime() {
+	public void estimatedTimeIsNULL() {
 		try {
 			List<Issue> issues = loadRedmine11IssuesXml();
 			Integer issueID = 52;
@@ -166,7 +165,7 @@ public class TestRedmineXMLParser {
 
 //			String nonLatinSymbols = "Example with accents Ação";
 			String nonLatinSymbols = "Example with russian text: Привет";
-			List<Issue> issues = RedmineXMLParser.parseIssuesFromXML(xml);
+			List<Issue> issues = RedmineXMLParser.parseObjectsFromXML(Issue.class, xml);
 			// must be 1 issue in the file
 			Assert.assertTrue(issues.size() == 1);
 			Issue issue = issues.get(0);
@@ -182,7 +181,7 @@ public class TestRedmineXMLParser {
 		try {
 			String text = MyIOUtils
 					.getResourceAsString("invalid_page.txt");
-			RedmineXMLParser.parseIssuesFromXML(text);
+            RedmineXMLParser.parseObjectsFromXML(Issue.class, text);
 			Assert.fail("Must have failed with RuntimeException");
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
@@ -296,6 +295,6 @@ public class TestRedmineXMLParser {
 	
 	private List<Issue> loadRedmine11IssuesXml() throws IOException {
 		String xml = MyIOUtils.getResourceAsString(REDMINE_1_1_ISSUES_XML);
-		return RedmineXMLParser.parseIssuesFromXML(xml);
+		return RedmineXMLParser.parseObjectsFromXML(Issue.class, xml);
 	}
 }

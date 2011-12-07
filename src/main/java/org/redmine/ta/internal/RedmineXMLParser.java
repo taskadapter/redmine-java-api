@@ -65,11 +65,11 @@ public class RedmineXMLParser {
 		return parseObjectFromXML(Project.class, xml);
 	}
 
-	public static List<Issue> parseIssuesFromXML(String xml) throws RuntimeException {
-		StringBuilder b = new StringBuilder(xml);
-		removeBadTags(b);
-		return parseObjectsFromXML(Issue.class, b.toString());
-	}
+//	public static List<Issue> parseIssuesFromXML(String xml) throws RuntimeException {
+//		StringBuilder b = new StringBuilder(xml);
+//		removeBadTags(b);
+//		return parseObjectsFromXML(Issue.class, b.toString());
+//	}
 
 	// see bug https://www.hostedredmine.com/issues/8240
 	private static void removeBadTags(StringBuilder xml) {
@@ -167,13 +167,16 @@ public class RedmineXMLParser {
 	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body) {
 //		System.out.println("parseObjectsFromXML:" + body);
 		verifyStartsAsXML(body);
+        StringBuilder builder = new StringBuilder(body);
+        removeBadTags(builder);
+
 		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, ArrayList.class);
 
 		List<T> list = null;
 		StringReader reader = null;
 		try {
-			reader = new StringReader(body);
+			reader = new StringReader(builder.toString());
 			list = (ArrayList<T>) unmarshaller.unmarshal(reader);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -187,8 +190,8 @@ public class RedmineXMLParser {
 
 	public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
 		verifyStartsAsXML(xml);
-		StringBuilder b = new StringBuilder(xml);
-		removeBadTags(b);
+		StringBuilder builder = new StringBuilder(xml);
+		removeBadTags(builder);
 		
 		String configFile = fromRedmineMap.get(classs);
 		Unmarshaller unmarshaller = getUnmarshaller(configFile, classs);
@@ -196,7 +199,7 @@ public class RedmineXMLParser {
 		T obj = null;
 		StringReader reader = null;
 		try {
-			reader = new StringReader(b.toString());
+			reader = new StringReader(builder.toString());
 			obj = (T) unmarshaller.unmarshal(reader);
 		} catch (Exception e) {
 			e.printStackTrace();

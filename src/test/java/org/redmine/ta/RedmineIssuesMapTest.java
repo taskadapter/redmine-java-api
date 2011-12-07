@@ -31,7 +31,7 @@ public class RedmineIssuesMapTest {
 	 // Is executed before each test method
 	public void setup() throws Exception {
 		String str = MyIOUtils.getResourceAsString(REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME);
-		this.issuesList = RedmineXMLParser.parseIssuesFromXML(str);
+		this.issuesList = RedmineXMLParser.parseObjectsFromXML(Issue.class, str);
 		
 		RedmineIssuesMap loader = new RedmineIssuesMap(issuesList);
 		issuesMap = loader.getIssuesMap();
