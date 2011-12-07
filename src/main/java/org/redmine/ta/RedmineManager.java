@@ -151,8 +151,7 @@ public class RedmineManager {
 		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
 		}
-		Issue newIssue = RedmineXMLParser.parseIssueFromXML(response.getBody());
-		return newIssue;
+        return RedmineXMLParser.parseObjectFromXML(Issue.class, response.getBody());
 	}
 	
 	private URI createURI(String query) {
