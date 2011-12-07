@@ -21,8 +21,9 @@ import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 
-public class TestRedmineXMLParser {
+public class RedmineXMLParserTest {
 	private static final String REDMINE_1_1_ISSUES_XML = "redmine_1_1_issues.xml";
+    private static final String REDMINE_1_2_2_DEV_ISSUES_XML = "redmine_1.2.2_dev_issues.xml";
 	private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
 
 	@Test
@@ -297,4 +298,22 @@ public class TestRedmineXMLParser {
 		String xml = MyIOUtils.getResourceAsString(REDMINE_1_1_ISSUES_XML);
 		return RedmineXMLParser.parseObjectsFromXML(Issue.class, xml);
 	}
+
+    /**
+     * regression test for http://code.google.com/p/redmine-java-api/issues/detail?id=91
+     * with Redmine 1.3.0: NULL value returned by getIssues call is interpreted as 0.0
+     */
+    @Test
+    public void nullEstimatedTimeProcessedCorrectlyWithRedmine122() {
+        try {
+            String str = MyIOUtils.getResourceAsString(REDMINE_1_2_2_DEV_ISSUES_XML);
+            List<Issue> issues = RedmineXMLParser.parseObjectsFromXML(Issue.class, str);
+            Issue issue = RedmineTestUtils.findIssueInList(issues, 4808);
+            assertNull(issue.getEstimatedHours());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Error:" + e);
+        }
+
+    }
 }
