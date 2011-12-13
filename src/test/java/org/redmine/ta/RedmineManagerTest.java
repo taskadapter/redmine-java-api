@@ -274,38 +274,24 @@ public class RedmineManagerTest {
     public void testEmptyHostParameter() throws RuntimeException {
         new RedmineManager("", null);
     }
-	
-	@Test
-	public void testWrongCredentialsOnCreateIssue() throws RuntimeException {
-		
-		RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI(), null);
 
-		// NO API access key set
-		Issue issue = new Issue();
-		issue.setSubject("test zzx");
-		try {
-			redmineMgrEmpty.createIssue(projectKey, issue);
-			Assert.fail("Must have failed with '401 Not authorized'");
-		} catch (AuthenticationException e) {
-			System.out.println("Got expected AuthenticationException.");
-		} catch (Exception e) {
-			Assert.fail("Got unexpected exception : " + e);
-		}
-		
-		// set invalid API access key
-		RedmineManager redmineMgrInvalidKey = new RedmineManager(testConfig.getURI(), "wrong_key");
-		try {
-			redmineMgrInvalidKey.createIssue(projectKey, issue);
-			Assert.fail("Must have failed with '401 Not authorized'");
-		} catch (AuthenticationException e) {
-			System.out.println("Got expected AuthenticationException.");
-		} catch (Exception e) {
-			Assert.fail("Got unexpected exception : " + e);
-		}
+    @Test(expected = AuthenticationException.class)
+    public void nullAPIKeyOnCreateIssueThrowsAE() throws Exception {
+        RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI(), null);
+        Issue issue = new Issue();
+        issue.setSubject("test zzx");
+        redmineMgrEmpty.createIssue(projectKey, issue);
+    }
 
-	}
+    @Test(expected = AuthenticationException.class)
+    public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
+        RedmineManager redmineMgrInvalidKey = new RedmineManager(testConfig.getURI(), "wrong_key");
+        Issue issue = new Issue();
+        issue.setSubject("test zzx");
+        redmineMgrInvalidKey.createIssue(projectKey, issue);
+    }
 
-	@Test
+    @Test
 	public void testUpdateIssue() {
 		try {
 			Issue issue = new Issue();
