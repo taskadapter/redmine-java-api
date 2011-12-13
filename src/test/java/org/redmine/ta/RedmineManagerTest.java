@@ -257,18 +257,10 @@ public class RedmineManagerTest {
 		return user;
 	}
 
-	@Test
-	public void testNULLHostParameter() throws RuntimeException {
-		try {
-			new RedmineManager(null, null); 
-			Assert.fail("Must have failed with IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
-			System.out.println("Got expected IllegalArgumentException.");
-		} catch (Exception e) {
-			Assert.fail("Got unexpected exception : " + e);
-		}
-		
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testNULLHostParameter() {
+        new RedmineManager(null, null);
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyHostParameter() throws RuntimeException {
@@ -384,19 +376,12 @@ public class RedmineManagerTest {
 			Assert.fail(e.getMessage());
 		}
 	}
-	
-	@Test
-	public void testGetIssuesInvalidQueryId() {
-		try {
-			Integer invalidQueryId = 9999999;
-			mgr.getIssues(projectKey, invalidQueryId);
-			Assert.fail("Must have failed with NotFoundException because query ID is invalid");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException:" + e.getMessage());
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+
+    @Test(expected = NotFoundException.class)
+    public void testGetIssuesInvalidQueryId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Integer invalidQueryId = 9999999;
+        mgr.getIssues(projectKey, invalidQueryId);
+    }
 	
 	@Test
 	public void testCreateProject() throws IOException, AuthenticationException, NotFoundException, RedmineException {
@@ -530,73 +515,36 @@ public class RedmineManagerTest {
 		}
 	}
 
-	@Test
-	public void testCreateIssueInvalidProjectKey() {
-		try {
-			Issue issueToCreate = new Issue();
-			issueToCreate.setSubject("Summary line 100");
-			String invalidProjectKey = "someNotExistingProjectKey";
-			mgr.createIssue(invalidProjectKey, issueToCreate);
-			
-			Assert.fail("Must have failed with NotFoundException because we provided invalid project key.");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException: " + e.getMessage());
-		} catch (Exception e) {
-			Assert.fail();
-		}
-	}
+    @Test(expected = NotFoundException.class)
+    public void testCreateIssueInvalidProjectKey() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Issue issueToCreate = new Issue();
+        issueToCreate.setSubject("Summary line 100");
+        mgr.createIssue("someNotExistingProjectKey", issueToCreate);
+    }
 
-	@Test
-	public void testGetProjectNonExistingId() {
-		try {
-			mgr.getProjectByKey("some-non-existing-key");
-			Assert.fail("Must have failed with NotFoundException");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException.");
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
+    @Test(expected = NotFoundException.class)
+    public void testGetProjectNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.getProjectByKey("some-non-existing-key");
+    }
+
+    @Test(expected = NotFoundException.class)
+	public void testDeleteNonExistingProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+		mgr.deleteProject("some-non-existing-key");
 	}
 	
-	@Test
-	public void testDeleteNonExistingProject() {
-		try {
-			mgr.deleteProject("some-non-existing-key");
-			Assert.fail("Must have failed with NotFoundException");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException.");
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
-	
-	@Test
-	public void testGetIssueNonExistingId() {
-		try {
-			int someNonExistingID = 999999;
-			mgr.getIssueById(someNonExistingID);
-			Assert.fail("Must have failed with NotFoundException.");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException.");
-		} catch (Exception e) {
-			Assert.fail();
-		}
+    @Test(expected = NotFoundException.class)
+	public void testGetIssueNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+		int someNonExistingID = 999999;
+		mgr.getIssueById(someNonExistingID);
 	}
 
-	@Test
-	public void testUpdateIssueNonExistingId() {
-		try {
-			int nonExistingId = 999999;
-			Issue issue = new Issue();
-			issue.setId(nonExistingId);
-			mgr.updateIssue(issue);
-			Assert.fail("Must have failed with NotFoundException because we provided invalid issue ID.");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException.");
-		} catch (Exception e) {
-			Assert.fail();
-		}
-	}
+    @Test(expected = NotFoundException.class)
+    public void testUpdateIssueNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        int nonExistingId = 999999;
+        Issue issue = new Issue();
+        issue.setId(nonExistingId);
+        mgr.updateIssue(issue);
+    }
 
 	
 	@Test
@@ -634,14 +582,9 @@ public class RedmineManagerTest {
 		Assert.assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
 	}
 	
-	@Test
-	public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException {
-		try {
-			mgr.getUserById(999999);
-			Assert.fail("Must have failed above");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException");
-		}
+    @Test(expected = NotFoundException.class)
+	public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+		mgr.getUserById(999999);
 	}
 	
 	@Test
