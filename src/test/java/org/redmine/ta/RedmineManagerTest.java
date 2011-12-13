@@ -270,18 +270,10 @@ public class RedmineManagerTest {
 		
 	}
 
-	@Test
-	public void testEmptyHostParameter() throws RuntimeException {
-		try {
-			new RedmineManager("", null); 
-			Assert.fail("Must have failed with IllegalArgumentException");
-		} catch (IllegalArgumentException e) {
-			System.out.println("Got expected IllegalArgumentException.");
-		} catch (Exception e) {
-			Assert.fail("Got unexpected exception : " + e);
-		}
-		
-	}
+    @Test(expected = IllegalArgumentException.class)
+    public void testEmptyHostParameter() throws RuntimeException {
+        new RedmineManager("", null);
+    }
 	
 	@Test
 	public void testWrongCredentialsOnCreateIssue() throws RuntimeException {
