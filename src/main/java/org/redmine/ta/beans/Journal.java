@@ -15,7 +15,7 @@ public class Journal {
     private Date createdOn;
 
     /**
-     * This default empty constructor is required for Custor XML library.
+     * This default empty constructor is required for Castor XML library.
      */
     public Journal() {
     }
