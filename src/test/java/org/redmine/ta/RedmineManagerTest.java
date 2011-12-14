@@ -767,7 +767,7 @@ public class RedmineManagerTest {
 		Assert.assertEquals(newHours, updatedEntry.getHours());
 	}
 	
-	@Test
+	@Test(expected = NotFoundException.class)
 	public void testCreateDeleteTimeEntry() throws IOException, AuthenticationException, NotFoundException, RedmineException {
 		Issue issue = createIssues(1).get(0);
 		Integer issueId = issue.getId();
@@ -781,12 +781,7 @@ public class RedmineManagerTest {
 		Assert.assertNotNull(createdEntry);
 		
 		mgr.deleteTimeEntry(createdEntry.getId());
-		try {
-			mgr.getTimeEntry(createdEntry.getId());
-			Assert.fail("Must have failed with NotFoundException");
-		} catch (NotFoundException e) {
-			System.out.println("Got expected NotFoundException when loading TimeEntry with non-existing id");
-		}
+		mgr.getTimeEntry(createdEntry.getId());
 	}
 	
 	@Test
@@ -820,7 +815,7 @@ public class RedmineManagerTest {
 		return createdEntry;
 	}
 	
-	@Test
+	@Test(expected = NotFoundException.class)
 	public void testDeleteIssue() throws IOException, AuthenticationException,
 			NotFoundException, RedmineException {
 		Issue issue = createIssues(1).get(0);
@@ -828,12 +823,7 @@ public class RedmineManagerTest {
 		Assert.assertEquals(issue, retrievedIssue);
 
 		mgr.deleteIssue(issue.getId());
-		try {
 			mgr.getIssueById(issue.getId());
-			Assert.fail("Must have failed with NotFoundException");
-		} catch (NotFoundException ignore) {
-			System.out.println("Got expected NotFoundException for deleted Issue");
-		}
 	}
 	
 	@Test
