@@ -4,7 +4,7 @@
 <mapping>
     <description>Redmine XML -> Java API binding. </description>
 
-    <class name="org.redmine.ta.beans.Status">
+    <class name="org.redmine.ta.beans.IssueStatus">
         <map-to xml="issue_status" />
 
         <field name="id" type="integer">

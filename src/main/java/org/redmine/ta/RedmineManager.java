@@ -19,7 +19,6 @@ package org.redmine.ta;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -85,7 +84,7 @@ public class RedmineManager {
 			put(Project.class, "projects");
 			put(TimeEntry.class, "time_entries");
 			put(SavedQuery.class, "queries");
-            put(Status.class, "issue_statuses");
+            put(IssueStatus.class, "issue_statuses");
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
@@ -914,9 +913,9 @@ public class RedmineManager {
 	}
 
     /**
-     * Delivers a list of existing {@link Status}es.
+     * Delivers a list of existing {@link org.redmine.ta.beans.IssueStatus}es.
      *
-     * @return a list of existing {@link Status}es.
+     * @return a list of existing {@link org.redmine.ta.beans.IssueStatus}es.
      * @throws IOException
      *             thrown in case something went wrong while performing I/O
      *             operations
@@ -927,8 +926,8 @@ public class RedmineManager {
      * @throws NotFoundException
      *             thrown in case an object can not be found
      */
-    public List<Status> getStatuses() throws IOException, AuthenticationException, RedmineException, NotFoundException {
-        return getObjectsList(Status.class, new HashSet<NameValuePair>());
+    public List<IssueStatus> getStatuses() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        return getObjectsList(IssueStatus.class, new HashSet<NameValuePair>());
     }
 
 }

@@ -32,7 +32,7 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
-import org.redmine.ta.beans.Status;
+import org.redmine.ta.beans.IssueStatus;
 import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
@@ -53,7 +53,7 @@ public class RedmineXMLParser {
 			put(TimeEntry.class, "/mapping_time_entries.xml");
 			put(SavedQuery.class, "/mapping_queries.xml");
 			put(IssueRelation.class, "/mapping_relations.xml");
-            put(Status.class, MAPPING_STATUSES);
+            put(IssueStatus.class, MAPPING_STATUSES);
 		}
 	};
 

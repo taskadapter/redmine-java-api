@@ -88,8 +88,8 @@ public class RedmineXMLGenerator {
 		if (o instanceof IssueRelation) {
 			return toXML((IssueRelation) o);
 		}
-        if (o instanceof Status) {
-            return toXML((Status) o);
+        if (o instanceof IssueStatus) {
+            return toXML((IssueStatus) o);
         }
 		throw new RuntimeException("Object type is not supported.");
 	}
@@ -140,10 +140,10 @@ public class RedmineXMLGenerator {
 		return b.toString();
 	}
 
-    public static String toXML(Status status) {
+    public static String toXML(IssueStatus issueStatus) {
         StringBuilder xmlBuilder = new StringBuilder(XML_PREFIX + "<issue_status>");
-        appendIfNotNull(xmlBuilder, "id", status.getId());
-        appendIfNotNull(xmlBuilder, "name", status.getName());
+        appendIfNotNull(xmlBuilder, "id", issueStatus.getId());
+        appendIfNotNull(xmlBuilder, "name", issueStatus.getName());
         xmlBuilder.append("</issue_status>");
         return xmlBuilder.toString();
     }

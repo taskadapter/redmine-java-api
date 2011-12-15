@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Redmine Issue Status ("new", "in progress" etc)
  *
  */
-public class Status implements Identifiable, Serializable {
+public class IssueStatus implements Identifiable, Serializable {
 
     private Integer id;
     private String name;
@@ -16,10 +16,10 @@ public class Status implements Identifiable, Serializable {
     /**
      * No-params constructor is required for reflective construction.
      */
-    public Status() {
+    public IssueStatus() {
     }
 
-    public Status(Integer id, String name) {
+    public IssueStatus(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -75,7 +75,7 @@ public class Status implements Identifiable, Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Status other = (Status) obj;
+        IssueStatus other = (IssueStatus) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
