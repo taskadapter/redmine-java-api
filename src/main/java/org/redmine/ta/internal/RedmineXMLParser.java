@@ -32,6 +32,7 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Status;
 import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
@@ -40,7 +41,8 @@ public class RedmineXMLParser {
 	private static final String MAPPING_PROJECTS_LIST = "/mapping_projects_list.xml";
 	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 	private static final String MAPPING_USERS = "/mapping_users.xml";
-	
+    private static final String MAPPING_STATUSES = "/mapping_statuses_list.xml";
+
 	// TODO optimize : pre-load xml 
 	private static final Map<Class, String> fromRedmineMap = new HashMap<Class, String>() {
 		private static final long serialVersionUID = 1L;
@@ -51,6 +53,7 @@ public class RedmineXMLParser {
 			put(TimeEntry.class, "/mapping_time_entries.xml");
 			put(SavedQuery.class, "/mapping_queries.xml");
 			put(IssueRelation.class, "/mapping_relations.xml");
+            put(Status.class, MAPPING_STATUSES);
 		}
 	};
 
