@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+        "http://castor.org/mapping.dtd">
+<mapping>
+    <description>Redmine XML -> Java API binding. </description>
+
+    <class name="org.redmine.ta.beans.Status">
+        <map-to xml="issue_status" />
+
+        <field name="id" type="integer">
+            <bind-xml name="id" node="element" />
+        </field>
+        <field name="name" type="string">
+            <bind-xml name="name" node="element" />
+        </field>
+        <field name="defaultStatus" type="boolean">
+            <bind-xml name="is_default" node="element" />
+        </field>
+        <field name="closed" type="boolean">
+            <bind-xml name="is_closed" node="element" />
+        </field>
+
+    </class>
+
+</mapping>

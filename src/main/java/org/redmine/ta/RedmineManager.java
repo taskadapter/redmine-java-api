@@ -85,6 +85,7 @@ public class RedmineManager {
 			put(Project.class, "projects");
 			put(TimeEntry.class, "time_entries");
 			put(SavedQuery.class, "queries");
+            put(Status.class, "issue_statuses");
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
@@ -911,5 +912,23 @@ public class RedmineManager {
 		IssueRelation relation = RedmineXMLParser.parseRelationFromXML(response.getBody());
 		return relation;
 	}
+
+    /**
+     * Delivers a list of existing {@link Status}es.
+     *
+     * @return a list of existing {@link Status}es.
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws NotFoundException
+     *             thrown in case an object can not be found
+     */
+    public List<Status> getStatuses() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        return getObjectsList(Status.class, new HashSet<NameValuePair>());
+    }
 
 }

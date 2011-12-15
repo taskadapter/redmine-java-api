@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 /**
  * This class and its dependencies are located in org.redmine.ta.api project.
  */
@@ -1155,7 +1158,7 @@ public class RedmineManagerTest {
 			System.out.println("create: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
+			fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 		try {
 			mgr.updateTimeEntry(timeEntry);
@@ -1163,7 +1166,7 @@ public class RedmineManagerTest {
 			System.out.println("update: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
+			fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 		// Now can try to verify with project ID (only test with issue ID seems to be already covered)
 		int projectId = mgr.getProjects().get(0).getId();
@@ -1173,7 +1176,33 @@ public class RedmineManagerTest {
 			System.out.println(created);
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
+			fail("Unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
 		}
 	}
+
+    /**
+     * tests the retrieval of statuses.
+     *
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws NotFoundException
+     *             thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testGetStatuses() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // TODO we should create some statuses first, but the Redmine Java API does not support this presently
+        List<Status> statuses = mgr.getStatuses();
+        Assert.assertFalse("Expected list of statuses not to be empty", statuses.isEmpty());
+        for (Status status : statuses) {
+            // asserts on status
+            assertNotNull("ID of status must not be null", status.getId());
+            assertNotNull("Name of status must not be null", status.getName());
+        }
+    }
+
 }
