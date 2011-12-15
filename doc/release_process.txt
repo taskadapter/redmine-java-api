@@ -1,10 +1,24 @@
 Release process for Redmine Java API.
 -------------------------------------
 
-Change version number in   \pom.xml
-! Make sure it does not have "-SNAPSHOP" at the end.
+Change version number in  /pom.xml (make sure it does not have "-SNAPSHOT" at the end).
+Commit to SVN.
 
-Commit to SVN, wait for the new auto-build. Verify all tests pass.
+AUTO-release:
+Start this Jenkins job: https://ta-dev.dyndns.biz:8093/job/redmine-java-api-publish
+This will build and test the library and then upload to OSS Sonatype Staging repository.
+
+Go to https://oss.sonatype.org/index.html#stagingRepositories and "close" the
+Redmine Staging repository, then click "Release" to finalize.
+The library will be synced from that repo to Maven Central in a few hours.
+
+Hints:
+1. the deployment passwords and GPG passphrase are stored on the build server in settings.xml file.
+GPG key is stored on the build server as well.
+
+2. Drop the staging repository if something goes wrong and re-start the Jenkins job or deploy via Maven script.
+
+--------------SKIP THIS --------- MANUAL RELEASE (Not recommended)
 
 Download 3 JAR files from the build server: src, classes, javadocs. E.g.:
   redmine-java-api-1.5.2-sources.jar
@@ -17,7 +31,4 @@ You need to have the "SSH private key" on your machine for this(?).
 You also need to provide a password for the upload, it's in "TA project infrastructure" doc
 (not available to people who are not part of the project).
 
-Drop the staging repository if something goes wrong:
-Go to https://oss.sonatype.org/index.html#stagingRepositories and "close" the 
-Redmine Staging repository, then click "Release" to finalize.
-The library will be synced from that repo to Maven Central in a few hours.  
+
