@@ -1196,12 +1196,12 @@ public class RedmineManagerTest {
     @Test
     public void testGetStatuses() throws RedmineException, IOException, AuthenticationException, NotFoundException {
         // TODO we should create some statuses first, but the Redmine Java API does not support this presently
-        List<Status> statuses = mgr.getStatuses();
+        List<IssueStatus> statuses = mgr.getStatuses();
         Assert.assertFalse("Expected list of statuses not to be empty", statuses.isEmpty());
-        for (Status status : statuses) {
+        for (IssueStatus issueStatus : statuses) {
             // asserts on status
-            assertNotNull("ID of status must not be null", status.getId());
-            assertNotNull("Name of status must not be null", status.getName());
+            assertNotNull("ID of status must not be null", issueStatus.getId());
+            assertNotNull("Name of status must not be null", issueStatus.getName());
         }
     }
 
