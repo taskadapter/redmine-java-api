@@ -85,6 +85,7 @@ public class RedmineManager {
 			put(TimeEntry.class, "time_entries");
 			put(SavedQuery.class, "queries");
             put(IssueStatus.class, "issue_statuses");
+            put(Version.class, "versions");
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
@@ -928,6 +929,88 @@ public class RedmineManager {
      */
     public List<IssueStatus> getStatuses() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         return getObjectsList(IssueStatus.class, new HashSet<NameValuePair>());
+    }
+
+    /**
+     * creates a new {@link Version} for the {@link Project} contained. <br/>
+     * Pre-condition: the attribute {@link Project} for the {@link Version} must
+     * not be null!
+     *
+     * @param version
+     *            the {@link Version}. Must contain a {@link Project}.
+     * @return the new {@link Version} created by Redmine
+     * @throws IllegalArgumentException
+     *             thrown in case the version does not contain a project.
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws NotFoundException
+     *             thrown in case an object can not be found
+     */
+    public Version createVersion(Version version) throws IOException, AuthenticationException, RedmineException, IllegalArgumentException, NotFoundException {
+        // check project
+        if (version.getProject() == null) {
+            throw new IllegalArgumentException("Version must contain a project");
+        }
+        // create URI and entity
+        int projectID = version.getProject().getId();
+        URI uri = createURI("projects/" + projectID + "/versions.xml");
+        HttpPost httpPost = new HttpPost(uri);
+        String createVersionXML = RedmineXMLGenerator.toXML(version);
+        setEntity(httpPost, createVersionXML);
+        // send request
+        Response response = sendRequest(httpPost);
+        // handle response
+        debug("Received response " + response.getBody());
+        Version createdVersion = RedmineXMLParser.parseVersionFromXML(response.getBody());
+        return createdVersion;
+    }
+
+    /**
+     * deletes a new {@link Version} from the {@link Project} contained. <br/>
+     *
+     * @param version
+     *            the {@link Version}.
+     * @return the new {@link Version} created by Redmine
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws NotFoundException
+     *             thrown in case an object can not be found
+     */
+    public void deleteVersion(Version version) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        deleteObject(Version.class, Integer.toString(version.getId()));
+    }
+
+    /**
+     * delivers a list of {@link Version}s of a {@link Project}
+     *
+     * @param projectID
+     *            the ID of the {@link Project}
+     * @return the list of {@link Version}s of the {@link Project}
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws NotFoundException
+     *             thrown in case an object can not be found
+     */
+    public List<Version> getVersions(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        URI uri = createURI("projects/" + projectID + "/versions.xml", new BasicNameValuePair("include", "projects"));
+        HttpGet http = new HttpGet(uri);
+        Response response = sendRequest(http);
+        return RedmineXMLParser.parseVersionsFromXML(response.getBody());
     }
 
 }

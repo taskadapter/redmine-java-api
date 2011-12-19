@@ -27,6 +27,26 @@ public class Version implements Identifiable {
 	private Date createdOn;
 	private Date updatedOn;
 
+    /**
+     * No-params constructor. Required for reflective construction.
+     */
+    public Version() {
+
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param project
+     *            the {@link Project} of the {@link Version}
+     * @param name
+     *            the name of the the {@link Version}
+     */
+    public Version(Project project, String name) {
+        this.project = project;
+        this.name = name;
+    }
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)

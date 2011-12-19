@@ -70,6 +70,12 @@ public class RedmineXMLGenerator {
 			}
 			b.append("</custom_fields>");
 		}
+
+        if (issue.getTargetVersion() != null) {
+            appendIfNotNull(b, "fixed_version_id", issue.getTargetVersion().getId());
+            appendIfNotNull(b, "fixed_version_name", issue.getTargetVersion().getName());
+        }
+
 		b.append("</issue>");
 		return b.toString();
 	}
@@ -90,6 +96,9 @@ public class RedmineXMLGenerator {
 		}
         if (o instanceof IssueStatus) {
             return toXML((IssueStatus) o);
+        }
+        if (o instanceof Version) {
+            return toXML((Version) o);
         }
 		throw new RuntimeException("Object type is not supported.");
 	}
@@ -145,6 +154,16 @@ public class RedmineXMLGenerator {
         appendIfNotNull(xmlBuilder, "id", issueStatus.getId());
         appendIfNotNull(xmlBuilder, "name", issueStatus.getName());
         xmlBuilder.append("</issue_status>");
+        return xmlBuilder.toString();
+    }
+
+    public static String toXML(Version version) {
+        StringBuilder xmlBuilder = new StringBuilder(XML_PREFIX + "<version>");
+        appendIfNotNull(xmlBuilder, "id", version.getId());
+        appendIfNotNull(xmlBuilder, "name", version.getName());
+        appendIfNotNull(xmlBuilder, "status", version.getStatus());
+        appendIfNotNull(xmlBuilder, "description", version.getDescription());
+        xmlBuilder.append("</version>");
         return xmlBuilder.toString();
     }
 
