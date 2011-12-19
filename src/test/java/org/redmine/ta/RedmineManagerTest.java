@@ -1205,4 +1205,118 @@ public class RedmineManagerTest {
         }
     }
 
+    /**
+     * tests the creation of an invalid {@link Version}.
+     *
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws NotFoundException
+     *             thrown in case the objects requested for could not be found
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateInvalidVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // create new invalid test version
+        Version version = new Version(null, "Invalid test version " + UUID.randomUUID().toString());
+        mgr.createVersion(version);
+    }
+
+    /**
+     * tests the deletion of an invalid {@link Version}. Expects a
+     * {@link NotFoundException} to be thrown.
+     *
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws NotFoundException
+     *             thrown in case the objects requested for could not be found
+     */
+    @Test(expected = NotFoundException.class)
+    public void testDeleteInvalidVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // create new test version
+        Version version = new Version(null, "Invalid test version " + UUID.randomUUID().toString());
+        version.setDescription("An invalid test version created by " + this.getClass());
+        // set invalid id
+        version.setId(-1);
+        // now try to delete version
+        mgr.deleteVersion(version);
+    }
+
+    /**
+     * tests the deletion of a {@link Version}.
+     *
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws NotFoundException
+     *             thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testDeleteVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        Project project = mgr.getProjectByKey(projectKey);
+        // create new test version
+        Version version = new Version(project, "Test version " + UUID.randomUUID().toString());
+        version.setDescription("A test version created by " + this.getClass());
+        version.setStatus("open");
+        Version newVersion = mgr.createVersion(version);
+        // assert new test version
+        Assert.assertNotNull("Expected new version not to be null", newVersion);
+        // now delete version
+        mgr.deleteVersion(newVersion);
+        // assert that the version is gone
+        List<Version> versions = mgr.getVersions(project.getId());
+        Assert.assertTrue("List of versions of test project must be empty now but is " + versions, versions.isEmpty());
+    }
+
+    /**
+     * tests the retrieval of {@link Version}s.
+     *
+     * @throws RedmineException
+     *             thrown in case something went wrong in Redmine
+     * @throws IOException
+     *             thrown in case something went wrong while performing I/O
+     *             operations
+     * @throws AuthenticationException
+     *             thrown in case something went wrong while trying to login
+     * @throws NotFoundException
+     *             thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testGetVersions() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        Project project = mgr.getProjectByKey(projectKey);
+        // create some versions
+        Version testVersion1 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
+        Version testVersion2 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
+        try {
+            List<Version> versions = mgr.getVersions(project.getId());
+            Assert.assertEquals("Wrong number of versions for project " + project.getName() + " delivered by Redmine Java API", 2, versions.size());
+            for (Version version : versions) {
+                // assert version
+                Assert.assertNotNull("ID of version must not be null", version.getId());
+                Assert.assertNotNull("Name of version must not be null", version.getName());
+                Assert.assertNotNull("Project of version must not be null", version.getProject());
+            }
+        } finally {
+            // scrub test versions
+            if (testVersion1 != null) {
+                mgr.deleteVersion(testVersion1);
+            }
+            if (testVersion2 != null) {
+                mgr.deleteVersion(testVersion2);
+            }
+        }
+    }
+
 }

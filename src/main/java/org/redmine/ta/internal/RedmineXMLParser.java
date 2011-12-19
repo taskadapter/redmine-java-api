@@ -26,13 +26,7 @@ import java.util.regex.Pattern;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.IssueRelation;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.SavedQuery;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.User;
-import org.redmine.ta.beans.IssueStatus;
+import org.redmine.ta.beans.*;
 import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
@@ -42,6 +36,7 @@ public class RedmineXMLParser {
 	private static final String MAPPING_ISSUES = "/mapping_issues_list.xml";
 	private static final String MAPPING_USERS = "/mapping_users.xml";
     private static final String MAPPING_STATUSES = "/mapping_statuses_list.xml";
+    private static final String MAPPING_VERSIONS = "/mapping_versions_list.xml";
 
 	// TODO optimize : pre-load xml 
 	private static final Map<Class, String> fromRedmineMap = new HashMap<Class, String>() {
@@ -54,6 +49,7 @@ public class RedmineXMLParser {
 			put(SavedQuery.class, "/mapping_queries.xml");
 			put(IssueRelation.class, "/mapping_relations.xml");
             put(IssueStatus.class, MAPPING_STATUSES);
+            put(Version.class, MAPPING_VERSIONS);
 		}
 	};
 
@@ -250,4 +246,12 @@ public class RedmineXMLParser {
 	public static IssueRelation parseRelationFromXML(String body) {
 		return parseObjectFromXML(IssueRelation.class, body);
 	}
+
+    public static List<Version> parseVersionsFromXML(String body) {
+        return parseObjectsFromXML(Version.class, body);
+    }
+
+    public static Version parseVersionFromXML(String body) {
+        return parseObjectFromXML(Version.class, body);
+    }
 }
