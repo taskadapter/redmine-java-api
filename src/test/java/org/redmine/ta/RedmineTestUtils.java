@@ -17,7 +17,16 @@ public class RedmineTestUtils {
 		return result;
 	}
 
-	public static TimeEntry findTimeEntry(List<TimeEntry> list, Integer id) {
+    public static Issue findIssueInList(List<Issue> list, String subject) {
+   		Issue result = null;
+   		for (Issue issue : list) {
+   			if (issue.getSubject().equals(subject)) {
+   				result = issue;
+   			}
+   		}
+   		return result;
+   	}
+    public static TimeEntry findTimeEntry(List<TimeEntry> list, Integer id) {
 		TimeEntry result = null;
 		for (TimeEntry obj : list) {
 			if (obj.getId().equals(id)) {
