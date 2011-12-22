@@ -157,25 +157,18 @@ public class RedmineXMLParserTest {
 		}
 	}
 
-	@Test
-	@Ignore
-	public void testParseIssueNonUnicodeSymbols() {
-		try {
-			String xml = MyIOUtils
-					.getResourceAsString("issues_foreign_symbols.xml");
-
-//			String nonLatinSymbols = "Example with accents Ação";
-			String nonLatinSymbols = "Example with russian text: Привет";
-			List<Issue> issues = RedmineXMLParser.parseObjectsFromXML(Issue.class, xml);
-			// must be 1 issue in the file
-			Assert.assertTrue(issues.size() == 1);
-			Issue issue = issues.get(0);
-			Assert.assertEquals(nonLatinSymbols, issue.getSubject());
-
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-		}
-	}
+    @Test
+    public void testParseIssueNonUnicodeSymbols() throws IOException {
+        String xml = MyIOUtils
+                .getResourceAsString("issues_foreign_symbols.xml");
+        String nonLatinAccentSymbols = "Accent symbols: Ação";
+        String nonLatinRussianSymbols = "Russian symbols: Привет";
+        List<Issue> issues = RedmineXMLParser.parseObjectsFromXML(Issue.class, xml);
+        // must be 2 issues in the file
+        Assert.assertTrue(issues.size() == 2);
+        assertNotNull(RedmineTestUtils.findIssueInList(issues, nonLatinRussianSymbols));
+        assertNotNull(RedmineTestUtils.findIssueInList(issues, nonLatinAccentSymbols));
+    }
 	
 	@Test
 	public void testParseInvalidPage() {
