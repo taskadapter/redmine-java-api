@@ -110,6 +110,9 @@ public class RedmineManager {
 		this.apiAccessKey = apiAccessKey;
 	}
 
+    /**
+     * @deprecated Use RedmineManager(String uri) constructor instead.
+     */
 	public RedmineManager(String uri, String login, String password) {
 		this(uri);
 		this.login = login;
@@ -453,7 +456,7 @@ public class RedmineManager {
 
 	/**
 	 * 
-	 * @param projectKey
+	 * @param projectKey ignored if NULL
 	 * @param queryId id of the saved query in Redmine. the query must be accessible to the user 
 	 *   represented by the API access key (if the Redmine project requires authorization). 
 	 *   This parameter is <b>optional<b>, NULL can be provided to get all available issues.
