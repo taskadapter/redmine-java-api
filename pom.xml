@@ -105,7 +105,7 @@
 
     <profiles>
         <profile>
-            <id>deploy-profile</id>
+            <id>sign-and-release</id>
             <build>
                 <plugins>
                     <plugin>
