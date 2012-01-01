@@ -111,7 +111,7 @@ public class RedmineManager {
 	}
 
     /**
-     * @deprecated Use RedmineManager(String uri) constructor instead.
+     * @deprecated Use RedmineManager(String uri) constructor and then setLogin() , setPassword()
      */
 	public RedmineManager(String uri, String login, String password) {
 		this(uri);
@@ -1016,4 +1016,11 @@ public class RedmineManager {
         return RedmineXMLParser.parseVersionsFromXML(response.getBody());
     }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
