@@ -30,7 +30,9 @@ public class RedmineManagerTest {
         testConfig = new TestConfig();
 		System.out.println("Running redmine tests using: " + testConfig.getURI());
 //		mgr = new RedmineManager(TestConfig.getURI(), TestConfig.getApiKey());
-		mgr = new RedmineManager(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+		mgr = new RedmineManager(testConfig.getURI());
+        mgr.setLogin(testConfig.getLogin());
+        mgr.setPassword(testConfig.getPassword());
 		Project junitTestProject = new Project();
 		junitTestProject.setName("test project");
 		junitTestProject.setIdentifier("test"
