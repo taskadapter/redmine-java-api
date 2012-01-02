@@ -1,14 +1,14 @@
 package org.redmine.ta;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.redmine.ta.beans.Project;
 
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.redmine.ta.beans.Project;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Check the RedmineManager returns the same amount of projects using HTTP basic authentication and
@@ -28,7 +28,9 @@ public final class HttpBasicAuthTest {
     public static void setup() {
         testConfig = new TestConfig();
         mgrKey = new RedmineManager(testConfig.getURI(), testConfig.getApiKey());
-        mgrHttpBasicAuth = new RedmineManager(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        mgrHttpBasicAuth = new RedmineManager(testConfig.getURI());
+        mgrHttpBasicAuth.setLogin(testConfig.getLogin());
+        mgrHttpBasicAuth.setPassword(testConfig.getPassword());
     }
 
     @Test
