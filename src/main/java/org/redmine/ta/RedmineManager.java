@@ -95,6 +95,7 @@ public class RedmineManager {
 			throw new IllegalArgumentException("The host parameter is NULL or empty");
 		}
 		this.host = uri;
+        this.useBasicAuth = true;
 	}
 	
 	/**
@@ -108,6 +109,7 @@ public class RedmineManager {
 	public RedmineManager(String host, String apiAccessKey) {
 		this(host);
 		this.apiAccessKey = apiAccessKey;
+        this.useBasicAuth = false;
 	}
 
     /**

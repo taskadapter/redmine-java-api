@@ -42,7 +42,7 @@ public class RedmineManagerTest {
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("can't create a test project" + e.getMessage());
+			Assert.fail("can't create a test project. " + e.getMessage());
 		}
 	}
 
@@ -264,17 +264,17 @@ public class RedmineManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testNULLHostParameter() {
-        new RedmineManager(null, null);
+        new RedmineManager(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyHostParameter() throws RuntimeException {
-        new RedmineManager("", null);
+        new RedmineManager("");
     }
 
     @Test(expected = AuthenticationException.class)
-    public void nullAPIKeyOnCreateIssueThrowsAE() throws Exception {
-        RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI(), null);
+    public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
+        RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI());
         Issue issue = new Issue();
         issue.setSubject("test zzx");
         redmineMgrEmpty.createIssue(projectKey, issue);
