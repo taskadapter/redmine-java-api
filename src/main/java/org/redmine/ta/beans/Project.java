@@ -8,251 +8,252 @@ import java.util.List;
  * Redmine's Project.
  */
 public class Project implements Identifiable, Serializable {
-	
-	/**
-	 * database ID
-	 */
-	private Integer id;
-	
-	/**
-	 * String "identifier" (human-readable name without spaces and other extra stuff)
-	 */
-	private String identifier;
-	
-	/**
-	 * Can contain any symbols
-	 */
-	private String name;
-	
-	private String description;
-	
-	private String homepage;
-	
-	private Date createdOn;
-	
-	private Date updatedOn;
-	
-	/**
-	 * Trackers available for this project
-	 */
-	private List<Tracker> trackers;
 
-	/**
-	 * This is the *database ID*, not a String-based key.
-	 */
-	private Integer parentId;
-	
-	public String getHomepage() {
-		return homepage;
-	}
+    /**
+     * database ID
+     */
+    private Integer id;
 
-	public void setHomepage(String homepage) {
-		this.homepage = homepage;
-	}
+    /**
+     * String "identifier" (human-readable name without spaces and other extra stuff)
+     */
+    private String identifier;
 
-	/**
-	 * @return project's string "key" (not a numeric database id!). Example: "project_ABC"
-	 */
-	public String getIdentifier() {
-		return identifier;
-	}
+    /**
+     * Can contain any symbols
+     */
+    private String name;
 
-	public void setIdentifier(String identifier) {
-		this.identifier = identifier;
-	}
+    private String description;
 
-	@Override
-	/**
-	 * @return numeric database ID
-	 */
-	public Integer getId() {
-		return id;
-	}
+    private String homepage;
 
-	/**
-	 * @param id numeric database ID
-	 */
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    private Date createdOn;
 
-	/**
-	 * @return project name
-	 */
-	public String getName() {
-		return name;
-	}
+    private Date updatedOn;
 
-	/**
-	 * @param name the project name
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	/**
-	 * @return list of Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
-	 */
-	public List<Tracker> getTrackers() {
-		return trackers;
-	}
+    /**
+     * Trackers available for this project
+     */
+    private List<Tracker> trackers;
 
-	public void setTrackers(List<Tracker> trackers) {
-		this.trackers = trackers;
-	}
-	
-	public Tracker getTrackerByName(String trackerName) {
-		if (this.trackers == null) return null;
-		for (Tracker t : this.trackers) {
-			if (t.getName().equals(trackerName)) return t;
-		}
-		return null;
-	}
+    /**
+     * This is the *database ID*, not a String-based key.
+     */
+    private Integer parentId;
 
-	@Override
-	public String toString(){
-		return name;
-	}
+    public String getHomepage() {
+        return homepage;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setHomepage(String homepage) {
+        this.homepage = homepage;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    /**
+     * @return project's string "key" (not a numeric database id!). Example: "project_ABC"
+     */
+    public String getIdentifier() {
+        return identifier;
+    }
 
-	public Date getCreatedOn() {
-		return createdOn;
-	}
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 
-	public void setCreatedOn(Date createdOn) {
-		this.createdOn = createdOn;
-	}
+    @Override
+    /**
+     * @return numeric database ID
+     */
+    public Integer getId() {
+        return id;
+    }
 
-	public Date getUpdatedOn() {
-		return updatedOn;
-	}
+    /**
+     * @param id numeric database ID
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setUpdatedOn(Date updatedOn) {
-		this.updatedOn = updatedOn;
-	}
+    /**
+     * @return project name
+     */
+    public String getName() {
+        return name;
+    }
 
-	/** <b>Redmine's REST API "get project" operation does NOT return the parent project ID. </b> 
-	 * see bug http://www.redmine.org/issues/8229
-	 * Which means calling getParentId() of the project loaded from Redmine server will
-	 * return <b>NULL</b>!
-	 * 
-	 * @return the parent project Id if it was set programmatically or NULL (!!!) if the project was loaded from the server.
-	 */ 
-	public Integer getParentId() {
-		return parentId;
-	}
+    /**
+     * @param name the project name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setParentId(Integer parentId) {
-		this.parentId = parentId;
-	}
+    /**
+     * @return list of Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
+     */
+    public List<Tracker> getTrackers() {
+        return trackers;
+    }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result
-				+ ((createdOn == null) ? 0 : createdOn.hashCode());
-		result = prime * result
-				+ ((description == null) ? 0 : description.hashCode());
-		result = prime * result
-				+ ((homepage == null) ? 0 : homepage.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result
-				+ ((identifier == null) ? 0 : identifier.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
-				+ ((parentId == null) ? 0 : parentId.hashCode());
-		result = prime * result
-				+ ((trackers == null) ? 0 : trackers.hashCode());
-		result = prime * result
-				+ ((updatedOn == null) ? 0 : updatedOn.hashCode());
-		return result;
-	}
+    public void setTrackers(List<Tracker> trackers) {
+        this.trackers = trackers;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
-			return false;
-		}
-		Project other = (Project) obj;
-		if (createdOn == null) {
-			if (other.createdOn != null) {
-				return false;
-			}
-		} else if (!createdOn.equals(other.createdOn)) {
-			return false;
-		}
-		if (description == null) {
-			if (other.description != null) {
-				return false;
-			}
-		} else if (!description.equals(other.description)) {
-			return false;
-		}
-		if (homepage == null) {
-			if (other.homepage != null) {
-				return false;
-			}
-		} else if (!homepage.equals(other.homepage)) {
-			return false;
-		}
-		if (id == null) {
-			if (other.id != null) {
-				return false;
-			}
-		} else if (!id.equals(other.id)) {
-			return false;
-		}
-		if (identifier == null) {
-			if (other.identifier != null) {
-				return false;
-			}
-		} else if (!identifier.equals(other.identifier)) {
-			return false;
-		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		if (parentId == null) {
-			if (other.parentId != null) {
-				return false;
-			}
-		} else if (!parentId.equals(other.parentId)) {
-			return false;
-		}
-		if (trackers == null) {
-			if (other.trackers != null) {
-				return false;
-			}
-		} else if (!trackers.equals(other.trackers)) {
-			return false;
-		}
-		if (updatedOn == null) {
-			if (other.updatedOn != null) {
-				return false;
-			}
-		} else if (!updatedOn.equals(other.updatedOn)) {
-			return false;
-		}
-		return true;
-	}
-	
-	
+    public Tracker getTrackerByName(String trackerName) {
+        if (this.trackers == null) return null;
+        for (Tracker t : this.trackers) {
+            if (t.getName().equals(trackerName)) return t;
+        }
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(Date createdOn) {
+        this.createdOn = createdOn;
+    }
+
+    public Date getUpdatedOn() {
+        return updatedOn;
+    }
+
+    public void setUpdatedOn(Date updatedOn) {
+        this.updatedOn = updatedOn;
+    }
+
+    /**
+     * <b>Redmine's REST API "get project" operation does NOT return the parent project ID. </b>
+     * see bug http://www.redmine.org/issues/8229
+     * Which means calling getParentId() of the project loaded from Redmine server will
+     * return <b>NULL</b>!
+     *
+     * @return the parent project Id if it was set programmatically or NULL (!!!) if the project was loaded from the server.
+     */
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((createdOn == null) ? 0 : createdOn.hashCode());
+        result = prime * result
+                + ((description == null) ? 0 : description.hashCode());
+        result = prime * result
+                + ((homepage == null) ? 0 : homepage.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result
+                + ((identifier == null) ? 0 : identifier.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result
+                + ((parentId == null) ? 0 : parentId.hashCode());
+        result = prime * result
+                + ((trackers == null) ? 0 : trackers.hashCode());
+        result = prime * result
+                + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Project other = (Project) obj;
+        if (createdOn == null) {
+            if (other.createdOn != null) {
+                return false;
+            }
+        } else if (!createdOn.equals(other.createdOn)) {
+            return false;
+        }
+        if (description == null) {
+            if (other.description != null) {
+                return false;
+            }
+        } else if (!description.equals(other.description)) {
+            return false;
+        }
+        if (homepage == null) {
+            if (other.homepage != null) {
+                return false;
+            }
+        } else if (!homepage.equals(other.homepage)) {
+            return false;
+        }
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else if (!id.equals(other.id)) {
+            return false;
+        }
+        if (identifier == null) {
+            if (other.identifier != null) {
+                return false;
+            }
+        } else if (!identifier.equals(other.identifier)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (parentId == null) {
+            if (other.parentId != null) {
+                return false;
+            }
+        } else if (!parentId.equals(other.parentId)) {
+            return false;
+        }
+        if (trackers == null) {
+            if (other.trackers != null) {
+                return false;
+            }
+        } else if (!trackers.equals(other.trackers)) {
+            return false;
+        }
+        if (updatedOn == null) {
+            if (other.updatedOn != null) {
+                return false;
+            }
+        } else if (!updatedOn.equals(other.updatedOn)) {
+            return false;
+        }
+        return true;
+    }
+
+
 }
