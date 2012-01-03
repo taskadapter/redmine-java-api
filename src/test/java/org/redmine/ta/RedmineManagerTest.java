@@ -1321,4 +1321,106 @@ public class RedmineManagerTest {
         }
     }
 
+    /**
+     * tests the creation and deletion of a {@link IssueCategory}.
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testCreateAndDeleteIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        Project project = mgr.getProjectByKey(projectKey);
+        // create new test category
+        IssueCategory category = new IssueCategory(project, "Category" + new Date().getTime());
+        category.setAssignee(getOurUser());
+        IssueCategory newIssueCategory = mgr.createCategory(category);
+        // assert new test category
+        Assert.assertNotNull("Expected new category not to be null", newIssueCategory);
+        Assert.assertNotNull("Expected project of new category not to be null", newIssueCategory.getProject());
+        Assert.assertNotNull("Expected assignee of new category not to be null", newIssueCategory.getAssignee());
+        // now delete category
+        mgr.deleteCategory(newIssueCategory);
+        // assert that the category is gone
+        List<IssueCategory> categories = mgr.getCategories(project.getId());
+        Assert.assertTrue("List of categories of test project must be empty now but is " + categories, categories.isEmpty());
+}
+
+    /**
+     * tests the retrieval of {@link IssueCategory}s.
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testGetIssueCategories() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        Project project = mgr.getProjectByKey(projectKey);
+        // create some categories
+        IssueCategory testIssueCategory1 = new IssueCategory(project, "Category" + new Date().getTime());
+        testIssueCategory1.setAssignee(getOurUser());
+        IssueCategory newIssueCategory1 = mgr.createCategory(testIssueCategory1);
+        IssueCategory testIssueCategory2 = new IssueCategory(project, "Category" + new Date().getTime());
+        testIssueCategory2.setAssignee(getOurUser());
+        IssueCategory newIssueCategory2 = mgr.createCategory(testIssueCategory2);
+        try {
+            List<IssueCategory> categories = mgr.getCategories(project.getId());
+            Assert.assertEquals("Wrong number of categories for project " + project.getName() + " delivered by Redmine Java API", 2, categories.size());
+            for (IssueCategory category : categories) {
+                // assert category
+                Assert.assertNotNull("ID of category must not be null", category.getId());
+                Assert.assertNotNull("Name of category must not be null", category.getName());
+                Assert.assertNotNull("Project of category must not be null", category.getProject());
+                Assert.assertNotNull("Assignee of category must not be null", category.getAssignee());
+            }
+        } finally {
+            // scrub test categories
+            if (newIssueCategory1 != null) {
+                mgr.deleteCategory(newIssueCategory1);
+            }
+            if (newIssueCategory2 != null) {
+                mgr.deleteCategory(newIssueCategory2);
+            }
+        }
+    }
+
+    /**
+     * tests the creation of an invalid {@link IssueCategory}.
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // create new invalid test category
+        IssueCategory category = new IssueCategory(null, "InvalidCategory" + new Date().getTime());
+        mgr.createCategory(category);
+    }
+
+    /**
+     * tests the deletion of an invalid {@link IssueCategory}. Expects a
+     * {@link NotFoundException} to be thrown.
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test(expected = NotFoundException.class)
+    public void testDeleteInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // create new test category
+        IssueCategory category = new IssueCategory(null, "InvalidCategory" + new Date().getTime());
+        // set invalid id
+        category.setId(-1);
+        // now try to delete category
+        mgr.deleteCategory(category);
+    }
 }
