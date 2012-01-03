@@ -86,6 +86,7 @@ public class RedmineManager {
 			put(SavedQuery.class, "queries");
             put(IssueStatus.class, "issue_statuses");
             put(Version.class, "versions");
+            put(IssueCategory.class,"issue_categories");
 		}
 	};
 	private static final String URL_POSTFIX = ".xml";
@@ -640,21 +641,23 @@ public class RedmineManager {
 
 	// TODO is there a way to get rid of the 1st parameter and use generics?
 	private <T> T createObject(Class<T> classs, T obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-
 		URI uri = getCreateURI(obj.getClass());
-		HttpPost http = new HttpPost(uri);
-		
-		String xml = RedmineXMLGenerator.toXML(obj);
-		setEntity((HttpEntityEnclosingRequest)http, xml);
-
-		Response response = sendRequest(http);
-		if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
-			throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
-		}
-		return RedmineXMLParser.parseObjectFromXML(classs, response.getBody());
-		
+    return createObject(classs, obj, uri);
 	}
 	
+  private <T> T createObject(Class<T> classs, T obj, URI uri) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+  		HttpPost http = new HttpPost(uri);
+  		String xml = RedmineXMLGenerator.toXML(obj);
+  		setEntity(http, xml);
+  
+  		Response response = sendRequest(http);
+  		if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
+  			throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
+  		}
+  		return RedmineXMLParser.parseObjectFromXML(classs, response.getBody());
+  		
+  	}
+  
 	/*
 	 * note: This method cannot return the updated object from Redmine
 	 * because the server does not provide any XML in response.
@@ -664,7 +667,7 @@ public class RedmineManager {
 		HttpPut http = new HttpPut(uri);
 		
 		String xml = RedmineXMLGenerator.toXML(obj);
-		setEntity((HttpEntityEnclosingRequest)http, xml);
+		setEntity(http, xml);
 
 		Response response = sendRequest(http);
 		if (response.getCode() ==	HttpStatus.SC_NOT_FOUND) {
@@ -1018,6 +1021,61 @@ public class RedmineManager {
         return RedmineXMLParser.parseVersionsFromXML(response.getBody());
     }
 
+    /**
+     * delivers a list of {@link IssueCategory}s of a {@link Project}
+     *
+     * @param projectID the ID of the {@link Project}
+     * @return the list of {@link IssueCategory}s of the {@link Project}
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws NotFoundException       thrown in case an object can not be found
+     */
+    public List<IssueCategory> getCategories(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        URI uri = createURI("projects/" + projectID + "/issue_categories.xml");
+        HttpGet http = new HttpGet(uri);
+        Response response = sendRequest(http);
+        return RedmineXMLParser.parseIssueCategoriesFromXML(response.getBody());
+    }
+
+    /**
+     * creates a new {@link IssueCategory} for the {@link Project} contained. <br/>
+     * Pre-condition: the attribute {@link Project} for the {@link IssueCategory} must
+     * not be null!
+     *
+     * @param category the {@link IssueCategory}. Must contain a {@link Project}.
+     * @return the new {@link IssueCategory} created by Redmine
+     * @throws IllegalArgumentException thrown in case the category does not contain a project.
+     * @throws IOException              thrown in case something went wrong while performing I/O
+     *                                  operations
+     * @throws AuthenticationException  thrown in case something went wrong while trying to login
+     * @throws RedmineException         thrown in case something went wrong in Redmine
+     * @throws NotFoundException        thrown in case an object can not be found
+     */
+    public IssueCategory createCategory(IssueCategory category) throws IOException, AuthenticationException, RedmineException, IllegalArgumentException, NotFoundException {
+      if (category.getProject() == null) {
+        throw new IllegalArgumentException("IssueCategory must contain a project");
+      }
+      URI uri = getCreateURIIssueCategory(category.getProject().getId());
+      return createObject(IssueCategory.class, category, uri);
+    }
+
+  /**
+     * deletes an {@link IssueCategory}. <br/>
+     *
+     * @param category the {@link IssueCategory}.
+     * @return the new {@link IssueCategory} created by Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws NotFoundException       thrown in case an object can not be found
+     */
+    public void deleteCategory(IssueCategory category) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        deleteObject(IssueCategory.class, Integer.toString(category.getId()));
+    }
+    
     public void setLogin(String login) {
         this.login = login;
     }
@@ -1025,4 +1083,8 @@ public class RedmineManager {
     public void setPassword(String password) {
         this.password = password;
     }
+  
+  private URI getCreateURIIssueCategory(Integer projectID) {
+    return createURI("projects/" + projectID + "/issue_categories.xml");
+  }
 }

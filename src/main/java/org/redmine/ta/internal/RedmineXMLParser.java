@@ -37,6 +37,7 @@ public class RedmineXMLParser {
 	private static final String MAPPING_USERS = "/mapping_users.xml";
     private static final String MAPPING_STATUSES = "/mapping_statuses_list.xml";
     private static final String MAPPING_VERSIONS = "/mapping_versions_list.xml";
+    private static final String MAPPING_CATEGORIES = "/mapping_categories_list.xml";
 
 	// TODO optimize : pre-load xml 
 	private static final Map<Class, String> fromRedmineMap = new HashMap<Class, String>() {
@@ -50,6 +51,7 @@ public class RedmineXMLParser {
 			put(IssueRelation.class, "/mapping_relations.xml");
             put(IssueStatus.class, MAPPING_STATUSES);
             put(Version.class, MAPPING_VERSIONS);
+            put(IssueCategory.class, MAPPING_CATEGORIES);
 		}
 	};
 
@@ -254,4 +256,13 @@ public class RedmineXMLParser {
     public static Version parseVersionFromXML(String body) {
         return parseObjectFromXML(Version.class, body);
     }
+
+    public static List<IssueCategory> parseIssueCategoriesFromXML(String body) {
+        return parseObjectsFromXML(IssueCategory.class, body);
+}
+
+    public static IssueCategory parseIssueCategoryFromXML(String body) {
+        return parseObjectFromXML(IssueCategory.class, body);
+    }
+
 }

@@ -100,6 +100,9 @@ public class RedmineXMLGenerator {
         if (o instanceof Version) {
             return toXML((Version) o);
         }
+        if (o instanceof IssueCategory) {
+            return toXML((IssueCategory) o);
+        }
 		throw new RuntimeException("Object type is not supported.");
 	}
 
@@ -164,6 +167,17 @@ public class RedmineXMLGenerator {
         appendIfNotNull(xmlBuilder, "status", version.getStatus());
         appendIfNotNull(xmlBuilder, "description", version.getDescription());
         xmlBuilder.append("</version>");
+        return xmlBuilder.toString();
+    }
+
+    public static String toXML(IssueCategory issueCategory) {
+        StringBuilder xmlBuilder = new StringBuilder(XML_PREFIX).append("<issue_category>");
+        appendIfNotNull(xmlBuilder, "id", issueCategory.getId());
+        appendIfNotNull(xmlBuilder, "name", issueCategory.getName());
+        if (issueCategory.getAssignee() != null) {
+            appendIfNotNull(xmlBuilder, "assigned_to_id", issueCategory.getAssignee().getId());
+        }
+        xmlBuilder.append("</issue_category>");
         return xmlBuilder.toString();
     }
 
