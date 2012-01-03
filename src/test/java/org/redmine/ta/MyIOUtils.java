@@ -21,103 +21,103 @@ import java.util.TimeZone;
 
 public class MyIOUtils {
 
-	public static InputStream getResourceAsStream(String resource)
-			throws IOException {
-		ClassLoader cl = MyIOUtils.class.getClassLoader();
-		InputStream in = cl.getResourceAsStream(resource);
+    public static InputStream getResourceAsStream(String resource)
+            throws IOException {
+        ClassLoader cl = MyIOUtils.class.getClassLoader();
+        InputStream in = cl.getResourceAsStream(resource);
 
-		if (in == null) {
-			throw new IOException("resource \"" + resource + "\" not found");
-		}
+        if (in == null) {
+            throw new IOException("resource \"" + resource + "\" not found");
+        }
 
-		return in;
-	}
+        return in;
+    }
 
-	/**
-	 * Loads the resource from classpath
-	 */
-	public static String getResourceAsString(String resource)
-			throws IOException {
-		InputStream in = getResourceAsStream(resource);
-		return convertStreamToString(in);
-	}
+    /**
+     * Loads the resource from classpath
+     */
+    public static String getResourceAsString(String resource)
+            throws IOException {
+        InputStream in = getResourceAsStream(resource);
+        return convertStreamToString(in);
+    }
 
-	private static String convertStreamToString(InputStream is)
-			throws IOException {
-		/*
-		 * To convert the InputStream to String we use the Reader.read(char[]
-		 * buffer) method. We iterate until the Reader return -1 which means
-		 * there's no more data to read. We use the StringWriter class to
-		 * produce the string.
-		 */
-		if (is != null) {
-			Writer writer = new StringWriter();
+    private static String convertStreamToString(InputStream is)
+            throws IOException {
+        /*
+           * To convert the InputStream to String we use the Reader.read(char[]
+           * buffer) method. We iterate until the Reader return -1 which means
+           * there's no more data to read. We use the StringWriter class to
+           * produce the string.
+           */
+        if (is != null) {
+            Writer writer = new StringWriter();
 
-			char[] buffer = new char[1024];
-			try {
-				Reader reader = new BufferedReader(new InputStreamReader(is,
-						"UTF8"));
-				int n;
-				while ((n = reader.read(buffer)) != -1) {
-					writer.write(buffer, 0, n);
-				}
-			} finally {
-				is.close();
-			}
-			return writer.toString();
-		} else {
-			return "";
-		}
-	}
+            char[] buffer = new char[1024];
+            try {
+                Reader reader = new BufferedReader(new InputStreamReader(is,
+                        "UTF8"));
+                int n;
+                while ((n = reader.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+            } finally {
+                is.close();
+            }
+            return writer.toString();
+        } else {
+            return "";
+        }
+    }
 
-	public static void writeToFile(String fileName, String text)
-			throws IOException {
-		BufferedWriter out = null;
-		try {
-			// XXX is it UTF8 or UTF-8 ???
-			out = new BufferedWriter(new OutputStreamWriter(
-					new FileOutputStream(fileName), "UTF8"));
+    public static void writeToFile(String fileName, String text)
+            throws IOException {
+        BufferedWriter out = null;
+        try {
+            // XXX is it UTF8 or UTF-8 ???
+            out = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(fileName), "UTF8"));
 
-			out.write(text);
-			out.close();
-		} finally {
-			if (out != null) {
-				out.close();
-			}
-		}
-	}
+            out.write(text);
+            out.close();
+        } finally {
+            if (out != null) {
+                out.close();
+            }
+        }
+    }
 
-	public static String loadFile(String fileName) throws IOException {
-		StringBuffer buffer = new StringBuffer();
-		FileInputStream fis = new FileInputStream(fileName);
-		InputStreamReader isr = new InputStreamReader(fis, "UTF8");
-		Reader in = new BufferedReader(isr);
-		int ch;
-		while ((ch = in.read()) > -1) {
-			buffer.append((char) ch);
-		}
-		in.close();
-		return buffer.toString();
-	}
-	
-	public static void testLongDate(int year, int month, int day, int hour, int min, int sec, String timeZone, Date expectedDate){
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, year);
-		c.set(Calendar.MONTH, month);
-		c.set(Calendar.DAY_OF_MONTH, day);
-		c.set(Calendar.HOUR_OF_DAY, hour);
-		c.set(Calendar.MINUTE, min);
-		c.set(Calendar.SECOND, sec);
-		c.set(Calendar.MILLISECOND, 0);
-		if (timeZone.length()>0) {
-			c.setTimeZone(TimeZone.getTimeZone(timeZone));
-		}
-		Date actualDate = c.getTime();
-		Assert.assertEquals("Checking date", actualDate, expectedDate);
-	}
+    public static String loadFile(String fileName) throws IOException {
+        StringBuffer buffer = new StringBuffer();
+        FileInputStream fis = new FileInputStream(fileName);
+        InputStreamReader isr = new InputStreamReader(fis, "UTF8");
+        Reader in = new BufferedReader(isr);
+        int ch;
+        while ((ch = in.read()) > -1) {
+            buffer.append((char) ch);
+        }
+        in.close();
+        return buffer.toString();
+    }
 
-	public static void testShortDate(int year, int month, int day, Date expectedDate){
-		testLongDate(year, month, day, 0,0,0, "", expectedDate);
-	}
+    public static void testLongDate(int year, int month, int day, int hour, int min, int sec, String timeZone, Date expectedDate) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month);
+        c.set(Calendar.DAY_OF_MONTH, day);
+        c.set(Calendar.HOUR_OF_DAY, hour);
+        c.set(Calendar.MINUTE, min);
+        c.set(Calendar.SECOND, sec);
+        c.set(Calendar.MILLISECOND, 0);
+        if (timeZone.length() > 0) {
+            c.setTimeZone(TimeZone.getTimeZone(timeZone));
+        }
+        Date actualDate = c.getTime();
+        Assert.assertEquals("Checking date", actualDate, expectedDate);
+    }
+
+    public static void testShortDate(int year, int month, int day, Date expectedDate) {
+        testLongDate(year, month, day, 0, 0, 0, "", expectedDate);
+    }
 
 }

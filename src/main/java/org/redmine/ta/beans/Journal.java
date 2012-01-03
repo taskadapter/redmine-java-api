@@ -4,7 +4,7 @@ import java.util.Date;
 
 /**
  * Redmine issue journal field
- * 
+ *
  * @author Vladimir Polyakov
  */
 public class Journal {
@@ -98,5 +98,5 @@ public class Journal {
     public String toString() {
         return "Journal{" + "id=" + id + " notes=" + notes + " user=" + user + " createdOn=" + createdOn + '}';
     }
-  
+
 }

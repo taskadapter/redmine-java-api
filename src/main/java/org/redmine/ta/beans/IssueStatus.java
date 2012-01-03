@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * Redmine Issue Status ("new", "in progress" etc)
- *
  */
 public class IssueStatus implements Identifiable, Serializable {
 
