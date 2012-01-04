@@ -766,10 +766,20 @@ public class RedmineManager {
         return getObject(User.class, userId);
     }
 
-    public User getCurrentUser() throws IOException, AuthenticationException, RedmineException {
+    /**
+     * @return the current user logged into Redmine
+     * @throws IOException
+     * @throws AuthenticationException
+     * @throws RedmineException
+     * @throws NotFoundException
+     */
+    public User getCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = createURI("users/current.xml");
         HttpGet http = new HttpGet(uri);
         Response response = sendRequest(http);
+        if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
+            throw new NotFoundException("Could not determine current user. Maybe you weren't logged in correctly?");
+        }
         return RedmineXMLParser.parseUserFromXML(response.getBody());
     }
 
