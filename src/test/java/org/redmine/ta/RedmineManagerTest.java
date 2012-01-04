@@ -574,7 +574,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testGetCurrentUser() throws IOException, AuthenticationException, RedmineException {
+    public void testGetCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         User currentUser = mgr.getCurrentUser();
         Assert.assertEquals(getOurUser().getId(), currentUser.getId());
         Assert.assertEquals(getOurUser().getLogin(), currentUser.getLogin());
@@ -590,6 +590,14 @@ public class RedmineManagerTest {
     @Test(expected = NotFoundException.class)
     public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         mgr.getUserById(999999);
+    }
+    
+    @Test(expected = NotFoundException.class)
+    public void testInvalidGetCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        RedmineManager invalidManager = new RedmineManager(testConfig.getURI() + "/INVALID");
+        invalidManager.setLogin("Invalid");
+        invalidManager.setPassword("Invalid");
+        invalidManager.getCurrentUser();
     }
 
     @Test
