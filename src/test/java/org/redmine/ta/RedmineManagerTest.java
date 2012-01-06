@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 /**
@@ -1411,5 +1412,20 @@ public class RedmineManagerTest {
         category.setId(-1);
         // now try to delete category
         mgr.deleteCategory(category);
+    }
+
+    /**
+     * Tests the retrieval of {@link Tracker}s.
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testGetTrackers() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        List<Tracker> trackers = mgr.getTrackers();
+        assertNotNull("List of trackers returned should not be null",trackers);
+        assertFalse("List of trackers returned should not be empty",trackers.isEmpty());
     }
 }

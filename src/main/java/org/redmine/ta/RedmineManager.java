@@ -88,6 +88,7 @@ public class RedmineManager {
             put(IssueStatus.class, "issue_statuses");
             put(Version.class, "versions");
             put(IssueCategory.class, "issue_categories");
+            put(Tracker.class,"trackers");
         }
     };
     private static final String URL_POSTFIX = ".xml";
@@ -1032,6 +1033,18 @@ public class RedmineManager {
         deleteObject(IssueCategory.class, Integer.toString(category.getId()));
     }
 
+    /**
+     * @return a list of all {@link Tracker}s available
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws NotFoundException       thrown in case an object can not be found
+     */
+    public List<Tracker> getTrackers() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        return getObjectsList(Tracker.class,new HashSet<NameValuePair>());
+    }
+    
     public void setLogin(String login) {
         this.login = login;
     }
