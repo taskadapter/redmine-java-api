@@ -31,6 +31,8 @@ import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.HttpUtil;
 import org.redmine.ta.internal.RedmineXMLGenerator;
 import org.redmine.ta.internal.RedmineXMLParser;
+import org.redmine.ta.internal.logging.Logger;
+import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -47,12 +49,13 @@ import java.util.Map.Entry;
  * @author Alexey Skorokhodov
  */
 public class RedmineManager {
-    private static final boolean PRINT_DEBUG = false;
 
     private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
     private static final String CHARSET = "UTF-8";
 
     private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
+
+    private Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
     // TODO add tests for "relations" to RedmineManagerTest class
     public static enum INCLUDE {
@@ -244,7 +247,7 @@ public class RedmineManager {
     }
 
     private Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException {
-        debug(request.getRequestLine().toString());
+        logger.debug(request.getRequestLine().toString());
         DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 
         configureProxy(httpclient);
@@ -582,7 +585,7 @@ public class RedmineManager {
 
             String query = urls.get(objectClass) + URL_POSTFIX;
             URI uri = createURI(query, paramsList);
-            debug("URI = " + uri);
+            logger.debug(uri.toString());
             HttpGet http = new HttpGet(uri);
 
             Response response = sendRequest(http);
@@ -873,12 +876,6 @@ public class RedmineManager {
         return getObjectsList(SavedQuery.class, new HashSet<NameValuePair>());
     }
 
-    private static void debug(String string) {
-        if (PRINT_DEBUG) {
-            System.out.println(string);
-        }
-    }
-
     public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         URI uri = createURI("issues/" + issueId + "/relations.xml");
 
@@ -940,7 +937,7 @@ public class RedmineManager {
         // send request
         Response response = sendRequest(httpPost);
         // handle response
-        debug("Received response " + response.getBody());
+        logger.debug(response.getBody());
         Version createdVersion = RedmineXMLParser.parseVersionFromXML(response.getBody());
         return createdVersion;
     }
