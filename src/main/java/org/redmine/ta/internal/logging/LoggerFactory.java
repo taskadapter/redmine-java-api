@@ -7,7 +7,35 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Factory for {@link DefaultLogger}s
+ * Factory for {@link DefaultLogger}s.
+ <pre>
+  Create a Logger:
+ ***********************
+ private ILogger logger = LoggerFactory.getLogger(<Class, usually the class the logger is used in>);
+
+ Usage of Logger:
+ ****************
+
+ logger.debug(<Message>)
+ logger.info(<Message>)
+ logger.warn(<Message>)
+ logger.error(<Message>)
+ logger.error(<Throwable>,<Message>)
+
+ Meaning and behavior should be clear.
+
+ Log output:
+ ***********
+ To System.out in the format date - level - logger name - message
+
+ There is no concept of different appenders for different output channels.
+
+ Logger configuration:
+ *********************
+ By a simple properties file redmine.log.properties somewhere in the classpath that contains one single entry (key/value pair) for the key "log.level".
+
+ The log level is global, there is no concept of configuring log levels for separate loggers.
+ </pre>
  */
 public final class LoggerFactory {
 
