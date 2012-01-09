@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.redmine.ta.MyIOUtils;
 import org.redmine.ta.RedmineTestUtils;
@@ -20,11 +19,15 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
+import org.redmine.ta.internal.logging.Logger;
+import org.redmine.ta.internal.logging.LoggerFactory;
 
 public class RedmineXMLParserTest {
     private static final String REDMINE_1_1_ISSUES_XML = "redmine_1_1_issues.xml";
     private static final String REDMINE_1_2_2_DEV_ISSUES_XML = "redmine_1.2.2_dev_issues.xml";
     private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
+
+    private static Logger logger = LoggerFactory.getLogger(RedmineXMLParserTest.class);
 
     @Test
     public void testParseIssuesFromEmptyXML() {
@@ -180,7 +183,7 @@ public class RedmineXMLParserTest {
         } catch (IOException e) {
             Assert.fail(e.getMessage());
         } catch (RuntimeException e) {
-            System.out.println("Got expected RuntimeException when parsing invalid xml");
+            logger.debug("Got expected RuntimeException when parsing invalid xml");
         }
     }
 
@@ -231,7 +234,7 @@ public class RedmineXMLParserTest {
         String xml = MyIOUtils.getResourceAsString("redmine_1_1_time_entries.xml");
         List<TimeEntry> objects = RedmineXMLParser.parseTimeEntries(xml);
         for (TimeEntry timeEntry : objects) {
-            System.out.println(timeEntry);
+            logger.debug("Parsed time entry " + timeEntry);
         }
         Integer objId = 2;
         TimeEntry obj2 = RedmineTestUtils.findTimeEntry(objects, objId);

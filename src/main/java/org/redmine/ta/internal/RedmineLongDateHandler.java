@@ -15,6 +15,9 @@
 */
 package org.redmine.ta.internal;
 
+import org.redmine.ta.internal.logging.Logger;
+import org.redmine.ta.internal.logging.LoggerFactory;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -35,6 +38,8 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
 
     private static SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_REDMINE_1_1);
     private static final int SHIFT = 3;
+
+    private static Logger logger = LoggerFactory.getLogger(RedmineLongDateHandler.class);
 
     @Override
     public Date getDate(String str) throws ParseException {
@@ -71,6 +76,6 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
         Date d = new Date();
         RedmineLongDateHandler h = new RedmineLongDateHandler();
 //		System.out.println(h.getDate(dateStr));
-        System.out.println(h.getString(d));
+        logger.debug(h.getString(d));
     }
 }

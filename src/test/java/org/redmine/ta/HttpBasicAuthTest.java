@@ -3,6 +3,8 @@ package org.redmine.ta;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.internal.logging.Logger;
+import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +21,8 @@ import static org.junit.Assert.assertTrue;
  * @author JÃ©rÃ©mie Huchet
  */
 public final class HttpBasicAuthTest {
+
+    private Logger logger = LoggerFactory.getLogger(HttpBasicAuthTest.class);
 
     private static TestConfig testConfig;
     private static RedmineManager mgrKey;
@@ -39,9 +43,9 @@ public final class HttpBasicAuthTest {
         final List<Project> projectsWithApiKey = mgrKey.getProjects();
         final List<Project> projectsWithHttpBasicAuth = mgrHttpBasicAuth.getProjects();
 
-        System.out.println(String.format("RedmineManager using API key auth returned %s projects",
+        logger.debug(String.format("RedmineManager using API key auth returned %s projects",
                 projectsWithApiKey.size()));
-        System.out.println(String.format(
+        logger.debug(String.format(
                 "RedmineManager using HTTP basic auth returned %s projects",
                 projectsWithHttpBasicAuth.size()));
 

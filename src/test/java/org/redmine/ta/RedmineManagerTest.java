@@ -3,6 +3,8 @@ package org.redmine.ta;
 import org.junit.*;
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.*;
+import org.redmine.ta.internal.logging.Logger;
+import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,6 +23,8 @@ public class RedmineManagerTest {
     // see feature request http://www.redmine.org/issues/7506
     private static final Integer ACTIVITY_ID = 8;
 
+    private static Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
+
     private static RedmineManager mgr;
 
     private static String projectKey;
@@ -29,7 +33,7 @@ public class RedmineManagerTest {
     @BeforeClass
     public static void oneTimeSetUp() {
         testConfig = new TestConfig();
-        System.out.println("Running redmine tests using: " + testConfig.getURI());
+        logger.info("Running redmine tests using: " + testConfig.getURI());
 //		mgr = new RedmineManager(TestConfig.getURI(), TestConfig.getApiKey());
         mgr = new RedmineManager(testConfig.getURI());
         mgr.setLogin(testConfig.getLogin());
@@ -42,7 +46,7 @@ public class RedmineManagerTest {
             Project createdProject = mgr.createProject(junitTestProject);
             projectKey = createdProject.getIdentifier();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e, "Exception while creating test project");
             Assert.fail("can't create a test project. " + e.getMessage());
         }
     }
@@ -54,7 +58,7 @@ public class RedmineManagerTest {
                 mgr.deleteProject(projectKey);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e, "Exception while deleting test project");
             Assert.fail("can't delete the test project '" + projectKey + ". reason: "
                     + e.getMessage());
         }
@@ -151,7 +155,7 @@ public class RedmineManagerTest {
             Issue parentIssue = new Issue();
             parentIssue.setSubject("parent 1");
             Issue newParentIssue = mgr.createIssue(projectKey, parentIssue);
-            System.out.println("created parent: " + newParentIssue);
+            logger.debug("created parent: " + newParentIssue);
 
             Assert.assertNotNull("Checking parent was created", newParentIssue);
             Assert.assertNotNull("Checking ID of parent issue is not null",
@@ -165,7 +169,7 @@ public class RedmineManagerTest {
             childIssue.setParentId(parentId);
 
             Issue newChildIssue = mgr.createIssue(projectKey, childIssue);
-            System.out.println("created child: " + newChildIssue);
+            logger.debug("created child: " + newChildIssue);
 
             Assert.assertEquals("Checking parent ID of the child issue", parentId,
                     newChildIssue.getParentId());
@@ -203,7 +207,7 @@ public class RedmineManagerTest {
             issue.setAssignee(assignee);
 
             Issue newIssue = mgr.createIssue(projectKey, issue);
-            System.out.println("created: " + newIssue);
+            logger.debug("created: " + newIssue);
             Assert.assertNotNull("Checking returned result", newIssue);
             Assert.assertNotNull("New issue must have some ID", newIssue.getId());
 
@@ -364,7 +368,7 @@ public class RedmineManagerTest {
             Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 
             List<Issue> issues = mgr.getIssues(projectKey, null);
-            System.out.println("getIssues() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
+            logger.debug("getIssues() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
             Assert.assertTrue(issues.size() > 0);
             boolean found = false;
             for (Issue issue : issues) {
@@ -422,7 +426,7 @@ public class RedmineManagerTest {
         String key = null;
         try {
             projectToCreate.setIdentifier("id" + new Date().getTime());
-            System.out.println("trying to create a project with id " + projectToCreate.getIdentifier());
+            logger.debug("trying to create a project with id " + projectToCreate.getIdentifier());
             Project createdProject = mgr.createProject(projectToCreate);
             key = createdProject.getIdentifier();
             String newDescr = "NEW123";
@@ -674,7 +678,7 @@ public class RedmineManagerTest {
             createIssues(27);
 //			mgr.setObjectsPerPage(5); <-- does not work now
             List<Issue> issues = mgr.getIssues(projectKey, null);
-            System.out.println("testGetIssuesPaging() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
+            logger.debug("testGetIssuesPaging() loaded " + issues.size() + " issues");//using query #" + queryIdIssuesCreatedLast2Days);
             Assert.assertTrue(issues.size() > 26);
 
             Set<Issue> issueSet = new HashSet<Issue>(issues);
@@ -769,7 +773,7 @@ public class RedmineManagerTest {
         TimeEntry createdEntry = mgr.createTimeEntry(entry);
 
         Assert.assertNotNull(createdEntry);
-        System.out.println(createdEntry);
+        logger.debug("Created time entry " + createdEntry);
         Assert.assertEquals(hours, createdEntry.getHours());
 
         Float newHours = 22f;
@@ -1141,7 +1145,7 @@ public class RedmineManagerTest {
             // XXX there could be a case when a project does not have any trackers
             // need to create a project with some trackers to make this test deterministic
             Assert.assertTrue(!p1.getTrackers().isEmpty());
-            System.out.println(p1.getTrackers());
+            logger.debug("Created trackers " + p1.getTrackers());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail(e.getMessage());
@@ -1167,7 +1171,7 @@ public class RedmineManagerTest {
         try {
             mgr.createTimeEntry(timeEntry);
         } catch (IllegalArgumentException e) {
-            System.out.println("create: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
+            logger.debug("create: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
         } catch (Exception e) {
             e.printStackTrace();
             fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -1175,7 +1179,7 @@ public class RedmineManagerTest {
         try {
             mgr.updateTimeEntry(timeEntry);
         } catch (IllegalArgumentException e) {
-            System.out.println("update: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
+            logger.debug("update: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
         } catch (Exception e) {
             e.printStackTrace();
             fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
@@ -1185,7 +1189,7 @@ public class RedmineManagerTest {
         timeEntry.setProjectId(projectId);
         try {
             TimeEntry created = mgr.createTimeEntry(timeEntry);
-            System.out.println(created);
+            logger.debug("Created time entry " + created);
         } catch (Exception e) {
             e.printStackTrace();
             fail("Unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
