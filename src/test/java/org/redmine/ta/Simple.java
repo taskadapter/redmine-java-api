@@ -56,7 +56,7 @@ public class Simple {
     }
 
     private static void tryCreateRelation(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        IssueRelation r = mgr.createRelation(projectKey, 49, 50, IssueRelation.TYPE.precedes.toString());
+        IssueRelation r = mgr.createRelation(49, 50, IssueRelation.TYPE.precedes.toString());
         logger.debug("Created relation " + r);
     }
 

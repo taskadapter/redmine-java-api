@@ -1066,7 +1066,7 @@ public class RedmineManagerTest {
             Issue target = issues.get(1);
 
             String relationText = IssueRelation.TYPE.precedes.toString();
-            IssueRelation r = mgr.createRelation(projectKey, src.getId(), target.getId(), relationText);
+            IssueRelation r = mgr.createRelation(src.getId(), target.getId(), relationText);
 //			assertEquals(src.getId(), r.getIssueId());
             Assert.assertEquals(target.getId(), r.getIssueToId());
             Assert.assertEquals(relationText, r.getType());
@@ -1081,7 +1081,7 @@ public class RedmineManagerTest {
         Issue target = issues.get(1);
 
         String relationText = IssueRelation.TYPE.precedes.toString();
-        IssueRelation r = mgr.createRelation(projectKey, src.getId(), target.getId(), relationText);
+        IssueRelation r = mgr.createRelation(src.getId(), target.getId(), relationText);
         return r;
     }
 
