@@ -1081,8 +1081,7 @@ public class RedmineManagerTest {
         Issue target = issues.get(1);
 
         String relationText = IssueRelation.TYPE.precedes.toString();
-        IssueRelation r = mgr.createRelation(src.getId(), target.getId(), relationText);
-        return r;
+        return mgr.createRelation(src.getId(), target.getId(), relationText);
     }
 
     @Test
@@ -1226,7 +1225,6 @@ public class RedmineManagerTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
-        // create new invalid test version
         Version version = new Version(null, "Invalid test version " + UUID.randomUUID().toString());
         mgr.createVersion(version);
     }
