@@ -1067,7 +1067,7 @@ public class RedmineManagerTest {
 
             String relationText = IssueRelation.TYPE.precedes.toString();
             IssueRelation r = mgr.createRelation(src.getId(), target.getId(), relationText);
-//			assertEquals(src.getId(), r.getIssueId());
+			assertEquals(src.getId(), r.getIssueId());
             Assert.assertEquals(target.getId(), r.getIssueToId());
             Assert.assertEquals(relationText, r.getType());
         } catch (Exception e) {
