@@ -35,5 +35,20 @@
 			handler="org.redmine.ta.internal.RedmineLongDateHandler">
 			<bind-xml name="last_login_on" node="element" />
 		</field>
+		<field name="customFields" type="org.redmine.ta.beans.CustomField" collection="arraylist" >
+			<bind-xml name="custom_field" location="custom_fields"/>
+		</field>
+	</class>
+	
+	<class name="org.redmine.ta.beans.CustomField">
+		<field name="id" type="integer">
+			<bind-xml name="id" node="attribute"/>
+		</field>
+		<field name="name" type="string">
+			<bind-xml name="name" node="attribute"/>
+		</field>
+		<field name="value" type="string">
+			<bind-xml node="element"/>
+		</field>
 	</class>
 </mapping>

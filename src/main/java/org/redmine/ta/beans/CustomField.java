@@ -1,7 +1,7 @@
 package org.redmine.ta.beans;
 
 /**
- * Redmine issue custom field
+ * Redmine custom field
  *
  * @author Yuri Lupol
  */
