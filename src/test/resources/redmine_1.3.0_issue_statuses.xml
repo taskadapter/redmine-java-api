@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issue_statuses type="array">
+    <issue_status>
+        <id>1</id>
+        <name>New</name>
+        <is_default>true</is_default>
+        <is_closed>false</is_closed>
+    </issue_status>
+    <issue_status>
+        <id>2</id>
+        <name>In Progress</name>
+        <is_default>false</is_default>
+        <is_closed>false</is_closed>
+    </issue_status>
+    <issue_status>
+        <id>3</id>
+        <name>Resolved</name>
+        <is_default>false</is_default>
+        <is_closed>false</is_closed>
+    </issue_status>
+    <issue_status>
+        <id>4</id>
+        <name>Feedback</name>
+        <is_default>false</is_default>
+        <is_closed>false</is_closed>
+    </issue_status>
+    <issue_status>
+        <id>5</id>
+        <name>Closed</name>
+        <is_default>false</is_default>
+        <is_closed>true</is_closed>
+    </issue_status>
+    <issue_status>
+        <id>6</id>
+        <name>Rejected</name>
+        <is_default>false</is_default>
+        <is_closed>true</is_closed>
+    </issue_status>
+</issue_statuses>

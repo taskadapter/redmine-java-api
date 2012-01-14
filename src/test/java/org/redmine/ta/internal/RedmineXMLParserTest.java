@@ -14,11 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.redmine.ta.MyIOUtils;
 import org.redmine.ta.RedmineTestUtils;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.Tracker;
-import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -26,6 +22,7 @@ public class RedmineXMLParserTest {
     private static final String REDMINE_1_1_ISSUES_XML = "redmine_1_1_issues.xml";
     private static final String REDMINE_1_2_2_DEV_ISSUES_XML = "redmine_1.2.2_dev_issues.xml";
     private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
+    private static final String REDMINE_1_3_0_ISSUE_STATUSES_XML = "redmine_1.3.0_issue_statuses.xml";
 
     private static Logger logger = LoggerFactory.getLogger(RedmineXMLParserTest.class);
 
@@ -310,6 +307,24 @@ public class RedmineXMLParserTest {
             e.printStackTrace();
             Assert.fail("Error:" + e);
         }
+    }
+
+    @Test
+    public void issueStatusesCanBeParsed() {
+        try {
+            String str = MyIOUtils.getResourceAsString(REDMINE_1_3_0_ISSUE_STATUSES_XML);
+            List<IssueStatus> statuses = RedmineXMLParser.parseObjectsFromXML(IssueStatus.class, str);
+            assertEquals(6, statuses.size());
+            IssueStatus status5 = statuses.get(4);
+            assertEquals(new Integer(5), status5.getId());
+            assertEquals("Closed", status5.getName());
+            assertEquals(false, status5.isDefaultStatus());
+            assertEquals(true, status5.isClosed());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Error:" + e);
+        }
 
     }
+
 }
