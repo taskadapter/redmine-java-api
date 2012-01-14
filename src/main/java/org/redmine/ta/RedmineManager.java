@@ -65,6 +65,7 @@ public class RedmineManager {
         journals, relations
     }
 
+    // TODO delete REDMINE_1_0 mode. there's no method to set "current mode" on RedmineManager anyway.
     private static enum MODE {
         REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
     }
@@ -215,7 +216,6 @@ public class RedmineManager {
         // XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
         String NO_PROJECT_KEY = null;
         String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
-//		System.out.println(xmlBody);
         setEntity(httpRequest, xmlBody);
         Response response = sendRequest(httpRequest);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
@@ -264,7 +264,6 @@ public class RedmineManager {
         request.addHeader("Accept-Encoding", "gzip,deflate");
         HttpResponse httpResponse = httpclient.execute((HttpUriRequest) request);
 
-//		System.out.println(httpResponse.getStatusLine());
         int responseCode = httpResponse.getStatusLine().getStatusCode();
         if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
             throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
@@ -293,7 +292,6 @@ public class RedmineManager {
         // that the request body can be retrieved later ("socket closed" exception can occur)
         Response r = new Response(responseCode, responseBody);
         httpclient.getConnectionManager().shutdown();
-//		String responseBody = EntityUtils.toString(responseEntity);
         return r;
     }
 
@@ -516,10 +514,8 @@ public class RedmineManager {
         String firstPage = null;
 
         addPagingParameters(params);
-//		addAuthParameters(params);
 
         do {
-            //params.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
             List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
             paramsList.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
 
@@ -556,7 +552,6 @@ public class RedmineManager {
         return objects;
     }
 
-    // XXX fix this: why it is Map of string->pair? should be a flat set of params!
     private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
             return getObjectsListV11(objectClass, params);
@@ -569,7 +564,7 @@ public class RedmineManager {
     }
 
     /**
-     * Redmine 1.1 / Chiliproject 1.2 - specific version
+     * Redmine 1.1+ / Chiliproject 1.2 - specific version
      */
     private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         List<T> objects = new ArrayList<T>();
@@ -579,7 +574,6 @@ public class RedmineManager {
         int offset = 0;
         int totalObjectsFoundOnServer;
         do {
-            //params.add(new BasicNameValuePair("offset", String.valueOf(offset)));
             List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
             paramsList.add(new BasicNameValuePair("offset", String.valueOf(offset)));
 
@@ -715,7 +709,6 @@ public class RedmineManager {
 
         HttpPost httpPost = new HttpPost(uri);
         String createProjectXML = RedmineXMLGenerator.toXML(project);
-//		System.out.println("create project:" + createProjectXML);
         setEntity(httpPost, createProjectXML);
 
         Response response = sendRequest(httpPost);
@@ -743,8 +736,7 @@ public class RedmineManager {
         return objectsPerPage;
     }
 
-    // TODO add junit test
-
+    // TODO add test
     /**
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
@@ -876,7 +868,7 @@ public class RedmineManager {
         return getObjectsList(SavedQuery.class, new HashSet<NameValuePair>());
     }
 
-    public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         URI uri = createURI("issues/" + issueId + "/relations.xml");
 
         HttpPost http = new HttpPost(uri);
@@ -885,14 +877,18 @@ public class RedmineManager {
         toCreate.setIssueToId(issueToId);
         toCreate.setType(type);
         String xml = RedmineXMLGenerator.toXML(toCreate);
-        setEntity((HttpEntityEnclosingRequest) http, xml);
+        setEntity(http, xml);
 
         Response response = sendRequest(http);
-//		if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
-//			throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
-//		}
-        IssueRelation relation = RedmineXMLParser.parseRelationFromXML(response.getBody());
-        return relation;
+        return RedmineXMLParser.parseRelationFromXML(response.getBody());
+    }
+
+    /**
+     * @deprecated use createRelation(Integer issueId, Integer issueToId, String type). "projectKey" parameter is not used anyway.
+     * this method will be deleted soon.
+     */
+    public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+        return createRelation(issueId, issueToId, type);
     }
 
     /**
