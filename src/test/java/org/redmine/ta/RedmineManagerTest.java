@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * This class and its dependencies are located in org.redmine.ta.api project.
@@ -1088,7 +1086,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testLoadRelation() {
+    public void issueRelationsAreCreatedAndLoadedOK() {
         try {
             IssueRelation relation = createTwoRelatedIssues();
             Issue issue = mgr.getIssueById(relation.getIssueId(), INCLUDE.relations);
@@ -1098,10 +1096,10 @@ public class RedmineManagerTest {
             Assert.assertEquals(1, issueTarget.getRelations().size());
 
             IssueRelation relation1 = issue.getRelations().get(0);
-//			assertEquals(issue.getId(), relation1.getIssueId());
-            Assert.assertEquals(issue.getId(), relation1.getIssueToId());
-            Assert.assertEquals("precedes", relation1.getType());
-            Assert.assertEquals((Integer) 0, relation1.getDelay());
+			assertEquals(issue.getId(), relation1.getIssueId());
+            assertEquals(issueTarget.getId(), relation1.getIssueToId());
+            assertEquals("precedes", relation1.getType());
+            assertEquals((Integer) 0, relation1.getDelay());
 
             IssueRelation reverseRelation = issueTarget.getRelations().get(0);
             // both forward and reverse relations are the same!
