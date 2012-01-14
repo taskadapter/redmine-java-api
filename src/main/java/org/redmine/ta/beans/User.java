@@ -1,6 +1,8 @@
 package org.redmine.ta.beans;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Redmine's User.
@@ -16,6 +18,8 @@ public class User implements Identifiable {
     private String mail;
     private Date createdOn;
     private Date lastLoginOn;
+    // TODO add tests after http://code.google.com/p/redmine-java-api/issues/detail?id=100 is implemented
+    private List<CustomField> customFields = new ArrayList<CustomField>();
 
     public Integer getId() {
         return id;
@@ -181,4 +185,31 @@ public class User implements Identifiable {
         this.password = password;
     }
 
+    /**
+     * @param fieldName
+     * @return the value or NULL if the field is not found
+     */
+    public String getCustomField(String fieldName) {
+        for (CustomField f : customFields) {
+            if (f.getName().equals(fieldName)) {
+                return f.getValue();
+            }
+        }
+        return null;
+    }
+
+    /**
+     *  list of Custom Field objects, NEVER NULL.
+     */
+    public List<CustomField> getCustomFields() {
+        return customFields;
+    }
+
+    /**
+     * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
+     * ID can be seen in database or in Redmine administration when editing the custom field (number is part of the URL!).
+     */
+    public void setCustomFields(List<CustomField> customFields) {
+        this.customFields = customFields;
+    }
 }
