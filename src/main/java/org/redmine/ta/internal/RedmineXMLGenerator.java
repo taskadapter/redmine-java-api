@@ -74,7 +74,7 @@ public class RedmineXMLGenerator {
             appendIfNotNull(b, "fixed_version_id", issue.getTargetVersion().getId());
             appendIfNotNull(b, "fixed_version_name", issue.getTargetVersion().getName());
         }
-
+        appendIfNotNull(b, "priority_id", issue.getPriorityId());
         b.append("</issue>");
         return b.toString();
     }
