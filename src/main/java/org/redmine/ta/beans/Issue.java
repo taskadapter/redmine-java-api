@@ -60,6 +60,10 @@ public class Issue implements Identifiable {
         return priorityText;
     }
 
+    /**
+     * @deprecated This method has no effect when creating issues on Redmine Server, so we might as well just delete it
+     * in the future releases.
+     */
     public void setPriorityText(String priority) {
         this.priorityText = priority;
     }
