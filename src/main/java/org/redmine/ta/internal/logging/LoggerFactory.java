@@ -115,7 +115,7 @@ public final class LoggerFactory {
 
     private static Properties createDefaultConfiguration() {
         Properties properties = new Properties();
-        properties.put("log.level", DEFAULT_LOG_LEVEL);
+        properties.put("log.level", DEFAULT_LOG_LEVEL.toString());
         return properties;
     }
 }
