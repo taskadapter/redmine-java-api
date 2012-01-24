@@ -39,6 +39,7 @@ public class Issue implements Identifiable {
     private List<CustomField> customFields = new ArrayList<CustomField>();
     private List<Journal> journals = new ArrayList<Journal>();
     private List<IssueRelation> relations = new ArrayList<IssueRelation>();
+    private List<Attachment> attachments = new ArrayList<Attachment>();
 
     public Project getProject() {
         return project;
@@ -445,6 +446,13 @@ public class Issue implements Identifiable {
         } else if (!updatedOn.equals(other.updatedOn)) {
             return false;
         }
+        if (attachments == null) {
+            if (other.attachments != null) {
+                return false;
+            }
+        } else if (!attachments.equals(other.attachments)) {
+            return false;
+        }
         return true;
     }
 
@@ -485,9 +493,15 @@ public class Issue implements Identifiable {
         return targetVersion;
     }
 
+    public List<Attachment> getAttachments() {
+        return attachments;
+    }
+
     public void setTargetVersion(Version version) {
         this.targetVersion = version;
+
     }
+
 
 
 }

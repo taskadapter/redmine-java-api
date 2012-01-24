@@ -34,8 +34,7 @@ import org.redmine.ta.internal.RedmineXMLParser;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -62,7 +61,7 @@ public class RedmineManager {
         // these values MUST BE exactly as they are written here,
         // can't use capital letters or rename.
         // they are provided in "?include=..." HTTP request
-        journals, relations
+        journals, relations,attachments
     }
 
     // TODO delete REDMINE_1_0 mode. there's no method to set "current mode" on RedmineManager anyway.
@@ -93,6 +92,7 @@ public class RedmineManager {
             put(Version.class, "versions");
             put(IssueCategory.class, "issue_categories");
             put(Tracker.class,"trackers");
+            put(Attachment.class,"attachments");
         }
     };
     private static final String URL_POSTFIX = ".xml";
@@ -1037,7 +1037,50 @@ public class RedmineManager {
     public List<Tracker> getTrackers() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         return getObjectsList(Tracker.class,new HashSet<NameValuePair>());
     }
-    
+
+    /**
+     * Delivers an {@link org.redmine.ta.beans.Attachment} by its ID.
+     * @param attachmentID the ID
+     * @return the {@link org.redmine.ta.beans.Attachment}
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws NotFoundException       thrown in case an object can not be found
+     */
+    public Attachment getAttachmentById(int attachmentID) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+        return getObject(Attachment.class, attachmentID);
+    }
+
+    /**
+     * Downloads the content of an {@link org.redmine.ta.beans.Attachment} from the Redmine server.
+     *
+     * @param issueAttachment the {@link org.redmine.ta.beans.Attachment}
+     * @return the content of the attachment as a byte[] array
+     * @throws IOException thrown in case the download fails
+     */
+    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws IOException {
+        byte[] result = null;
+        URL url = new URL(issueAttachment.getContentURL());
+        BufferedReader inputReader = null;
+        try {
+            inputReader = new BufferedReader(
+                    new InputStreamReader(
+                            url.openStream()));
+            StringBuilder contentBuilder = new StringBuilder();
+            String line = null;
+            while ((line = inputReader.readLine()) != null) {
+                contentBuilder.append(line);
+            }
+            result = contentBuilder.toString().getBytes();
+        } finally {
+            if (inputReader != null) {
+                inputReader.close();
+            }
+        }
+        return result;
+    }
+
     public void setLogin(String login) {
         this.login = login;
     }

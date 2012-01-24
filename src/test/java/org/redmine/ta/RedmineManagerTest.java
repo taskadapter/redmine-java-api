@@ -1428,4 +1428,76 @@ public class RedmineManagerTest {
         assertNotNull("List of trackers returned should not be null",trackers);
         assertFalse("List of trackers returned should not be empty",trackers.isEmpty());
     }
+
+    /**
+     * Tests the retrieval of an {@link Issue}, inlcuding the {@link org.redmine.ta.beans.Attachment}s.
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testGetIssueWithAttachments() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        Issue newIssue = null;
+        try {
+            // create at least 1 issue
+            Issue issueToCreate = new Issue();
+            issueToCreate.setSubject("testGetIssueAttachment_" + UUID.randomUUID());
+            newIssue = mgr.createIssue(projectKey, issueToCreate);
+            // TODO create test attachments for the issue once the Redmine REST API allows for it
+            // retrieve issue attachments
+            Issue retrievedIssue = mgr.getIssueById(newIssue.getId(),INCLUDE.attachments);
+            Assert.assertNotNull("List of attachments retrieved for issue " + newIssue.getId() + " delivered by Redmine Java API should not be null", retrievedIssue.getAttachments());
+            // TODO assert attachments once we actually receive ones for our test issue
+        } finally {
+            // scrub test issue
+            if (newIssue != null) {
+                mgr.deleteIssue(newIssue.getId());
+            }
+        }
+    }
+
+    /**
+     * Tests the retrieval of an {@link org.redmine.ta.beans.Attachment} by its ID.
+     * TODO reactivate once the Redmine REST API allows for creating attachments
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    // @Test
+    public void testGetAttachmentById() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // TODO where do we get a valid attachment number from? We can't create an attachment by our own for the test as the Redmine REST API does not support that.
+        int attachmentID = 1;
+        // retrieve issue attachment
+        Attachment attachment = mgr.getAttachmentById(attachmentID);
+        Assert.assertNotNull("Attachment retrieved by ID " + attachmentID + " should not be null", attachment);
+        Assert.assertNotNull("Content URL of attachment retrieved by ID " + attachmentID + " should not be null", attachment.getContentURL());
+        // TODO more asserts on the attachment once this delivers an attachment
+    }
+
+    /**
+     * Tests the donload of the content of an {@link org.redmine.ta.beans.Attachment}.
+     * TODO reactivate once the Redmine REST API allows for creating attachments
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    // @Test
+    public void testDownloadAttachmentContent() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // TODO where do we get a valid attachment number from? We can't create an attachment by our own for the test as the Redmine REST API does not support that.
+        int attachmentID = 1;
+        // retrieve issue attachment
+        Attachment attachment = mgr.getAttachmentById(attachmentID);
+        // download  attachment content
+        byte[] attachmentContent = mgr.downloadAttachmentContent(attachment);
+        Assert.assertNotNull("Download of content of attachment with content URL " + attachment.getContentURL() + " should not be null", attachmentContent);
+    }
+
 }
