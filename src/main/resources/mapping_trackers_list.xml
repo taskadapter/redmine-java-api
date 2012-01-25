@@ -7,10 +7,10 @@
     <class name="org.redmine.ta.beans.Tracker">
         <map-to xml="tracker"/>
         <field name="id" type="integer" >
-            <bind-xml name="id" node="attribute"/>
+            <bind-xml name="id" node="element"/>
         </field>
         <field name="name" type="string" >
-            <bind-xml name="name" node="attribute"/>
+            <bind-xml name="name" node="element"/>
         </field>
     </class>
 

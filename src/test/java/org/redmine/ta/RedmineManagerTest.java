@@ -315,25 +315,31 @@ public class RedmineManagerTest {
         }
     }
 
+    /**
+     * Tests the retrieval of an {@link Issue} by its ID.
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
     @Test
-    public void testGetIssueById() {
-        try {
-            Issue issue = new Issue();
-            String originalSubject = "Issue " + new Date();
-            issue.setSubject(originalSubject);
+    public void testGetIssueById() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        Issue issue = new Issue();
+        String originalSubject = "Issue " + new Date();
+        issue.setSubject(originalSubject);
 
-            Issue newIssue = mgr.createIssue(projectKey, issue);
+        Issue newIssue = mgr.createIssue(projectKey, issue);
 
-            Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
+        Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
 
-            Assert.assertEquals(
-                    "Checking if 'get issue by ID' operation returned issue with same 'subject' field",
-                    originalSubject, reloadedFromRedmineIssue.getSubject());
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        Assert.assertEquals(
+                "Checking if 'get issue by ID' operation returned issue with same 'subject' field",
+                originalSubject, reloadedFromRedmineIssue.getSubject());
+        Tracker tracker = reloadedFromRedmineIssue.getTracker();
+        Assert.assertNotNull("Tracker of issue should not be null",tracker);
+        Assert.assertNotNull("ID of tracker of issue should not be null",tracker.getId());
+        Assert.assertNotNull("Name of tracker of issue should not be null",tracker.getName());
     }
 
     @Test
@@ -1427,6 +1433,11 @@ public class RedmineManagerTest {
         List<Tracker> trackers = mgr.getTrackers();
         assertNotNull("List of trackers returned should not be null",trackers);
         assertFalse("List of trackers returned should not be empty",trackers.isEmpty());
+        for (Tracker tracker : trackers) {
+            assertNotNull("Tracker returned should not be null",tracker);
+            assertNotNull("ID of tracker returned should not be null",tracker.getId());
+            assertNotNull("Name of tracker returned should not be null", tracker.getName());
+        }
     }
 
     /**
@@ -1480,7 +1491,7 @@ public class RedmineManagerTest {
     }
 
     /**
-     * Tests the donload of the content of an {@link org.redmine.ta.beans.Attachment}.
+     * Tests the download of the content of an {@link org.redmine.ta.beans.Attachment}.
      * TODO reactivate once the Redmine REST API allows for creating attachments
      *
      * @throws RedmineException        thrown in case something went wrong in Redmine
