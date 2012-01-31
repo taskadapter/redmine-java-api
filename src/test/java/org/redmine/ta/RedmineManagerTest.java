@@ -1511,4 +1511,45 @@ public class RedmineManagerTest {
         Assert.assertNotNull("Download of content of attachment with content URL " + attachment.getContentURL() + " should not be null", attachmentContent);
     }
 
+    /**
+     * Tests the creation and retrieval of an  {@link org.redmine.ta.beans.Issue} with a {@link IssueCategory}.
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testCreateAndGetIssueWithCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        IssueCategory newIssueCategory = null;
+        Issue newIssue = null;
+        try {
+            Project project = mgr.getProjectByKey(projectKey);
+            // create an issue category
+            IssueCategory category = new IssueCategory(project, "Category_" + new Date().getTime());
+            category.setAssignee(getOurUser());
+            newIssueCategory = mgr.createCategory(category);
+            // create an issue
+            Issue issueToCreate = new Issue();
+            issueToCreate.setSubject("testGetIssueWithCategory_" + UUID.randomUUID());
+            issueToCreate.setCategory(newIssueCategory);
+            newIssue = mgr.createIssue(projectKey, issueToCreate);
+            // retrieve issue 
+            Issue retrievedIssue = mgr.getIssueById(newIssue.getId());
+            // assert retrieved category of issue
+            IssueCategory retrievedCategory = retrievedIssue.getCategory();
+            Assert.assertNotNull("Category retrieved for issue " + newIssue.getId() + " should not be null", retrievedCategory);
+            Assert.assertEquals("ID of category retrieved for issue "+ newIssue.getId() + " is wrong",newIssueCategory.getId(),retrievedCategory.getId());
+            Assert.assertEquals("Name of category retrieved for issue "+ newIssue.getId() + " is wrong",newIssueCategory.getName(),retrievedCategory.getName());
+        } finally {
+            // scrub test issue and category
+            if (newIssue != null) {
+                mgr.deleteIssue(newIssue.getId());
+            }
+            if(newIssueCategory!=null) {
+                mgr.deleteCategory(newIssueCategory);
+            }
+        }
+        
+    }
 }
