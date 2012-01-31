@@ -31,6 +31,7 @@ public class Issue implements Identifiable {
     private Integer statusId;
     private String statusName;
     private Version targetVersion;
+    private IssueCategory category;
 
     /**
      * Some comment describing the issue update
@@ -502,6 +503,11 @@ public class Issue implements Identifiable {
 
     }
 
+    public IssueCategory getCategory() {
+        return category;
+    }
 
-
+    public void setCategory(IssueCategory category) {
+        this.category = category;
+    }
 }
