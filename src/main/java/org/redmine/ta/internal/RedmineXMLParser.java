@@ -40,8 +40,10 @@ public class RedmineXMLParser {
     private static final String MAPPING_CATEGORIES = "/mapping_categories_list.xml";
     private static final String MAPPING_TRACKERS = "/mapping_trackers_list.xml";
     private static final String MAPPING_ATTACHMENTS = "/mapping_attachments_list.xml";
+    private static final String MAPPING_NEWS = "/mapping_news_list.xml";
 
     // TODO optimize : pre-load xml
+    @SuppressWarnings("rawtypes")
     private static final Map<Class, String> fromRedmineMap = new HashMap<Class, String>() {
         private static final long serialVersionUID = 1L;
 
@@ -57,6 +59,7 @@ public class RedmineXMLParser {
             put(IssueCategory.class, MAPPING_CATEGORIES);
             put(Tracker.class,MAPPING_TRACKERS);
             put(Attachment.class,MAPPING_ATTACHMENTS);
+            put(News.class,MAPPING_NEWS);
         }
     };
 
@@ -66,6 +69,7 @@ public class RedmineXMLParser {
     }
 
     // see bug https://www.hostedredmine.com/issues/8240
+    @SuppressWarnings("rawtypes") 
     private static void removeBadTags(Class redmineClass, StringBuilder xml) {
         if (redmineClass.equals(Issue.class)) {
             replaceAll(xml, "<estimated_hours></estimated_hours>", "");
@@ -184,6 +188,7 @@ public class RedmineXMLParser {
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
         verifyStartsAsXML(xml);
         StringBuilder builder = new StringBuilder(xml);
