@@ -327,4 +327,30 @@ public class RedmineXMLParserTest {
 
     }
 
+    @Test
+    public void doesNotFailWithNoNews() {
+        // "news" xml with no items in the list should not break the loader.
+        try {
+            String str = MyIOUtils.getResourceAsString("redmine_1_3_0_news_empty.xml");
+            List<News> news = RedmineXMLParser.parseObjectsFromXML(News.class, str);
+            Assert.assertTrue(news.isEmpty());
+        } catch (Exception e) {
+            Assert.fail("Error:" + e);
+        }
+    }
+
+    @Test
+    public void parses2NewsItems() {
+        // "news" xml with no items in the list should not break the loader.
+        try {
+            String str = MyIOUtils.getResourceAsString("redmine_1_3_0_news_2_items.xml");
+            List<News> news = RedmineXMLParser.parseObjectsFromXML(News.class, str);
+            assertEquals(2, news.size());
+            
+            News anyItem = news.get(0);
+            assertEquals("rest last", anyItem.getUser().getFullName());
+        } catch (Exception e) {
+            Assert.fail("Error:" + e);
+        }
+    }
 }

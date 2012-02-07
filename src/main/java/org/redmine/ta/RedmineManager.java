@@ -44,6 +44,8 @@ import java.util.Map.Entry;
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
+ * <p/>
+ * TODO This God-class should be split into several smaller classes.
  *
  * @author Alexey Skorokhodov
  */
@@ -51,23 +53,23 @@ public class RedmineManager {
 
     private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
     private static final String CHARSET = "UTF-8";
-
+    private static final String URL_POSTFIX = ".xml";
     private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
-
-    private Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
     // TODO add tests for "relations" to RedmineManagerTest class
     public static enum INCLUDE {
         // these values MUST BE exactly as they are written here,
         // can't use capital letters or rename.
         // they are provided in "?include=..." HTTP request
-        journals, relations,attachments
+        journals, relations, attachments
     }
 
     // TODO delete REDMINE_1_0 mode. there's no method to set "current mode" on RedmineManager anyway.
     private static enum MODE {
         REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
     }
+
+    private Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
     private String host;
     private String apiAccessKey;
@@ -91,11 +93,11 @@ public class RedmineManager {
             put(IssueStatus.class, "issue_statuses");
             put(Version.class, "versions");
             put(IssueCategory.class, "issue_categories");
-            put(Tracker.class,"trackers");
-            put(Attachment.class,"attachments");
+            put(Tracker.class, "trackers");
+            put(Attachment.class, "attachments");
+            put(News.class, "news");
         }
     };
-    private static final String URL_POSTFIX = ".xml";
 
     public RedmineManager(String uri) {
         if (uri == null || uri.isEmpty()) {
@@ -139,7 +141,6 @@ public class RedmineManager {
      *   issueToCreate.setSubject("This is the summary line 123");
      *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
      * }
-     *
      *
      * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
      * @param issue      the Issue object to create on the server.
@@ -210,7 +211,7 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = createURI("issues/" + issue.getId() + ".xml");
+        URI uri = createURI("issues/" + issue.getId() + URL_POSTFIX);
         HttpPut httpRequest = new HttpPut(uri);
 
         // XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
@@ -413,7 +414,7 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Project getProjectByKey(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = createURI("projects/" + projectKey + ".xml", new BasicNameValuePair("include", "trackers"));
+        URI uri = createURI("projects/" + projectKey + URL_POSTFIX, new BasicNameValuePair("include", "trackers"));
         HttpGet http = new HttpGet(uri);
         Response response = sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
@@ -552,25 +553,27 @@ public class RedmineManager {
         return objects;
     }
 
-    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
+            AuthenticationException, NotFoundException, RedmineException {
         if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
             return getObjectsListV11(objectClass, params);
         } else if (currentMode.equals(MODE.REDMINE_1_0)) {
             return getObjectsListV104(objectClass, params);
         } else {
-            throw new RuntimeException("unsupported mode:" + currentMode + ". supported modes are: " +
-                    MODE.REDMINE_1_0 + " and " + MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2);
+            throw new RuntimeException("unsupported mode:" + currentMode
+                    + ". supported modes are: " + MODE.REDMINE_1_0 + " and "
+                    + MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2);
         }
     }
 
     /**
      * Redmine 1.1+ / Chiliproject 1.2 - specific version
      */
-    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
+            AuthenticationException, NotFoundException, RedmineException {
         List<T> objects = new ArrayList<T>();
 
-        int limit = 25;
-        params.add(new BasicNameValuePair("limit", String.valueOf(limit)));
+        params.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
         int offset = 0;
         int totalObjectsFoundOnServer;
         do {
@@ -737,6 +740,7 @@ public class RedmineManager {
     }
 
     // TODO add test
+
     /**
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
@@ -885,7 +889,7 @@ public class RedmineManager {
 
     /**
      * @deprecated use createRelation(Integer issueId, Integer issueToId, String type). "projectKey" parameter is not used anyway.
-     * this method will be deleted soon.
+     *             this method will be deleted soon.
      */
     public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         return createRelation(issueId, issueToId, type);
@@ -1035,11 +1039,12 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<Tracker> getTrackers() throws IOException, AuthenticationException, RedmineException, NotFoundException {
-        return getObjectsList(Tracker.class,new HashSet<NameValuePair>());
+        return getObjectsList(Tracker.class, new HashSet<NameValuePair>());
     }
 
     /**
      * Delivers an {@link org.redmine.ta.beans.Attachment} by its ID.
+     *
      * @param attachmentID the ID
      * @return the {@link org.redmine.ta.beans.Attachment}
      * @throws IOException             thrown in case something went wrong while performing I/O
@@ -1091,5 +1096,23 @@ public class RedmineManager {
 
     private URI getCreateURIIssueCategory(Integer projectID) {
         return createURI("projects/" + projectID + "/issue_categories.xml");
+    }
+
+    /**
+     * @param projectKey ignored if NULL
+     * @return list of news objects
+     * @throws IOException
+     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws RedmineException
+     * @see News
+     */
+    public List<News> getNews(String projectKey) throws IOException, AuthenticationException,
+            NotFoundException, RedmineException {
+        Set<NameValuePair> params = new HashSet<NameValuePair>();
+        if ((projectKey != null) && (projectKey.length() > 0)) {
+            params.add(new BasicNameValuePair("project_id", projectKey));
+        }
+        return getObjectsList(News.class, params);
     }
 }

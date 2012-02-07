@@ -5,12 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.redmine.ta.RedmineManager.INCLUDE;
-import org.redmine.ta.beans.Issue;
-import org.redmine.ta.beans.IssueRelation;
-import org.redmine.ta.beans.Project;
-import org.redmine.ta.beans.SavedQuery;
-import org.redmine.ta.beans.TimeEntry;
-import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.RedmineXMLGenerator;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
@@ -23,35 +18,39 @@ public class Simple {
     private static Logger logger = LoggerFactory.getLogger(Simple.class);
 
     //	private static String redmineHost = "http://192.168.0.30:3030";
-    private static String redmineHost = "http://org.redmine.ta-dev.dyndns.biz:3030";
-    //    private static String apiAccessKey = "e4e0fa8083e85ff787f2fd30e28ff7e285bff346";
-    private static String login = "admin";
-    private static String password = "zzz666";
-
-//	private static String redmineHost = "http://192.168.0.64:3000";
+    private static String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.0";
+        private static String apiAccessKey = "9eba7a1101d10c074249b890372593d5d64b0f0f";
 //    private static String login = "admin";
-//    private static String password = "admin";
+//    private static String password = "zzz666";
 
     private static String projectKey = "test";
 
     private static Integer queryId = null; // any
 
     public static void main(String[] args) {
-        RedmineManager mgr = new RedmineManager(redmineHost, login, password);
-//		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
+		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
         try {
 //			getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
 //			tryGetIssues(mgr);
-            tryGetAllIssues(mgr);
+//            tryGetAllIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
 //			generateXMLForTimeEntry();
 //			getSavedQueries(mgr);
 //			getProjects(mgr);
 //			tryCreateRelation(mgr);
+            tryGetNews(mgr);
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void tryGetNews(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        String projectKey = "test";
+        List<News> news = mgr.getNews(projectKey);
+        for (News aNew : news) {
+            System.out.println(aNew);
         }
     }
 
