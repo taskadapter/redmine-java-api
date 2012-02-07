@@ -10,7 +10,7 @@
 
     <groupId>com.googlecode</groupId>
     <artifactId>redmine-java-api</artifactId>
-    <version>1.7.1</version>
+    <version>1.8.0-SNAPSHOT</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
     <url>http://code.google.com/p/redmine-java-api</url>
