@@ -148,13 +148,10 @@ public class RedmineXMLParser {
     /**
      * @throws RuntimeException if the text does not start with a valid XML tag.
      */
-    private static boolean verifyStartsAsXML(String text) {
-        String XML_START_PATTERN = "<?xml version="; // "1.0"
-        // encoding="UTF-8"?>";
+    static void verifyStartsAsXML(String text) {
+        String XML_START_PATTERN = "<?xml version=";
         String lines[] = text.split("\\r?\\n");
-        if ((lines.length > 0) && lines[0].startsWith(XML_START_PATTERN)) {
-            return true;
-        } else {
+        if ((lines.length == 0) || !lines[0].startsWith(XML_START_PATTERN)) {
             // show not more than 500 chars
             int charsToShow = text.length() < 500 ? text.length() : 500;
             throw new RuntimeException(
