@@ -1007,7 +1007,7 @@ public class RedmineManagerTest {
                 mgr.updateIssue(reloadedFromRedmineIssue);
             } catch (RedmineException e) {
                 Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
-                Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0).toString());
+                Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0));
             }
 
             Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
