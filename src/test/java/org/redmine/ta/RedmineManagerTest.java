@@ -859,8 +859,7 @@ public class RedmineManagerTest {
         entry.setHours(hours);
         entry.setIssueId(issueId);
         entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = mgr.createTimeEntry(entry);
-        return createdEntry;
+        return mgr.createTimeEntry(entry);
     }
 
     @Test(expected = NotFoundException.class)
@@ -1191,28 +1190,27 @@ public class RedmineManagerTest {
 //		assertEquals((Float) spentHours, newIssue.getSpentHours());
     }
 
-    @Test
-    public void testViolateTimeEntryConstraint_ProjectOrIssueID_issue66() throws IOException, AuthenticationException, RedmineException {
+    @Test (expected = IllegalArgumentException.class)
+    public void invalidTimeEntryFailsWithIAEOnCreate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.createTimeEntry(createIncompleteTimeEntry());
+    }
+
+    @Test (expected = IllegalArgumentException.class)
+    public void invalidTimeEntryFailsWithIAEOnUpdate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.update(createIncompleteTimeEntry());
+    }
+
+    private TimeEntry createIncompleteTimeEntry() {
         TimeEntry timeEntry = new TimeEntry();
         timeEntry.setActivityId(ACTIVITY_ID);
         timeEntry.setSpentOn(new Date());
         timeEntry.setHours(1.5f);
-        try {
-            mgr.createTimeEntry(timeEntry);
-        } catch (IllegalArgumentException e) {
-            logger.debug("create: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
-        }
-        try {
-            mgr.updateTimeEntry(timeEntry);
-        } catch (IllegalArgumentException e) {
-            logger.debug("update: Got expected IllegalArgumentException for invalid Time Entry (issue #66).");
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail("Got unexpected " + e.getClass().getSimpleName() + ": " + e.getMessage());
-        }
+        return timeEntry;
+    }
+
+    @Test
+    public void testViolateTimeEntryConstraint_ProjectOrIssueID_issue66() throws IOException, AuthenticationException, RedmineException {
+        TimeEntry timeEntry = createIncompleteTimeEntry();
         // Now can try to verify with project ID (only test with issue ID seems to be already covered)
         int projectId = mgr.getProjects().get(0).getId();
         timeEntry.setProjectId(projectId);
