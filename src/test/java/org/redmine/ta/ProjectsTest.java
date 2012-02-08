@@ -50,9 +50,7 @@ public class ProjectsTest {
       */
     private Project findProjectInList(int projectDbId) {
         Project result = null;
-        Iterator<Project> it = projectsList.iterator();
-        while (it.hasNext()) {
-            Project project = it.next();
+        for (Project project : projectsList) {
             if (project.getId().equals(projectDbId)) {
                 result = project;
                 break;

@@ -24,7 +24,7 @@ public class RedmineXMLParserTest {
     private static final String FILE_EMPTY_ISSUES_XML = "issues_empty_list.xml";
     private static final String REDMINE_1_3_0_ISSUE_STATUSES_XML = "redmine_1.3.0_issue_statuses.xml";
 
-    private static Logger logger = LoggerFactory.getLogger(RedmineXMLParserTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedmineXMLParserTest.class);
 
     @Test
     public void testParseIssuesFromEmptyXML() {

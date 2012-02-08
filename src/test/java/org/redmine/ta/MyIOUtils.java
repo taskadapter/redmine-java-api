@@ -88,7 +88,7 @@ public class MyIOUtils {
     }
 
     public static String loadFile(String fileName) throws IOException {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         FileInputStream fis = new FileInputStream(fileName);
         InputStreamReader isr = new InputStreamReader(fis, "UTF8");
         Reader in = new BufferedReader(isr);
