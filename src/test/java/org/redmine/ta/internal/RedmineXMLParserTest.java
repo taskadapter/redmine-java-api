@@ -276,7 +276,7 @@ public class RedmineXMLParserTest {
     public void testCreatedOn() throws IOException {
         List<Issue> redmine11Issues = loadRedmine11IssuesXml();
         Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
-        MyIOUtils.testLongDate(2011, Calendar.FEBRUARY, 12, 16, 00, 31, "GMT-8", issue.getCreatedOn());
+        MyIOUtils.testLongDate(2011, Calendar.FEBRUARY, 12, 16, 0, 31, "GMT-8", issue.getCreatedOn());
     }
 
     @Test

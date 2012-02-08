@@ -169,11 +169,7 @@ public class RedmineManager {
     }
 
     private URI createURI(String query, NameValuePair... param) {
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
-        for (NameValuePair p : param) {
-            list.add(p);
-        }
-        return createURI(query, list);
+        return createURI(query, Arrays.asList(param));
     }
 
     /**
@@ -678,7 +674,7 @@ public class RedmineManager {
         return createURI(query);
     }
 
-    private URI getUpdateURI(Class zz, String id) throws MalformedURLException {
+    private URI getUpdateURI(Class zz, String id) {
         String query = urls.get(zz) + "/" + id + URL_POSTFIX;
         return createURI(query);
     }
