@@ -100,7 +100,8 @@ public final class LoggerFactory {
         }
         // valid properties loaded? If not, we will use the default configuration.
         if ((properties == null) || (!properties.containsKey(PROPERTY_KEY_LOGLEVEL))) {
-            System.err.println("No valid logging configuration could be loaded [" + PROPERTIES_FILE_NAME + "] => using default configuration");
+            System.out.println("Using default logging configuration. You can add \"" + PROPERTIES_FILE_NAME + "\" file to the classpath to override." +
+                    " See http://code.google.com/p/redmine-java-api/issues/detail?id=95");
             properties = createDefaultConfiguration();
         }
         // inspect properties for log level to use
