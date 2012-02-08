@@ -353,4 +353,15 @@ public class RedmineXMLParserTest {
             Assert.fail("Error:" + e);
         }
     }
+    
+    @Test
+    public void correctXmlFileIsRecognized() {
+        RedmineXMLParser.verifyStartsAsXML("<?xml version=");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void incorrectXmlFileIsNOTRecognized() {
+        RedmineXMLParser.verifyStartsAsXML("<html");
+    }
+
 }
