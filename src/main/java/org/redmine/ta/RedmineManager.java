@@ -803,6 +803,17 @@ public class RedmineManager {
         updateObject(User.class, user);
     }
 
+    /**
+     * @param userId user identifier (numeric ID)
+     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       if the user with the given id is not found
+     * @throws RedmineException
+     */
+    public void deleteUser(Integer userId) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        deleteObject(User.class, Integer.toString(userId));
+    }
+
     public List<TimeEntry> getTimeEntries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
         return getObjectsList(TimeEntry.class, new HashSet<NameValuePair>());
     }
