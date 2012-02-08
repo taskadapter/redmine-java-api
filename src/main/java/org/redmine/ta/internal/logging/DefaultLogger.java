@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public final class DefaultLogger implements Logger {
 
-    private String identifier;
+    private final String identifier;
 
     /**
      * default level is INFO

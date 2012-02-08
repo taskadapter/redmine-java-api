@@ -7,7 +7,7 @@ import java.util.Properties;
 public class TestConfig {
     private static final String TEST_PROPERTIES = "api_test.properties";
 
-    private Properties properties = new Properties();
+    private final Properties properties = new Properties();
 
     public TestConfig() {
         loadProperties();

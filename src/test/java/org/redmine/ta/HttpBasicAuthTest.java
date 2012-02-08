@@ -22,7 +22,7 @@ import static org.junit.Assert.assertTrue;
  */
 public final class HttpBasicAuthTest {
 
-    private Logger logger = LoggerFactory.getLogger(HttpBasicAuthTest.class);
+    private final Logger logger = LoggerFactory.getLogger(HttpBasicAuthTest.class);
 
     private static TestConfig testConfig;
     private static RedmineManager mgrKey;
