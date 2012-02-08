@@ -636,8 +636,12 @@ public class RedmineManager {
     /*
       * note: This method cannot return the updated object from Redmine
       * because the server does not provide any XML in response.
+      *
+      * @since 1.8.0
       */
-    private <T extends Identifiable> void updateObject(Class<T> classs, T obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void update(Identifiable obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+        validate(obj);
+
         URI uri = getUpdateURI(obj.getClass(), Integer.toString(obj.getId()));
         HttpPut http = new HttpPut(uri);
 
@@ -647,6 +651,15 @@ public class RedmineManager {
         Response response = sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
+        }
+    }
+
+    private void validate(Identifiable obj) {
+        // TODO this is a temporary step during refactoring. remove this class check, make it generic.
+        // maybe add validate() method to the objects themselves, although need to remember that
+        // there could be several "valid" states - e.g. "Valid to create"m "valid to update".
+        if (obj instanceof  TimeEntry && !(isValidTimeEntry((TimeEntry) obj))) {
+            throw createIllegalTimeEntryException();
         }
     }
 
@@ -720,16 +733,20 @@ public class RedmineManager {
     }
 
     /**
+     * @deprecated this method will be deleted in the future releases. use update() method instead
+     *
      * @param project
      * @throws IOException
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      * @throws NotFoundException
+     *
+     * @see #update(org.redmine.ta.beans.Identifiable)
      */
     public void updateProject(Project project) throws IOException,
             AuthenticationException, RedmineException, NotFoundException {
-        updateObject(Project.class, project);
+        update(project);
     }
 
     /**
@@ -788,6 +805,8 @@ public class RedmineManager {
     }
 
     /**
+     * @deprecated this method will be deleted in the future releases. use update() method instead
+     *
      * This method cannot return the updated object from Redmine
      * because the server does not provide any XML in response.
      *
@@ -800,7 +819,7 @@ public class RedmineManager {
      */
     public void updateUser(User user) throws IOException,
             AuthenticationException, RedmineException, NotFoundException {
-        updateObject(User.class, user);
+        update(user);
     }
 
     /**
@@ -833,17 +852,15 @@ public class RedmineManager {
     }
 
     public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        if (!isValidTimeEntry(obj)) {
-            throw createIllegalTimeEntryException();
-        }
+        validate(obj);
         return createObject(TimeEntry.class, obj);
     }
 
+    /**
+     * @deprecated this method will be deleted in the future releases. use update() method instead
+     */
     public void updateTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        if (!isValidTimeEntry(obj)) {
-            throw createIllegalTimeEntryException();
-        }
-        updateObject(TimeEntry.class, obj);
+        update(obj);
     }
 
     public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
