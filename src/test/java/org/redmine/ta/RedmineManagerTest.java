@@ -298,7 +298,7 @@ public class RedmineManagerTest {
             String changedSubject = "changed subject";
             newIssue.setSubject(changedSubject);
 
-            mgr.updateIssue(newIssue);
+            mgr.update(newIssue);
 
             Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
 
@@ -435,7 +435,7 @@ public class RedmineManagerTest {
 
             createdProject.setName(newName);
             createdProject.setDescription(newDescr);
-            mgr.updateProject(createdProject);
+            mgr.update(createdProject);
 
             Project updatedProject = mgr.getProjectByKey(key);
             Assert.assertNotNull(updatedProject);
@@ -554,7 +554,7 @@ public class RedmineManagerTest {
         int nonExistingId = 999999;
         Issue issue = new Issue();
         issue.setId(nonExistingId);
-        mgr.updateIssue(issue);
+        mgr.update(issue);
     }
 
 
@@ -663,7 +663,7 @@ public class RedmineManagerTest {
             createdUser.setLastName(newLastName);
             createdUser.setMail(newMail);
 
-            mgr.updateUser(createdUser);
+            mgr.update(createdUser);
 
             User updatedUser = mgr.getUserById(userId);
 
@@ -877,10 +877,10 @@ public class RedmineManagerTest {
     public void testUpdateIssueSpecialXMLtags() throws Exception {
         Issue issue = createIssues(1).get(0);
         String newSubject = "\"text in quotes\" and <xml> tags";
-        String newDescription = "<teghere>\"abc\"</here>";
+        String newDescription = "<taghere>\"abc\"</here>";
         issue.setSubject(newSubject);
         issue.setDescription(newDescription);
-        mgr.updateIssue(issue);
+        mgr.update(issue);
 
         Issue updatedIssue = mgr.getIssueById(issue.getId());
         Assert.assertEquals(newSubject, updatedIssue.getSubject());
@@ -912,7 +912,7 @@ public class RedmineManagerTest {
 
         issue.getCustomFields().add(new CustomField(id1, custom1FieldName, custom1Value));
         issue.getCustomFields().add(new CustomField(id2, custom2FieldName, custom2Value));
-        mgr.updateIssue(issue);
+        mgr.update(issue);
 
         Issue updatedIssue = mgr.getIssueById(issue.getId());
         Assert.assertEquals(2, updatedIssue.getCustomFields().size());
@@ -930,7 +930,7 @@ public class RedmineManagerTest {
             Issue newIssue = mgr.createIssue(projectKey, issue);
             Assert.assertEquals("Estimated hours must be NULL", null, newIssue.getEstimatedHours());
 
-            mgr.updateIssue(newIssue);
+            mgr.update(newIssue);
 
             Issue reloadedFromRedmineIssue = mgr.getIssueById(newIssue.getId());
             Assert.assertEquals("Estimated hours must be NULL", null, reloadedFromRedmineIssue.getEstimatedHours());
@@ -993,7 +993,7 @@ public class RedmineManagerTest {
             Assert.assertEquals("Initial 'done ratio' must be 0", (Integer) 0, createdIssue.getDoneRatio());
             Integer doneRatio = 50;
             createdIssue.setDoneRatio(doneRatio);
-            mgr.updateIssue(createdIssue);
+            mgr.update(createdIssue);
 
             Integer issueId = createdIssue.getId();
             Issue reloadedFromRedmineIssue = mgr.getIssueById(issueId);
@@ -1004,7 +1004,7 @@ public class RedmineManagerTest {
             Integer invalidDoneRatio = 130;
             reloadedFromRedmineIssue.setDoneRatio(invalidDoneRatio);
             try {
-                mgr.updateIssue(reloadedFromRedmineIssue);
+                mgr.update(reloadedFromRedmineIssue);
             } catch (RedmineException e) {
                 Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
                 Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0));
@@ -1015,7 +1015,7 @@ public class RedmineManagerTest {
                     "'done ratio' must have remained unchanged after invalid value",
                     doneRatio, reloadedFromRedmineIssueUnchanged.getDoneRatio());
         } catch (Exception e) {
-            Assert.fail();
+            fail(e.toString());
         }
     }
 
@@ -1033,7 +1033,7 @@ public class RedmineManagerTest {
             Assert.assertEquals("Checking description", descr, createdIssue.getDescription());
 
             createdIssue.setDescription(null);
-            mgr.updateIssue(createdIssue);
+            mgr.update(createdIssue);
 
             Integer issueId = createdIssue.getId();
             Issue reloadedFromRedmineIssue = mgr.getIssueById(issueId);
@@ -1042,7 +1042,7 @@ public class RedmineManagerTest {
                     descr, reloadedFromRedmineIssue.getDescription());
 
             reloadedFromRedmineIssue.setDescription("");
-            mgr.updateIssue(reloadedFromRedmineIssue);
+            mgr.update(reloadedFromRedmineIssue);
 
             Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
             Assert.assertEquals(
@@ -1067,7 +1067,7 @@ public class RedmineManagerTest {
             String commentDescribingTheUpdate = "some comment describing the issue update";
             loadedIssueWithJournals.setSubject("new subject");
             loadedIssueWithJournals.setNotes(commentDescribingTheUpdate);
-            mgr.updateIssue(loadedIssueWithJournals);
+            mgr.update(loadedIssueWithJournals);
 
             Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(), INCLUDE.journals);
             Assert.assertEquals(1, loadedIssueWithJournals2.getJournals().size());

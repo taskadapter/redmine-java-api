@@ -109,6 +109,9 @@ public class RedmineXMLGenerator {
         if (o instanceof IssueCategory) {
             return toXML((IssueCategory) o);
         }
+        if (o instanceof Issue) {
+            return toXML(null, (Issue) o);
+        }
         throw new RuntimeException("Object type is not supported.");
     }
 

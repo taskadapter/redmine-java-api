@@ -125,7 +125,7 @@ public class Simple {
         logger.debug("user=" + currentUser.getMail());
 
         currentUser.setMail("ne@com123.com");
-        mgr.updateUser(currentUser);
+        mgr.update(currentUser);
         logger.debug("updated user");
 
         User currentUser2 = mgr.getCurrentUser();

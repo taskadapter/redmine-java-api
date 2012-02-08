@@ -196,6 +196,8 @@ public class RedmineManager {
     }
 
     /**
+     * @deprecated this method will be deleted in the future releases. use update() method instead
+     *
      * Note: This method cannot return the updated Issue from Redmine
      * because the server does not provide any XML in response.
      *
