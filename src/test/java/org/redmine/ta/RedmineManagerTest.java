@@ -63,11 +63,6 @@ public class RedmineManagerTest {
         }
     }
 
-    @Before
-    // Is executed before each test method
-    public void setup() throws Exception {
-    }
-
     @Test
     public void testCreateIssue() {
         try {

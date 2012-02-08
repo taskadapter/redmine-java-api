@@ -43,7 +43,7 @@ public final class LoggerFactory {
     private static final String PROPERTY_KEY_LOGLEVEL = "log.level";
     private static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.INFO;
 
-    private static Map<String, DefaultLogger> loggers = new HashMap<String, DefaultLogger>();
+    private static final Map<String, DefaultLogger> loggers = new HashMap<String, DefaultLogger>();
     private static LogLevel logLevel;
 
     /**
