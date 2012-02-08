@@ -134,10 +134,9 @@ public class TimeEntry implements Identifiable {
 
     @Override
     public String toString() {
-        String s = "User \"" + userName + "\" spent " + hours
+        return "User \"" + userName + "\" spent " + hours
                 + " hours on task " + issueId + " (project \"" + projectName
                 + "\") doing " + activityName;
-        return s;
     }
 
     @Override

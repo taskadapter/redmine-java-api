@@ -756,7 +756,7 @@ public class RedmineManagerTest {
         deleteProjects(projects);
     }
 
-    private List<Project> createProjects(int num) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private List<Project> createProjects(int num) throws IOException, AuthenticationException, RedmineException {
         List<Project> projects = new ArrayList<Project>(num);
         for (int i = 0; i < num; i++) {
             Project projectToCreate = generateRandomProject();

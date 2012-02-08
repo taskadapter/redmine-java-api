@@ -6,5 +6,5 @@ package org.redmine.ta.internal.logging;
  * @author Matthias Paul scholz
  */
 public enum LogLevel {
-    DEBUG, INFO, WARN, ERROR;
+    DEBUG, INFO, WARN, ERROR
 }

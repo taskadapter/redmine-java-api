@@ -726,8 +726,7 @@ public class RedmineManager {
         setEntity(httpPost, createProjectXML);
 
         Response response = sendRequest(httpPost);
-        Project createdProject = RedmineXMLParser.parseProjectFromXML(response.getBody());
-        return createdProject;
+        return RedmineXMLParser.parseProjectFromXML(response.getBody());
     }
 
     /**
@@ -960,12 +959,9 @@ public class RedmineManager {
         HttpPost httpPost = new HttpPost(uri);
         String createVersionXML = RedmineXMLGenerator.toXML(version);
         setEntity(httpPost, createVersionXML);
-        // send request
         Response response = sendRequest(httpPost);
-        // handle response
         logger.debug(response.getBody());
-        Version createdVersion = RedmineXMLParser.parseVersionFromXML(response.getBody());
-        return createdVersion;
+        return RedmineXMLParser.parseVersionFromXML(response.getBody());
     }
 
     /**
@@ -1099,7 +1095,7 @@ public class RedmineManager {
                     new InputStreamReader(
                             url.openStream()));
             StringBuilder contentBuilder = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = inputReader.readLine()) != null) {
                 contentBuilder.append(line);
             }

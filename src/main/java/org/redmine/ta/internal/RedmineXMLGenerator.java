@@ -193,7 +193,7 @@ public class RedmineXMLGenerator {
     /**
      * append, if the value is not NULL
      */
-    private static final void appendIfNotNull(StringBuilder b, String tag, Object value) {
+    private static void appendIfNotNull(StringBuilder b, String tag, Object value) {
         if (value != null) {
             b.append("<" + tag + ">");
             if (value instanceof Date) {
@@ -211,7 +211,7 @@ public class RedmineXMLGenerator {
     /**
      * append NULL value
      */
-    private static final void appendNull(StringBuilder b, String tag) {
+    private static void appendNull(StringBuilder b, String tag) {
         b.append("<" + tag + ">null</" + tag + ">");
     }
 

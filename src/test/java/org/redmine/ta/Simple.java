@@ -11,24 +11,15 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 public class Simple {
-//	private static String redmineHost = "https://www.hostedredmine.com";
-//	private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
-//	private static String projectKey = "taskconnector-test";
-
     private static Logger logger = LoggerFactory.getLogger(Simple.class);
-
-    //	private static String redmineHost = "http://192.168.0.30:3030";
-    private static String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.0";
-        private static String apiAccessKey = "9eba7a1101d10c074249b890372593d5d64b0f0f";
-//    private static String login = "admin";
-//    private static String password = "zzz666";
-
     private static String projectKey = "test";
 
     private static Integer queryId = null; // any
 
     public static void main(String[] args) {
-		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
+        String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.0";
+        String apiAccessKey = "9eba7a1101d10c074249b890372593d5d64b0f0f";
+        RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
         try {
 //			getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
