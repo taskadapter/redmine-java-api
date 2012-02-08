@@ -27,6 +27,7 @@ public class RedmineManagerTest {
 
     private static String projectKey;
     private static TestConfig testConfig;
+    private static List<User> userList = new ArrayList<User>();
 
     @BeforeClass
     public static void oneTimeSetUp() {
@@ -53,6 +54,13 @@ public class RedmineManagerTest {
     @AfterClass
     public static void oneTimeTearDown() {
         try {
+            for (User u : userList) {
+                User existUser = mgr.getUserById(u.getId());
+                if (existUser != null) {
+                    mgr.deleteUser(u.getId());
+                }
+            }
+
             if (mgr != null && projectKey != null) {
                 mgr.deleteProject(projectKey);
             }
@@ -611,6 +619,7 @@ public class RedmineManagerTest {
         try {
             User userToCreate = generateRandomUser();
             User createdUser = mgr.createUser(userToCreate);
+            userList.add(createdUser);
 
             Assert.assertNotNull("checking that a non-null project is returned", createdUser);
 
@@ -633,6 +642,7 @@ public class RedmineManagerTest {
         user.setLogin("login" + randomNumber);
         user.setMail("somemail" + randomNumber + "@somedomain.com");
         user.setPassword("zzzz");
+
         return user;
     }
 
