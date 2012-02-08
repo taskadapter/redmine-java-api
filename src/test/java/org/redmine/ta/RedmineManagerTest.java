@@ -677,19 +677,26 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testDeleteUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void userCanBeDeleted() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         User user = generateRandomUser();
         User createdUser = mgr.createUser(user);
+        Integer newUserId = createdUser.getId();
 
         try {
-            mgr.deleteUser(createdUser.getId());
+            mgr.deleteUser(newUserId);
         } catch (Exception e) {
             Assert.fail(e.getMessage());
+        }
+        try {
+            mgr.getUserById(newUserId);
+            fail("Must have failed with NotFoundException because we tried to delete the user");
+        } catch (NotFoundException e) {
+            // ignore: the user should not be found
         }
     }
 
     @Test(expected = NotFoundException.class)
-    public void testDeleteNonExistingUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deletingNonExistingUserThrowsNFE() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         mgr.deleteUser(999999);
     }
 
