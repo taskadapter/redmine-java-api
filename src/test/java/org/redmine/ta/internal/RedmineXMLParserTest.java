@@ -360,7 +360,7 @@ public class RedmineXMLParserTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void incorrectXmlFileIsNOTRecognized() {
+    public void failsWithIncorrectXmlFile() {
         RedmineXMLParser.verifyStartsAsXML("<html");
     }
 
