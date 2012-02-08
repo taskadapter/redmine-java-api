@@ -24,13 +24,12 @@ public final class HttpBasicAuthTest {
 
     private final Logger logger = LoggerFactory.getLogger(HttpBasicAuthTest.class);
 
-    private static TestConfig testConfig;
     private static RedmineManager mgrKey;
     private static RedmineManager mgrHttpBasicAuth;
 
     @BeforeClass
     public static void setup() {
-        testConfig = new TestConfig();
+        TestConfig testConfig = new TestConfig();
         mgrKey = new RedmineManager(testConfig.getURI(), testConfig.getApiKey());
         mgrHttpBasicAuth = new RedmineManager(testConfig.getURI());
         mgrHttpBasicAuth.setLogin(testConfig.getLogin());
