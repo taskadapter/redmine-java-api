@@ -809,7 +809,7 @@ public class RedmineManagerTest {
         Float newHours = 22f;
         createdEntry.setHours(newHours);
 
-        mgr.updateTimeEntry(createdEntry);
+        mgr.update(createdEntry);
 
         TimeEntry updatedEntry = mgr.getTimeEntry(createdEntry.getId());
         Assert.assertEquals(newHours, updatedEntry.getHours());

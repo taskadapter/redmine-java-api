@@ -29,7 +29,7 @@ public class RedmineShortDateHandler extends RedmineDateHandler {
 
     // XXX there's bug in Castor: http://jira.codehaus.org/browse/CASTOR-1878
     private static final String FORMAT = "yyyy-MM-dd";
-    SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+    private final SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
 
     @Override
     public Date getDate(String str) throws ParseException {

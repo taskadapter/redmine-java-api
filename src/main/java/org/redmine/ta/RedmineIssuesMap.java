@@ -35,9 +35,7 @@ public class RedmineIssuesMap {
     private HashMap<Integer, Issue> issuesMap = new HashMap<Integer, Issue>();
 
     public RedmineIssuesMap(List<Issue> list) {
-        Iterator<Issue> it = list.iterator();
-        while (it.hasNext()) {
-            Issue issue = it.next();
+        for (Issue issue : list) {
             issuesMap.put(issue.getId(), issue);
         }
     }

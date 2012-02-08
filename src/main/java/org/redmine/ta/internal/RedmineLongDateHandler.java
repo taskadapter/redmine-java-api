@@ -47,14 +47,14 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
     }
 
     private String convertToRFC822Format(String str) {
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         b.append(str.substring(0, str.length() - SHIFT));
         b.append(str.substring(str.length() - SHIFT + 1));
         return b.toString();
     }
 
     private String convertToRedmine11Format(String str) {
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         b.append(str.substring(0, str.length() - SHIFT + 1));
         b.append(":");
         b.append(str.substring(str.length() - SHIFT + 1));
