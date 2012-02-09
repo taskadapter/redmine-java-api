@@ -16,24 +16,24 @@
 
 package org.redmine.ta;
 
-import org.apache.http.*;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.methods.*;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
-import org.castor.core.util.Base64Encoder;
 import org.redmine.ta.beans.*;
-import org.redmine.ta.internal.HttpUtil;
-import org.redmine.ta.internal.RedmineXMLGenerator;
-import org.redmine.ta.internal.RedmineXMLParser;
-import org.redmine.ta.internal.URIConfigurator;
+import org.redmine.ta.internal.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
@@ -47,7 +47,6 @@ import java.util.Map.Entry;
 public class RedmineManager {
 
     private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
-    private static final String CHARSET = "UTF-8";
     private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
     // TODO add tests for "relations" to RedmineManagerTest class
@@ -133,7 +132,7 @@ public class RedmineManager {
         String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
 
         setEntity(http, xmlBody);
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
         }
@@ -162,101 +161,16 @@ public class RedmineManager {
         String NO_PROJECT_KEY = null;
         String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
         setEntity(httpRequest, xmlBody);
-        Response response = sendRequest(httpRequest);
+        Response response = getCommunicator().sendRequest(httpRequest);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Issue with id=" + issue.getId() + " is not found.");
         }
     }
 
     private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
-        StringEntity entity = new StringEntity(xmlBody, CHARSET);
+        StringEntity entity = new StringEntity(xmlBody, Communicator.CHARSET);
         entity.setContentType(CONTENT_TYPE);
         request.setEntity(entity);
-    }
-
-    private void configureProxy(DefaultHttpClient httpclient) {
-        String proxyHost = System.getProperty("http.proxyHost");
-        String proxyPort = System.getProperty("http.proxyPort");
-        if (proxyHost != null && proxyPort != null) {
-            int port = Integer.parseInt(proxyPort);
-            HttpHost proxy = new HttpHost(proxyHost, port);
-            httpclient.getParams().setParameter(org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY, proxy);
-            String proxyUser = System.getProperty("http.proxyUser");
-            if (proxyUser != null) {
-                String proxyPassword = System.getProperty("http.proxyPassword");
-                httpclient.getCredentialsProvider().setCredentials(
-                        new AuthScope(proxyHost, port),
-                        new UsernamePasswordCredentials(proxyUser, proxyPassword));
-            }
-        }
-    }
-
-    private Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException {
-        logger.debug(request.getRequestLine().toString());
-        DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
-
-        configureProxy(httpclient);
-
-        if (useBasicAuth) {
-            // replaced because of http://code.google.com/p/redmine-java-api/issues/detail?id=72
-//			httpclient.getCredentialsProvider().setCredentials(
-//                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
-//                new UsernamePasswordCredentials(login, password));
-            final String credentials = String.valueOf(Base64Encoder.encode((login + ':' + password).getBytes(CHARSET)));
-            request.addHeader("Authorization", "Basic: " + credentials);
-        }
-
-        request.addHeader("Accept-Encoding", "gzip,deflate");
-        HttpResponse httpResponse = httpclient.execute((HttpUriRequest) request);
-
-        int responseCode = httpResponse.getStatusLine().getStatusCode();
-        if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
-            throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
-        }
-        if (responseCode == HttpStatus.SC_FORBIDDEN) {
-            throw new AuthenticationException("Forbidden. Please check the user has proper permissions.");
-        }
-
-        HttpEntity responseEntity = httpResponse.getEntity();
-        String responseBody = EntityUtils.toString(responseEntity);
-
-        if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
-            List<String> errors = RedmineXMLParser.parseErrors(responseBody);
-            throw new RedmineException(errors);
-        }
-        /* 422 "invalid"
-          <?xml version="1.0" encoding="UTF-8"?>
-          <errors>
-            <error>Name can't be blank</error>
-            <error>Identifier has already been taken</error>
-          </errors>
-           */
-
-
-        // have to fill our own object, otherwise there's no guarantee
-        // that the request body can be retrieved later ("socket closed" exception can occur)
-        Response r = new Response(responseCode, responseBody);
-        httpclient.getConnectionManager().shutdown();
-        return r;
-    }
-
-    class Response {
-        private int code;
-        private String body;
-
-        public Response(int code, String body) {
-            super();
-            this.code = code;
-            this.body = body;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String getBody() {
-            return body;
-        }
     }
 
     /**
@@ -359,7 +273,7 @@ public class RedmineManager {
         URI uri = getURIConfigurator().getUpdateURI(Project.class, projectKey, new BasicNameValuePair("include", "trackers"));
 
         HttpGet http = new HttpGet(uri);
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Project with key '" + projectKey + "' is not found.");
         }
@@ -429,7 +343,7 @@ public class RedmineManager {
             URI uri = getURIConfigurator().getRetrieveObjectsListURI(objectClass, paramsList);
 
             HttpGet http = new HttpGet(uri);
-            Response response = sendRequest(http);
+            Response response = getCommunicator().sendRequest(http);
             if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
                 throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
             }
@@ -490,7 +404,7 @@ public class RedmineManager {
             logger.debug(uri.toString());
             HttpGet http = new HttpGet(uri);
 
-            Response response = sendRequest(http);
+            Response response = getCommunicator().sendRequest(http);
             if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
                 throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
             }
@@ -530,7 +444,7 @@ public class RedmineManager {
         String xml = RedmineXMLGenerator.toXML(obj);
         setEntity(http, xml);
 
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
         }
@@ -553,7 +467,7 @@ public class RedmineManager {
         String xml = RedmineXMLGenerator.toXML(obj);
         setEntity(http, xml);
 
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
         }
@@ -572,7 +486,7 @@ public class RedmineManager {
         URI uri = getURIConfigurator().getUpdateURI(classs, id);
         HttpDelete http = new HttpDelete(uri);
 
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
         }
@@ -580,7 +494,7 @@ public class RedmineManager {
 
     private String sendGet(URI uri) throws NotFoundException, IOException, AuthenticationException, RedmineException {
         HttpGet http = new HttpGet(uri);
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + response.getBody());
         }
@@ -622,7 +536,7 @@ public class RedmineManager {
         String createProjectXML = RedmineXMLGenerator.toXML(project);
         setEntity(httpPost, createProjectXML);
 
-        Response response = sendRequest(httpPost);
+        Response response = getCommunicator().sendRequest(httpPost);
         return RedmineXMLParser.parseProjectFromXML(response.getBody());
     }
 
@@ -687,7 +601,7 @@ public class RedmineManager {
     public User getCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = getURIConfigurator().createURI("users/current.xml");
         HttpGet http = new HttpGet(uri);
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         if (response.getCode() == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Could not determine current user. Maybe you weren't logged in correctly?");
         }
@@ -805,7 +719,7 @@ public class RedmineManager {
         String xml = RedmineXMLGenerator.toXML(toCreate);
         setEntity(http, xml);
 
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         return RedmineXMLParser.parseRelationFromXML(response.getBody());
     }
 
@@ -856,7 +770,7 @@ public class RedmineManager {
         HttpPost httpPost = new HttpPost(uri);
         String createVersionXML = RedmineXMLGenerator.toXML(version);
         setEntity(httpPost, createVersionXML);
-        Response response = sendRequest(httpPost);
+        Response response = getCommunicator().sendRequest(httpPost);
         logger.debug(response.getBody());
         return RedmineXMLParser.parseVersionFromXML(response.getBody());
     }
@@ -890,7 +804,7 @@ public class RedmineManager {
     public List<Version> getVersions(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/versions.xml", new BasicNameValuePair("include", "projects"));
         HttpGet http = new HttpGet(uri);
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         return RedmineXMLParser.parseVersionsFromXML(response.getBody());
     }
 
@@ -908,7 +822,7 @@ public class RedmineManager {
     public List<IssueCategory> getCategories(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/issue_categories.xml");
         HttpGet http = new HttpGet(uri);
-        Response response = sendRequest(http);
+        Response response = getCommunicator().sendRequest(http);
         return RedmineXMLParser.parseIssueCategoriesFromXML(response.getBody());
     }
 
@@ -1037,5 +951,13 @@ public class RedmineManager {
             uriConfigurator.setApiAccessKey(apiAccessKey);
         }
         return uriConfigurator;
+    }
+    
+    private Communicator getCommunicator() {
+        Communicator communicator = new Communicator();
+        if (useBasicAuth) {
+            communicator.setCredentials(login, password);
+        }
+        return communicator;
     }
 }
