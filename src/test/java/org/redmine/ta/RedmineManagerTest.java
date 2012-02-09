@@ -730,11 +730,6 @@ public class RedmineManagerTest {
         return issues;
     }
 
-    private Issue createIssue() throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        List<Issue> createIssues = createIssues(1);
-        return createIssues.get(0);
-    }
-
     private Issue generateRandomIssue() {
         Random r = new Random();
         Issue issue = new Issue();
@@ -776,16 +771,6 @@ public class RedmineManagerTest {
     public void testGetTimeEntries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
         List<TimeEntry> list = mgr.getTimeEntries();
         Assert.assertNotNull(list);
-//			boolean found = false;
-//			for (Project project : projects) {
-//				if (project.getIdentifier().equals(projectKey)) {
-//					found = true;
-//					break;
-//				}
-//			}
-//			if (!found) {
-//				fail("Our project with key '" + projectKey+"' is not found on the server");
-//			}
     }
 
     @Test
@@ -1329,7 +1314,6 @@ public class RedmineManagerTest {
                 Assert.assertNotNull("Project of version must not be null", version.getProject());
             }
         } finally {
-            // scrub test versions
             if (testVersion1 != null) {
                 mgr.deleteVersion(testVersion1);
             }
@@ -1417,7 +1401,6 @@ public class RedmineManagerTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
-        // create new invalid test category
         IssueCategory category = new IssueCategory(null, "InvalidCategory" + new Date().getTime());
         mgr.createCategory(category);
     }
@@ -1507,7 +1490,6 @@ public class RedmineManagerTest {
     public void testGetAttachmentById() throws RedmineException, IOException, AuthenticationException, NotFoundException {
         // TODO where do we get a valid attachment number from? We can't create an attachment by our own for the test as the Redmine REST API does not support that.
         int attachmentID = 1;
-        // retrieve issue attachment
         Attachment attachment = mgr.getAttachmentById(attachmentID);
         Assert.assertNotNull("Attachment retrieved by ID " + attachmentID + " should not be null", attachment);
         Assert.assertNotNull("Content URL of attachment retrieved by ID " + attachmentID + " should not be null", attachment.getContentURL());
@@ -1567,7 +1549,6 @@ public class RedmineManagerTest {
             Assert.assertEquals("ID of category retrieved for issue " + newIssue.getId() + " is wrong", newIssueCategory.getId(), retrievedCategory.getId());
             Assert.assertEquals("Name of category retrieved for issue " + newIssue.getId() + " is wrong", newIssueCategory.getName(), retrievedCategory.getName());
         } finally {
-            // scrub test issue and category
             if (newIssue != null) {
                 mgr.deleteIssue(newIssue.getId());
             }
