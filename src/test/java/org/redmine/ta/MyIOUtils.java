@@ -1,23 +1,6 @@
 package org.redmine.ta;
 
-import org.junit.Assert;
-
-import static org.junit.Assert.assertEquals;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.io.*;
 
 public class MyIOUtils {
 
@@ -68,35 +51,5 @@ public class MyIOUtils {
         } else {
             return "";
         }
-    }
-
-    public static void writeToFile(String fileName, String text)
-            throws IOException {
-        BufferedWriter out = null;
-        try {
-            // XXX is it UTF8 or UTF-8 ???
-            out = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(fileName), "UTF8"));
-
-            out.write(text);
-            out.close();
-        } finally {
-            if (out != null) {
-                out.close();
-            }
-        }
-    }
-
-    public static String loadFile(String fileName) throws IOException {
-        StringBuilder buffer = new StringBuilder();
-        FileInputStream fis = new FileInputStream(fileName);
-        InputStreamReader isr = new InputStreamReader(fis, "UTF8");
-        Reader in = new BufferedReader(isr);
-        int ch;
-        while ((ch = in.read()) > -1) {
-            buffer.append((char) ch);
-        }
-        in.close();
-        return buffer.toString();
     }
 }
