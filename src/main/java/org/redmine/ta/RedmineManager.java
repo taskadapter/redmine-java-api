@@ -132,8 +132,8 @@ public class RedmineManager {
         String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
 
         setEntity(http, xmlBody);
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseObjectFromXML(Issue.class, response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseObjectFromXML(Issue.class, response);
     }
 
     /**
@@ -267,8 +267,8 @@ public class RedmineManager {
         URI uri = getURIConfigurator().getUpdateURI(Project.class, projectKey, new BasicNameValuePair("include", "trackers"));
 
         HttpGet http = new HttpGet(uri);
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseProjectFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseProjectFromXML(response);
     }
 
     /**
@@ -336,20 +336,19 @@ public class RedmineManager {
             URI uri = getURIConfigurator().getRetrieveObjectsListURI(objectClass, paramsList);
 
             HttpGet http = new HttpGet(uri);
-            Response response = getCommunicator().sendRequest(http);
-            String body = response.getBody();
+            String response = getCommunicator().sendRequest(http);
 
             if (pageNum == FIRST_REDMINE_PAGE) {
-                firstPage = body;
+                firstPage = response;
             } else {
                 // check that the response is NOT equal to the First Page
                 // - this would indicate that no more pages are available (for Redmine 1.0.*);
-                if (firstPage.equals(body)) {
+                if (firstPage.equals(response)) {
                     // done, no more pages. exit the loop
                     break;
                 }
             }
-            List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
+            List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, response);
             if (foundItems.size() == 0) {
                 break;
             }
@@ -398,11 +397,10 @@ public class RedmineManager {
             logger.debug(uri.toString());
             HttpGet http = new HttpGet(uri);
 
-            Response response = getCommunicator().sendRequest(http);
-            String body = response.getBody();
-            totalObjectsFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(body);
+            String response = getCommunicator().sendRequest(http);
+            totalObjectsFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(response);
 
-            List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, body);
+            List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, response);
             if (foundItems.size() == 0) {
                 break;
             }
@@ -435,8 +433,8 @@ public class RedmineManager {
         String xml = RedmineXMLGenerator.toXML(obj);
         setEntity(http, xml);
 
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseObjectFromXML(classs, response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseObjectFromXML(classs, response);
     }
 
     /*
@@ -506,8 +504,8 @@ public class RedmineManager {
         String createProjectXML = RedmineXMLGenerator.toXML(project);
         setEntity(httpPost, createProjectXML);
 
-        Response response = getCommunicator().sendRequest(httpPost);
-        return RedmineXMLParser.parseProjectFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(httpPost);
+        return RedmineXMLParser.parseProjectFromXML(response);
     }
 
     /**
@@ -567,8 +565,8 @@ public class RedmineManager {
     public User getCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = getURIConfigurator().createURI("users/current.xml");
         HttpGet http = new HttpGet(uri);
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseUserFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseUserFromXML(response);
     }
 
     public User createUser(User user) throws IOException, AuthenticationException, RedmineException, NotFoundException {
@@ -682,8 +680,8 @@ public class RedmineManager {
         String xml = RedmineXMLGenerator.toXML(toCreate);
         setEntity(http, xml);
 
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseRelationFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseRelationFromXML(response);
     }
 
     /**
@@ -733,9 +731,9 @@ public class RedmineManager {
         HttpPost httpPost = new HttpPost(uri);
         String createVersionXML = RedmineXMLGenerator.toXML(version);
         setEntity(httpPost, createVersionXML);
-        Response response = getCommunicator().sendRequest(httpPost);
-        logger.debug(response.getBody());
-        return RedmineXMLParser.parseVersionFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(httpPost);
+        logger.debug(response);
+        return RedmineXMLParser.parseVersionFromXML(response);
     }
 
     /**
@@ -767,8 +765,8 @@ public class RedmineManager {
     public List<Version> getVersions(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/versions.xml", new BasicNameValuePair("include", "projects"));
         HttpGet http = new HttpGet(uri);
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseVersionsFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseVersionsFromXML(response);
     }
 
     /**
@@ -785,8 +783,8 @@ public class RedmineManager {
     public List<IssueCategory> getCategories(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/issue_categories.xml");
         HttpGet http = new HttpGet(uri);
-        Response response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseIssueCategoriesFromXML(response.getBody());
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseIssueCategoriesFromXML(response);
     }
 
     /**
