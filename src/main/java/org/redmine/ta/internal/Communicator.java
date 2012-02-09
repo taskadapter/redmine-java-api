@@ -3,6 +3,7 @@ package org.redmine.ta.internal;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -14,6 +15,7 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 
 public class Communicator {
@@ -98,5 +100,11 @@ public class Communicator {
     public void setCredentials(String login, String password) {
         this.login = login;
         this.password = password;
+    }
+
+    public String sendGet(URI uri) throws NotFoundException, IOException, AuthenticationException, RedmineException {
+        HttpGet http = new HttpGet(uri);
+        Response response = sendRequest(http);
+        return response.getBody();
     }
 }
