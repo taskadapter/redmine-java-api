@@ -316,6 +316,8 @@ public class RedmineManager {
 
     /**
      * Redmine 1.0 - specific version
+     *
+     * @return objects list, never NULL
      */
     private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         List<T> objects = new ArrayList<T>();
@@ -359,6 +361,9 @@ public class RedmineManager {
         return objects;
     }
 
+    /**
+     * @return objects list, never NULL
+     */
     private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
             AuthenticationException, NotFoundException, RedmineException {
         if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
@@ -374,6 +379,8 @@ public class RedmineManager {
 
     /**
      * Redmine 1.1+ / Chiliproject 1.2 - specific version
+     *
+     * @return objects list, never NULL
      */
     private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
             AuthenticationException, NotFoundException, RedmineException {
