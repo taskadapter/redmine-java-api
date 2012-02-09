@@ -1,1 +1,1 @@
-mvn clean deploy -P deploy-profile
+mvn clean deploy -P release-sign-artifacts
