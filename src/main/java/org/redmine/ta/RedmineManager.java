@@ -169,7 +169,11 @@ public class RedmineManager {
     }
 
     private URI createURI(String query, NameValuePair... param) {
-        return createURI(query, Arrays.asList(param));
+        List<NameValuePair> list = new ArrayList<NameValuePair>();
+        for (NameValuePair p : param) {
+            list.add(p);
+        }
+        return createURI(query, list);
     }
 
     /**
