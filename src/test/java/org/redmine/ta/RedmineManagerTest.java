@@ -939,11 +939,10 @@ public class RedmineManagerTest {
         }
     }
 
-    /* This tests finally PASSES after Redmine bug http://www.redmine.org/issues/8229
-      * was fixed
+    /* This tests finally PASSES after Redmine bug http://www.redmine.org/issues/8229 was fixed
       */
     @Test
-    public void testCreateSubProject() {
+    public void subProjectIsCreatedWithCorrectParentId() {
         Project createdMainProject = null;
         try {
             createdMainProject = createProject();
@@ -962,7 +961,6 @@ public class RedmineManagerTest {
                 }
             }
         }
-
     }
 
     private Project createProject() throws IOException, AuthenticationException, RedmineException {
