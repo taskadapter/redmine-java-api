@@ -17,8 +17,8 @@ public class Simple {
     private static Integer queryId = null; // any
 
     public static void main(String[] args) {
-        String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.0";
-        String apiAccessKey = "9eba7a1101d10c074249b890372593d5d64b0f0f";
+        String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.1";
+        String apiAccessKey = "e665eabdddfa3744e3cbea0f122445d098f2f4b2";
         RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
         try {
 //			getIssueWithRelations(mgr);
@@ -38,8 +38,7 @@ public class Simple {
     }
 
     private static void tryGetNews(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
-        String projectKey = "test";
-        List<News> news = mgr.getNews(projectKey);
+        List<News> news = mgr.getNews(null);
         for (News aNew : news) {
             System.out.println(aNew);
         }
