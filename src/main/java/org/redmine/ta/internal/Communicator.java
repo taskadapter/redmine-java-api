@@ -27,7 +27,11 @@ public class Communicator {
 
     // TODO lots of usages process 404 code themselves, but some don't.
     // check if we can process 404 code in this method instead of forcing clients to deal with it.
-    public Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+
+    /**
+     * @return the response body
+     */
+    public String sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         logger.debug(request.getRequestLine().toString());
         DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 
@@ -71,13 +75,8 @@ public class Communicator {
             <error>Identifier has already been taken</error>
           </errors>
            */
-
-
-        // have to fill our own object, otherwise there's no guarantee
-        // that the request body can be retrieved later ("socket closed" exception can occur)
-        Response r = new Response(responseCode, responseBody);
         httpclient.getConnectionManager().shutdown();
-        return r;
+        return responseBody;
     }
 
     private void configureProxy(DefaultHttpClient httpclient) {
@@ -104,7 +103,6 @@ public class Communicator {
 
     public String sendGet(URI uri) throws NotFoundException, IOException, AuthenticationException, RedmineException {
         HttpGet http = new HttpGet(uri);
-        Response response = sendRequest(http);
-        return response.getBody();
+        return sendRequest(http);
     }
 }
