@@ -31,10 +31,16 @@ public class Simple {
 //			getSavedQueries(mgr);
 //			getProjects(mgr);
 //			tryCreateRelation(mgr);
-            tryGetNews(mgr);
+//            tryGetNews(mgr);
+            getProject(mgr);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void getProject(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Project test = mgr.getProjectByKey("test");
+        System.out.println(test);
     }
 
     private static void tryGetNews(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
