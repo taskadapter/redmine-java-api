@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.redmine.ta.DateComparator;
 import org.redmine.ta.MyIOUtils;
 import org.redmine.ta.RedmineTestUtils;
 import org.redmine.ta.beans.*;
@@ -257,10 +258,10 @@ public class RedmineXMLParserTest {
         Assert.assertEquals(expectedHours, obj2.getHours());
         Assert.assertEquals("spent 2 hours working on ABC", obj2.getComment());
 
-        MyIOUtils.testLongDate(2011, Calendar.JANUARY, 31, 11, 10, 40, "GMT-8", obj2.getCreatedOn());
-        MyIOUtils.testLongDate(2011, Calendar.JANUARY, 31, 11, 12, 32, "GMT-8", obj2.getUpdatedOn());
+        DateComparator.testLongDate(2011, Calendar.JANUARY, 31, 11, 10, 40, "GMT-8", obj2.getCreatedOn());
+        DateComparator.testLongDate(2011, Calendar.JANUARY, 31, 11, 12, 32, "GMT-8", obj2.getUpdatedOn());
 
-        MyIOUtils.testShortDate(2011, Calendar.JANUARY, 30, obj2.getSpentOn());
+        DateComparator.testShortDate(2011, Calendar.JANUARY, 30, obj2.getSpentOn());
     }
 
     @Test
@@ -276,14 +277,14 @@ public class RedmineXMLParserTest {
     public void testCreatedOn() throws IOException {
         List<Issue> redmine11Issues = loadRedmine11IssuesXml();
         Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
-        MyIOUtils.testLongDate(2011, Calendar.FEBRUARY, 12, 16, 0, 31, "GMT-8", issue.getCreatedOn());
+        DateComparator.testLongDate(2011, Calendar.FEBRUARY, 12, 16, 0, 31, "GMT-8", issue.getCreatedOn());
     }
 
     @Test
     public void testUpdatedOn() throws IOException {
         List<Issue> redmine11Issues = loadRedmine11IssuesXml();
         Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
-        MyIOUtils.testLongDate(2011, Calendar.SEPTEMBER, 17, 21, 28, 45, "GMT-8", issue.getUpdatedOn());
+        DateComparator.testLongDate(2011, Calendar.SEPTEMBER, 17, 21, 28, 45, "GMT-8", issue.getUpdatedOn());
     }
 
 
