@@ -55,34 +55,6 @@ public class RedmineXMLParserTest {
 
     }
 
-/*	@Test
-	public void testParseProjectXMLRedmine_1_0() {
-		String xml;
-		try {
-			xml = MyIOUtils.getResourceAsString("project.xml");
-			Project project = RedmineXMLParser.parseProjectFromXML(xml);
-			Integer expectedProjectID = 308;
-			String expectedName = "taskconnector-test";
-			String expectedKey = "taskconnector-test";
-			assertEquals(expectedProjectID, project.getId());
-			assertEquals(expectedName, project.getName());
-			assertEquals(expectedKey, project.getIdentifier());
-
-			List<Tracker> trackers = project.getTrackers();
-			assertNotNull("Trackers list must not be NULL", trackers);
-			assertEquals(4, trackers.size());
-
-			Tracker tracker = project.getTrackerByName("Support");
-			assertNotNull("Tracker must be not null", tracker);
-			Integer expectedTrackerId = 3;
-			assertEquals("checking id of 'support' tracker", expectedTrackerId,
-					tracker.getId());
-
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
-	}*/
-
     @Test
     public void testParseProjectXMLRedmine_1_1() {
         String xml;
