@@ -413,7 +413,7 @@ public class RedmineManager {
 
         // TODO simplify!
         URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, new ArrayList<NameValuePair>(Arrays.asList(params)));
-        String body = sendGet(uri);
+        String body = getCommunicator().sendGet(uri);
         return RedmineXMLParser.parseObjectFromXML(objectClass, body);
     }
 
@@ -463,12 +463,6 @@ public class RedmineManager {
         URI uri = getURIConfigurator().getUpdateURI(classs, id);
         HttpDelete http = new HttpDelete(uri);
         getCommunicator().sendRequest(http);
-    }
-
-    private String sendGet(URI uri) throws NotFoundException, IOException, AuthenticationException, RedmineException {
-        HttpGet http = new HttpGet(uri);
-        Response response = getCommunicator().sendRequest(http);
-        return response.getBody();
     }
 
     /**
