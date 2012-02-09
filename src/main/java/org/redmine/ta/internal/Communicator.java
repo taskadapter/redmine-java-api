@@ -8,6 +8,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.castor.core.util.Base64Encoder;
 import org.redmine.ta.AuthenticationException;
+import org.redmine.ta.NotFoundException;
 import org.redmine.ta.RedmineException;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
@@ -24,7 +25,7 @@ public class Communicator {
 
     // TODO lots of usages process 404 code themselves, but some don't.
     // check if we can process 404 code in this method instead of forcing clients to deal with it.
-    public Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException {
+    public Response sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         logger.debug(request.getRequestLine().toString());
         DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 
@@ -52,6 +53,10 @@ public class Communicator {
 
         HttpEntity responseEntity = httpResponse.getEntity();
         String responseBody = EntityUtils.toString(responseEntity);
+
+        if (responseCode == HttpStatus.SC_NOT_FOUND) {
+            throw new NotFoundException("Server returned '404 not found'. response body:" + responseBody);
+        }
 
         if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
             List<String> errors = RedmineXMLParser.parseErrors(responseBody);

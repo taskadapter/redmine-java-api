@@ -751,7 +751,7 @@ public class RedmineManagerTest {
         deleteProjects(projects);
     }
 
-    private List<Project> createProjects(int num) throws IOException, AuthenticationException, RedmineException {
+    private List<Project> createProjects(int num) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         List<Project> projects = new ArrayList<Project>(num);
         for (int i = 0; i < num; i++) {
             Project projectToCreate = generateRandomProject();
@@ -948,7 +948,7 @@ public class RedmineManagerTest {
         }
     }
 
-    private Project createProject() throws IOException, AuthenticationException, RedmineException {
+    private Project createProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         Project mainProject = new Project();
         long id = new Date().getTime();
         mainProject.setName("project" + id);
@@ -956,7 +956,7 @@ public class RedmineManagerTest {
         return mgr.createProject(mainProject);
     }
 
-    private Project createSubProject(Project parent) throws IOException, AuthenticationException, RedmineException {
+    private Project createSubProject(Project parent) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         Project project = new Project();
         long id = new Date().getTime();
         project.setName("sub_pr" + id);
