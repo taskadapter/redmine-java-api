@@ -1557,4 +1557,24 @@ public class RedmineManagerTest {
             }
         }
     }
+    
+    @Test
+    public void getNewsDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.getNews(null);
+    }
+
+    @Test
+    public void getNewsDoesNotFailForTempProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.getNews(projectKey);
+    }
+
+    @Test
+    public void getSavedQueriesDoesNotFailForTempProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.getSavedQueries(projectKey);
+    }
+
+    @Test
+    public void getSavedQueriesDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        mgr.getSavedQueries(null);
+    }
 }
