@@ -12,7 +12,7 @@ public class CustomField {
     private String value;
 
     /**
-     * This default empty constructor is required for Custor XML library.
+     * This default empty constructor is required for Castor XML library.
      */
     public CustomField() {
     }
