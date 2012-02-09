@@ -185,7 +185,6 @@ public class RedmineXMLParser {
         return list;
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
         verifyStartsAsXML(xml);
         StringBuilder builder = new StringBuilder(xml);
@@ -198,7 +197,7 @@ public class RedmineXMLParser {
         StringReader reader = null;
         try {
             reader = new StringReader(builder.toString());
-            obj = (T) unmarshaller.unmarshal(reader);
+            obj = classs.cast(unmarshaller.unmarshal(reader));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
