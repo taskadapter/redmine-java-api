@@ -450,11 +450,6 @@ public class RedmineManager {
      * @see Issue
      */
     public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        // have to load users first because the issues response does not contain the users names
-        // see http://www.redmine.org/issues/7487
-//		List<User> users = getUsers();
-//		Map<Integer, User> idToUserMap = buildIdToUserMap(users);
-
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         if (queryId != null) {
             params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
@@ -466,39 +461,7 @@ public class RedmineManager {
         String includeStr = join(",", include);
         params.add(new BasicNameValuePair("include", includeStr));
 
-        List<Issue> issues = getObjectsList(Issue.class, params);
-//		setUserFields(issues, idToUserMap);
-        return issues;
-    }
-
-//	private void setUserFields(List<Issue> issues,
-//			Map<Integer, User> idToUserMap) {
-//		for (Issue issue : issues) {
-//			User author = issue.getAuthor();
-//			if (author != null) {
-//				User completelyFilledUser = idToUserMap.get(author.getId());
-//				issue.setAuthor(completelyFilledUser);
-//			}
-//			User assignee = issue.getAssignee();
-//			if (assignee != null) {
-//				User completelyFilledUser = idToUserMap.get(author.getId());
-//				issue.setAssignee(completelyFilledUser);
-//			}
-//		}
-//	}
-//	private Map<Integer, User> buildIdToUserMap(List<User> usersList) {
-//		Map<Integer, User> idToUserMap = new HashMap<Integer, User>();
-//		for (User u : usersList) {
-//			idToUserMap.put(u.getId(), u);
-//		}
-//		return idToUserMap;
-//	}
-
-    /**
-     * This ONLY works with Redmine 1.0.  Redmine 1.1 uses "objects per page" parameter instead!
-     */
-    private void addPagingParameters(Set<NameValuePair> params) {
-        params.add(new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
+        return getObjectsList(Issue.class, params);
     }
 
     /**
@@ -509,10 +472,10 @@ public class RedmineManager {
 
         final int FIRST_REDMINE_PAGE = 1;
         int pageNum = FIRST_REDMINE_PAGE;
-        // Redmine 1.0.4 (and Trunk at this moment - Dec 22, 2010) returns the same page1 when no other pages are available!!
+        // Redmine 1.0.4 returns the same page1 when no other pages are available!!
         String firstPage = null;
 
-        addPagingParameters(params);
+        params.add(new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
 
         do {
             List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
