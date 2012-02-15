@@ -58,6 +58,9 @@ public class User implements Identifiable {
         this.lastName = lastName;
     }
 
+    /**
+     * This field is empty when using issues.get(i).getAssignee().getMail()
+     */
     public String getMail() {
         return mail;
     }
