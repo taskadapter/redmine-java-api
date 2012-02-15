@@ -33,10 +33,17 @@ public class Simple {
 //			tryCreateRelation(mgr);
 //            tryGetNews(mgr);
 //            getProject(mgr);
-            changeIssueStatus(mgr);
+//            changeIssueStatus(mgr);
+            getVersion(mgr);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void getVersion(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        // see Redmine bug http://www.redmine.org/issues/10241
+        Version version = mgr.getVersionById(294);
+        System.out.println(version);
     }
 
     private static void changeIssueStatus(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
