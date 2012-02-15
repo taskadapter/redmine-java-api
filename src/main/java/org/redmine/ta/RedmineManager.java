@@ -769,6 +769,14 @@ public class RedmineManager {
         return RedmineXMLParser.parseVersionsFromXML(response);
     }
 
+    // TODO add test
+    public Version getVersionById(int versionId) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        URI uri = getURIConfigurator().createURI("versions/" + versionId + ".xml");
+        HttpGet http = new HttpGet(uri);
+        String response = getCommunicator().sendRequest(http);
+        return RedmineXMLParser.parseVersionFromXML(response);
+    }
+
     /**
      * delivers a list of {@link IssueCategory}s of a {@link Project}
      *

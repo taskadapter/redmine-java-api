@@ -1323,6 +1323,26 @@ public class RedmineManagerTest {
         }
     }
 
+    @Ignore // see Redmine bug http://www.redmine.org/issues/10241
+    @Test
+    public void versionIsRetrievedById() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Project project = mgr.getProjectByKey(projectKey);
+        Version createdVersion = mgr.createVersion(new Version(project, "Version_1_" + UUID.randomUUID()));
+        Version versionById = mgr.getVersionById(createdVersion.getId());
+        assertEquals(createdVersion, versionById);
+    }
+
+    @Ignore // see Redmine bug http://www.redmine.org/issues/10241
+    @Test
+    public void versionIsUpdated() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Project project = mgr.getProjectByKey(projectKey);
+        Version createdVersion = mgr.createVersion(new Version(project, "Version_1_" + UUID.randomUUID()));
+        String description = "new description";
+        createdVersion.setDescription(description);
+        mgr.update(createdVersion);
+        Version versionById = mgr.getVersionById(createdVersion.getId());
+        assertEquals(description, versionById.getDescription());
+    }
     /**
      * tests the creation and deletion of a {@link IssueCategory}.
      *
