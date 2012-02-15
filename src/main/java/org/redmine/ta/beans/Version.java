@@ -5,8 +5,7 @@ import java.util.Date;
 /**
  * Redmine's project versions<br/>
  * <br/>
- * REMARK: currently this is only used with Issues, so only id and name are
- * filled ATM
+ * REMARK: currently this is only used with Issues, so only id and name are filled
  *
  * @author Christian Migowski
  */
@@ -27,15 +26,12 @@ public class Version implements Identifiable {
     private Date updatedOn;
 
     /**
-     * No-params constructor. Required for reflective construction.
+     * Required for reflective construction.
      */
     public Version() {
-
     }
 
     /**
-     * Constructor.
-     *
      * @param project the {@link Project} of the {@link Version}
      * @param name    the name of the the {@link Version}
      */
