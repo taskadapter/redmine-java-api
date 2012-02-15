@@ -32,10 +32,17 @@ public class Simple {
 //			getProjects(mgr);
 //			tryCreateRelation(mgr);
 //            tryGetNews(mgr);
-            getProject(mgr);
+//            getProject(mgr);
+            changeIssueStatus(mgr);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private static void changeIssueStatus(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Issue issue = mgr.getIssueById(1771);
+        issue.setSubject("new");
+        mgr.update(issue);
     }
 
     private static void getProject(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
