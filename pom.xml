@@ -16,6 +16,8 @@
     <url>http://code.google.com/p/redmine-java-api</url>
     <scm>
         <connection>scm:svn:http://redmine-java-api.googlecode.com/svn/trunk</connection>
+        <!-- "developerConnection" is required for Maven Release plugin. -->
+        <developerConnection>scm:svn:http://redmine-java-api.googlecode.com/svn/trunk</developerConnection>
         <tag>HEAD</tag>
         <!-- A publicly browsable repository. For example, via ViewCVS -->
         <url>http://code.google.com/p/redmine-java-api/source/browse</url>
