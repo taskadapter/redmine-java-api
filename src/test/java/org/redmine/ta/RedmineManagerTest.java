@@ -339,24 +339,30 @@ public class RedmineManagerTest {
         Assert.assertNotNull("Name of tracker of issue should not be null", tracker.getName());
     }
 
+    /**
+     * Tests the retrieval of {@link Project}s.
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
     @Test
-    public void testGetProjects() {
-        try {
-            List<Project> projects = mgr.getProjects();
-            Assert.assertTrue(projects.size() > 0);
-            boolean found = false;
-            for (Project project : projects) {
-                if (project.getIdentifier().equals(projectKey)) {
-                    found = true;
-                    break;
-                }
+    public void testGetProjects() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+        // retrieve projects
+        List<Project> projects = mgr.getProjects();
+        // asserts
+        Assert.assertTrue(projects.size() > 0);
+        boolean found = false;
+        for (Project project : projects) {
+            if (project.getIdentifier().equals(projectKey)) {
+                found = true;
+                break;
             }
-            if (!found) {
-                Assert.fail("Our project with key '" + projectKey + "' is not found on the server");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
+        }
+        if (!found) {
+            Assert.fail("Our project with key '" + projectKey + "' is not found on the server");
         }
     }
 
@@ -924,26 +930,26 @@ public class RedmineManagerTest {
         }
     }
 
-    /* This tests finally PASSES after Redmine bug http://www.redmine.org/issues/8229 was fixed
-      */
+    /**
+     * Tests the correct retrieval of the parent id of sub {@link Project}.
+     *
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws IOException             thrown in case something went wrong while performing I/O
+     *                                 operations
+     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException       thrown in case the objects requested for could not be found
+     */
     @Test
-    public void subProjectIsCreatedWithCorrectParentId() {
+    public void testSubProjectIsCreatedWithCorrectParentId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         Project createdMainProject = null;
         try {
             createdMainProject = createProject();
             Project subProject = createSubProject(createdMainProject);
-
             Assert.assertEquals("Must have correct parent ID",
                     createdMainProject.getId(), subProject.getParentId());
-        } catch (Exception e) {
-            Assert.fail();
         } finally {
             if (createdMainProject != null) {
-                try {
-                    mgr.deleteProject(createdMainProject.getIdentifier());
-                } catch (Exception e) {
-                    Assert.fail();
-                }
+                mgr.deleteProject(createdMainProject.getIdentifier());
             }
         }
     }
