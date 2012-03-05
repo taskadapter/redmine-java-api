@@ -90,6 +90,10 @@ public class Issue implements Identifiable {
         return spentHours;
     }
 
+    public void setSpentHours(Float spentHours) {
+        this.spentHours = spentHours;
+    }
+
     /**
      * Parent Issue ID, or NULL for issues without a parent.
      *
