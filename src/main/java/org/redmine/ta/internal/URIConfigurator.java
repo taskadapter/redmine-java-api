@@ -31,6 +31,7 @@ public class URIConfigurator {
             put(Tracker.class, "trackers");
             put(Attachment.class, "attachments");
             put(News.class, "news");
+            put(IssueRelation.class, "relations");
         }
     };
 

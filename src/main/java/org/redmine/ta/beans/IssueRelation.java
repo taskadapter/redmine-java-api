@@ -1,6 +1,6 @@
 package org.redmine.ta.beans;
 
-public class IssueRelation {
+public class IssueRelation implements Identifiable {
     public enum TYPE {
         precedes
     }
