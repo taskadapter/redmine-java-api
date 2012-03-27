@@ -1128,6 +1128,15 @@ public class RedmineManagerTest {
         }
     }
 
+    @Test
+    public void testIssureRelationDelete() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        IssueRelation relation = createTwoRelatedIssues();
+
+        mgr.deleteRelation(relation.getId());
+        Issue issue = mgr.getIssueById(relation.getIssueId(), INCLUDE.relations);
+        Assert.assertEquals(0, issue.getRelations().size());
+    }
+
     /**
      * this test is ignored because:
      * 1) we can't create Versions. see http://www.redmine.org/issues/9088
@@ -1169,6 +1178,23 @@ public class RedmineManagerTest {
         }
     }
 
+    @Test
+    public void testSpentTimeFieldLoaded() {
+        try {
+            Issue issue = new Issue();
+            String subject = "Issue " + new Date();
+            issue.setSubject(subject);
+            float spentHours = 2;
+            issue.setSpentHours(spentHours);
+
+            Issue createdIssue = mgr.createIssue(projectKey, issue);
+            Issue newIssue = mgr.getIssueById(createdIssue.getId());
+            Assert.assertEquals((Float)spentHours, newIssue.getSpentHours());
+        } catch (Exception e) {
+            Assert.fail();
+        }
+    }
+
     @Ignore
     @Test
     public void testSpentTime() {
@@ -1179,12 +1205,12 @@ public class RedmineManagerTest {
 //		assertEquals((Float) spentHours, newIssue.getSpentHours());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnCreate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         mgr.createTimeEntry(createIncompleteTimeEntry());
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnUpdate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         mgr.update(createIncompleteTimeEntry());
     }
@@ -1349,6 +1375,7 @@ public class RedmineManagerTest {
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(description, versionById.getDescription());
     }
+
     /**
      * tests the creation and deletion of a {@link IssueCategory}.
      *
@@ -1583,7 +1610,7 @@ public class RedmineManagerTest {
             }
         }
     }
-    
+
     @Test
     public void getNewsDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         mgr.getNews(null);
