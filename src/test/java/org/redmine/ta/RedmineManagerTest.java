@@ -1197,6 +1197,7 @@ public class RedmineManagerTest {
         }
     }
 
+    @Ignore
     @Test
     public void testSpentTimeFieldLoaded() {
         try {
