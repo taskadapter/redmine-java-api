@@ -684,6 +684,11 @@ public class RedmineManager {
         return RedmineXMLParser.parseRelationFromXML(response);
     }
 
+    public void deleteRelation(Integer id) throws IOException,
+            AuthenticationException, NotFoundException, RedmineException {
+        deleteObject(IssueRelation.class, Integer.toString(id));
+    }
+
     /**
      * @deprecated use createRelation(Integer issueId, Integer issueToId, String type). "projectKey" parameter is not used anyway.
      *             this method will be deleted soon.
