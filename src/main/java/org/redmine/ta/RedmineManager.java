@@ -30,6 +30,7 @@ import org.redmine.ta.internal.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
+import javax.naming.ldap.InitialLdapContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -684,9 +685,47 @@ public class RedmineManager {
         return RedmineXMLParser.parseRelationFromXML(response);
     }
 
+    /**
+     * Deletes the selected relation.
+     *
+     * @param id
+     * @throws IOException
+     * @throws AuthenticationException
+     * @throws NotFoundException
+     * @throws RedmineException
+     */
     public void deleteRelation(Integer id) throws IOException,
             AuthenticationException, NotFoundException, RedmineException {
         deleteObject(IssueRelation.class, Integer.toString(id));
+    }
+
+    /**
+     * Delete all issue's relations
+     *
+     * @param redmineIssue
+     * @throws IOException
+     * @throws AuthenticationException
+     * @throws RedmineException
+     * @throws NotFoundException
+     */
+    public void deleteIssueRelations(Issue redmineIssue) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        for (IssueRelation relation : redmineIssue.getRelations()) {
+            deleteRelation(relation.getId());
+        }
+    }
+
+    /**
+     * Delete all issue's relation.
+     *
+     * @param id
+     * @throws IOException
+     * @throws AuthenticationException
+     * @throws RedmineException
+     * @throws NotFoundException
+     */
+    public void deleteIssueRelationsByIssueId(Integer id) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        Issue issue = getIssueById(id, INCLUDE.relations);
+        deleteIssueRelations(issue);
     }
 
     /**
