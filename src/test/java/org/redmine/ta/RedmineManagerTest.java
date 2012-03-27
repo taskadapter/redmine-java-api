@@ -1137,6 +1137,25 @@ public class RedmineManagerTest {
         Assert.assertEquals(0, issue.getRelations().size());
     }
 
+    @Test
+    public void testIssueRelationsDelete() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+        List<Issue> issues = createIssues(3);
+        Issue src = issues.get(0);
+        Issue target = issues.get(1);
+        String relationText = IssueRelation.TYPE.precedes.toString();
+
+        mgr.createRelation(src.getId(), target.getId(), relationText);
+
+        target = issues.get(2);
+        mgr.createRelation(src.getId(), target.getId(), relationText);
+
+        src = mgr.getIssueById(src.getId(), INCLUDE.relations);
+        mgr.deleteIssueRelations(src);
+
+        Issue issue = mgr.getIssueById(src.getId(), INCLUDE.relations);
+        Assert.assertEquals(0, issue.getRelations().size());
+    }
+
     /**
      * this test is ignored because:
      * 1) we can't create Versions. see http://www.redmine.org/issues/9088
