@@ -1,0 +1,15 @@
+Redmine/Chiliproject Java API.
+
+* Uses Redmine REST API
+* Does not require any plugins installed to Redmine/Chiliproject server.
+* Runs on any standard Java platform as well as Android OS (version 2.2 or newer)
+* Supports HTTP proxy
+* Supports GZipped responses from servers
+
+Maven Central dependency:
+
+<dependency>
+    <groupId>com.googlecode</groupId>
+    <artifactId>redmine-java-api</artifactId>
+    <version>1.8.0</version>
+</dependency>
