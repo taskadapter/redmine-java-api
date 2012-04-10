@@ -2,7 +2,7 @@ Release process for Redmine Java API.
 -------------------------------------
 
 Change version number in  /pom.xml (make sure it does not have "-SNAPSHOT" at the end).
-Commit to SVN.
+Commit and push to GIT.
 
 AUTO-release:
 Start this Jenkins job: https://ta-dev.dyndns.biz:8093/job/redmine-java-api-publish
