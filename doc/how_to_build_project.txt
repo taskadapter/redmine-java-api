@@ -1,21 +1,18 @@
-#summary How to build the project from source code.
+How to build the project from source code.
 
-  * Subscribe to developers list: http://groups.google.com/group/redmine-java-api-dev
-  * Install software
-  * Checkout the source code
-  * Build the distributive in command-line mode
+* Subscribe to developers list: http://groups.google.com/group/redmine-java-api-dev
 
-= Install software =
+* Install software
 Maven 3: http://maven.apache.org/download.html
 
-= Checkout the source code =
-Repository: https://redmine-java-api.googlecode.com/svn/trunk
+* Checkout the source code
+Repository: https://github.com/redminedev/redmine-java-api
 
-= Build the distributive in command-line mode =
+* Build the distributive in command-line mode
 
 Make sure you have Maven's "bin" folder in your path.
 Run this command in the project root folder:
   mvn clean integration-test
-This will create the distributive in "_project_root\build_" folder.
+
 
 
