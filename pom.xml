@@ -13,15 +13,19 @@
     <version>1.9.1-SNAPSHOT</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.</description>
-    <url>http://code.google.com/p/redmine-java-api</url>
+    <url>http://github.com/redminedev/redmine-java-api</url>
     <scm>
-        <connection>scm:svn:http://redmine-java-api.googlecode.com/svn/trunk</connection>
+        <connection>scm:git:git://github.com/redminedev/redmine-java-api.git</connection>
         <!-- "developerConnection" is required for Maven Release plugin. -->
-        <developerConnection>scm:svn:http://redmine-java-api.googlecode.com/svn/trunk</developerConnection>
+        <developerConnection>scm:git:git@github.com:redminedev/redmine-java-api.git</developerConnection>
         <tag>HEAD</tag>
         <!-- A publicly browsable repository. For example, via ViewCVS -->
-        <url>http://code.google.com/p/redmine-java-api/source/browse</url>
+        <url>http://github.com/redminedev/redmine-java-api/tree/master/</url>
     </scm>
+    <issueManagement>
+        <system>github</system>
+        <url>http://github.com/redminedev/redmine-java-api/issues</url>
+    </issueManagement>
 
     <licenses>
         <license>
