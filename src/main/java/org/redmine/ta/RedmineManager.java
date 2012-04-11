@@ -510,7 +510,6 @@ public class RedmineManager {
     /**
      * @deprecated this method will be deleted in the future releases. use update() method instead
      *
-     * @param project
      * @throws IOException
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -578,7 +577,6 @@ public class RedmineManager {
      * This method cannot return the updated object from Redmine
      * because the server does not provide any XML in response.
      *
-     * @param user
      * @throws IOException
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -680,9 +678,8 @@ public class RedmineManager {
     }
 
     /**
-     * Deletes the selected relation.
+     * Delete Issue Relation with the given ID.
      *
-     * @param id
      * @throws IOException
      * @throws AuthenticationException
      * @throws NotFoundException
@@ -778,7 +775,6 @@ public class RedmineManager {
      * deletes a new {@link Version} from the {@link Project} contained. <br/>
      *
      * @param version the {@link Version}.
-     * @return the new {@link Version} created by Redmine
      * @throws IOException             thrown in case something went wrong while performing I/O
      *                                 operations
      * @throws AuthenticationException thrown in case something went wrong while trying to login
@@ -859,7 +855,6 @@ public class RedmineManager {
      * deletes an {@link IssueCategory}. <br/>
      *
      * @param category the {@link IssueCategory}.
-     * @return the new {@link IssueCategory} created by Redmine
      * @throws IOException             thrown in case something went wrong while performing I/O
      *                                 operations
      * @throws AuthenticationException thrown in case something went wrong while trying to login

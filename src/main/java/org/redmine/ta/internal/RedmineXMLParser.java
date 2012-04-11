@@ -217,7 +217,7 @@ public class RedmineXMLParser {
     }
 
     /**
-     * sample parameter:
+     * @param responseBody  sample parameter:
      * <pre>
      * 	&lt;?xml version="1.0" encoding="UTF-8"?>
      * 	&lt;errors>
@@ -225,9 +225,6 @@ public class RedmineXMLParser {
      * 		&lt;error>Identifier has already been taken&lt;/error>
      * 	&lt;/errors>
      * </pre>
-     *
-     * @param responseBody
-     * @return
      */
     public static List<String> parseErrors(String responseBody) {
         List<String> errors = new ArrayList<String>();

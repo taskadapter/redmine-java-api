@@ -462,7 +462,6 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * @param fieldName
      * @return the value or NULL if the field is not found
      */
     public String getCustomField(String fieldName) {
