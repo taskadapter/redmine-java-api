@@ -243,4 +243,7 @@ public class TimeEntry implements Identifiable {
         return true;
     }
 
+    public boolean isValid() {
+        return (hours != null) && (projectId != null || issueId != null);
+    }
 }

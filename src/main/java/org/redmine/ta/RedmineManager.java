@@ -17,7 +17,6 @@
 package org.redmine.ta;
 
 import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -30,7 +29,6 @@ import org.redmine.ta.internal.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
-import javax.naming.ldap.InitialLdapContext;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -460,7 +458,7 @@ public class RedmineManager {
         // TODO this is a temporary step during refactoring. remove this class check, make it generic.
         // maybe add validate() method to the objects themselves, although need to remember that
         // there could be several "valid" states - e.g. "Valid to create"m "valid to update".
-        if (obj instanceof  TimeEntry && !(isValidTimeEntry((TimeEntry) obj))) {
+        if (obj instanceof  TimeEntry && !((TimeEntry) obj).isValid()) {
             throw createIllegalTimeEntryException();
         }
     }
@@ -635,10 +633,6 @@ public class RedmineManager {
 
     public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         deleteObject(TimeEntry.class, Integer.toString(id));
-    }
-
-    private boolean isValidTimeEntry(TimeEntry obj) {
-        return obj.getProjectId() != null || obj.getIssueId() != null;
     }
 
     private IllegalArgumentException createIllegalTimeEntryException() {
