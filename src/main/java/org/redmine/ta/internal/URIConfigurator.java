@@ -77,7 +77,7 @@ public class URIConfigurator {
         return uri;
     }
 
-    public URI getCreateURI(Class zz) throws MalformedURLException {
+    public URI getCreateURI(Class zz) {
         String query = urls.get(zz) + XML_URL_POSTFIX;
         return createURI(query);
     }

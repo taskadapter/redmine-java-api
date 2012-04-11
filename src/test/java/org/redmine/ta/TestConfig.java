@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class TestConfig {
+class TestConfig {
     private static final String TEST_PROPERTIES = "api_test.properties";
 
     private final Properties properties = new Properties();

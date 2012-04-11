@@ -1215,16 +1215,6 @@ public class RedmineManagerTest {
         }
     }
 
-    @Ignore
-    @Test
-    public void testSpentTime() {
-        // TODO need to use "Time Entries"
-//		float spentHours = 12.5f;
-//		issueToCreate.setSpentHours(spentHours);
-        // check SPENT TIME
-//		assertEquals((Float) spentHours, newIssue.getSpentHours());
-    }
-
     @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnCreate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
         mgr.createTimeEntry(createIncompleteTimeEntry());
