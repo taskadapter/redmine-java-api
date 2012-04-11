@@ -173,7 +173,6 @@ public class RedmineManager {
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
-     * @throws NotFoundException
      */
     public List<Project> getProjects() throws IOException, AuthenticationException, RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
@@ -188,7 +187,6 @@ public class RedmineManager {
     /**
      * There could be several issues with the same summary, so the method returns List.
      *
-     * @param summaryField
      * @return empty list if not issues with this summary field exist, never NULL
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -693,7 +691,6 @@ public class RedmineManager {
     /**
      * Delete all issue's relations
      *
-     * @param redmineIssue
      * @throws IOException
      * @throws AuthenticationException
      * @throws RedmineException
@@ -706,9 +703,9 @@ public class RedmineManager {
     }
 
     /**
-     * Delete all issue's relation.
+     * Delete relations for the given issue ID.
      *
-     * @param id
+     * @param id issue ID
      * @throws IOException
      * @throws AuthenticationException
      * @throws RedmineException
