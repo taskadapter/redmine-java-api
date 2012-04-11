@@ -265,16 +265,4 @@ public class RedmineXMLParser {
         return parseObjectsFromXML(IssueCategory.class, body);
     }
 
-    public static IssueCategory parseIssueCategoryFromXML(String body) {
-        return parseObjectFromXML(IssueCategory.class, body);
-    }
-
-    public static List<Attachment> parseIssueAttachmentsFromXML(String body) {
-        return parseObjectsFromXML(Attachment.class, body);
-    }
-
-    public static Attachment parseIssueAttachmentFromXML(String body) {
-        return parseObjectFromXML(Attachment.class, body);
-    }
-
 }
