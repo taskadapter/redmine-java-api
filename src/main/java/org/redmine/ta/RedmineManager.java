@@ -45,7 +45,9 @@ import java.util.Map.Entry;
  */
 public class RedmineManager {
 
-    private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
+//    private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
+private static final String URI_SUFFIX = "json";
+    private static final String CONTENT_TYPE = "application/json; charset=utf-8";
     private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
     // TODO add tests for "relations" to RedmineManagerTest class
@@ -106,33 +108,24 @@ public class RedmineManager {
     }
 
     /**
-     * Sample usage:
-     * <p/>
-     * <p/>
-     * <pre>
-     * {@code
-     *   Issue issueToCreate = new Issue();
-     *   issueToCreate.setSubject("This is the summary line 123");
-     *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
-     * }
-     *
-     * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
+     * Creates an issue for a project.
+     * @param projectKey The project "identifier".
      * @param issue      the Issue object to create on the server.
      * @return the newly created Issue.
      * @throws IOException
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the project with the given projectKey is not found
-     * @throws RedmineException
+     * @throws RedmineException something unexpected happened in Redmine
      */
     public Issue createIssue(String projectKey, Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = getURIConfigurator().createURI("issues.xml");
+        URI uri = getURIConfigurator().createURI("issues." + URI_SUFFIX);
         HttpPost http = new HttpPost(uri);
-        String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
+        String body = RedmineJSONBuilder.toJSON(projectKey, issue);
 
-        setEntity(http, xmlBody);
+        setEntity(http, body);
         String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseObjectFromXML(Issue.class, response);
+        return RedmineJSONParser.parseObject(Issue.class, response);
     }
 
     /**
@@ -160,8 +153,9 @@ public class RedmineManager {
         getCommunicator().sendRequest(httpRequest);
     }
 
-    private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
-        StringEntity entity = new StringEntity(xmlBody, Communicator.CHARSET);
+    private void setEntity(HttpEntityEnclosingRequest request, String body) throws UnsupportedEncodingException {
+        logger.debug(body);
+        StringEntity entity = new StringEntity(body, Communicator.CHARSET);
         entity.setContentType(CONTENT_TYPE);
         request.setEntity(entity);
     }
@@ -313,6 +307,7 @@ public class RedmineManager {
 
     /**
      * Redmine 1.0 - specific version
+     * TODO adapt to JSON
      *
      * @return objects list, never NULL
      */
@@ -395,9 +390,10 @@ public class RedmineManager {
             HttpGet http = new HttpGet(uri);
 
             String response = getCommunicator().sendRequest(http);
-            totalObjectsFoundOnServer = RedmineXMLParser.parseObjectsTotalCount(response);
+            logger.debug("received: " + response);
+            totalObjectsFoundOnServer = RedmineJSONParser.parseObjectsTotalCount(objectClass,response);
 
-            List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, response);
+            List<T> foundItems = RedmineJSONParser.parseObjects(objectClass, response);
             if (foundItems.size() == 0) {
                 break;
             }
@@ -494,15 +490,12 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Project createProject(Project project) throws IOException, AuthenticationException, RedmineException, NotFoundException {
-        // see bug http://www.redmine.org/issues/7184
-        URI uri = getURIConfigurator().createURI("projects.xml", new BasicNameValuePair("include", "trackers"));
-
+        URI uri = getURIConfigurator().createURI("projects." + URI_SUFFIX, new BasicNameValuePair("include", "trackers"));
         HttpPost httpPost = new HttpPost(uri);
-        String createProjectXML = RedmineXMLGenerator.toXML(project);
-        setEntity(httpPost, createProjectXML);
-
+        String body = RedmineJSONBuilder.toJSON(project);
+        setEntity(httpPost, body);
         String response = getCommunicator().sendRequest(httpPost);
-        return RedmineXMLParser.parseProjectFromXML(response);
+        return RedmineJSONParser.parseObject(Project.class,response);
     }
 
     /**

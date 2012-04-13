@@ -11,6 +11,7 @@ import org.castor.core.util.Base64Encoder;
 import org.redmine.ta.AuthenticationException;
 import org.redmine.ta.NotFoundException;
 import org.redmine.ta.RedmineException;
+import org.redmine.ta.internal.logging.LogLevel;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -32,7 +33,6 @@ public class Communicator {
      * @return the response body
      */
     public String sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException, NotFoundException {
-        logger.debug(request.getRequestLine().toString());
         DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 
         configureProxy(httpclient);
@@ -46,9 +46,16 @@ public class Communicator {
             request.addHeader("Authorization", "Basic: " + credentials);
         }
 
-        request.addHeader("Accept-Encoding", "gzip,deflate");
+/*        request.addHeader("Accept-Encoding", "gzip,deflate");
+        if(logger.getLogLevel().equals(LogLevel.DEBUG)) {
+            for(Header header : request.getAllHeaders()) {
+                logger.debug(header.toString());
+            }
+        } */
+        logger.debug(request.getRequestLine().toString());
         HttpResponse httpResponse = httpclient.execute((HttpUriRequest) request);
 
+        logger.debug(httpResponse.getStatusLine().toString());
         int responseCode = httpResponse.getStatusLine().getStatusCode();
         if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
             throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
@@ -59,6 +66,7 @@ public class Communicator {
 
         HttpEntity responseEntity = httpResponse.getEntity();
         String responseBody = EntityUtils.toString(responseEntity);
+        logger.debug(responseBody);
 
         if (responseCode == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + responseBody);
