@@ -77,6 +77,7 @@ public class RedmineXMLParser {
         }
     }
 
+    // TODO move to a separate utility class or find a replacement in Google Guava
     private static void replaceAll(StringBuilder builder, String from, String to) {
         int index = builder.indexOf(from);
         while (index != -1) {

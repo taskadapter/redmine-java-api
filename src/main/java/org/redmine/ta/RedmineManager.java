@@ -207,6 +207,7 @@ public class RedmineManager {
         return getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
+    // TODO move to a separate utility class or find a replacement in Google Guava
     // TODO add unit tests
     private static String join(String delimToUse, INCLUDE... include) {
         String delim = "";
