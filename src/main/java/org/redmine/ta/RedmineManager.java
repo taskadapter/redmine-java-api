@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -242,6 +242,7 @@ public class RedmineManager {
         return getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
+    // TODO add unit tests
     private static String join(String delimToUse, INCLUDE... include) {
         String delim = "";
         StringBuilder sb = new StringBuilder();
