@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -45,8 +45,8 @@ import java.util.Map.Entry;
  */
 public class RedmineManager {
 
-//    private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
-private static final String URI_SUFFIX = "json";
+    //    private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
+    private static final String URI_SUFFIX = "json";
     private static final String CONTENT_TYPE = "application/json; charset=utf-8";
     private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
@@ -63,7 +63,7 @@ private static final String URI_SUFFIX = "json";
         REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
     }
 
-    private Logger logger = LoggerFactory.getLogger(RedmineManager.class);
+    private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
     private String host;
     private String apiAccessKey;
@@ -98,18 +98,17 @@ private static final String URI_SUFFIX = "json";
     }
 
     /**
-     * @deprecated Use RedmineManager(String uri) constructor and then setLogin() , setPassword()
-     */
-    public RedmineManager(String uri, String login, String password) {
-        this(uri);
-        this.login = login;
-        this.password = password;
-        this.useBasicAuth = true;
-    }
-
-    /**
-     * Creates an issue for a project.
-     * @param projectKey The project "identifier".
+     * Sample usage:
+     * <p/>
+     * <p/>
+     * <pre>
+     * {@code
+     *   Issue issueToCreate = new Issue();
+     *   issueToCreate.setSubject("This is the summary line 123");
+     *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+     * }
+     *
+     * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
      * @param issue      the Issue object to create on the server.
      * @return the newly created Issue.
      * @throws IOException
@@ -128,33 +127,7 @@ private static final String URI_SUFFIX = "json";
         return RedmineJSONParser.parseObject(Issue.class, response);
     }
 
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * Note: This method cannot return the updated Issue from Redmine
-     * because the server does not provide any XML in response.
-     *
-     * @param issue the Issue to update on the server. issue.getId() is used for identification.
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       the issue with the required ID is not found
-     * @throws RedmineException
-     */
-    public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = getURIConfigurator().getUpdateURI(issue.getClass(), Integer.toString(issue.getId()));
-
-        HttpPut httpRequest = new HttpPut(uri);
-
-        // XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
-        String NO_PROJECT_KEY = null;
-        String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
-        setEntity(httpRequest, xmlBody);
-        getCommunicator().sendRequest(httpRequest);
-    }
-
     private void setEntity(HttpEntityEnclosingRequest request, String body) throws UnsupportedEncodingException {
-        logger.debug(body);
         StringEntity entity = new StringEntity(body, Communicator.CHARSET);
         entity.setContentType(CONTENT_TYPE);
         request.setEntity(entity);
@@ -236,6 +209,8 @@ private static final String URI_SUFFIX = "json";
         return getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
+    // TODO move to a separate utility class or find a replacement in Google Guava
+    // TODO add unit tests
     private static String join(String delimToUse, INCLUDE... include) {
         String delim = "";
         StringBuilder sb = new StringBuilder();
@@ -499,22 +474,6 @@ private static final String URI_SUFFIX = "json";
     }
 
     /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
-     * @throws NotFoundException
-     *
-     * @see #update(org.redmine.ta.beans.Identifiable)
-     */
-    public void updateProject(Project project) throws IOException,
-            AuthenticationException, RedmineException, NotFoundException {
-        update(project);
-    }
-
-    /**
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
     public int getObjectsPerPage() {
@@ -563,23 +522,6 @@ private static final String URI_SUFFIX = "json";
     }
 
     /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * This method cannot return the updated object from Redmine
-     * because the server does not provide any XML in response.
-     *
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
-     * @throws NotFoundException       some object is not found. e.g. the user with the given id
-     */
-    public void updateUser(User user) throws IOException,
-            AuthenticationException, RedmineException, NotFoundException {
-        update(user);
-    }
-
-    /**
      * @param userId user identifier (numeric ID)
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -611,13 +553,6 @@ private static final String URI_SUFFIX = "json";
     public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         validate(obj);
         return createObject(TimeEntry.class, obj);
-    }
-
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     */
-    public void updateTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        update(obj);
     }
 
     public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
@@ -707,14 +642,6 @@ private static final String URI_SUFFIX = "json";
     public void deleteIssueRelationsByIssueId(Integer id) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         Issue issue = getIssueById(id, INCLUDE.relations);
         deleteIssueRelations(issue);
-    }
-
-    /**
-     * @deprecated use createRelation(Integer issueId, Integer issueToId, String type). "projectKey" parameter is not used anyway.
-     *             this method will be deleted soon.
-     */
-    public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        return createRelation(issueId, issueToId, type);
     }
 
     /**

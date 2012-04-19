@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -77,6 +77,7 @@ public class RedmineXMLParser {
         }
     }
 
+    // TODO move to a separate utility class or find a replacement in Google Guava
     private static void replaceAll(StringBuilder builder, String from, String to) {
         int index = builder.indexOf(from);
         while (index != -1) {

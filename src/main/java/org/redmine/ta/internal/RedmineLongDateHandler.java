@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
      */
     private static final String FORMAT_REDMINE_1_1 = "yyyy-MM-dd'T'HH:mm:ssZ";
 
-    private static SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_REDMINE_1_1);
+    private static final SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_REDMINE_1_1);
     private static final int SHIFT = 3;
 
     @Override

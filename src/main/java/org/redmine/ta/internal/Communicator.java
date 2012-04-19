@@ -22,7 +22,7 @@ import java.util.List;
 public class Communicator {
     public static final String CHARSET = "UTF-8";
 
-    private Logger logger = LoggerFactory.getLogger(Communicator.class);
+    private final Logger logger = LoggerFactory.getLogger(Communicator.class);
     private String login;
     private String password;
 

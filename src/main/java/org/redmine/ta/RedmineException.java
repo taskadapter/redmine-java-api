@@ -3,7 +3,7 @@ package org.redmine.ta;
 import java.util.List;
 
 public class RedmineException extends Exception {
-    private List<String> errors;
+    private final List<String> errors;
     private String text = "";
 
     // TODO Refactor this to get rid of adding "\n".
