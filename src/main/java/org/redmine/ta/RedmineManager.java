@@ -96,16 +96,6 @@ public class RedmineManager {
     }
 
     /**
-     * @deprecated Use RedmineManager(String uri) constructor and then setLogin() , setPassword()
-     */
-    public RedmineManager(String uri, String login, String password) {
-        this(uri);
-        this.login = login;
-        this.password = password;
-        this.useBasicAuth = true;
-    }
-
-    /**
      * Sample usage:
      * <p/>
      * <p/>
@@ -133,31 +123,6 @@ public class RedmineManager {
         setEntity(http, xmlBody);
         String response = getCommunicator().sendRequest(http);
         return RedmineXMLParser.parseObjectFromXML(Issue.class, response);
-    }
-
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * Note: This method cannot return the updated Issue from Redmine
-     * because the server does not provide any XML in response.
-     *
-     * @param issue the Issue to update on the server. issue.getId() is used for identification.
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       the issue with the required ID is not found
-     * @throws RedmineException
-     */
-    public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = getURIConfigurator().getUpdateURI(issue.getClass(), Integer.toString(issue.getId()));
-
-        HttpPut httpRequest = new HttpPut(uri);
-
-        // XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
-        String NO_PROJECT_KEY = null;
-        String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
-        setEntity(httpRequest, xmlBody);
-        getCommunicator().sendRequest(httpRequest);
     }
 
     private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
@@ -507,22 +472,6 @@ public class RedmineManager {
     }
 
     /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
-     * @throws NotFoundException
-     *
-     * @see #update(org.redmine.ta.beans.Identifiable)
-     */
-    public void updateProject(Project project) throws IOException,
-            AuthenticationException, RedmineException, NotFoundException {
-        update(project);
-    }
-
-    /**
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
     public int getObjectsPerPage() {
@@ -571,23 +520,6 @@ public class RedmineManager {
     }
 
     /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * This method cannot return the updated object from Redmine
-     * because the server does not provide any XML in response.
-     *
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
-     * @throws NotFoundException       some object is not found. e.g. the user with the given id
-     */
-    public void updateUser(User user) throws IOException,
-            AuthenticationException, RedmineException, NotFoundException {
-        update(user);
-    }
-
-    /**
      * @param userId user identifier (numeric ID)
      * @throws AuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -619,13 +551,6 @@ public class RedmineManager {
     public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
         validate(obj);
         return createObject(TimeEntry.class, obj);
-    }
-
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     */
-    public void updateTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        update(obj);
     }
 
     public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
@@ -715,14 +640,6 @@ public class RedmineManager {
     public void deleteIssueRelationsByIssueId(Integer id) throws IOException, AuthenticationException, RedmineException, NotFoundException {
         Issue issue = getIssueById(id, INCLUDE.relations);
         deleteIssueRelations(issue);
-    }
-
-    /**
-     * @deprecated use createRelation(Integer issueId, Integer issueToId, String type). "projectKey" parameter is not used anyway.
-     *             this method will be deleted soon.
-     */
-    public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        return createRelation(issueId, issueToId, type);
     }
 
     /**
