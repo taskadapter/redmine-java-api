@@ -21,7 +21,7 @@ public class RedmineManagerTest {
     // see feature request http://www.redmine.org/issues/7506
     private static final Integer ACTIVITY_ID = 8;
 
-    private static Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
 
     private static RedmineManager mgr;
 

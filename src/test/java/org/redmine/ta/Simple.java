@@ -11,10 +11,10 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 public class Simple {
-    private static Logger logger = LoggerFactory.getLogger(Simple.class);
-    private static String projectKey = "test";
+    private static final Logger logger = LoggerFactory.getLogger(Simple.class);
+    private static final String projectKey = "test";
 
-    private static Integer queryId = null; // any
+    private static final Integer queryId = null; // any
 
     public static void main(String[] args) {
         String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.1";

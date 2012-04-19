@@ -61,7 +61,7 @@ public class RedmineManager {
         REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
     }
 
-    private Logger logger = LoggerFactory.getLogger(RedmineManager.class);
+    private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
     private String host;
     private String apiAccessKey;
