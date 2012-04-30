@@ -15,9 +15,6 @@
 */
 package org.redmine.ta.internal;
 
-import org.redmine.ta.internal.logging.Logger;
-import org.redmine.ta.internal.logging.LoggerFactory;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

@@ -16,7 +16,6 @@
 package org.redmine.ta.internal;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
