@@ -19,10 +19,6 @@ import java.util.Date;
  */
 public class RedmineXMLGenerator {
 
-    private static final String REDMINE_START_DATE_FORMAT = "yyyy-MM-dd";
-    private static final SimpleDateFormat sdf = new SimpleDateFormat(
-            REDMINE_START_DATE_FORMAT);
-
     private final static String XML_PREFIX = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 
     public static String toXML(String projectKey, Issue issue) {
@@ -63,8 +59,8 @@ public class RedmineXMLGenerator {
         if (!issue.getCustomFields().isEmpty()) {
             b.append("<custom_fields type=\"array\">");
             for (CustomField field : issue.getCustomFields()) {
-                b.append("<custom_field id=\"" + field.getId() + "\" name=\"" + field.getName() + "\">");
-                b.append("<value>" + field.getValue() + "</value>");
+                b.append("<custom_field id=\"" + field.getId() + "\" name=\"" + encodeXML(field.getName()) + "\">");
+                b.append("<value>" + encodeXML(field.getValue()) + "</value>");
                 b.append("</custom_field>");
             }
             b.append("</custom_fields>");
@@ -198,11 +194,11 @@ public class RedmineXMLGenerator {
             b.append("<" + tag + ">");
             if (value instanceof Date) {
                 // always use Short Date Format for now!
-                b.append(sdf.format(value));
+                b.append(RedmineDateUtils.formatShortDate((Date) value));
             } else if (value instanceof String) {
                 b.append(encodeXML((String) value));
             } else {
-                b.append(value);
+                b.append(encodeXML(value.toString()));
             }
             b.append("</" + tag + ">");
         }
