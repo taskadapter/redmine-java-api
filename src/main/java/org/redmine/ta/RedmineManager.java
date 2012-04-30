@@ -485,6 +485,9 @@ public class RedmineManager {
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
     public void setObjectsPerPage(int pageSize) {
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("Page size must be >= 0. You provided: " + pageSize);
+        }
         this.objectsPerPage = pageSize;
     }
 
