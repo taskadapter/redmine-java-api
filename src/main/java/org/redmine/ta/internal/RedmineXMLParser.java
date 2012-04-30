@@ -233,7 +233,9 @@ public class RedmineXMLParser {
         for (int i = lineToStartWith; i < lastLine; i++) {
             int begin = lines[i].indexOf(openTag) + openTag.length();
             int end = lines[i].indexOf(closeTag);
-            errors.add(lines[i].substring(begin, end));
+            if (begin >= 0 && end >= 0) {
+                errors.add(lines[i].substring(begin, end));
+            }
         }
         return errors;
     }
