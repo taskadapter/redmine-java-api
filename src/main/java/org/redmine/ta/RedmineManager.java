@@ -76,7 +76,7 @@ public class RedmineManager {
         this(uri, null, null);
     }
 
-    private RedmineManager(String uri, String login, String password) {
+    public RedmineManager(String uri, String login, String password) {
         this.configurator = new URIConfigurator(uri, null);
         this.login = login;
         this.password = password;
