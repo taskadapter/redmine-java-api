@@ -8,38 +8,42 @@ import org.redmine.ta.beans.*;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class URIConfigurator {
     private static final String XML_URL_POSTFIX = ".xml";
 
-    private static final Map<Class, String> urls = new HashMap<Class, String>() {
-        private static final long serialVersionUID = 1L;
-        {
-            put(User.class, "users");
-            put(Issue.class, "issues");
-            put(Project.class, "projects");
-            put(TimeEntry.class, "time_entries");
-            put(SavedQuery.class, "queries");
-            put(IssueStatus.class, "issue_statuses");
-            put(Version.class, "versions");
-            put(IssueCategory.class, "issue_categories");
-            put(Tracker.class, "trackers");
-            put(Attachment.class, "attachments");
-            put(News.class, "news");
-            put(IssueRelation.class, "relations");
-        }
-    };
+    private static final Map<Class<?>, String> urls = new HashMap<Class<?>, String>();
+    
+    static {
+        urls.put(User.class, "users");
+        urls.put(Issue.class, "issues");
+        urls.put(Project.class, "projects");
+        urls.put(TimeEntry.class, "time_entries");
+        urls.put(SavedQuery.class, "queries");
+        urls.put(IssueStatus.class, "issue_statuses");
+        urls.put(Version.class, "versions");
+        urls.put(IssueCategory.class, "issue_categories");
+        urls.put(Tracker.class, "trackers");
+        urls.put(Attachment.class, "attachments");
+        urls.put(News.class, "news");
+        urls.put(IssueRelation.class, "relations");    	
+    }
 
-    private final String host;
+    private final URL baseURL;
     private String apiAccessKey;
 
     public URIConfigurator(String host) {
-        this.host = host;
+        if (host == null || host.isEmpty()) {
+            throw new IllegalArgumentException("The host parameter is NULL or empty");
+        }
+    	try {
+			this.baseURL = new URL(host);
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException("Illegal host URL " + host, e);
+		}
     }
 
     public URI createURI(String query) {
@@ -47,11 +51,7 @@ public class URIConfigurator {
     }
 
     public URI createURI(String query, NameValuePair... param) {
-        List<NameValuePair> list = new ArrayList<NameValuePair>();
-        for (NameValuePair p : param) {
-            list.add(p);
-        }
-        return createURI(query, list);
+        return createURI(query, Arrays.asList(param));
     }
 
     /**
@@ -60,35 +60,45 @@ public class URIConfigurator {
      */
     public URI createURI(String query, List<NameValuePair> params) {
         if (apiAccessKey != null) {
+        	/* NEVER modify passed parameters list! It may be unmodifiable list.*/
+        	params = new ArrayList<NameValuePair>(params);
             params.add(new BasicNameValuePair("key", apiAccessKey));
         }
         URI uri;
         try {
-            URL url = new URL(host);
+            URL url = baseURL;
             String path = url.getPath();
             if (!query.isEmpty()) {
                 path += "/" + query;
             }
             uri = URIUtils.createURI(url.getProtocol(), url.getHost(), url.getPort(), path,
                     URLEncodedUtils.format(params, "UTF-8"), null);
-        } catch (Exception e) {
+        } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
         return uri;
     }
 
-    public URI getCreateURI(Class zz) {
-        String query = urls.get(zz) + XML_URL_POSTFIX;
+    private String getClassUrl(Class<?> zz) {
+   		final String result = urls.get(zz);
+   		if (result == null) {
+   			throw new IllegalArgumentException("Unsupported class " + zz.getName());
+        }
+   		return result;
+   	}
+
+    public URI getCreateURI(Class<?> zz) {
+        String query = getClassUrl(zz) + XML_URL_POSTFIX;
         return createURI(query);
     }
 
-    public URI getUpdateURI(Class zz, String id) {
-        String query = urls.get(zz) + "/" + id + XML_URL_POSTFIX;
+    public URI getUpdateURI(Class<?> zz, String id) {
+        String query = getClassUrl(zz) + "/" + id + XML_URL_POSTFIX;
         return createURI(query);
     }
 
-    public URI getUpdateURI(Class zz, String id, NameValuePair... param) {
-        String query = urls.get(zz) + "/" + id + XML_URL_POSTFIX;
+    public URI getUpdateURI(Class<?> zz, String id, NameValuePair... param) {
+        String query = getClassUrl(zz) + "/" + id + XML_URL_POSTFIX;
         return createURI(query, param);
     }
 
@@ -99,14 +109,14 @@ public class URIConfigurator {
     public void setApiAccessKey(String apiAccessKey) {
         this.apiAccessKey = apiAccessKey;
     }
-    
-    public URI getRetrieveObjectsListURI(Class className, List<NameValuePair> param) {
-        String query = urls.get(className) + XML_URL_POSTFIX;
+
+    public URI getRetrieveObjectsListURI(Class<?> className, List<NameValuePair> param) {
+        String query = getClassUrl(className) + XML_URL_POSTFIX;
         return createURI(query, param);
     }
 
-    public URI getRetrieveObjectURI(Class className, Integer id, List<NameValuePair> param) {
-        String query = urls.get(className) + "/" + id + XML_URL_POSTFIX;
+    public URI getRetrieveObjectURI(Class<?> className, Integer id, List<NameValuePair> param) {
+        String query = getClassUrl(className) + "/" + id + XML_URL_POSTFIX;
         return createURI(query, param);
     }
 }
