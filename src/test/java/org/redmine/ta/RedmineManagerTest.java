@@ -321,7 +321,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetIssueById() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetIssueById() throws RedmineException, IOException, AuthenticationException {
         Issue issue = new Issue();
         String originalSubject = "Issue " + new Date();
         issue.setSubject(originalSubject);
@@ -349,7 +349,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetProjects() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetProjects() throws RedmineException, IOException, AuthenticationException {
         // retrieve projects
         List<Project> projects = mgr.getProjects();
         // asserts
@@ -395,13 +395,13 @@ public class RedmineManagerTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void testGetIssuesInvalidQueryId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testGetIssuesInvalidQueryId() throws IOException, AuthenticationException, RedmineException {
         Integer invalidQueryId = 9999999;
         mgr.getIssues(projectKey, invalidQueryId);
     }
 
     @Test
-    public void testCreateProject() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testCreateProject() throws IOException, AuthenticationException, RedmineException {
         Project projectToCreate = generateRandomProject();
         String key = null;
         try {
@@ -428,7 +428,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testCreateGetUpdateDeleteProject() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testCreateGetUpdateDeleteProject() throws IOException, AuthenticationException, RedmineException {
         Project projectToCreate = generateRandomProject();
         String key = null;
         try {
@@ -475,7 +475,7 @@ public class RedmineManagerTest {
             // need to cleanup - delete this project
             key = createdProject.getIdentifier();
 
-        } catch (RedmineException e) {
+        } catch (RedmineProcessingException e) {
             Assert.assertNotNull(e.getErrors());
             Assert.assertEquals(1, e.getErrors().size());
             Assert.assertEquals("Identifier is reserved", e.getErrors().get(0));
@@ -533,30 +533,30 @@ public class RedmineManagerTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void testCreateIssueInvalidProjectKey() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testCreateIssueInvalidProjectKey() throws IOException, AuthenticationException, RedmineException {
         Issue issueToCreate = new Issue();
         issueToCreate.setSubject("Summary line 100");
         mgr.createIssue("someNotExistingProjectKey", issueToCreate);
     }
 
     @Test(expected = NotFoundException.class)
-    public void testGetProjectNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testGetProjectNonExistingId() throws IOException, AuthenticationException, RedmineException {
         mgr.getProjectByKey("some-non-existing-key");
     }
 
     @Test(expected = NotFoundException.class)
-    public void testDeleteNonExistingProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testDeleteNonExistingProject() throws IOException, AuthenticationException, RedmineException {
         mgr.deleteProject("some-non-existing-key");
     }
 
     @Test(expected = NotFoundException.class)
-    public void testGetIssueNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testGetIssueNonExistingId() throws IOException, AuthenticationException, RedmineException {
         int someNonExistingID = 999999;
         mgr.getIssueById(someNonExistingID);
     }
 
     @Test(expected = NotFoundException.class)
-    public void testUpdateIssueNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testUpdateIssueNonExistingId() throws IOException, AuthenticationException, RedmineException {
         int nonExistingId = 999999;
         Issue issue = new Issue();
         issue.setId(nonExistingId);
@@ -586,26 +586,26 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testGetCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testGetCurrentUser() throws IOException, AuthenticationException, RedmineException {
         User currentUser = mgr.getCurrentUser();
         Assert.assertEquals(getOurUser().getId(), currentUser.getId());
         Assert.assertEquals(getOurUser().getLogin(), currentUser.getLogin());
     }
 
     @Test
-    public void testGetUserById() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testGetUserById() throws IOException, AuthenticationException, RedmineException {
         User loadedUser = mgr.getUserById(getOurUser().getId());
         Assert.assertEquals(getOurUser().getId(), loadedUser.getId());
         Assert.assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
     }
 
     @Test(expected = NotFoundException.class)
-    public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testGetUserNonExistingId() throws IOException, AuthenticationException, RedmineException {
         mgr.getUserById(999999);
     }
 
     @Test(expected = NotFoundException.class)
-    public void testInvalidGetCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testInvalidGetCurrentUser() throws IOException, AuthenticationException, RedmineException {
         RedmineManager invalidManager = new RedmineManager(testConfig.getURI() + "/INVALID");
         invalidManager.setLogin("Invalid");
         invalidManager.setPassword("Invalid");
@@ -613,7 +613,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testCreateUser() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testCreateUser() throws IOException, AuthenticationException, RedmineException {
         User createdUser = null;
         try {
             User userToCreate = generateRandomUser();
@@ -684,7 +684,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void userCanBeDeleted() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void userCanBeDeleted() throws IOException, AuthenticationException, RedmineException {
         User user = generateRandomUser();
         User createdUser = mgr.createUser(user);
         Integer newUserId = createdUser.getId();
@@ -703,7 +703,7 @@ public class RedmineManagerTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void deletingNonExistingUserThrowsNFE() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deletingNonExistingUserThrowsNFE() throws IOException, AuthenticationException, RedmineException {
         mgr.deleteUser(999999);
     }
 
@@ -725,7 +725,7 @@ public class RedmineManagerTest {
         }
     }
 
-    private List<Issue> createIssues(int issuesNumber) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private List<Issue> createIssues(int issuesNumber) throws IOException, AuthenticationException, RedmineException {
         List<Issue> issues = new ArrayList<Issue>(issuesNumber);
         for (int i = 0; i < issuesNumber; i++) {
             Issue issueToCreate = new Issue();
@@ -744,7 +744,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testProjectsAllPagesLoaded() throws IOException, AuthenticationException, NotFoundException, URISyntaxException, RedmineException {
+    public void testProjectsAllPagesLoaded() throws IOException, AuthenticationException, URISyntaxException, RedmineException {
         int NUM = 27; // must be larger than 25, which is a default page size in Redmine
         List<Project> projects = createProjects(NUM);
 
@@ -757,7 +757,7 @@ public class RedmineManagerTest {
         deleteProjects(projects);
     }
 
-    private List<Project> createProjects(int num) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private List<Project> createProjects(int num) throws IOException, AuthenticationException, RedmineException {
         List<Project> projects = new ArrayList<Project>(num);
         for (int i = 0; i < num; i++) {
             Project projectToCreate = generateRandomProject();
@@ -767,20 +767,20 @@ public class RedmineManagerTest {
         return projects;
     }
 
-    private void deleteProjects(List<Project> projects) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private void deleteProjects(List<Project> projects) throws IOException, AuthenticationException, RedmineException {
         for (Project p : projects) {
             mgr.deleteProject(p.getIdentifier());
         }
     }
 
     @Test
-    public void testGetTimeEntries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testGetTimeEntries() throws IOException, AuthenticationException, RedmineException {
         List<TimeEntry> list = mgr.getTimeEntries();
         Assert.assertNotNull(list);
     }
 
     @Test
-    public void testCreateGetTimeEntry() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testCreateGetTimeEntry() throws IOException, AuthenticationException, RedmineException {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
@@ -807,7 +807,7 @@ public class RedmineManagerTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void testCreateDeleteTimeEntry() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testCreateDeleteTimeEntry() throws IOException, AuthenticationException, RedmineException {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
@@ -824,7 +824,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testGetTimeEntriesForIssue() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void testGetTimeEntriesForIssue() throws IOException, AuthenticationException, RedmineException {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
         Float hours1 = 2f;
@@ -845,7 +845,7 @@ public class RedmineManagerTest {
     }
 
     private TimeEntry createTimeEntry(Integer issueId, float hours) throws IOException,
-            AuthenticationException, NotFoundException, RedmineException {
+            AuthenticationException, RedmineException {
         TimeEntry entry = new TimeEntry();
         entry.setHours(hours);
         entry.setIssueId(issueId);
@@ -855,7 +855,7 @@ public class RedmineManagerTest {
 
     @Test(expected = NotFoundException.class)
     public void testDeleteIssue() throws IOException, AuthenticationException,
-            NotFoundException, RedmineException {
+            RedmineException {
         Issue issue = createIssues(1).get(0);
         Issue retrievedIssue = mgr.getIssueById(issue.getId());
         Assert.assertEquals(issue, retrievedIssue);
@@ -940,7 +940,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testSubProjectIsCreatedWithCorrectParentId() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testSubProjectIsCreatedWithCorrectParentId() throws IOException, AuthenticationException, RedmineException {
         Project createdMainProject = null;
         try {
             createdMainProject = createProject();
@@ -954,7 +954,7 @@ public class RedmineManagerTest {
         }
     }
 
-    private Project createProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private Project createProject() throws IOException, AuthenticationException, RedmineException {
         Project mainProject = new Project();
         long id = new Date().getTime();
         mainProject.setName("project" + id);
@@ -962,7 +962,7 @@ public class RedmineManagerTest {
         return mgr.createProject(mainProject);
     }
 
-    private Project createSubProject(Project parent) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private Project createSubProject(Project parent) throws IOException, AuthenticationException, RedmineException {
         Project project = new Project();
         long id = new Date().getTime();
         project.setName("sub_pr" + id);
@@ -994,7 +994,7 @@ public class RedmineManagerTest {
             reloadedFromRedmineIssue.setDoneRatio(invalidDoneRatio);
             try {
                 mgr.update(reloadedFromRedmineIssue);
-            } catch (RedmineException e) {
+            } catch (RedmineProcessingException e) {
                 Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
                 Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0));
             }
@@ -1095,7 +1095,7 @@ public class RedmineManagerTest {
         }
     }
 
-    private IssueRelation createTwoRelatedIssues() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private IssueRelation createTwoRelatedIssues() throws IOException, AuthenticationException, RedmineException {
         List<Issue> issues = createIssues(2);
         Issue src = issues.get(0);
         Issue target = issues.get(1);
@@ -1129,7 +1129,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testIssureRelationDelete() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testIssureRelationDelete() throws IOException, AuthenticationException, RedmineException {
         IssueRelation relation = createTwoRelatedIssues();
 
         mgr.deleteRelation(relation.getId());
@@ -1138,7 +1138,7 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testIssueRelationsDelete() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void testIssueRelationsDelete() throws IOException, AuthenticationException, RedmineException {
         List<Issue> issues = createIssues(3);
         Issue src = issues.get(0);
         Issue target = issues.get(1);
@@ -1216,12 +1216,12 @@ public class RedmineManagerTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invalidTimeEntryFailsWithIAEOnCreate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void invalidTimeEntryFailsWithIAEOnCreate() throws IOException, AuthenticationException, RedmineException {
         mgr.createTimeEntry(createIncompleteTimeEntry());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void invalidTimeEntryFailsWithIAEOnUpdate() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void invalidTimeEntryFailsWithIAEOnUpdate() throws IOException, AuthenticationException, RedmineException {
         mgr.update(createIncompleteTimeEntry());
     }
 
@@ -1258,7 +1258,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetStatuses() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetStatuses() throws RedmineException, IOException, AuthenticationException {
         // TODO we should create some statuses first, but the Redmine Java API does not support this presently
         List<IssueStatus> statuses = mgr.getStatuses();
         Assert.assertFalse("Expected list of statuses not to be empty", statuses.isEmpty());
@@ -1279,7 +1279,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateInvalidVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testCreateInvalidVersion() throws RedmineException, IOException, AuthenticationException {
         Version version = new Version(null, "Invalid test version " + UUID.randomUUID().toString());
         mgr.createVersion(version);
     }
@@ -1295,7 +1295,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test(expected = NotFoundException.class)
-    public void testDeleteInvalidVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testDeleteInvalidVersion() throws RedmineException, IOException, AuthenticationException {
         // create new test version
         Version version = new Version(null, "Invalid test version " + UUID.randomUUID().toString());
         version.setDescription("An invalid test version created by " + this.getClass());
@@ -1315,7 +1315,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testDeleteVersion() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testDeleteVersion() throws RedmineException, IOException, AuthenticationException {
         Project project = mgr.getProjectByKey(projectKey);
         // create new test version
         Version version = new Version(project, "Test version " + UUID.randomUUID().toString());
@@ -1341,7 +1341,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetVersions() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetVersions() throws RedmineException, IOException, AuthenticationException {
         Project project = mgr.getProjectByKey(projectKey);
         // create some versions
         Version testVersion1 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
@@ -1367,7 +1367,7 @@ public class RedmineManagerTest {
 
     @Ignore // see Redmine bug http://www.redmine.org/issues/10241
     @Test
-    public void versionIsRetrievedById() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void versionIsRetrievedById() throws IOException, AuthenticationException, RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
         Version createdVersion = mgr.createVersion(new Version(project, "Version_1_" + UUID.randomUUID()));
         Version versionById = mgr.getVersionById(createdVersion.getId());
@@ -1376,7 +1376,7 @@ public class RedmineManagerTest {
 
     @Ignore // see Redmine bug http://www.redmine.org/issues/10241
     @Test
-    public void versionIsUpdated() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void versionIsUpdated() throws IOException, AuthenticationException, RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
         Version createdVersion = mgr.createVersion(new Version(project, "Version_1_" + UUID.randomUUID()));
         String description = "new description";
@@ -1396,7 +1396,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testCreateAndDeleteIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testCreateAndDeleteIssueCategory() throws RedmineException, IOException, AuthenticationException {
         Project project = mgr.getProjectByKey(projectKey);
         // create new test category
         IssueCategory category = new IssueCategory(project, "Category" + new Date().getTime());
@@ -1423,7 +1423,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetIssueCategories() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetIssueCategories() throws RedmineException, IOException, AuthenticationException {
         Project project = mgr.getProjectByKey(projectKey);
         // create some categories
         IssueCategory testIssueCategory1 = new IssueCategory(project, "Category" + new Date().getTime());
@@ -1463,7 +1463,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test(expected = IllegalArgumentException.class)
-    public void testCreateInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testCreateInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException {
         IssueCategory category = new IssueCategory(null, "InvalidCategory" + new Date().getTime());
         mgr.createCategory(category);
     }
@@ -1479,7 +1479,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test(expected = NotFoundException.class)
-    public void testDeleteInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testDeleteInvalidIssueCategory() throws RedmineException, IOException, AuthenticationException {
         // create new test category
         IssueCategory category = new IssueCategory(null, "InvalidCategory" + new Date().getTime());
         // set invalid id
@@ -1498,7 +1498,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetTrackers() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetTrackers() throws RedmineException, IOException, AuthenticationException {
         List<Tracker> trackers = mgr.getTrackers();
         assertNotNull("List of trackers returned should not be null", trackers);
         assertFalse("List of trackers returned should not be empty", trackers.isEmpty());
@@ -1519,7 +1519,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testGetIssueWithAttachments() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetIssueWithAttachments() throws RedmineException, IOException, AuthenticationException {
         Issue newIssue = null;
         try {
             // create at least 1 issue
@@ -1550,7 +1550,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     // @Test
-    public void testGetAttachmentById() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testGetAttachmentById() throws RedmineException, IOException, AuthenticationException {
         // TODO where do we get a valid attachment number from? We can't create an attachment by our own for the test as the Redmine REST API does not support that.
         int attachmentID = 1;
         Attachment attachment = mgr.getAttachmentById(attachmentID);
@@ -1570,7 +1570,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     // @Test
-    public void testDownloadAttachmentContent() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testDownloadAttachmentContent() throws RedmineException, IOException, AuthenticationException {
         // TODO where do we get a valid attachment number from? We can't create an attachment by our own for the test as the Redmine REST API does not support that.
         int attachmentID = 1;
         // retrieve issue attachment
@@ -1590,7 +1590,7 @@ public class RedmineManagerTest {
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
     @Test
-    public void testCreateAndGetIssueWithCategory() throws RedmineException, IOException, AuthenticationException, NotFoundException {
+    public void testCreateAndGetIssueWithCategory() throws RedmineException, IOException, AuthenticationException {
         IssueCategory newIssueCategory = null;
         Issue newIssue = null;
         try {
@@ -1622,22 +1622,22 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void getNewsDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void getNewsDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException {
         mgr.getNews(null);
     }
 
     @Test
-    public void getNewsDoesNotFailForTempProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void getNewsDoesNotFailForTempProject() throws IOException, AuthenticationException, RedmineException {
         mgr.getNews(projectKey);
     }
 
     @Test
-    public void getSavedQueriesDoesNotFailForTempProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void getSavedQueriesDoesNotFailForTempProject() throws IOException, AuthenticationException, RedmineException {
         mgr.getSavedQueries(projectKey);
     }
 
     @Test
-    public void getSavedQueriesDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void getSavedQueriesDoesNotFailForNULLProject() throws IOException, AuthenticationException, RedmineException {
         mgr.getSavedQueries(null);
     }
 }

@@ -11,6 +11,7 @@ import org.castor.core.util.Base64Encoder;
 import org.redmine.ta.AuthenticationException;
 import org.redmine.ta.NotFoundException;
 import org.redmine.ta.RedmineException;
+import org.redmine.ta.RedmineProcessingException;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class Communicator {
 
         if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
             List<String> errors = RedmineXMLParser.parseErrors(responseBody);
-            throw new RedmineException(errors);
+            throw new RedmineProcessingException(errors);
         }
         /* 422 "invalid"
           <?xml version="1.0" encoding="UTF-8"?>
