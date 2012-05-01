@@ -29,9 +29,9 @@ import org.redmine.ta.internal.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
@@ -778,28 +778,25 @@ public class RedmineManager {
      *
      * @param issueAttachment the {@link org.redmine.ta.beans.Attachment}
      * @return the content of the attachment as a byte[] array
-     * @throws IOException thrown in case the download fails
+     * @throws RedmineCommunicationException thrown in case the download fails
      */
-    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws IOException {
-        byte[] result = null;
-        URL url = new URL(issueAttachment.getContentURL());
-        BufferedReader inputReader = null;
+    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws RedmineCommunicationException {
         try {
-            inputReader = new BufferedReader(
-                    new InputStreamReader(
-                            url.openStream()));
-            StringBuilder contentBuilder = new StringBuilder();
-            String line;
-            while ((line = inputReader.readLine()) != null) {
-                contentBuilder.append(line);
+            final URL url = new URL(issueAttachment.getContentURL());
+            final InputStream is = url.openStream();
+            try {
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                final byte[] buffer = new byte[65536];
+                int read;
+                while ((read = is.read(buffer)) != -1)
+                    baos.write(buffer, 0, read);
+                return baos.toByteArray();
+            } finally {
+                is.close();
             }
-            result = contentBuilder.toString().getBytes();
-        } finally {
-            if (inputReader != null) {
-                inputReader.close();
-            }
+        } catch (IOException e) {
+            throw new RedmineTransportException(e);
         }
-        return result;
     }
 
     public void setLogin(String login) {
