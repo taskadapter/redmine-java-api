@@ -37,7 +37,7 @@ public final class HttpBasicAuthTest {
     }
 
     @Test
-    public void testGetProjectList() throws IOException, RedmineException {
+    public void testGetProjectList() throws RedmineException {
 
         final List<Project> projectsWithApiKey = mgrKey.getProjects();
         final List<Project> projectsWithHttpBasicAuth = mgrHttpBasicAuth.getProjects();

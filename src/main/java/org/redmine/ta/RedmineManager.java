@@ -109,13 +109,12 @@ public class RedmineManager {
      * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
      * @param issue      the Issue object to create on the server.
      * @return the newly created Issue.
-     * @throws IOException
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the project with the given projectKey is not found
      * @throws RedmineException
      */
-    public Issue createIssue(String projectKey, Issue issue) throws IOException, RedmineException {
+    public Issue createIssue(String projectKey, Issue issue) throws RedmineException {
         URI uri = getURIConfigurator().createURI("issues.xml");
         HttpPost http = new HttpPost(uri);
         String xmlBody = RedmineXMLGenerator.toXML(projectKey, issue);
@@ -125,8 +124,14 @@ public class RedmineManager {
         return RedmineXMLParser.parseObjectFromXML(Issue.class, response);
     }
 
-    private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) throws UnsupportedEncodingException {
-        StringEntity entity = new StringEntity(xmlBody, Communicator.CHARSET);
+    private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) {
+        StringEntity entity;
+        try {
+            entity = new StringEntity(xmlBody, Communicator.CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            throw new RedmineInternalError("Required charset "
+                    + Communicator.CHARSET + " is not supported", e);
+        }
         entity.setContentType(CONTENT_TYPE);
         request.setEntity(entity);
     }
@@ -139,7 +144,7 @@ public class RedmineManager {
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public List<Project> getProjects() throws IOException, RedmineException {
+    public List<Project> getProjects() throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         params.add(new BasicNameValuePair("include", "trackers"));
         try {
@@ -158,7 +163,7 @@ public class RedmineManager {
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, RedmineException {
+    public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         params.add(new BasicNameValuePair("subject", summaryField));
 
@@ -179,7 +184,7 @@ public class RedmineManager {
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public List<Issue> getIssues(Map<String, String> pParameters) throws IOException, RedmineException {
+    public List<Issue> getIssues(Map<String, String> pParameters) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
 
         for (final Entry<String, String> param : pParameters.entrySet()) {
@@ -193,13 +198,12 @@ public class RedmineManager {
      * @param id      the Redmine issue ID
      * @param include list of "includes". e.g. "relations", "journals", ...
      * @return Issue object
-     * @throws IOException
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the issue with the given id is not found on the server
      * @throws RedmineException
      */
-    public Issue getIssueById(Integer id, INCLUDE... include) throws IOException, RedmineException {
+    public Issue getIssueById(Integer id, INCLUDE... include) throws RedmineException {
         String value = join(",", include);
         // there's no harm in adding "include" parameter even if it's empty
         return getObject(Issue.class, id, new BasicNameValuePair("include", value));
@@ -225,7 +229,7 @@ public class RedmineManager {
      * @throws NotFoundException       the project with the given key is not found
      * @throws RedmineException
      */
-    public Project getProjectByKey(String projectKey) throws IOException, RedmineException {
+    public Project getProjectByKey(String projectKey) throws RedmineException {
         URI uri = getURIConfigurator().getUpdateURI(Project.class, projectKey, new BasicNameValuePair("include", "trackers"));
 
         HttpGet http = new HttpGet(uri);
@@ -240,7 +244,7 @@ public class RedmineManager {
      * @throws NotFoundException       if the project with the given key is not found
      * @throws RedmineException
      */
-    public void deleteProject(String projectKey) throws IOException, RedmineException {
+    public void deleteProject(String projectKey) throws RedmineException {
         deleteObject(Project.class, projectKey);
     }
 
@@ -255,13 +259,12 @@ public class RedmineManager {
      *                   represented by the API access key (if the Redmine project requires authorization).
      *                   This parameter is <b>optional<b>, NULL can be provided to get all available issues.
      * @return list of Issue objects
-     * @throws IOException
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      * @see Issue
      */
-    public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws IOException, RedmineException {
+    public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         if (queryId != null) {
             params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
@@ -281,7 +284,7 @@ public class RedmineManager {
      *
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws IOException, RedmineException {
+    private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
 
         final int FIRST_REDMINE_PAGE = 1;
@@ -325,8 +328,7 @@ public class RedmineManager {
     /**
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
-            RedmineException {
+    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
             return getObjectsListV11(objectClass, params);
         } else if (currentMode.equals(MODE.REDMINE_1_0)) {
@@ -343,8 +345,7 @@ public class RedmineManager {
      *
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
-            RedmineException {
+    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
 
         params.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
@@ -375,7 +376,7 @@ public class RedmineManager {
     }
 
     private <T> T getObject(Class<T> objectClass, Integer id, NameValuePair... params)
-            throws IOException, RedmineException {
+            throws RedmineException {
 
         // TODO simplify!
         URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, new ArrayList<NameValuePair>(Arrays.asList(params)));
@@ -384,12 +385,12 @@ public class RedmineManager {
     }
 
     // TODO is there a way to get rid of the 1st parameter and use generics?
-    private <T> T createObject(Class<T> classs, T obj) throws IOException, RedmineException {
+    private <T> T createObject(Class<T> classs, T obj) throws RedmineException {
         URI uri = getURIConfigurator().getCreateURI(obj.getClass());
         return createObject(classs, obj, uri);
     }
 
-    private <T> T createObject(Class<T> classs, T obj, URI uri) throws IOException, RedmineException {
+    private <T> T createObject(Class<T> classs, T obj, URI uri) throws RedmineException {
         HttpPost http = new HttpPost(uri);
         String xml = RedmineXMLGenerator.toXML(obj);
         setEntity(http, xml);
@@ -404,7 +405,7 @@ public class RedmineManager {
       *
       * @since 1.8.0
       */
-    public void update(Identifiable obj) throws IOException, RedmineException {
+    public void update(Identifiable obj) throws RedmineException {
         validate(obj);
 
         URI uri = getURIConfigurator().getUpdateURI(obj.getClass(), Integer.toString(obj.getId()));
@@ -425,7 +426,7 @@ public class RedmineManager {
         }
     }
 
-    private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws IOException, RedmineException {
+    private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws RedmineException {
         URI uri = getURIConfigurator().getUpdateURI(classs, id);
         HttpDelete http = new HttpDelete(uri);
         getCommunicator().sendRequest(http);
@@ -452,12 +453,11 @@ public class RedmineManager {
      *
      * @param project project to create on the server
      * @return the newly created Project object.
-     * @throws IOException
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public Project createProject(Project project) throws IOException, RedmineException {
+    public Project createProject(Project project) throws RedmineException {
         // see bug http://www.redmine.org/issues/7184
         URI uri = getURIConfigurator().createURI("projects.xml", new BasicNameValuePair("include", "trackers"));
 
@@ -498,25 +498,25 @@ public class RedmineManager {
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public List<User> getUsers() throws IOException, RedmineException {
+    public List<User> getUsers() throws RedmineException {
         return getObjectsList(User.class, new HashSet<NameValuePair>());
     }
 
-    public User getUserById(Integer userId) throws IOException, RedmineException {
+    public User getUserById(Integer userId) throws RedmineException {
         return getObject(User.class, userId);
     }
 
     /**
      * @return the current user logged into Redmine
      */
-    public User getCurrentUser() throws IOException, RedmineException {
+    public User getCurrentUser() throws RedmineException {
         URI uri = getURIConfigurator().createURI("users/current.xml");
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
         return RedmineXMLParser.parseUserFromXML(response);
     }
 
-    public User createUser(User user) throws IOException, RedmineException {
+    public User createUser(User user) throws RedmineException {
         return createObject(User.class, user);
     }
 
@@ -527,34 +527,34 @@ public class RedmineManager {
      * @throws NotFoundException       if the user with the given id is not found
      * @throws RedmineException
      */
-    public void deleteUser(Integer userId) throws IOException, RedmineException {
+    public void deleteUser(Integer userId) throws RedmineException {
         deleteObject(User.class, Integer.toString(userId));
     }
 
-    public List<TimeEntry> getTimeEntries() throws IOException, RedmineException {
+    public List<TimeEntry> getTimeEntries() throws RedmineException {
         return getObjectsList(TimeEntry.class, new HashSet<NameValuePair>());
     }
 
     /**
      * @param id the database Id of the TimeEntry record
      */
-    public TimeEntry getTimeEntry(Integer id) throws IOException, RedmineException {
+    public TimeEntry getTimeEntry(Integer id) throws RedmineException {
         return getObject(TimeEntry.class, id);
     }
 
-    public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws IOException, RedmineException {
+    public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         params.add(new BasicNameValuePair("issue_id", Integer.toString(issueId)));
 
         return getObjectsList(TimeEntry.class, params);
     }
 
-    public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, RedmineException {
+    public TimeEntry createTimeEntry(TimeEntry obj) throws RedmineException {
         validate(obj);
         return createObject(TimeEntry.class, obj);
     }
 
-    public void deleteTimeEntry(Integer id) throws IOException, RedmineException {
+    public void deleteTimeEntry(Integer id) throws RedmineException {
         deleteObject(TimeEntry.class, Integer.toString(id));
     }
 
@@ -568,7 +568,7 @@ public class RedmineManager {
      * <p/>
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
      */
-    public List<SavedQuery> getSavedQueries(String projectKey) throws IOException, RedmineException {
+    public List<SavedQuery> getSavedQueries(String projectKey) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
 
         if ((projectKey != null) && (projectKey.length() > 0)) {
@@ -583,11 +583,11 @@ public class RedmineManager {
      * <p/>
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
      */
-    public List<SavedQuery> getSavedQueries() throws IOException, RedmineException {
+    public List<SavedQuery> getSavedQueries() throws RedmineException {
         return getObjectsList(SavedQuery.class, new HashSet<NameValuePair>());
     }
 
-    public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws IOException, RedmineException {
+    public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
         URI uri = getURIConfigurator().createURI("issues/" + issueId + "/relations.xml");
 
         HttpPost http = new HttpPost(uri);
@@ -605,20 +605,18 @@ public class RedmineManager {
     /**
      * Delete Issue Relation with the given ID.
      *
-     * @throws IOException
      * @throws RedmineAuthenticationException
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public void deleteRelation(Integer id) throws IOException,
-            RedmineException {
+    public void deleteRelation(Integer id) throws RedmineException {
         deleteObject(IssueRelation.class, Integer.toString(id));
     }
 
     /**
      * Delete all issue's relations
      */
-    public void deleteIssueRelations(Issue redmineIssue) throws IOException, RedmineException {
+    public void deleteIssueRelations(Issue redmineIssue) throws RedmineException {
         for (IssueRelation relation : redmineIssue.getRelations()) {
             deleteRelation(relation.getId());
         }
@@ -629,7 +627,7 @@ public class RedmineManager {
      *
      * @param id issue ID
      */
-    public void deleteIssueRelationsByIssueId(Integer id) throws IOException, RedmineException {
+    public void deleteIssueRelationsByIssueId(Integer id) throws RedmineException {
         Issue issue = getIssueById(id, INCLUDE.relations);
         deleteIssueRelations(issue);
     }
@@ -638,13 +636,11 @@ public class RedmineManager {
      * Delivers a list of existing {@link org.redmine.ta.beans.IssueStatus}es.
      *
      * @return a list of existing {@link org.redmine.ta.beans.IssueStatus}es.
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<IssueStatus> getStatuses() throws IOException, RedmineException {
+    public List<IssueStatus> getStatuses() throws RedmineException {
         return getObjectsList(IssueStatus.class, new HashSet<NameValuePair>());
     }
 
@@ -656,13 +652,11 @@ public class RedmineManager {
      * @param version the {@link Version}. Must contain a {@link Project}.
      * @return the new {@link Version} created by Redmine
      * @throws IllegalArgumentException thrown in case the version does not contain a project.
-     * @throws IOException              thrown in case something went wrong while performing I/O
-     *                                  operations
      * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
-    public Version createVersion(Version version) throws IOException, RedmineException, IllegalArgumentException {
+    public Version createVersion(Version version) throws RedmineException, IllegalArgumentException {
         // check project
         if (version.getProject() == null) {
             throw new IllegalArgumentException("Version must contain a project");
@@ -682,13 +676,11 @@ public class RedmineManager {
      * deletes a new {@link Version} from the {@link Project} contained. <br/>
      *
      * @param version the {@link Version}.
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public void deleteVersion(Version version) throws IOException, RedmineException {
+    public void deleteVersion(Version version) throws RedmineException {
         deleteObject(Version.class, Integer.toString(version.getId()));
     }
 
@@ -697,13 +689,11 @@ public class RedmineManager {
      *
      * @param projectID the ID of the {@link Project}
      * @return the list of {@link Version}s of the {@link Project}
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<Version> getVersions(int projectID) throws IOException, RedmineException {
+    public List<Version> getVersions(int projectID) throws RedmineException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/versions.xml", new BasicNameValuePair("include", "projects"));
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
@@ -711,7 +701,7 @@ public class RedmineManager {
     }
 
     // TODO add test
-    public Version getVersionById(int versionId) throws IOException, RedmineException {
+    public Version getVersionById(int versionId) throws RedmineException {
         URI uri = getURIConfigurator().createURI("versions/" + versionId + ".xml");
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
@@ -723,13 +713,11 @@ public class RedmineManager {
      *
      * @param projectID the ID of the {@link Project}
      * @return the list of {@link IssueCategory}s of the {@link Project}
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<IssueCategory> getCategories(int projectID) throws IOException, RedmineException {
+    public List<IssueCategory> getCategories(int projectID) throws RedmineException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/issue_categories.xml");
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
@@ -744,13 +732,11 @@ public class RedmineManager {
      * @param category the {@link IssueCategory}. Must contain a {@link Project}.
      * @return the new {@link IssueCategory} created by Redmine
      * @throws IllegalArgumentException thrown in case the category does not contain a project.
-     * @throws IOException              thrown in case something went wrong while performing I/O
-     *                                  operations
      * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
-    public IssueCategory createCategory(IssueCategory category) throws IOException, RedmineException, IllegalArgumentException {
+    public IssueCategory createCategory(IssueCategory category) throws RedmineException, IllegalArgumentException {
         if (category.getProject() == null) {
             throw new IllegalArgumentException("IssueCategory must contain a project");
         }
@@ -762,25 +748,21 @@ public class RedmineManager {
      * deletes an {@link IssueCategory}. <br/>
      *
      * @param category the {@link IssueCategory}.
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public void deleteCategory(IssueCategory category) throws IOException, RedmineException {
+    public void deleteCategory(IssueCategory category) throws RedmineException {
         deleteObject(IssueCategory.class, Integer.toString(category.getId()));
     }
 
     /**
      * @return a list of all {@link Tracker}s available
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<Tracker> getTrackers() throws IOException, RedmineException {
+    public List<Tracker> getTrackers() throws RedmineException {
         return getObjectsList(Tracker.class, new HashSet<NameValuePair>());
     }
 
@@ -789,13 +771,11 @@ public class RedmineManager {
      *
      * @param attachmentID the ID
      * @return the {@link org.redmine.ta.beans.Attachment}
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public Attachment getAttachmentById(int attachmentID) throws IOException, RedmineException {
+    public Attachment getAttachmentById(int attachmentID) throws RedmineException {
         return getObject(Attachment.class, attachmentID);
     }
 
@@ -839,13 +819,12 @@ public class RedmineManager {
     /**
      * @param projectKey ignored if NULL
      * @return list of news objects
-     * @throws IOException
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      * @see News
      */
-    public List<News> getNews(String projectKey) throws IOException, RedmineException {
+    public List<News> getNews(String projectKey) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         if ((projectKey != null) && (projectKey.length() > 0)) {
             params.add(new BasicNameValuePair("project_id", projectKey));

@@ -3,6 +3,7 @@ package org.redmine.ta.internal;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -13,6 +14,7 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
 
@@ -29,7 +31,7 @@ public class Communicator {
     /**
      * @return the response body
      */
-    public String sendRequest(HttpRequest request) throws IOException, RedmineException {
+    public String sendRequest(HttpRequest request) throws RedmineException {
         logger.debug(request.getRequestLine().toString());
         DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 
@@ -40,12 +42,24 @@ public class Communicator {
 //			httpclient.getCredentialsProvider().setCredentials(
 //                new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
 //                new UsernamePasswordCredentials(login, password));
-            final String credentials = String.valueOf(Base64Encoder.encode((login + ':' + password).getBytes(CHARSET)));
+            String credentials;
+            try {
+                credentials = String.valueOf(Base64Encoder.encode((login + ':' + password).getBytes(CHARSET)));
+            } catch (UnsupportedEncodingException e) {
+                throw new RedmineInternalError(e);
+            }
             request.addHeader("Authorization", "Basic: " + credentials);
         }
 
         request.addHeader("Accept-Encoding", "gzip,deflate");
-        HttpResponse httpResponse = httpclient.execute((HttpUriRequest) request);
+        HttpResponse httpResponse;
+        try {
+            httpResponse = httpclient.execute((HttpUriRequest) request);
+        } catch (ClientProtocolException e1) {
+            throw new RedmineFormatException(e1);
+        } catch (IOException e1) {
+            throw new RedmineTransportException(e1);
+        }
 
         int responseCode = httpResponse.getStatusLine().getStatusCode();
         if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
@@ -56,7 +70,14 @@ public class Communicator {
         }
 
         HttpEntity responseEntity = httpResponse.getEntity();
-        String responseBody = EntityUtils.toString(responseEntity);
+        String responseBody;
+        try {
+            responseBody = EntityUtils.toString(responseEntity);
+        } catch (ParseException e) {
+            throw new RedmineFormatException(e);
+        } catch (IOException e) {
+            throw new RedmineTransportException(e);
+        }
 
         if (responseCode == HttpStatus.SC_NOT_FOUND) {
             throw new NotFoundException("Server returned '404 not found'. response body:" + responseBody);
@@ -81,7 +102,12 @@ public class Communicator {
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
         if (proxyHost != null && proxyPort != null) {
-            int port = Integer.parseInt(proxyPort);
+            int port;
+            try {
+                port = Integer.parseInt(proxyPort);
+            } catch (NumberFormatException e) {
+                throw new RedmineConfigurationException("Illegal proxy port " + proxyPort, e);
+            }
             HttpHost proxy = new HttpHost(proxyHost, port);
             httpclient.getParams().setParameter(org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY, proxy);
             String proxyUser = System.getProperty("http.proxyUser");
@@ -99,7 +125,7 @@ public class Communicator {
         this.password = password;
     }
 
-    public String sendGet(URI uri) throws IOException, RedmineException {
+    public String sendGet(URI uri) throws RedmineException {
         HttpGet http = new HttpGet(uri);
         return sendRequest(http);
     }
