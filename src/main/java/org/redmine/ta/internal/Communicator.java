@@ -8,10 +8,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.castor.core.util.Base64Encoder;
-import org.redmine.ta.AuthenticationException;
-import org.redmine.ta.NotFoundException;
-import org.redmine.ta.RedmineException;
-import org.redmine.ta.RedmineProcessingException;
+import org.redmine.ta.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -32,7 +29,7 @@ public class Communicator {
     /**
      * @return the response body
      */
-    public String sendRequest(HttpRequest request) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public String sendRequest(HttpRequest request) throws IOException, RedmineException {
         logger.debug(request.getRequestLine().toString());
         DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
 
@@ -52,10 +49,10 @@ public class Communicator {
 
         int responseCode = httpResponse.getStatusLine().getStatusCode();
         if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
-            throw new AuthenticationException("Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
+            throw new RedmineAuthenticationException("Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
         }
         if (responseCode == HttpStatus.SC_FORBIDDEN) {
-            throw new AuthenticationException("Forbidden. Please check the user has proper permissions.");
+            throw new NotAuthorizedException("Forbidden. Please check the user has proper permissions.");
         }
 
         HttpEntity responseEntity = httpResponse.getEntity();
@@ -102,7 +99,7 @@ public class Communicator {
         this.password = password;
     }
 
-    public String sendGet(URI uri) throws NotFoundException, IOException, AuthenticationException, RedmineException {
+    public String sendGet(URI uri) throws IOException, RedmineException {
         HttpGet http = new HttpGet(uri);
         return sendRequest(http);
     }
