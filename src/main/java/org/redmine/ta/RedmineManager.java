@@ -150,7 +150,7 @@ public class RedmineManager {
         try {
             return getObjectsList(Project.class, params);
         } catch (NotFoundException e) {
-            throw new RuntimeException("NotFoundException received, which should never happen in this request");
+            throw new RedmineInternalError("NotFoundException received, which should never happen in this request");
         }
     }
 
@@ -248,8 +248,7 @@ public class RedmineManager {
         deleteObject(Project.class, projectKey);
     }
 
-    public void deleteIssue(Integer id) throws IOException,
-            RedmineException {
+    public void deleteIssue(Integer id) throws RedmineException {
         deleteObject(Issue.class, Integer.toString(id));
     }
 
@@ -378,8 +377,7 @@ public class RedmineManager {
     private <T> T getObject(Class<T> objectClass, Integer id, NameValuePair... params)
             throws RedmineException {
 
-        // TODO simplify!
-        URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, new ArrayList<NameValuePair>(Arrays.asList(params)));
+        URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, Arrays.asList(params));
         String body = getCommunicator().sendGet(uri);
         return RedmineXMLParser.parseObjectFromXML(objectClass, body);
     }
@@ -604,10 +602,6 @@ public class RedmineManager {
 
     /**
      * Delete Issue Relation with the given ID.
-     *
-     * @throws RedmineAuthenticationException
-     * @throws NotFoundException
-     * @throws RedmineException
      */
     public void deleteRelation(Integer id) throws RedmineException {
         deleteObject(IssueRelation.class, Integer.toString(id));
