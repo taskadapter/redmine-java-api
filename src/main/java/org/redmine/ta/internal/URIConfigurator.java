@@ -4,13 +4,18 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
+import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.beans.*;
 
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class URIConfigurator {
     private static final String XML_URL_POSTFIX = ".xml";
@@ -33,9 +38,9 @@ public class URIConfigurator {
     }
 
     private final URL baseURL;
-    private String apiAccessKey;
+    private final String apiAccessKey;
 
-    public URIConfigurator(String host) {
+    public URIConfigurator(String host, String apiAccessKey) {
         if (host == null || host.isEmpty()) {
             throw new IllegalArgumentException("The host parameter is NULL or empty");
         }
@@ -44,6 +49,7 @@ public class URIConfigurator {
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("Illegal host URL " + host, e);
 		}
+        this.apiAccessKey = apiAccessKey;
     }
 
     public URI createURI(String query) {
@@ -74,7 +80,7 @@ public class URIConfigurator {
             uri = URIUtils.createURI(url.getProtocol(), url.getHost(), url.getPort(), path,
                     URLEncodedUtils.format(params, "UTF-8"), null);
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RedmineInternalError(e);
         }
         return uri;
     }
@@ -104,10 +110,6 @@ public class URIConfigurator {
 
     public URI getCreateURIIssueCategory(Integer projectID) {
         return createURI("projects/" + projectID + "/issue_categories.xml");
-    }
-
-    public void setApiAccessKey(String apiAccessKey) {
-        this.apiAccessKey = apiAccessKey;
     }
 
     public URI getRetrieveObjectsListURI(Class<?> className, List<NameValuePair> param) {

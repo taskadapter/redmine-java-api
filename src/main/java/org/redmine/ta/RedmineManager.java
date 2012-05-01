@@ -63,8 +63,7 @@ public class RedmineManager {
 
     private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
-    private String host;
-    private String apiAccessKey;
+    private final URIConfigurator configurator;
     private String login;
     private String password;
     private boolean useBasicAuth = false;
@@ -74,11 +73,14 @@ public class RedmineManager {
     private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
 
     public RedmineManager(String uri) {
-        if (uri == null || uri.isEmpty()) {
-            throw new IllegalArgumentException("The host parameter is NULL or empty");
-        }
-        this.host = uri;
-        this.useBasicAuth = true;
+        this(uri, null, null);
+    }
+
+    private RedmineManager(String uri, String login, String password) {
+        this.configurator = new URIConfigurator(uri, null);
+        this.login = login;
+        this.password = password;
+        useBasicAuth = true;
     }
 
     /**
@@ -90,8 +92,7 @@ public class RedmineManager {
      *                     This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public".
      */
     public RedmineManager(String host, String apiAccessKey) {
-        this(host);
-        this.apiAccessKey = apiAccessKey;
+        this.configurator = new URIConfigurator(host, apiAccessKey);
         this.useBasicAuth = false;
     }
 
@@ -821,11 +822,7 @@ public class RedmineManager {
     }
     
     private URIConfigurator getURIConfigurator() {
-        URIConfigurator uriConfigurator = new URIConfigurator(host);
-        if (!useBasicAuth) {
-            uriConfigurator.setApiAccessKey(apiAccessKey);
-        }
-        return uriConfigurator;
+		return configurator;
     }
     
     private Communicator getCommunicator() {
