@@ -650,7 +650,7 @@ public class RedmineManager {
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
-    public Version createVersion(Version version) throws RedmineException, IllegalArgumentException {
+    public Version createVersion(Version version) throws RedmineException {
         // check project
         if (version.getProject() == null) {
             throw new IllegalArgumentException("Version must contain a project");
@@ -730,7 +730,7 @@ public class RedmineManager {
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
-    public IssueCategory createCategory(IssueCategory category) throws RedmineException, IllegalArgumentException {
+    public IssueCategory createCategory(IssueCategory category) throws RedmineException {
         if (category.getProject() == null) {
             throw new IllegalArgumentException("IssueCategory must contain a project");
         }
@@ -813,9 +813,6 @@ public class RedmineManager {
     /**
      * @param projectKey ignored if NULL
      * @return list of news objects
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
      * @see News
      */
     public List<News> getNews(String projectKey) throws RedmineException {
