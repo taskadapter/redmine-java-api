@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.redmine.ta.internal;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -27,18 +26,14 @@ import java.util.Date;
  */
 public class RedmineShortDateHandler extends RedmineDateHandler {
 
-    // XXX there's bug in Castor: http://jira.codehaus.org/browse/CASTOR-1878
-    private static final String FORMAT = "yyyy-MM-dd";
-    private final SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
-
     @Override
     public Date getDate(String str) throws ParseException {
-        return formatter.parse(str);
+        return RedmineDateUtils.parseShortDate(str);
     }
 
     @Override
     public String getString(Date date) {
-        return formatter.format(date);
+        return RedmineDateUtils.formatShortDate(date);
     }
 
 }

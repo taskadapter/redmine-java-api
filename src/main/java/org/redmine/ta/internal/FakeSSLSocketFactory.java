@@ -14,7 +14,7 @@ import javax.net.ssl.X509TrustManager;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
 class FakeSSLSocketFactory extends SSLSocketFactory {
-    private SSLContext sslContext = SSLContext.getInstance("TLS");
+    private final SSLContext sslContext = SSLContext.getInstance("TLS");
 
     public FakeSSLSocketFactory(KeyStore truststore)
             throws NoSuchAlgorithmException, KeyManagementException,

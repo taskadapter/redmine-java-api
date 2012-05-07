@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
    limitations under the License.
 */
 package org.redmine.ta.internal;
-
-import org.redmine.ta.internal.logging.Logger;
-import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,14 +33,14 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
      */
     private static final String FORMAT_REDMINE_1_1 = "yyyy-MM-dd'T'HH:mm:ssZ";
 
-    private static SimpleDateFormat formatter = new SimpleDateFormat(FORMAT_REDMINE_1_1);
+    private static final ThreadLocal<SimpleDateFormat> formatter = new LocalDateFormat(FORMAT_REDMINE_1_1);
     private static final int SHIFT = 3;
 
     @Override
     public Date getDate(String str) throws ParseException {
         // convert to RFC 822 format
         String converted = convertToRFC822Format(str);
-        return formatter.parse(converted);
+        return formatter.get().parse(converted);
     }
 
     private String convertToRFC822Format(String str) {
@@ -63,7 +60,7 @@ public class RedmineLongDateHandler extends RedmineDateHandler {
 
     @Override
     public String getString(Date date) {
-        String rfcFormat = formatter.format(date);
+        String rfcFormat = formatter.get().format(date);
         return convertToRedmine11Format(rfcFormat);
     }
 }

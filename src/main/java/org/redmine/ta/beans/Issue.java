@@ -492,7 +492,11 @@ public class Issue implements Identifiable {
     }
 
     /**
+     * Relations are only loaded if you include INCLUDE.relations when loading the Issue.
+     *
      * @return list of relations or EMPTY list if no relations, never returns NULL
+     *
+     * @see org.redmine.ta.RedmineManager#getIssueById(Integer id, INCLUDE... include)
      */
     public List<IssueRelation> getRelations() {
         return relations;

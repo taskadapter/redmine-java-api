@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -29,9 +29,9 @@ import org.redmine.ta.internal.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
@@ -45,8 +45,7 @@ import java.util.Map.Entry;
  */
 public class RedmineManager {
 
-//    private static final String CONTENT_TYPE = "text/xml; charset=utf-8";
-private static final String URI_SUFFIX = "json";
+    private static final String URI_SUFFIX = "json";
     private static final String CONTENT_TYPE = "application/json; charset=utf-8";
     private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
@@ -63,10 +62,9 @@ private static final String URI_SUFFIX = "json";
         REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
     }
 
-    private Logger logger = LoggerFactory.getLogger(RedmineManager.class);
+    private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
-    private String host;
-    private String apiAccessKey;
+    private final URIConfigurator configurator;
     private String login;
     private String password;
     private boolean useBasicAuth = false;
@@ -76,11 +74,14 @@ private static final String URI_SUFFIX = "json";
     private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
 
     public RedmineManager(String uri) {
-        if (uri == null || uri.isEmpty()) {
-            throw new IllegalArgumentException("The host parameter is NULL or empty");
-        }
-        this.host = uri;
-        this.useBasicAuth = true;
+        this(uri, null, null);
+    }
+
+    public RedmineManager(String uri, String login, String password) {
+        this.configurator = new URIConfigurator(uri, null);
+        this.login = login;
+        this.password = password;
+        useBasicAuth = true;
     }
 
     /**
@@ -92,33 +93,30 @@ private static final String URI_SUFFIX = "json";
      *                     This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public".
      */
     public RedmineManager(String host, String apiAccessKey) {
-        this(host);
-        this.apiAccessKey = apiAccessKey;
+        this.configurator = new URIConfigurator(host, apiAccessKey);
         this.useBasicAuth = false;
     }
 
     /**
-     * @deprecated Use RedmineManager(String uri) constructor and then setLogin() , setPassword()
-     */
-    public RedmineManager(String uri, String login, String password) {
-        this(uri);
-        this.login = login;
-        this.password = password;
-        this.useBasicAuth = true;
-    }
-
-    /**
-     * Creates an issue for a project.
-     * @param projectKey The project "identifier".
+     * Sample usage:
+     * <p/>
+     * <p/>
+     * <pre>
+     * {@code
+     *   Issue issueToCreate = new Issue();
+     *   issueToCreate.setSubject("This is the summary line 123");
+     *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
+     * }
+     *
+     * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
      * @param issue      the Issue object to create on the server.
      * @return the newly created Issue.
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the project with the given projectKey is not found
-     * @throws RedmineException something unexpected happened in Redmine
+     * @throws RedmineException
      */
-    public Issue createIssue(String projectKey, Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public Issue createIssue(String projectKey, Issue issue) throws RedmineException {
         URI uri = getURIConfigurator().createURI("issues." + URI_SUFFIX);
         HttpPost http = new HttpPost(uri);
         String body = RedmineJSONBuilder.toJSON(projectKey, issue);
@@ -128,34 +126,14 @@ private static final String URI_SUFFIX = "json";
         return RedmineJSONParser.parseObject(Issue.class, response);
     }
 
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * Note: This method cannot return the updated Issue from Redmine
-     * because the server does not provide any XML in response.
-     *
-     * @param issue the Issue to update on the server. issue.getId() is used for identification.
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       the issue with the required ID is not found
-     * @throws RedmineException
-     */
-    public void updateIssue(Issue issue) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        URI uri = getURIConfigurator().getUpdateURI(issue.getClass(), Integer.toString(issue.getId()));
-
-        HttpPut httpRequest = new HttpPut(uri);
-
-        // XXX add "notes" xml node. see http://www.redmine.org/wiki/redmine/Rest_Issues
-        String NO_PROJECT_KEY = null;
-        String xmlBody = RedmineXMLGenerator.toXML(NO_PROJECT_KEY, issue);
-        setEntity(httpRequest, xmlBody);
-        getCommunicator().sendRequest(httpRequest);
-    }
-
-    private void setEntity(HttpEntityEnclosingRequest request, String body) throws UnsupportedEncodingException {
-        logger.debug(body);
-        StringEntity entity = new StringEntity(body, Communicator.CHARSET);
+    private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) {
+        StringEntity entity;
+        try {
+            entity = new StringEntity(xmlBody, Communicator.CHARSET);
+        } catch (UnsupportedEncodingException e) {
+            throw new RedmineInternalError("Required charset "
+                    + Communicator.CHARSET + " is not supported", e);
+        }
         entity.setContentType(CONTENT_TYPE);
         request.setEntity(entity);
     }
@@ -164,17 +142,17 @@ private static final String URI_SUFFIX = "json";
      * Load the list of projects available to the user, which is represented by the API access key.
      *
      * @return list of Project objects
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public List<Project> getProjects() throws IOException, AuthenticationException, RedmineException {
+    public List<Project> getProjects() throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         params.add(new BasicNameValuePair("include", "trackers"));
         try {
             return getObjectsList(Project.class, params);
         } catch (NotFoundException e) {
-            throw new RuntimeException("NotFoundException received, which should never happen in this request");
+            throw new RedmineInternalError("NotFoundException received, which should never happen in this request");
         }
     }
 
@@ -182,12 +160,12 @@ private static final String URI_SUFFIX = "json";
      * There could be several issues with the same summary, so the method returns List.
      *
      * @return empty list if not issues with this summary field exist, never NULL
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         params.add(new BasicNameValuePair("subject", summaryField));
 
@@ -203,14 +181,12 @@ private static final String URI_SUFFIX = "json";
      *
      * @param pParameters the http parameters key/value pairs to append to the rest api request
      * @return empty list if not issues with this summary field exist, never NULL
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public List<Issue> getIssues(Map<String, String> pParameters)
-            throws IOException, AuthenticationException, NotFoundException,
-            RedmineException {
+    public List<Issue> getIssues(Map<String, String> pParameters) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
 
         for (final Entry<String, String> param : pParameters.entrySet()) {
@@ -224,18 +200,19 @@ private static final String URI_SUFFIX = "json";
      * @param id      the Redmine issue ID
      * @param include list of "includes". e.g. "relations", "journals", ...
      * @return Issue object
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the issue with the given id is not found on the server
      * @throws RedmineException
      */
-    public Issue getIssueById(Integer id, INCLUDE... include) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public Issue getIssueById(Integer id, INCLUDE... include) throws RedmineException {
         String value = join(",", include);
         // there's no harm in adding "include" parameter even if it's empty
         return getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
+    // TODO move to a separate utility class or find a replacement in Google Guava
+    // TODO add unit tests
     private static String join(String delimToUse, INCLUDE... include) {
         String delim = "";
         StringBuilder sb = new StringBuilder();
@@ -249,12 +226,12 @@ private static final String URI_SUFFIX = "json";
     /**
      * @param projectKey string key like "project-ABC", NOT a database numeric ID
      * @return Redmine's project
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the project with the given key is not found
      * @throws RedmineException
      */
-    public Project getProjectByKey(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public Project getProjectByKey(String projectKey) throws RedmineException {
         URI uri = getURIConfigurator().getUpdateURI(Project.class, projectKey, new BasicNameValuePair("include", "trackers"));
 
         HttpGet http = new HttpGet(uri);
@@ -264,17 +241,16 @@ private static final String URI_SUFFIX = "json";
 
     /**
      * @param projectKey string key like "project-ABC", NOT a database numeric ID
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       if the project with the given key is not found
      * @throws RedmineException
      */
-    public void deleteProject(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void deleteProject(String projectKey) throws RedmineException {
         deleteObject(Project.class, projectKey);
     }
 
-    public void deleteIssue(Integer id) throws IOException,
-            AuthenticationException, NotFoundException, RedmineException {
+    public void deleteIssue(Integer id) throws RedmineException {
         deleteObject(Issue.class, Integer.toString(id));
     }
 
@@ -284,13 +260,12 @@ private static final String URI_SUFFIX = "json";
      *                   represented by the API access key (if the Redmine project requires authorization).
      *                   This parameter is <b>optional<b>, NULL can be provided to get all available issues.
      * @return list of Issue objects
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      * @see Issue
      */
-    public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         if (queryId != null) {
             params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
@@ -307,11 +282,10 @@ private static final String URI_SUFFIX = "json";
 
     /**
      * Redmine 1.0 - specific version
-     * TODO adapt to JSON
      *
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
 
         final int FIRST_REDMINE_PAGE = 1;
@@ -355,8 +329,7 @@ private static final String URI_SUFFIX = "json";
     /**
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
-            AuthenticationException, NotFoundException, RedmineException {
+    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
             return getObjectsListV11(objectClass, params);
         } else if (currentMode.equals(MODE.REDMINE_1_0)) {
@@ -373,8 +346,7 @@ private static final String URI_SUFFIX = "json";
      *
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws IOException,
-            AuthenticationException, NotFoundException, RedmineException {
+    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
 
         params.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
@@ -406,22 +378,20 @@ private static final String URI_SUFFIX = "json";
     }
 
     private <T> T getObject(Class<T> objectClass, Integer id, NameValuePair... params)
-            throws IOException, AuthenticationException, NotFoundException,
-            RedmineException {
+            throws RedmineException {
 
-        // TODO simplify!
-        URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, new ArrayList<NameValuePair>(Arrays.asList(params)));
+        URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, Arrays.asList(params));
         String body = getCommunicator().sendGet(uri);
         return RedmineXMLParser.parseObjectFromXML(objectClass, body);
     }
 
     // TODO is there a way to get rid of the 1st parameter and use generics?
-    private <T> T createObject(Class<T> classs, T obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private <T> T createObject(Class<T> classs, T obj) throws RedmineException {
         URI uri = getURIConfigurator().getCreateURI(obj.getClass());
         return createObject(classs, obj, uri);
     }
 
-    private <T> T createObject(Class<T> classs, T obj, URI uri) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private <T> T createObject(Class<T> classs, T obj, URI uri) throws RedmineException {
         HttpPost http = new HttpPost(uri);
         String xml = RedmineXMLGenerator.toXML(obj);
         setEntity(http, xml);
@@ -436,7 +406,7 @@ private static final String URI_SUFFIX = "json";
       *
       * @since 1.8.0
       */
-    public void update(Identifiable obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void update(Identifiable obj) throws RedmineException {
         validate(obj);
 
         URI uri = getURIConfigurator().getUpdateURI(obj.getClass(), Integer.toString(obj.getId()));
@@ -457,7 +427,7 @@ private static final String URI_SUFFIX = "json";
         }
     }
 
-    private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws RedmineException {
         URI uri = getURIConfigurator().getUpdateURI(classs, id);
         HttpDelete http = new HttpDelete(uri);
         getCommunicator().sendRequest(http);
@@ -484,34 +454,17 @@ private static final String URI_SUFFIX = "json";
      *
      * @param project project to create on the server
      * @return the newly created Project object.
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public Project createProject(Project project) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public Project createProject(Project project) throws RedmineException {
         URI uri = getURIConfigurator().createURI("projects." + URI_SUFFIX, new BasicNameValuePair("include", "trackers"));
         HttpPost httpPost = new HttpPost(uri);
         String body = RedmineJSONBuilder.toJSON(project);
         setEntity(httpPost, body);
         String response = getCommunicator().sendRequest(httpPost);
         return RedmineJSONParser.parseObject(Project.class,response);
-    }
-
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
-     * @throws NotFoundException
-     *
-     * @see #update(org.redmine.ta.beans.Identifiable)
-     */
-    public void updateProject(Project project) throws IOException,
-            AuthenticationException, RedmineException, NotFoundException {
-        update(project);
     }
 
     /**
@@ -527,6 +480,9 @@ private static final String URI_SUFFIX = "json";
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
     public void setObjectsPerPage(int pageSize) {
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("Page size must be >= 0. You provided: " + pageSize);
+        }
         this.objectsPerPage = pageSize;
     }
 
@@ -535,92 +491,68 @@ private static final String URI_SUFFIX = "json";
      * <p><b>This operation requires "Redmine Administrator" permission.</b>
      *
      * @return list of User objects
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException
      * @throws RedmineException
      */
-    public List<User> getUsers() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<User> getUsers() throws RedmineException {
         return getObjectsList(User.class, new HashSet<NameValuePair>());
     }
 
-    public User getUserById(Integer userId) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public User getUserById(Integer userId) throws RedmineException {
         return getObject(User.class, userId);
     }
 
     /**
      * @return the current user logged into Redmine
      */
-    public User getCurrentUser() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public User getCurrentUser() throws RedmineException {
         URI uri = getURIConfigurator().createURI("users/current.xml");
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
         return RedmineXMLParser.parseUserFromXML(response);
     }
 
-    public User createUser(User user) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public User createUser(User user) throws RedmineException {
         return createObject(User.class, user);
     }
 
     /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     *
-     * This method cannot return the updated object from Redmine
-     * because the server does not provide any XML in response.
-     *
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
-     * @throws NotFoundException       some object is not found. e.g. the user with the given id
-     */
-    public void updateUser(User user) throws IOException,
-            AuthenticationException, RedmineException, NotFoundException {
-        update(user);
-    }
-
-    /**
      * @param userId user identifier (numeric ID)
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       if the user with the given id is not found
      * @throws RedmineException
      */
-    public void deleteUser(Integer userId) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deleteUser(Integer userId) throws RedmineException {
         deleteObject(User.class, Integer.toString(userId));
     }
 
-    public List<TimeEntry> getTimeEntries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<TimeEntry> getTimeEntries() throws RedmineException {
         return getObjectsList(TimeEntry.class, new HashSet<NameValuePair>());
     }
 
     /**
      * @param id the database Id of the TimeEntry record
      */
-    public TimeEntry getTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public TimeEntry getTimeEntry(Integer id) throws RedmineException {
         return getObject(TimeEntry.class, id);
     }
 
-    public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         params.add(new BasicNameValuePair("issue_id", Integer.toString(issueId)));
 
         return getObjectsList(TimeEntry.class, params);
     }
 
-    public TimeEntry createTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public TimeEntry createTimeEntry(TimeEntry obj) throws RedmineException {
         validate(obj);
         return createObject(TimeEntry.class, obj);
     }
 
-    /**
-     * @deprecated this method will be deleted in the future releases. use update() method instead
-     */
-    public void updateTimeEntry(TimeEntry obj) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        update(obj);
-    }
-
-    public void deleteTimeEntry(Integer id) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public void deleteTimeEntry(Integer id) throws RedmineException {
         deleteObject(TimeEntry.class, Integer.toString(id));
     }
 
@@ -634,7 +566,7 @@ private static final String URI_SUFFIX = "json";
      * <p/>
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
      */
-    public List<SavedQuery> getSavedQueries(String projectKey) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<SavedQuery> getSavedQueries(String projectKey) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
 
         if ((projectKey != null) && (projectKey.length() > 0)) {
@@ -649,11 +581,11 @@ private static final String URI_SUFFIX = "json";
      * <p/>
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
      */
-    public List<SavedQuery> getSavedQueries() throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public List<SavedQuery> getSavedQueries() throws RedmineException {
         return getObjectsList(SavedQuery.class, new HashSet<NameValuePair>());
     }
 
-    public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
         URI uri = getURIConfigurator().createURI("issues/" + issueId + "/relations.xml");
 
         HttpPost http = new HttpPost(uri);
@@ -670,26 +602,15 @@ private static final String URI_SUFFIX = "json";
 
     /**
      * Delete Issue Relation with the given ID.
-     *
-     * @throws IOException
-     * @throws AuthenticationException
-     * @throws NotFoundException
-     * @throws RedmineException
      */
-    public void deleteRelation(Integer id) throws IOException,
-            AuthenticationException, NotFoundException, RedmineException {
+    public void deleteRelation(Integer id) throws RedmineException {
         deleteObject(IssueRelation.class, Integer.toString(id));
     }
 
     /**
      * Delete all issue's relations
-     *
-     * @throws IOException
-     * @throws AuthenticationException
-     * @throws RedmineException
-     * @throws NotFoundException
      */
-    public void deleteIssueRelations(Issue redmineIssue) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deleteIssueRelations(Issue redmineIssue) throws RedmineException {
         for (IssueRelation relation : redmineIssue.getRelations()) {
             deleteRelation(relation.getId());
         }
@@ -699,35 +620,21 @@ private static final String URI_SUFFIX = "json";
      * Delete relations for the given issue ID.
      *
      * @param id issue ID
-     * @throws IOException
-     * @throws AuthenticationException
-     * @throws RedmineException
-     * @throws NotFoundException
      */
-    public void deleteIssueRelationsByIssueId(Integer id) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deleteIssueRelationsByIssueId(Integer id) throws RedmineException {
         Issue issue = getIssueById(id, INCLUDE.relations);
         deleteIssueRelations(issue);
-    }
-
-    /**
-     * @deprecated use createRelation(Integer issueId, Integer issueToId, String type). "projectKey" parameter is not used anyway.
-     *             this method will be deleted soon.
-     */
-    public IssueRelation createRelation(String projectKey, Integer issueId, Integer issueToId, String type) throws IOException, AuthenticationException, NotFoundException, RedmineException {
-        return createRelation(issueId, issueToId, type);
     }
 
     /**
      * Delivers a list of existing {@link org.redmine.ta.beans.IssueStatus}es.
      *
      * @return a list of existing {@link org.redmine.ta.beans.IssueStatus}es.
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<IssueStatus> getStatuses() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public List<IssueStatus> getStatuses() throws RedmineException {
         return getObjectsList(IssueStatus.class, new HashSet<NameValuePair>());
     }
 
@@ -739,13 +646,11 @@ private static final String URI_SUFFIX = "json";
      * @param version the {@link Version}. Must contain a {@link Project}.
      * @return the new {@link Version} created by Redmine
      * @throws IllegalArgumentException thrown in case the version does not contain a project.
-     * @throws IOException              thrown in case something went wrong while performing I/O
-     *                                  operations
-     * @throws AuthenticationException  thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
-    public Version createVersion(Version version) throws IOException, AuthenticationException, RedmineException, IllegalArgumentException, NotFoundException {
+    public Version createVersion(Version version) throws RedmineException {
         // check project
         if (version.getProject() == null) {
             throw new IllegalArgumentException("Version must contain a project");
@@ -765,13 +670,11 @@ private static final String URI_SUFFIX = "json";
      * deletes a new {@link Version} from the {@link Project} contained. <br/>
      *
      * @param version the {@link Version}.
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public void deleteVersion(Version version) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deleteVersion(Version version) throws RedmineException {
         deleteObject(Version.class, Integer.toString(version.getId()));
     }
 
@@ -780,13 +683,11 @@ private static final String URI_SUFFIX = "json";
      *
      * @param projectID the ID of the {@link Project}
      * @return the list of {@link Version}s of the {@link Project}
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<Version> getVersions(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public List<Version> getVersions(int projectID) throws RedmineException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/versions.xml", new BasicNameValuePair("include", "projects"));
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
@@ -794,7 +695,7 @@ private static final String URI_SUFFIX = "json";
     }
 
     // TODO add test
-    public Version getVersionById(int versionId) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public Version getVersionById(int versionId) throws RedmineException {
         URI uri = getURIConfigurator().createURI("versions/" + versionId + ".xml");
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
@@ -806,13 +707,11 @@ private static final String URI_SUFFIX = "json";
      *
      * @param projectID the ID of the {@link Project}
      * @return the list of {@link IssueCategory}s of the {@link Project}
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<IssueCategory> getCategories(int projectID) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public List<IssueCategory> getCategories(int projectID) throws RedmineException {
         URI uri = getURIConfigurator().createURI("projects/" + projectID + "/issue_categories.xml");
         HttpGet http = new HttpGet(uri);
         String response = getCommunicator().sendRequest(http);
@@ -827,13 +726,11 @@ private static final String URI_SUFFIX = "json";
      * @param category the {@link IssueCategory}. Must contain a {@link Project}.
      * @return the new {@link IssueCategory} created by Redmine
      * @throws IllegalArgumentException thrown in case the category does not contain a project.
-     * @throws IOException              thrown in case something went wrong while performing I/O
-     *                                  operations
-     * @throws AuthenticationException  thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
-    public IssueCategory createCategory(IssueCategory category) throws IOException, AuthenticationException, RedmineException, IllegalArgumentException, NotFoundException {
+    public IssueCategory createCategory(IssueCategory category) throws RedmineException {
         if (category.getProject() == null) {
             throw new IllegalArgumentException("IssueCategory must contain a project");
         }
@@ -845,25 +742,21 @@ private static final String URI_SUFFIX = "json";
      * deletes an {@link IssueCategory}. <br/>
      *
      * @param category the {@link IssueCategory}.
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public void deleteCategory(IssueCategory category) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public void deleteCategory(IssueCategory category) throws RedmineException {
         deleteObject(IssueCategory.class, Integer.toString(category.getId()));
     }
 
     /**
      * @return a list of all {@link Tracker}s available
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public List<Tracker> getTrackers() throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    public List<Tracker> getTrackers() throws RedmineException {
         return getObjectsList(Tracker.class, new HashSet<NameValuePair>());
     }
 
@@ -872,13 +765,11 @@ private static final String URI_SUFFIX = "json";
      *
      * @param attachmentID the ID
      * @return the {@link org.redmine.ta.beans.Attachment}
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws AuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
-    public Attachment getAttachmentById(int attachmentID) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    public Attachment getAttachmentById(int attachmentID) throws RedmineException {
         return getObject(Attachment.class, attachmentID);
     }
 
@@ -887,28 +778,25 @@ private static final String URI_SUFFIX = "json";
      *
      * @param issueAttachment the {@link org.redmine.ta.beans.Attachment}
      * @return the content of the attachment as a byte[] array
-     * @throws IOException thrown in case the download fails
+     * @throws RedmineCommunicationException thrown in case the download fails
      */
-    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws IOException {
-        byte[] result = null;
-        URL url = new URL(issueAttachment.getContentURL());
-        BufferedReader inputReader = null;
+    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws RedmineCommunicationException {
         try {
-            inputReader = new BufferedReader(
-                    new InputStreamReader(
-                            url.openStream()));
-            StringBuilder contentBuilder = new StringBuilder();
-            String line;
-            while ((line = inputReader.readLine()) != null) {
-                contentBuilder.append(line);
+            final URL url = new URL(issueAttachment.getContentURL());
+            final InputStream is = url.openStream();
+            try {
+                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                final byte[] buffer = new byte[65536];
+                int read;
+                while ((read = is.read(buffer)) != -1)
+                    baos.write(buffer, 0, read);
+                return baos.toByteArray();
+            } finally {
+                is.close();
             }
-            result = contentBuilder.toString().getBytes();
-        } finally {
-            if (inputReader != null) {
-                inputReader.close();
-            }
+        } catch (IOException e) {
+            throw new RedmineTransportException(e);
         }
-        return result;
     }
 
     public void setLogin(String login) {
@@ -922,14 +810,9 @@ private static final String URI_SUFFIX = "json";
     /**
      * @param projectKey ignored if NULL
      * @return list of news objects
-     * @throws IOException
-     * @throws AuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
      * @see News
      */
-    public List<News> getNews(String projectKey) throws IOException, AuthenticationException,
-            NotFoundException, RedmineException {
+    public List<News> getNews(String projectKey) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
         if ((projectKey != null) && (projectKey.length() > 0)) {
             params.add(new BasicNameValuePair("project_id", projectKey));
@@ -938,11 +821,7 @@ private static final String URI_SUFFIX = "json";
     }
     
     private URIConfigurator getURIConfigurator() {
-        URIConfigurator uriConfigurator = new URIConfigurator(host);
-        if (!useBasicAuth) {
-            uriConfigurator.setApiAccessKey(apiAccessKey);
-        }
-        return uriConfigurator;
+		return configurator;
     }
     
     private Communicator getCommunicator() {

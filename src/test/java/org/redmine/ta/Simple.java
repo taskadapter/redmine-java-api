@@ -11,10 +11,10 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 public class Simple {
-    private static Logger logger = LoggerFactory.getLogger(Simple.class);
-    private static String projectKey = "test";
+    private static final Logger logger = LoggerFactory.getLogger(Simple.class);
+    private static final String projectKey = "test";
 
-    private static Integer queryId = null; // any
+    private static final Integer queryId = null; // any
 
     public static void main(String[] args) {
         String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.1";
@@ -40,55 +40,55 @@ public class Simple {
         }
     }
 
-    private static void getVersion(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private static void getVersion(RedmineManager mgr) throws RedmineException {
         // see Redmine bug http://www.redmine.org/issues/10241
         Version version = mgr.getVersionById(294);
         System.out.println(version);
     }
 
-    private static void changeIssueStatus(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private static void changeIssueStatus(RedmineManager mgr) throws RedmineException {
         Issue issue = mgr.getIssueById(1771);
         issue.setSubject("new");
         mgr.update(issue);
     }
 
-    private static void getProject(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private static void getProject(RedmineManager mgr) throws RedmineException {
         Project test = mgr.getProjectByKey("test");
         System.out.println(test);
     }
 
-    private static void tryGetNews(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException, NotFoundException {
+    private static void tryGetNews(RedmineManager mgr) throws RedmineException {
         List<News> news = mgr.getNews(null);
         for (News aNew : news) {
             System.out.println(aNew);
         }
     }
 
-    private static void tryCreateRelation(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private static void tryCreateRelation(RedmineManager mgr) throws RedmineException {
         IssueRelation r = mgr.createRelation(49, 50, IssueRelation.TYPE.precedes.toString());
         logger.debug("Created relation " + r);
     }
 
-    private static void getProjects(RedmineManager mgr) throws IOException, AuthenticationException, RedmineException {
+    private static void getProjects(RedmineManager mgr) throws RedmineException {
         List<Project> projects = mgr.getProjects();
         logger.debug("Retrieved projects " + projects);
 
     }
 
-    private static void getSavedQueries(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private static void getSavedQueries(RedmineManager mgr) throws RedmineException {
         List<SavedQuery> savedQueries = mgr.getSavedQueries("test");
         logger.debug("Retrieved queries " + savedQueries);
 
     }
 
-    private static void getIssueWithRelations(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private static void getIssueWithRelations(RedmineManager mgr) throws RedmineException {
         Issue issue = mgr.getIssueById(24580, INCLUDE.relations);
         List<IssueRelation> r = issue.getRelations();
         logger.debug("Retrieved relations " + r);
 
     }
 
-    private static void tryCreateIssue(RedmineManager mgr) throws IOException, AuthenticationException, NotFoundException, RedmineException {
+    private static void tryCreateIssue(RedmineManager mgr) throws RedmineException {
         Issue issue = new Issue();
         issue.setSubject("test123");
         mgr.createIssue(projectKey, issue);

@@ -1,5 +1,5 @@
 /*
-   Copyright 2010-2011 Alexey Skorokhodov.
+   Copyright 2010-2012 Alexey Skorokhodov.
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ package org.redmine.ta.internal;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +28,18 @@ import java.util.regex.Pattern;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.redmine.ta.beans.*;
+import org.redmine.ta.beans.Attachment;
+import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueCategory;
+import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.IssueStatus;
+import org.redmine.ta.beans.News;
+import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.SavedQuery;
+import org.redmine.ta.beans.TimeEntry;
+import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Version;
 import org.xml.sax.InputSource;
 
 public class RedmineXMLParser {
@@ -43,47 +56,45 @@ public class RedmineXMLParser {
     private static final String MAPPING_NEWS = "/mapping_news_list.xml";
 
     // TODO optimize : pre-load xml
-    @SuppressWarnings("rawtypes")
-    private static final Map<Class, String> fromRedmineMap = new HashMap<Class, String>() {
-        private static final long serialVersionUID = 1L;
+    private static final Map<Class<?>, String> fromRedmineMap = new HashMap<Class<?>, String>();
+    private static final Map<Class<?>, Collection<Pattern>> badPatterns = new HashMap<Class<?>, Collection<Pattern>>();
 
-        {
-            put(User.class, MAPPING_USERS);
-            put(Issue.class, MAPPING_ISSUES);
-            put(Project.class, MAPPING_PROJECTS_LIST);
-            put(TimeEntry.class, "/mapping_time_entries.xml");
-            put(SavedQuery.class, "/mapping_queries.xml");
-            put(IssueRelation.class, "/mapping_relations.xml");
-            put(IssueStatus.class, MAPPING_STATUSES);
-            put(Version.class, MAPPING_VERSIONS);
-            put(IssueCategory.class, MAPPING_CATEGORIES);
-            put(Tracker.class,MAPPING_TRACKERS);
-            put(Attachment.class,MAPPING_ATTACHMENTS);
-            put(News.class,MAPPING_NEWS);
-        }
-    };
+    static {
+        fromRedmineMap.put(User.class, MAPPING_USERS);
+        fromRedmineMap.put(Issue.class, MAPPING_ISSUES);
+        fromRedmineMap.put(Project.class, MAPPING_PROJECTS_LIST);
+        fromRedmineMap.put(TimeEntry.class, "/mapping_time_entries.xml");
+        fromRedmineMap.put(SavedQuery.class, "/mapping_queries.xml");
+        fromRedmineMap.put(IssueRelation.class, "/mapping_relations.xml");
+        fromRedmineMap.put(IssueStatus.class, MAPPING_STATUSES);
+        fromRedmineMap.put(Version.class, MAPPING_VERSIONS);
+        fromRedmineMap.put(IssueCategory.class, MAPPING_CATEGORIES);
+        fromRedmineMap.put(Tracker.class, MAPPING_TRACKERS);
+        fromRedmineMap.put(Attachment.class, MAPPING_ATTACHMENTS);
+        fromRedmineMap.put(News.class, MAPPING_NEWS);
+
+        // see bug https://www.hostedredmine.com/issues/8240
+        badPatterns.put(Issue.class, Arrays.asList(
+      				Pattern.compile(Pattern.quote("<estimated_hours></estimated_hours>")),
+      				Pattern.compile(Pattern.quote("<estimated_hours/>"))));
+
+    }
 
     public static Project parseProjectFromXML(String xml)
             throws RuntimeException {
         return parseObjectFromXML(Project.class, xml);
     }
 
-    // see bug https://www.hostedredmine.com/issues/8240
-    @SuppressWarnings("rawtypes") 
-    private static void removeBadTags(Class redmineClass, StringBuilder xml) {
-        if (redmineClass.equals(Issue.class)) {
-            replaceAll(xml, "<estimated_hours></estimated_hours>", "");
-            replaceAll(xml, "<estimated_hours/>", "");
-        }
-    }
-
-    private static void replaceAll(StringBuilder builder, String from, String to) {
-        int index = builder.indexOf(from);
-        while (index != -1) {
-            builder.replace(index, index + from.length(), to);
-            index += to.length(); // Move to the end of the replacement
-            index = builder.indexOf(from, index);
-        }
+    private static String removeBadTags(Class<?> redmineClass, String xml) {
+    	final Collection<Pattern> patterns = badPatterns.get(redmineClass);
+    	if (patterns == null) {
+    		return xml;
+    	}
+        String newXML = xml;
+    	for (Pattern pattern : patterns) {
+    		newXML = pattern.matcher(newXML).replaceAll("");
+    	}
+    	return newXML;
     }
 
     /**
@@ -161,51 +172,33 @@ public class RedmineXMLParser {
 
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body) {
-        verifyStartsAsXML(body);
-        StringBuilder builder = new StringBuilder(body);
-        removeBadTags(classs, builder);
+    private static <T> T unmarshal(Class<?> elementClass, String body,
+   			Class<T> resultClass) {
+           verifyStartsAsXML(body);
+           body = removeBadTags(elementClass, body);
 
-        String configFile = fromRedmineMap.get(classs);
-        Unmarshaller unmarshaller = getUnmarshaller(configFile, ArrayList.class);
+           String configFile = fromRedmineMap.get(elementClass);
+           Unmarshaller unmarshaller = getUnmarshaller(configFile, resultClass);
 
-        List<T> list = null;
-        StringReader reader = null;
-        try {
-            reader = new StringReader(builder.toString());
-            list = (ArrayList<T>) unmarshaller.unmarshal(reader);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-        return list;
+           StringReader reader = null;
+           try {
+               reader = new StringReader(body);
+               return resultClass.cast(unmarshaller.unmarshal(reader));
+           } catch (Exception e) {
+               throw new RuntimeException(e);
+           } finally {
+               if (reader != null) {
+                   reader.close();
+               }
+           }
+       }
+
+	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body)	{
+    	return unmarshal(classs, body, ArrayList.class);
     }
 
-    public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
-        verifyStartsAsXML(xml);
-        StringBuilder builder = new StringBuilder(xml);
-        removeBadTags(classs, builder);
-
-        String configFile = fromRedmineMap.get(classs);
-        Unmarshaller unmarshaller = getUnmarshaller(configFile, classs);
-
-        T obj = null;
-        StringReader reader = null;
-        try {
-            reader = new StringReader(builder.toString());
-            obj = classs.cast(unmarshaller.unmarshal(reader));
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                reader.close();
-            }
-        }
-        return obj;
+	public static <T> T parseObjectFromXML(Class<T> classs, String xml) {
+    	return unmarshal(classs, xml, classs);
     }
 
     public static List<User> parseUsersFromXML(String body) {
@@ -240,7 +233,9 @@ public class RedmineXMLParser {
         for (int i = lineToStartWith; i < lastLine; i++) {
             int begin = lines[i].indexOf(openTag) + openTag.length();
             int end = lines[i].indexOf(closeTag);
-            errors.add(lines[i].substring(begin, end));
+            if (begin >= 0 && end >= 0) {
+                errors.add(lines[i].substring(begin, end));
+            }
         }
         return errors;
     }
