@@ -126,10 +126,11 @@ public class RedmineManager {
         return RedmineJSONParser.parseObject(Issue.class, response);
     }
 
-    private void setEntity(HttpEntityEnclosingRequest request, String xmlBody) {
+
+    private void setEntity(HttpEntityEnclosingRequest request, String body) {
         StringEntity entity;
         try {
-            entity = new StringEntity(xmlBody, Communicator.CHARSET);
+            entity = new StringEntity(body, Communicator.CHARSET);
         } catch (UnsupportedEncodingException e) {
             throw new RedmineInternalError("Required charset "
                     + Communicator.CHARSET + " is not supported", e);
