@@ -9,4 +9,8 @@ public class RedmineCommunicationException extends RedmineException {
 	public RedmineCommunicationException(Throwable cause) {
         super(cause);
     }
+
+	public RedmineCommunicationException(String message) {
+		super(message);
+	}
 }

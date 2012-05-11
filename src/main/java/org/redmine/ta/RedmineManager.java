@@ -464,10 +464,10 @@ public class RedmineManager {
     public Project createProject(Project project) throws RedmineException {
         URI uri = getURIConfigurator().createURI("projects." + URI_SUFFIX, new BasicNameValuePair("include", "trackers"));
         HttpPost httpPost = new HttpPost(uri);
-        String body = RedmineJSONBuilder.toJSON(project);
+		String body = RedmineJSONBuilder.toCreateRequest(project);
         setEntity(httpPost, body);
         String response = getCommunicator().sendRequest(httpPost);
-        return RedmineJSONParser.parseObject(Project.class,response);
+		return RedmineJSONParser.parseProject(response);
     }
 
     /**

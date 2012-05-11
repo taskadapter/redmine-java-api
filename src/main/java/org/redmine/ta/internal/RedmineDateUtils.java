@@ -30,4 +30,10 @@ public final class RedmineDateUtils {
     public static Date parseShortDate(String date) throws ParseException {
         return getShortFormat().parse(date);
     }
+
+	/**
+	 * Full date format.
+	 */
+	public static final LocalDateFormat FULL_DATE_FORMAT = new LocalDateFormat(
+			"yyyy/MM/dd HH:mm:ss Z");
 }

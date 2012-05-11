@@ -415,7 +415,6 @@ public class RedmineManagerTest {
         mgr.getIssues(projectKey, invalidQueryId);
     }
 
-	@Ignore("Отключен до перехода на json")
     @Test
     public void testCreateProject() throws RedmineException {
         Project projectToCreate = generateRandomProject();
@@ -981,7 +980,6 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
     @Test
     public void testSubProjectIsCreatedWithCorrectParentId() throws RedmineException {
         Project createdMainProject = null;
