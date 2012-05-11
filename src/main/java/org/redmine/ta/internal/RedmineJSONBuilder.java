@@ -28,17 +28,27 @@ public class RedmineJSONBuilder {
 		}
 	};
 
+	public static JsonObjectWriter<Project> CREATE_PROJECT_WRITER = new JsonObjectWriter<Project>() {
+		@Override
+		public void write(JsonWriter writer, Project object) throws IOException {
+			writeCreateRequest(writer, object);
+		}
+	};
+
 	/**
-	 * Converts a project to a "create project" request.
+	 * Writes a "create project" request.
 	 * 
+	 * @param writer
+	 *            project writer.
 	 * @param project
 	 *            project to create.
-	 * @return project string representation.
 	 * @throws IllegalArgumentException
 	 *             if some project fields are not configured.
+	 * @throws IOException
+	 *             if IO error occurs.
 	 */
-	public static String toCreateRequest(Project project)
-			throws IllegalArgumentException {
+	public static void writeCreateRequest(JsonWriter writer, Project project)
+			throws IllegalArgumentException, IOException {
 		/* Validate project */
 		if (project.getName() == null)
 			throw new IllegalArgumentException(
@@ -47,7 +57,7 @@ public class RedmineJSONBuilder {
 			throw new IllegalArgumentException(
 					"Project identifier must be set to create a new project");
 
-		return toJSON(project);
+		writeProject(project, writer);
 	}
 
 	/**
@@ -62,36 +72,53 @@ public class RedmineJSONBuilder {
 	 */
 	static void writeTracker(JsonWriter writer, Tracker tracker)
 			throws IOException {
-		writer.beginObject();
 		writer.name("id").value(tracker.getId());
 		writer.name("name").value(tracker.getName());
-		writer.endObject();
 	}
 
-	private static String toJSON(Project project) throws RedmineInternalError {
+	/**
+	 * Converts object to a "simple" json.
+	 * 
+	 * @param tag
+	 *            object tag.
+	 * @param object
+	 *            object to convert.
+	 * @param writer
+	 *            object writer.
+	 * @return object String representation.
+	 * @throws RedmineInternalError
+	 *             if conversion fails.
+	 */
+	public static <T> String toSimpleJSON(String tag, T object,
+			JsonObjectWriter<T> writer) throws RedmineInternalError {
 		final StringWriter swriter = new StringWriter();
-		final JsonWriter writer = new JsonWriter(swriter);
+		final JsonWriter jsWriter = new JsonWriter(swriter);
 		try {
-			writer.beginObject();
-			writer.name("project");
-			writer.beginObject();
-			addIfNotNull(writer, "id", project.getId());
-			addIfNotNull(writer, "identifier", project.getIdentifier());
-			addIfNotNull(writer, "name", project.getName());
-			addIfNotNull(writer, "description", project.getDescription());
-			addIfNotNull(writer, "homepage", project.getHomepage());
-			addIfNotNullFull(writer, "created_on", project.getCreatedOn());
-			addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
-			addIfNotNull(writer, "parent_id", project.getParentId());
-			addArrayIfNotNull(writer, "trackers", project.getTrackers(),
-					TRACKER_WRITER);
-			writer.endObject();
-			writer.endObject();
+			jsWriter.beginObject();
+			jsWriter.name(tag);
+			jsWriter.beginObject();
+			writer.write(jsWriter, object);
+			jsWriter.endObject();
+			jsWriter.endObject();
 		} catch (IOException e) {
 			throw new RedmineInternalError("Unexpected IOException", e);
 		}
 
 		return swriter.toString();
+	}
+
+	public static void writeProject(Project project, final JsonWriter writer)
+			throws IOException {
+		addIfNotNull(writer, "id", project.getId());
+		addIfNotNull(writer, "identifier", project.getIdentifier());
+		addIfNotNull(writer, "name", project.getName());
+		addIfNotNull(writer, "description", project.getDescription());
+		addIfNotNull(writer, "homepage", project.getHomepage());
+		addIfNotNullFull(writer, "created_on", project.getCreatedOn());
+		addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
+		addIfNotNull(writer, "parent_id", project.getParentId());
+		addArrayIfNotNull(writer, "trackers", project.getTrackers(),
+				TRACKER_WRITER);
 	}
 
 	/**
@@ -112,8 +139,11 @@ public class RedmineJSONBuilder {
 		if (items == null)
 			return;
 		writer.name(field).beginArray();
-		for (T item : items)
+		for (T item : items) {
+			writer.beginObject();
 			objWriter.write(writer, item);
+			writer.endObject();
+		}
 		writer.endArray();
 	}
 
