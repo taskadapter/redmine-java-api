@@ -8,8 +8,9 @@ import java.io.Serializable;
  * @author Matthias Paul Scholz
  */
 public class IssueCategory implements Identifiable, Serializable {
+	private static final long serialVersionUID = -109010410391968475L;
 
-    private Integer id;
+	private Integer id;
     private String name;
     private Project project;
     private User assignee;

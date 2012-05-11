@@ -64,6 +64,9 @@ public final class DefaultLogger implements Logger {
             case INFO:
             case DEBUG:
                 log(message, LogLevel.INFO);
+				break;
+			default:
+				return;
         }
     }
 
@@ -75,6 +78,9 @@ public final class DefaultLogger implements Logger {
             case DEBUG:
             case WARN:
                 log(message, LogLevel.WARN);
+				break;
+			default:
+				return;
         }
     }
 

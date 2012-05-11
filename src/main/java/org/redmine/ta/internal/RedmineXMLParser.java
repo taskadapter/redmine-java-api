@@ -193,6 +193,7 @@ public class RedmineXMLParser {
            }
        }
 
+	@SuppressWarnings("unchecked")
 	public static <T> List<T> parseObjectsFromXML(Class<T> classs, String body)	{
     	return unmarshal(classs, body, ArrayList.class);
     }

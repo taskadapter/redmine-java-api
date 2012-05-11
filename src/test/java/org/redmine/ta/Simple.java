@@ -1,6 +1,5 @@
 package org.redmine.ta;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -46,17 +45,21 @@ public class Simple {
         System.out.println(version);
     }
 
-    private static void changeIssueStatus(RedmineManager mgr) throws RedmineException {
+	@SuppressWarnings("unused")
+	private static void changeIssueStatus(RedmineManager mgr)
+			throws RedmineException {
         Issue issue = mgr.getIssueById(1771);
         issue.setSubject("new");
         mgr.update(issue);
     }
 
+	@SuppressWarnings("unused")
     private static void getProject(RedmineManager mgr) throws RedmineException {
         Project test = mgr.getProjectByKey("test");
         System.out.println(test);
     }
 
+	@SuppressWarnings("unused")
     private static void tryGetNews(RedmineManager mgr) throws RedmineException {
         List<News> news = mgr.getNews(null);
         for (News aNew : news) {
@@ -64,23 +67,27 @@ public class Simple {
         }
     }
 
+	@SuppressWarnings("unused")
     private static void tryCreateRelation(RedmineManager mgr) throws RedmineException {
         IssueRelation r = mgr.createRelation(49, 50, IssueRelation.TYPE.precedes.toString());
         logger.debug("Created relation " + r);
     }
 
+	@SuppressWarnings("unused")
     private static void getProjects(RedmineManager mgr) throws RedmineException {
         List<Project> projects = mgr.getProjects();
         logger.debug("Retrieved projects " + projects);
 
     }
 
+	@SuppressWarnings("unused")
     private static void getSavedQueries(RedmineManager mgr) throws RedmineException {
         List<SavedQuery> savedQueries = mgr.getSavedQueries("test");
         logger.debug("Retrieved queries " + savedQueries);
 
     }
 
+	@SuppressWarnings("unused")
     private static void getIssueWithRelations(RedmineManager mgr) throws RedmineException {
         Issue issue = mgr.getIssueById(24580, INCLUDE.relations);
         List<IssueRelation> r = issue.getRelations();
@@ -88,12 +95,14 @@ public class Simple {
 
     }
 
+	@SuppressWarnings("unused")
     private static void tryCreateIssue(RedmineManager mgr) throws RedmineException {
         Issue issue = new Issue();
         issue.setSubject("test123");
         mgr.createIssue(projectKey, issue);
     }
 
+	@SuppressWarnings("unused")
     private static void generateXMLForTimeEntry() {
         TimeEntry o = new TimeEntry();
         o.setId(13);
@@ -108,6 +117,7 @@ public class Simple {
         logger.debug(xml);
     }
 
+	@SuppressWarnings("unused")
     private static void generateXMLForUser() {
         User u = new User();
         u.setLogin("newlogin");
@@ -116,6 +126,7 @@ public class Simple {
 
     }
 
+	@SuppressWarnings("unused")
     private static void tryGetIssues(RedmineManager mgr) throws Exception {
         List<Issue> issues = mgr.getIssues(projectKey, queryId);
         for (Issue issue : issues) {
@@ -123,6 +134,7 @@ public class Simple {
         }
     }
 
+	@SuppressWarnings("unused")
     private static void tryGetAllIssues(RedmineManager mgr) throws Exception {
         List<Issue> issues = mgr.getIssues(projectKey, null);
         for (Issue issue : issues) {
@@ -130,6 +142,7 @@ public class Simple {
         }
     }
 
+	@SuppressWarnings("unused")
     private static void printCurrentUser(RedmineManager mgr) throws Exception {
         User currentUser = mgr.getCurrentUser();
         logger.debug("user=" + currentUser.getMail());

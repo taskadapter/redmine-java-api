@@ -1,10 +1,8 @@
 package org.redmine.ta.internal;
 
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import org.redmine.ta.beans.*;
 
-import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -15,14 +13,18 @@ public class RedmineJSONParser {
 
     private static final String KEY_TOTAL_COUNT = "total_count";
     
-    private static final Map<Class,String> redmineSingleResponseKeys = new HashMap<Class, String>() {
-        {
+	private static final Map<Class<?>, String> redmineSingleResponseKeys = new HashMap<Class<?>, String>() {
+		private static final long serialVersionUID = 9127978873143743650L;
+
+		{
             put(Project.class, "project");
             put(Issue.class, "issue");
         }
     };
-    private static final Map<Class,String> redmineListResponseKeys = new HashMap<Class, String>() {
-        {
+	private static final Map<Class<?>, String> redmineListResponseKeys = new HashMap<Class<?>, String>() {
+		private static final long serialVersionUID = -3514773352872587112L;
+
+		{
             put(Project.class, "projects");
             put(Issue.class, "issues");
         }

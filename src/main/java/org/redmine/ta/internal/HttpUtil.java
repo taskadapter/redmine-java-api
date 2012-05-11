@@ -17,7 +17,8 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 class HttpUtil {
-    public static DefaultHttpClient getNewHttpClient() {
+	@SuppressWarnings("deprecation")
+	public static DefaultHttpClient getNewHttpClient() {
         try {
             KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
             trustStore.load(null, null);

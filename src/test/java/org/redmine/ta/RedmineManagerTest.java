@@ -7,7 +7,6 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -261,12 +260,14 @@ public class RedmineManagerTest {
         return user;
     }
 
-    @Test(expected = IllegalArgumentException.class)
+	@SuppressWarnings("unused")
+	@Test(expected = IllegalArgumentException.class)
     public void testNULLHostParameter() {
         new RedmineManager(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
+	@SuppressWarnings("unused")
     public void testEmptyHostParameter() throws RuntimeException {
         new RedmineManager("");
     }

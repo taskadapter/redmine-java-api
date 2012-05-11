@@ -286,7 +286,9 @@ public class RedmineManager {
      *
      * @return objects list, never NULL
      */
-    private <T> List<T> getObjectsListV104(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
+	@SuppressWarnings("null")
+	private <T> List<T> getObjectsListV104(Class<T> objectClass,
+			Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
 
         final int FIRST_REDMINE_PAGE = 1;

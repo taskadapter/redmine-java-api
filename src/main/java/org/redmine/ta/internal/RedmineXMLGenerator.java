@@ -2,7 +2,6 @@ package org.redmine.ta.internal;
 
 import org.redmine.ta.beans.*;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
