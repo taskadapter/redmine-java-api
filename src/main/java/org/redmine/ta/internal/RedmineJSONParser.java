@@ -30,10 +30,17 @@ public class RedmineJSONParser {
 
 	private static final String KEY_TOTAL_COUNT = "total_count";
 
-	private static final JsonObjectParser<Tracker> TRACKER_PARSER = new JsonObjectParser<Tracker>() {
+	public static final JsonObjectParser<Tracker> TRACKER_PARSER = new JsonObjectParser<Tracker>() {
 		@Override
 		public Tracker parse(JsonElement input) throws RedmineFormatException {
 			return parseTracker(toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<Project> PROJECT_PARSER = new JsonObjectParser<Project>() {
+		@Override
+		public Project parse(JsonElement input) throws RedmineFormatException {
+			return parseProject(toObject(input));
 		}
 	};
 
@@ -82,31 +89,25 @@ public class RedmineJSONParser {
 	/**
 	 * Parses a project.
 	 * 
-	 * @param body
-	 *            project body.
+	 * @param content
+	 *            content to parse.
 	 * @return parsed project.
 	 */
-	public static Project parseProject(String body)
+	public static Project parseProject(JsonObject content)
 			throws RedmineFormatException {
-		try {
-			final JsonObject content = getResponceSingleObject(body, "project");
-			final Project result = new Project();
-			result.setId(getInt(content, "id"));
-			result.setIdentifier(getStringNotNull(content, "identifier"));
-			result.setName(getStringNotNull(content, "name"));
-			result.setDescription(getStringOrNull(content, "description"));
-			result.setHomepage(getStringOrNull(content, "homepage"));
-			result.setCreatedOn(getDateOrNull(content, "created_on"));
-			result.setUpdatedOn(getDateOrNull(content, "updated_on"));
-			final JsonObject parentProject = getObjectOrNull(content, "parent");
-			if (parentProject != null)
-				result.setParentId(getInt(parentProject, "id"));
-			result.setTrackers(getListOrNull(content, "trackers",
-					TRACKER_PARSER));
-			return result;
-		} catch (JsonParseException e) {
-			throw new RedmineFormatException(e);
-		}
+		final Project result = new Project();
+		result.setId(getInt(content, "id"));
+		result.setIdentifier(getStringNotNull(content, "identifier"));
+		result.setName(getStringNotNull(content, "name"));
+		result.setDescription(getStringOrNull(content, "description"));
+		result.setHomepage(getStringOrNull(content, "homepage"));
+		result.setCreatedOn(getDateOrNull(content, "created_on"));
+		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
+		final JsonObject parentProject = getObjectOrNull(content, "parent");
+		if (parentProject != null)
+			result.setParentId(getInt(parentProject, "id"));
+		result.setTrackers(getListOrNull(content, "trackers", TRACKER_PARSER));
+		return result;
 	}
 
 	/**
@@ -150,7 +151,8 @@ public class RedmineJSONParser {
 		if (guess == null)
 			return null;
 		try {
-			return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(guess.getAsString());
+			return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(
+					guess.getAsString());
 		} catch (ParseException e) {
 			throw new RedmineFormatException("Bad date value " + guess);
 		}
@@ -310,7 +312,7 @@ public class RedmineJSONParser {
 		return resultElt;
 	}
 
-	private static JsonObject getResponceSingleObject(String body, String key)
+	public static JsonObject getResponceSingleObject(String body, String key)
 			throws RedmineFormatException {
 		try {
 			final JsonObject bodyJson = toObject(new JsonParser().parse(body));

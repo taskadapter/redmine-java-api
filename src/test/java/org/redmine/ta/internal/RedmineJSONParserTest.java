@@ -22,7 +22,9 @@ public class RedmineJSONParserTest {
 	public void testParseProject1() throws RedmineFormatException,
 			ParseException {
 		final String projectString = "{\"project\":{\"created_on\":\"2012/05/11 06:53:21 -0700\",\"updated_on\":\"2012/05/11 06:53:20 -0700\",\"homepage\":\"\",\"trackers\":[{\"name\":\"Bug\",\"id\":1},{\"name\":\"Feature\",\"id\":2},{\"name\":\"Support\",\"id\":3}],\"identifier\":\"test1336744548920\",\"name\":\"test project\",\"id\":6143}}";
-		final Project project = RedmineJSONParser.parseProject(projectString);
+		final Project project = RedmineJSONParser.PROJECT_PARSER
+				.parse(RedmineJSONParser.getResponceSingleObject(projectString,
+						"project"));
 
 		final Project template = new Project();
 		template.setId(Integer.valueOf(6143));

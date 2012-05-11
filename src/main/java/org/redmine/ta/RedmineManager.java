@@ -64,14 +64,20 @@ public class RedmineManager {
 
     private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 
+	@Deprecated
     private final URIConfigurator configurator;
+	@Deprecated
     private String login;
+	@Deprecated
     private String password;
+	@Deprecated
     private boolean useBasicAuth = false;
 
     private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 
     private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
+
+	private final Transport transport;
 
     public RedmineManager(String uri) {
         this(uri, null, null);
@@ -81,6 +87,8 @@ public class RedmineManager {
         this.configurator = new URIConfigurator(uri, null);
         this.login = login;
         this.password = password;
+		this.transport = new Transport(configurator);
+		transport.setCredentials(login, password);
         useBasicAuth = true;
     }
 
@@ -95,6 +103,7 @@ public class RedmineManager {
     public RedmineManager(String host, String apiAccessKey) {
         this.configurator = new URIConfigurator(host, apiAccessKey);
         this.useBasicAuth = false;
+		this.transport = new Transport(configurator);
     }
 
     /**
@@ -462,13 +471,8 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Project createProject(Project project) throws RedmineException {
-        URI uri = getURIConfigurator().createURI("projects." + URI_SUFFIX, new BasicNameValuePair("include", "trackers"));
-        HttpPost httpPost = new HttpPost(uri);
-		String body = RedmineJSONBuilder.toSimpleJSON("project", project,
-				RedmineJSONBuilder.CREATE_PROJECT_WRITER);
-        setEntity(httpPost, body);
-        String response = getCommunicator().sendRequest(httpPost);
-		return RedmineJSONParser.parseProject(response);
+		return transport.post(project, new BasicNameValuePair("include",
+				"trackers"));
     }
 
     /**
@@ -804,10 +808,12 @@ public class RedmineManager {
     }
 
     public void setLogin(String login) {
+		transport.setCredentials(login, password);
         this.login = login;
     }
 
     public void setPassword(String password) {
+		transport.setCredentials(login, password);
         this.password = password;
     }
 
