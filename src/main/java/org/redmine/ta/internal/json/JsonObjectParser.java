@@ -1,4 +1,4 @@
-package org.redmine.ta.internal;
+package org.redmine.ta.internal.json;
 
 import org.redmine.ta.RedmineFormatException;
 

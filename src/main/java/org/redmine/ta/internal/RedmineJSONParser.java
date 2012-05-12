@@ -1,6 +1,6 @@
 package org.redmine.ta.internal;
 
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,6 +12,8 @@ import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.internal.json.JsonInput;
+import org.redmine.ta.internal.json.JsonObjectParser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
 /**
  * A parser for JSON items sent by Redmine. * TODO use maps for keys common to
@@ -33,14 +34,14 @@ public class RedmineJSONParser {
 	public static final JsonObjectParser<Tracker> TRACKER_PARSER = new JsonObjectParser<Tracker>() {
 		@Override
 		public Tracker parse(JsonElement input) throws RedmineFormatException {
-			return parseTracker(toObject(input));
+			return parseTracker(JsonInput.toObject(input));
 		}
 	};
 
 	public static final JsonObjectParser<Project> PROJECT_PARSER = new JsonObjectParser<Project>() {
 		@Override
 		public Project parse(JsonElement input) throws RedmineFormatException {
-			return parseProject(toObject(input));
+			return parseProject(JsonInput.toObject(input));
 		}
 	};
 
@@ -81,8 +82,8 @@ public class RedmineJSONParser {
 	 */
 	public static Tracker parseTracker(JsonObject object)
 			throws RedmineFormatException {
-		final int id = getInt(object, "id");
-		final String name = getStringNotNull(object, "name");
+		final int id = JsonInput.getInt(object, "id");
+		final String name = JsonInput.getStringNotNull(object, "name");
 		return new Tracker(id, name);
 	}
 
@@ -96,42 +97,17 @@ public class RedmineJSONParser {
 	public static Project parseProject(JsonObject content)
 			throws RedmineFormatException {
 		final Project result = new Project();
-		result.setId(getInt(content, "id"));
-		result.setIdentifier(getStringNotNull(content, "identifier"));
-		result.setName(getStringNotNull(content, "name"));
-		result.setDescription(getStringOrNull(content, "description"));
-		result.setHomepage(getStringOrNull(content, "homepage"));
+		result.setId(JsonInput.getInt(content, "id"));
+		result.setIdentifier(JsonInput.getStringNotNull(content, "identifier"));
+		result.setName(JsonInput.getStringNotNull(content, "name"));
+		result.setDescription(JsonInput.getStringOrNull(content, "description"));
+		result.setHomepage(JsonInput.getStringOrNull(content, "homepage"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
-		final JsonObject parentProject = getObjectOrNull(content, "parent");
+		final JsonObject parentProject = JsonInput.getObjectOrNull(content, "parent");
 		if (parentProject != null)
-			result.setParentId(getInt(parentProject, "id"));
-		result.setTrackers(getListOrNull(content, "trackers", TRACKER_PARSER));
-		return result;
-	}
-
-	/**
-	 * Parses optional item list.
-	 * 
-	 * @param obj
-	 *            object to extract a list from.
-	 * @param field
-	 *            field to parse.
-	 * @param parser
-	 *            single item parser.
-	 * @return parsed objects.
-	 * @throws RedmineFormatException
-	 *             if format is invalid.
-	 */
-	private static <T> List<T> getListOrNull(JsonObject obj, String field,
-			JsonObjectParser<T> parser) throws RedmineFormatException {
-		final JsonArray items = getArrayOrNull(obj, field);
-		if (items == null)
-			return null;
-		final int length = items.size();
-		final List<T> result = new ArrayList<T>(length);
-		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.get(i)));
+			result.setParentId(JsonInput.getInt(parentProject, "id"));
+		result.setTrackers(JsonInput.getListOrNull(content, "trackers", TRACKER_PARSER));
 		return result;
 	}
 
@@ -147,269 +123,20 @@ public class RedmineJSONParser {
 	 */
 	private static Date getDateOrNull(JsonObject obj, String field)
 			throws RedmineFormatException {
-		final JsonPrimitive guess = getPrimitiveNotNull(obj, field);
-		if (guess == null)
-			return null;
-		try {
-			return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(
-					guess.getAsString());
-		} catch (ParseException e) {
-			throw new RedmineFormatException("Bad date value " + guess);
-		}
-	}
-
-	/**
-	 * Fetches an optional string from an object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value from.
-	 * @throws RedmineFormatException
-	 *             if value is not valid
-	 */
-	private static String getStringOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		final JsonPrimitive guess = getPrimitiveOrNull(obj, field);
-		if (guess == null)
-			return null;
-		return guess.getAsString();
-	}
-
-	/**
-	 * Fetches a string from an object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value from.
-	 * @throws RedmineFormatException
-	 *             if value is not valid, not exists, etc...
-	 */
-	private static String getStringNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		return getPrimitiveNotNull(obj, field).getAsString();
-	}
-
-	/**
-	 * Fetches an int from an object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value from.
-	 * @throws RedmineFormatException
-	 *             if value is not valid, not exists, etc...
-	 */
-	private static int getInt(JsonObject obj, String field)
-			throws RedmineFormatException {
-		final JsonPrimitive primitive = getPrimitiveNotNull(obj, field);
-		try {
-			return primitive.getAsInt();
-		} catch (NumberFormatException e) {
-			throw new RedmineFormatException("Bad integer value " + primitive);
-		}
-	}
-
-	/**
-	 * Fetches an optional int from an object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value from.
-	 * @throws RedmineFormatException
-	 *             if value is not valid, not exists, etc...
-	 */
-	private static Integer getIntOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		final JsonPrimitive primitive = getPrimitiveOrNull(obj, field);
-		if (primitive == null)
-			return null;
-		try {
-			return primitive.getAsInt();
-		} catch (NumberFormatException e) {
-			throw new RedmineFormatException("Bad integer value " + primitive);
-		}
-	}
-
-	/**
-	 * Returns a json array as "not-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json array.
-	 */
-	private static JsonArray getArrayOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		return toArray(obj.get(field));
-	}
-
-	/**
-	 * Returns a json array as "not-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json array.
-	 */
-	private static JsonArray getArrayNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		return toArray(getNotNull(obj, field));
-	}
-
-	/**
-	 * Returns a json primitive as "maybe-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json primitive.
-	 */
-	private static JsonPrimitive getPrimitiveOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		return toPrimitive(obj.get(field));
-	}
-
-	/**
-	 * Returns a json primitive as "not-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json primitive.
-	 */
-	private static JsonPrimitive getPrimitiveNotNull(JsonObject obj,
-			String field) throws RedmineFormatException {
-		return toPrimitive(getNotNull(obj, field));
-	}
-
-	/**
-	 * Returns an object as non-null value.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value.
-	 * @return json value.
-	 * @throws RedmineFormatException
-	 *             if field is not present.
-	 */
-	private static JsonElement getNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		final JsonElement resultElt = obj.get(field);
-		if (!obj.has(field))
-			throw new RedmineFormatException("Missing required field " + field
-					+ " in " + obj);
-		if (resultElt.isJsonNull())
-			throw new RedmineFormatException("Missing required field " + field
-					+ " in " + obj);
-		return resultElt;
+		final SimpleDateFormat dateFormat = RedmineDateUtils.FULL_DATE_FORMAT
+				.get();
+		return JsonInput.getDateOrNull(obj, field, dateFormat);
 	}
 
 	public static JsonObject getResponceSingleObject(String body, String key)
 			throws RedmineFormatException {
 		try {
-			final JsonObject bodyJson = toObject(new JsonParser().parse(body));
-			final JsonObject contentJSon = getObjectNotNull(bodyJson, key);
+			final JsonObject bodyJson = JsonInput.toObject(new JsonParser().parse(body));
+			final JsonObject contentJSon = JsonInput.getObjectNotNull(bodyJson, key);
 			return contentJSon;
 		} catch (JsonParseException e) {
 			throw new RedmineFormatException(e);
 		}
-	}
-
-	/**
-	 * Returns a json object field for a specified object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            returned field.
-	 * @return object field.
-	 * @throws RedmineFormatException
-	 *             if target field is not an object.
-	 */
-	private static JsonObject getObjectNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		return toObject(getNotNull(obj, field));
-	}
-
-	/**
-	 * Returns a json object field for a specified object.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            returned field.
-	 * @return object field.
-	 * @throws RedmineFormatException
-	 *             if target field is not an object.
-	 */
-	private static JsonObject getObjectOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
-		final JsonElement elt = obj.get(field);
-		return toObject(elt);
-	}
-
-	/**
-	 * Converts element to object.
-	 * 
-	 * @param elt
-	 *            element to convert.
-	 * @return element as object value.
-	 * @throws RedmineFormatException
-	 *             if element is not an object value.
-	 */
-	static JsonObject toObject(JsonElement elt) throws RedmineFormatException {
-		if (elt == null || elt.isJsonNull())
-			return null;
-		if (elt.isJsonObject())
-			return elt.getAsJsonObject();
-		throw new RedmineFormatException("Expected object but got "
-				+ elt.getClass() + " in content " + elt);
-	}
-
-	/**
-	 * Converts element to array.
-	 * 
-	 * @param elt
-	 *            element to convert.
-	 * @return element as object value.
-	 * @throws RedmineFormatException
-	 *             if element is not an object value.
-	 */
-	private static JsonArray toArray(JsonElement elt)
-			throws RedmineFormatException {
-		if (elt == null || elt.isJsonNull())
-			return null;
-		if (elt.isJsonArray())
-			return elt.getAsJsonArray();
-		throw new RedmineFormatException("Expected array but got "
-				+ elt.getClass() + " in content " + elt);
-	}
-
-	/**
-	 * Converts element to primitive.
-	 * 
-	 * @param elt
-	 *            element to convert.
-	 * @return element as a primitive value.
-	 * @throws RedmineFormatException
-	 *             if element is not an primitive value.
-	 */
-	private static JsonPrimitive toPrimitive(JsonElement elt)
-			throws RedmineFormatException {
-		if (elt == null || elt.isJsonNull())
-			return null;
-		if (elt.isJsonPrimitive())
-			return elt.getAsJsonPrimitive();
-		throw new RedmineFormatException("Expected primitive but got "
-				+ elt.getClass() + " in content " + elt);
 	}
 
 	public static <T> T parseObject(Class<T> clazz, String body) {

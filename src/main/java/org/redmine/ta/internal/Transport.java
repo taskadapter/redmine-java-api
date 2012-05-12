@@ -13,6 +13,7 @@ import org.redmine.ta.RedmineException;
 import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.internal.json.JsonObjectParser;
 
 /**
  * Redmine transport utilities.
