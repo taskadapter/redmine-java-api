@@ -10,4 +10,8 @@ public class RedmineFormatException extends RedmineCommunicationException {
 	public RedmineFormatException(Throwable cause) {
         super(cause);
     }
+
+	public RedmineFormatException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

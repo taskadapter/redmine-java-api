@@ -104,6 +104,11 @@ public class URIConfigurator {
         return createURI(query);
     }
 
+	public URI getItemURI(Class<?> zz, String id, NameValuePair... args) {
+		final String query = getClassUrl(zz) + "/" + id + JSON_URL_POSTFIX;
+		return createURI(query, args);
+	}
+
     public URI getUpdateURI(Class<?> zz, String id, NameValuePair... param) {
         String query = getClassUrl(zz) + "/" + id + XML_URL_POSTFIX;
         return createURI(query, param);

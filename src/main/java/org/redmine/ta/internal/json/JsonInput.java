@@ -12,6 +12,28 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 public class JsonInput {
+	/**
+	 * Parses required item list.
+	 * 
+	 * @param obj
+	 *            object to extract a list from.
+	 * @param field
+	 *            field to parse.
+	 * @param parser
+	 *            single item parser.
+	 * @return parsed objects.
+	 * @throws JsonFormatException
+	 *             if format is invalid.
+	 */
+	public static <T> List<T> getListNotNull(JsonObject obj, String field,
+			JsonObjectParser<T> parser) throws JsonFormatException {
+		final JsonArray items = JsonInput.getArrayNotNull(obj, field);
+		final int length = items.size();
+		final List<T> result = new ArrayList<T>(length);
+		for (int i = 0; i < length; i++)
+			result.add(parser.parse(items.get(i)));
+		return result;
+	}
 
 	/**
 	 * Parses optional item list.

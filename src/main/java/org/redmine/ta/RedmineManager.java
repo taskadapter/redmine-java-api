@@ -21,7 +21,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.redmine.ta.beans.*;
@@ -45,9 +44,10 @@ import java.util.Map.Entry;
  */
 public class RedmineManager {
 
+	@Deprecated
     private static final String URI_SUFFIX = "json";
+	@Deprecated
     private static final String CONTENT_TYPE = "application/json; charset=utf-8";
-    private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 
     // TODO add tests for "relations" to RedmineManagerTest class
     public static enum INCLUDE {
@@ -58,6 +58,7 @@ public class RedmineManager {
     }
 
     // TODO delete REDMINE_1_0 mode. there's no method to set "current mode" on RedmineManager anyway.
+	@Deprecated
     private static enum MODE {
         REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
     }
@@ -72,8 +73,6 @@ public class RedmineManager {
     private String password;
 	@Deprecated
     private boolean useBasicAuth = false;
-
-    private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 
     private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
 
@@ -157,10 +156,9 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public List<Project> getProjects() throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
-        params.add(new BasicNameValuePair("include", "trackers"));
         try {
-            return getObjectsList(Project.class, params);
+			return transport.getObjectsList(Project.class,
+					new BasicNameValuePair("include", "trackers"));
         } catch (NotFoundException e) {
             throw new RedmineInternalError("NotFoundException received, which should never happen in this request");
         }
@@ -242,11 +240,8 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Project getProjectByKey(String projectKey) throws RedmineException {
-        URI uri = getURIConfigurator().getUpdateURI(Project.class, projectKey, new BasicNameValuePair("include", "trackers"));
-
-        HttpGet http = new HttpGet(uri);
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseProjectFromXML(response);
+		return transport.getObject(Project.class, projectKey,
+				new BasicNameValuePair("include", "trackers"));
     }
 
     /**
@@ -257,7 +252,7 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public void deleteProject(String projectKey) throws RedmineException {
-        deleteObject(Project.class, projectKey);
+		transport.deleteObject(Project.class, projectKey);
     }
 
     public void deleteIssue(Integer id) throws RedmineException {
@@ -296,6 +291,7 @@ public class RedmineManager {
      * @return objects list, never NULL
      */
 	@SuppressWarnings("null")
+	@Deprecated
 	private <T> List<T> getObjectsListV104(Class<T> objectClass,
 			Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
@@ -305,7 +301,8 @@ public class RedmineManager {
         // Redmine 1.0.4 returns the same page1 when no other pages are available!!
         String firstPage = null;
 
-        params.add(new BasicNameValuePair("per_page", String.valueOf(objectsPerPage)));
+		params.add(new BasicNameValuePair("per_page", String
+				.valueOf(getObjectsPerPage())));
 
         do {
             List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
@@ -341,6 +338,7 @@ public class RedmineManager {
     /**
      * @return objects list, never NULL
      */
+	@Deprecated
     private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
             return getObjectsListV11(objectClass, params);
@@ -358,10 +356,12 @@ public class RedmineManager {
      *
      * @return objects list, never NULL
      */
+	@Deprecated
     private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
         List<T> objects = new ArrayList<T>();
 
-        params.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
+		params.add(new BasicNameValuePair("limit", String
+				.valueOf(getObjectsPerPage())));
         int offset = 0;
         int totalObjectsFoundOnServer;
         do {
@@ -420,14 +420,7 @@ public class RedmineManager {
       */
     public void update(Identifiable obj) throws RedmineException {
         validate(obj);
-
-        URI uri = getURIConfigurator().getUpdateURI(obj.getClass(), Integer.toString(obj.getId()));
-        HttpPut http = new HttpPut(uri);
-
-        String xml = RedmineXMLGenerator.toXML(obj);
-        setEntity(http, xml);
-
-        getCommunicator().sendRequest(http);
+		transport.updateObject(obj);
     }
 
     private void validate(Identifiable obj) {
@@ -439,6 +432,7 @@ public class RedmineManager {
         }
     }
 
+	@Deprecated
     private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws RedmineException {
         URI uri = getURIConfigurator().getUpdateURI(classs, id);
         HttpDelete http = new HttpDelete(uri);
@@ -471,7 +465,7 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Project createProject(Project project) throws RedmineException {
-		return transport.post(project, new BasicNameValuePair("include",
+		return transport.addObject(project, new BasicNameValuePair("include",
 				"trackers"));
     }
 
@@ -479,7 +473,7 @@ public class RedmineManager {
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
     public int getObjectsPerPage() {
-        return objectsPerPage;
+		return transport.getObjectsPerPage();
     }
 
     // TODO add test
@@ -488,10 +482,7 @@ public class RedmineManager {
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
      */
     public void setObjectsPerPage(int pageSize) {
-        if (pageSize <= 0) {
-            throw new IllegalArgumentException("Page size must be >= 0. You provided: " + pageSize);
-        }
-        this.objectsPerPage = pageSize;
+		transport.setObjectsPerPage(pageSize);
     }
 
     /**

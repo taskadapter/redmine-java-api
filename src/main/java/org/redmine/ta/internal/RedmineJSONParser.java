@@ -46,6 +46,13 @@ public class RedmineJSONParser {
 		}
 	};
 
+	public static final JsonObjectParser<String> ERROR_PARSER = new JsonObjectParser<String>() {
+		@Override
+		public String parse(JsonElement input) throws JsonFormatException {
+			return input.toString();
+		}
+	};
+
 	private static final Map<Class<?>, String> redmineSingleResponseKeys = new HashMap<Class<?>, String>() {
 		private static final long serialVersionUID = 9127978873143743650L;
 
@@ -105,11 +112,22 @@ public class RedmineJSONParser {
 		result.setHomepage(JsonInput.getStringOrNull(content, "homepage"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
-		final JsonObject parentProject = JsonInput.getObjectOrNull(content, "parent");
+		final JsonObject parentProject = JsonInput.getObjectOrNull(content,
+				"parent");
 		if (parentProject != null)
 			result.setParentId(JsonInput.getInt(parentProject, "id"));
-		result.setTrackers(JsonInput.getListOrNull(content, "trackers", TRACKER_PARSER));
+		result.setTrackers(JsonInput.getListOrNull(content, "trackers",
+				TRACKER_PARSER));
 		return result;
+	}
+
+	/**
+	 * @param responseBody
+	 */
+	public static List<String> parseErrors(String responseBody)
+			throws JsonFormatException {
+		final JsonObject body = getResponce(responseBody);
+		return JsonInput.getListNotNull(body, "errors", ERROR_PARSER);
 	}
 
 	/**
@@ -132,9 +150,22 @@ public class RedmineJSONParser {
 	public static JsonObject getResponceSingleObject(String body, String key)
 			throws JsonFormatException {
 		try {
-			final JsonObject bodyJson = JsonInput.toObject(new JsonParser().parse(body));
-			final JsonObject contentJSon = JsonInput.getObjectNotNull(bodyJson, key);
+			final JsonObject bodyJson = JsonInput.toObject(new JsonParser()
+					.parse(body));
+			final JsonObject contentJSon = JsonInput.getObjectNotNull(bodyJson,
+					key);
 			return contentJSon;
+		} catch (JsonParseException e) {
+			throw new JsonFormatException(e);
+		}
+	}
+
+	public static JsonObject getResponce(String body)
+			throws JsonFormatException {
+		try {
+			final JsonObject bodyJson = JsonInput.toObject(new JsonParser()
+					.parse(body));
+			return bodyJson;
 		} catch (JsonParseException e) {
 			throw new JsonFormatException(e);
 		}
