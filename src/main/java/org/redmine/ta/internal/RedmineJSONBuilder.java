@@ -176,6 +176,16 @@ public class RedmineJSONBuilder {
 					.getId());
 		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
+
+		/*
+		 * Journals and Relations cannot be set for an issue during creation or
+		 * updates.
+		 */
+		/*
+		 * Attachement creation is supported in API 1.4, but actual beans does
+		 * not carry sufficient information to add an attachement now (token
+		 * required but not provided).
+		 */
 	}
 
 	private static void writeCustomFields(JsonWriter writer,
