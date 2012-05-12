@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.internal.json.JsonFormatException;
 
 /**
  * Redmine JSON parser tests.
@@ -19,8 +19,7 @@ import org.redmine.ta.beans.Tracker;
 public class RedmineJSONParserTest {
 
 	@Test
-	public void testParseProject1() throws RedmineFormatException,
-			ParseException {
+	public void testParseProject1() throws ParseException, JsonFormatException {
 		final String projectString = "{\"project\":{\"created_on\":\"2012/05/11 06:53:21 -0700\",\"updated_on\":\"2012/05/11 06:53:20 -0700\",\"homepage\":\"\",\"trackers\":[{\"name\":\"Bug\",\"id\":1},{\"name\":\"Feature\",\"id\":2},{\"name\":\"Support\",\"id\":3}],\"identifier\":\"test1336744548920\",\"name\":\"test project\",\"id\":6143}}";
 		final Project project = RedmineJSONParser.PROJECT_PARSER
 				.parse(RedmineJSONParser.getResponceSingleObject(projectString,

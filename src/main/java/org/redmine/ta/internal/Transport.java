@@ -13,7 +13,9 @@ import org.redmine.ta.RedmineException;
 import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonObjectParser;
+import org.redmine.ta.internal.json.JsonObjectWriter;
 
 /**
  * Redmine transport utilities.
@@ -80,8 +82,12 @@ public final class Transport {
 
 	private static <T> T parseResponce(String responce, String tag,
 			JsonObjectParser<T> parser) throws RedmineFormatException {
-		return parser.parse(RedmineJSONParser.getResponceSingleObject(responce,
-				tag));
+		try {
+			return parser.parse(RedmineJSONParser.getResponceSingleObject(
+					responce, tag));
+		} catch (JsonFormatException e) {
+			throw new RedmineFormatException(e);
+		}
 	}
 
 	private void setEntity(HttpEntityEnclosingRequest request, String body) {

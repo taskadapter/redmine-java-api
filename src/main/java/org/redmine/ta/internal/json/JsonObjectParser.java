@@ -1,7 +1,5 @@
 package org.redmine.ta.internal.json;
 
-import org.redmine.ta.RedmineFormatException;
-
 import com.google.gson.JsonElement;
 
 /**
@@ -13,5 +11,5 @@ import com.google.gson.JsonElement;
  *            parsing result type.
  */
 public interface JsonObjectParser<T> {
-	public T parse(JsonElement input) throws RedmineFormatException;
+	public T parse(JsonElement input) throws JsonFormatException;
 }

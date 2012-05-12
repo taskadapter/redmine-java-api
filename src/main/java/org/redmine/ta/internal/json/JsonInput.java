@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.redmine.ta.RedmineFormatException;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,11 +23,11 @@ public class JsonInput {
 	 * @param parser
 	 *            single item parser.
 	 * @return parsed objects.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if format is invalid.
 	 */
 	public static <T> List<T> getListOrNull(JsonObject obj, String field,
-			JsonObjectParser<T> parser) throws RedmineFormatException {
+			JsonObjectParser<T> parser) throws JsonFormatException {
 		final JsonArray items = JsonInput.getArrayOrNull(obj, field);
 		if (items == null)
 			return null;
@@ -50,18 +48,18 @@ public class JsonInput {
 	 * @param dateFormat
 	 *            field date format.
 	 * @return data format.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if error occurs.
 	 */
 	public static Date getDateOrNull(JsonObject obj, String field,
-			final SimpleDateFormat dateFormat) throws RedmineFormatException {
+			final SimpleDateFormat dateFormat) throws JsonFormatException {
 		final JsonPrimitive guess = JsonInput.getPrimitiveNotNull(obj, field);
 		if (guess == null)
 			return null;
 		try {
 			return dateFormat.parse(guess.getAsString());
 		} catch (ParseException e) {
-			throw new RedmineFormatException("Bad date value " + guess);
+			throw new JsonFormatException("Bad date value " + guess);
 		}
 	}
 
@@ -72,11 +70,11 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if value is not valid
 	 */
 	public static String getStringOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final JsonPrimitive guess = JsonInput.getPrimitiveOrNull(obj, field);
 		if (guess == null)
 			return null;
@@ -90,11 +88,11 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if value is not valid, not exists, etc...
 	 */
 	public static String getStringNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		return JsonInput.getPrimitiveNotNull(obj, field).getAsString();
 	}
 
@@ -105,16 +103,16 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if value is not valid, not exists, etc...
 	 */
 	public static int getInt(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final JsonPrimitive primitive = JsonInput.getPrimitiveNotNull(obj, field);
 		try {
 			return primitive.getAsInt();
 		} catch (NumberFormatException e) {
-			throw new RedmineFormatException("Bad integer value " + primitive);
+			throw new JsonFormatException("Bad integer value " + primitive);
 		}
 	}
 
@@ -125,18 +123,18 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if value is not valid, not exists, etc...
 	 */
 	public static Integer getIntOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final JsonPrimitive primitive = JsonInput.getPrimitiveOrNull(obj, field);
 		if (primitive == null)
 			return null;
 		try {
 			return primitive.getAsInt();
 		} catch (NumberFormatException e) {
-			throw new RedmineFormatException("Bad integer value " + primitive);
+			throw new JsonFormatException("Bad integer value " + primitive);
 		}
 	}
 
@@ -150,7 +148,7 @@ public class JsonInput {
 	 * @return json array.
 	 */
 	public static JsonArray getArrayOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		return JsonInput.toArray(obj.get(field));
 	}
 
@@ -164,7 +162,7 @@ public class JsonInput {
 	 * @return json array.
 	 */
 	public static JsonArray getArrayNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		return JsonInput.toArray(JsonInput.getNotNull(obj, field));
 	}
 
@@ -178,7 +176,7 @@ public class JsonInput {
 	 * @return json primitive.
 	 */
 	public static JsonPrimitive getPrimitiveOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		return JsonInput.toPrimitive(obj.get(field));
 	}
 
@@ -192,7 +190,8 @@ public class JsonInput {
 	 * @return json primitive.
 	 */
 	public static JsonPrimitive getPrimitiveNotNull(JsonObject obj,
-			String field) throws RedmineFormatException {
+ String field)
+			throws JsonFormatException {
 		return JsonInput.toPrimitive(JsonInput.getNotNull(obj, field));
 	}
 
@@ -204,17 +203,17 @@ public class JsonInput {
 	 * @param field
 	 *            field to get a value.
 	 * @return json value.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if field is not present.
 	 */
 	public static JsonElement getNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final JsonElement resultElt = obj.get(field);
 		if (!obj.has(field))
-			throw new RedmineFormatException("Missing required field " + field
+			throw new JsonFormatException("Missing required field " + field
 					+ " in " + obj);
 		if (resultElt.isJsonNull())
-			throw new RedmineFormatException("Missing required field " + field
+			throw new JsonFormatException("Missing required field " + field
 					+ " in " + obj);
 		return resultElt;
 	}
@@ -227,11 +226,11 @@ public class JsonInput {
 	 * @param field
 	 *            returned field.
 	 * @return object field.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if target field is not an object.
 	 */
 	public static JsonObject getObjectNotNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		return JsonInput.toObject(getNotNull(obj, field));
 	}
 
@@ -243,11 +242,11 @@ public class JsonInput {
 	 * @param field
 	 *            returned field.
 	 * @return object field.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if target field is not an object.
 	 */
 	public static JsonObject getObjectOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final JsonElement elt = obj.get(field);
 		return JsonInput.toObject(elt);
 	}
@@ -258,16 +257,16 @@ public class JsonInput {
 	 * @param elt
 	 *            element to convert.
 	 * @return element as object value.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if element is not an object value.
 	 */
 	public static JsonObject toObject(JsonElement elt)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		if (elt == null || elt.isJsonNull())
 			return null;
 		if (elt.isJsonObject())
 			return elt.getAsJsonObject();
-		throw new RedmineFormatException("Expected object but got "
+		throw new JsonFormatException("Expected object but got "
 				+ elt.getClass() + " in content " + elt);
 	}
 
@@ -277,16 +276,16 @@ public class JsonInput {
 	 * @param elt
 	 *            element to convert.
 	 * @return element as object value.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if element is not an object value.
 	 */
 	public static JsonArray toArray(JsonElement elt)
-			throws RedmineFormatException {
+ throws JsonFormatException {
 		if (elt == null || elt.isJsonNull())
 			return null;
 		if (elt.isJsonArray())
 			return elt.getAsJsonArray();
-		throw new RedmineFormatException("Expected array but got "
+		throw new JsonFormatException("Expected array but got "
 				+ elt.getClass() + " in content " + elt);
 	}
 
@@ -296,16 +295,16 @@ public class JsonInput {
 	 * @param elt
 	 *            element to convert.
 	 * @return element as a primitive value.
-	 * @throws RedmineFormatException
+	 * @throws JsonFormatException
 	 *             if element is not an primitive value.
 	 */
 	public static JsonPrimitive toPrimitive(JsonElement elt)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		if (elt == null || elt.isJsonNull())
 			return null;
 		if (elt.isJsonPrimitive())
 			return elt.getAsJsonPrimitive();
-		throw new RedmineFormatException("Expected primitive but got "
+		throw new JsonFormatException("Expected primitive but got "
 				+ elt.getClass() + " in content " + elt);
 	}
 

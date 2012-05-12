@@ -8,11 +8,13 @@ import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
+import org.redmine.ta.internal.json.JsonObjectWriter;
+import org.redmine.ta.internal.json.JsonOutput;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.util.Collection;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -109,45 +111,20 @@ public class RedmineJSONBuilder {
 
 	public static void writeProject(Project project, final JsonWriter writer)
 			throws IOException {
-		addIfNotNull(writer, "id", project.getId());
-		addIfNotNull(writer, "identifier", project.getIdentifier());
-		addIfNotNull(writer, "name", project.getName());
-		addIfNotNull(writer, "description", project.getDescription());
-		addIfNotNull(writer, "homepage", project.getHomepage());
+		JsonOutput.addIfNotNull(writer, "id", project.getId());
+		JsonOutput.addIfNotNull(writer, "identifier", project.getIdentifier());
+		JsonOutput.addIfNotNull(writer, "name", project.getName());
+		JsonOutput
+				.addIfNotNull(writer, "description", project.getDescription());
+		JsonOutput.addIfNotNull(writer, "homepage", project.getHomepage());
 		addIfNotNullFull(writer, "created_on", project.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
-		addIfNotNull(writer, "parent_id", project.getParentId());
-		addArrayIfNotNull(writer, "trackers", project.getTrackers(),
+		JsonOutput.addIfNotNull(writer, "parent_id", project.getParentId());
+		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(),
 				TRACKER_WRITER);
 	}
 
 	/**
-	 * Adds a list.
-	 * 
-	 * @param writer
-	 *            used writer.
-	 * @param field
-	 *            field to write.
-	 * @param items
-	 *            used items.
-	 * @param objWriter
-	 *            single object writer.
-	 */
-	private static <T> void addArrayIfNotNull(JsonWriter writer, String field,
-			Collection<T> items, JsonObjectWriter<T> objWriter)
-			throws IOException {
-		if (items == null)
-			return;
-		writer.name(field).beginArray();
-		for (T item : items) {
-			writer.beginObject();
-			objWriter.write(writer, item);
-			writer.endObject();
-		}
-		writer.endArray();
-	}
-
-	/**
 	 * Adds a value to a writer if value is not <code>null</code>.
 	 * 
 	 * @param writer
@@ -159,50 +136,10 @@ public class RedmineJSONBuilder {
 	 * @throws IOException
 	 *             if io error occurs.
 	 */
-	private static void addIfNotNullFull(JsonWriter writer, String field,
+	public static void addIfNotNullFull(JsonWriter writer, String field,
 			Date value) throws IOException {
-		if (value == null)
-			return;
-		writer.name(field).value(
-				RedmineDateUtils.FULL_DATE_FORMAT.get().format(value));
-	}
-
-	/**
-	 * Adds a value to a writer if value is not <code>null</code>.
-	 * 
-	 * @param writer
-	 *            writer to add object to.
-	 * @param field
-	 *            field name to set.
-	 * @param value
-	 *            field value.
-	 * @throws IOException
-	 *             if io error occurs.
-	 */
-	private static void addIfNotNull(JsonWriter writer, String field,
-			Integer value) throws IOException {
-		if (value == null)
-			return;
-		writer.name(field).value(value);
-	}
-
-	/**
-	 * Adds a value to a writer if value is not <code>null</code>.
-	 * 
-	 * @param writer
-	 *            writer to add object to.
-	 * @param field
-	 *            field name to set.
-	 * @param value
-	 *            field value.
-	 * @throws IOException
-	 *             if io error occurs.
-	 */
-	private static void addIfNotNull(JsonWriter writer, String field,
-			String value) throws IOException {
-		if (value == null)
-			return;
-		writer.name(field).value(value);
+		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
+		JsonOutput.addIfNotNull(writer, field, value, format);
 	}
 
 	/**

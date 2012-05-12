@@ -12,6 +12,7 @@ import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 
@@ -33,14 +34,14 @@ public class RedmineJSONParser {
 
 	public static final JsonObjectParser<Tracker> TRACKER_PARSER = new JsonObjectParser<Tracker>() {
 		@Override
-		public Tracker parse(JsonElement input) throws RedmineFormatException {
+		public Tracker parse(JsonElement input) throws JsonFormatException {
 			return parseTracker(JsonInput.toObject(input));
 		}
 	};
 
 	public static final JsonObjectParser<Project> PROJECT_PARSER = new JsonObjectParser<Project>() {
 		@Override
-		public Project parse(JsonElement input) throws RedmineFormatException {
+		public Project parse(JsonElement input) throws JsonFormatException {
 			return parseProject(JsonInput.toObject(input));
 		}
 	};
@@ -81,7 +82,7 @@ public class RedmineJSONParser {
 	 *             if object is not a valid tracker.
 	 */
 	public static Tracker parseTracker(JsonObject object)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final int id = JsonInput.getInt(object, "id");
 		final String name = JsonInput.getStringNotNull(object, "name");
 		return new Tracker(id, name);
@@ -95,7 +96,7 @@ public class RedmineJSONParser {
 	 * @return parsed project.
 	 */
 	public static Project parseProject(JsonObject content)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final Project result = new Project();
 		result.setId(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringNotNull(content, "identifier"));
@@ -122,20 +123,20 @@ public class RedmineJSONParser {
 	 *             if value is not valid
 	 */
 	private static Date getDateOrNull(JsonObject obj, String field)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		final SimpleDateFormat dateFormat = RedmineDateUtils.FULL_DATE_FORMAT
 				.get();
 		return JsonInput.getDateOrNull(obj, field, dateFormat);
 	}
 
 	public static JsonObject getResponceSingleObject(String body, String key)
-			throws RedmineFormatException {
+			throws JsonFormatException {
 		try {
 			final JsonObject bodyJson = JsonInput.toObject(new JsonParser().parse(body));
 			final JsonObject contentJSon = JsonInput.getObjectNotNull(bodyJson, key);
 			return contentJSon;
 		} catch (JsonParseException e) {
-			throw new RedmineFormatException(e);
+			throw new JsonFormatException(e);
 		}
 	}
 
