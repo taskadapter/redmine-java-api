@@ -61,6 +61,31 @@ public class JsonInput {
 	}
 
 	/**
+	 * Parses optional item list.
+	 * 
+	 * @param obj
+	 *            object to extract a list from.
+	 * @param field
+	 *            field to parse.
+	 * @param parser
+	 *            single item parser.
+	 * @return parsed objects.
+	 * @throws JsonFormatException
+	 *             if format is invalid.
+	 */
+	public static <T> List<T> getListOrEmpty(JsonObject obj, String field,
+			JsonObjectParser<T> parser) throws JsonFormatException {
+		final JsonArray items = JsonInput.getArrayOrNull(obj, field);
+		if (items == null)
+			return new ArrayList<T>();
+		final int length = items.size();
+		final List<T> result = new ArrayList<T>(length);
+		for (int i = 0; i < length; i++)
+			result.add(parser.parse(items.get(i)));
+		return result;
+	}
+
+	/**
 	 * Fetch a date or null.
 	 * 
 	 * @param obj
@@ -75,7 +100,7 @@ public class JsonInput {
 	 */
 	public static Date getDateOrNull(JsonObject obj, String field,
 			final SimpleDateFormat dateFormat) throws JsonFormatException {
-		final JsonPrimitive guess = JsonInput.getPrimitiveNotNull(obj, field);
+		final JsonPrimitive guess = JsonInput.getPrimitiveOrNull(obj, field);
 		if (guess == null)
 			return null;
 		try {
@@ -130,7 +155,8 @@ public class JsonInput {
 	 */
 	public static int getInt(JsonObject obj, String field)
 			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput.getPrimitiveNotNull(obj, field);
+		final JsonPrimitive primitive = JsonInput.getPrimitiveNotNull(obj,
+				field);
 		try {
 			return primitive.getAsInt();
 		} catch (NumberFormatException e) {
@@ -150,7 +176,8 @@ public class JsonInput {
 	 */
 	public static Integer getIntOrNull(JsonObject obj, String field)
 			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput.getPrimitiveOrNull(obj, field);
+		final JsonPrimitive primitive = JsonInput
+				.getPrimitiveOrNull(obj, field);
 		if (primitive == null)
 			return null;
 		try {
@@ -158,6 +185,50 @@ public class JsonInput {
 		} catch (NumberFormatException e) {
 			throw new JsonFormatException("Bad integer value " + primitive);
 		}
+	}
+
+	/**
+	 * Fetches an optional float from an object.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws JsonFormatException
+	 *             if value is not valid, not exists, etc...
+	 */
+	public static Float getFloatOrNull(JsonObject obj, String field)
+			throws JsonFormatException {
+		final JsonPrimitive primitive = JsonInput
+				.getPrimitiveOrNull(obj, field);
+		if (primitive == null)
+			return null;
+		try {
+			return primitive.getAsFloat();
+		} catch (NumberFormatException e) {
+			throw new JsonFormatException("Bad integer value " + primitive);
+		}
+	}
+
+	/**
+	 * Retreive optional object.
+	 * 
+	 * @param obj
+	 *            object to parse.
+	 * @param field
+	 *            field part.
+	 * @param parser
+	 *            parset ojbect.
+	 * @return parsed object.
+	 * @throws JsonFormatException
+	 *             if value is not valid.
+	 */
+	public static <T> T getObjectOrNull(JsonObject obj, String field,
+			JsonObjectParser<T> parser) throws JsonFormatException {
+		final JsonObject res = getObjectOrNull(obj, field);
+		if (res == null)
+			return null;
+		return parser.parse(res);
 	}
 
 	/**
@@ -211,8 +282,7 @@ public class JsonInput {
 	 *            field to get a value from.
 	 * @return json primitive.
 	 */
-	public static JsonPrimitive getPrimitiveNotNull(JsonObject obj,
- String field)
+	public static JsonPrimitive getPrimitiveNotNull(JsonObject obj, String field)
 			throws JsonFormatException {
 		return JsonInput.toPrimitive(JsonInput.getNotNull(obj, field));
 	}
@@ -301,8 +371,7 @@ public class JsonInput {
 	 * @throws JsonFormatException
 	 *             if element is not an object value.
 	 */
-	public static JsonArray toArray(JsonElement elt)
- throws JsonFormatException {
+	public static JsonArray toArray(JsonElement elt) throws JsonFormatException {
 		if (elt == null || elt.isJsonNull())
 			return null;
 		if (elt.isJsonArray())

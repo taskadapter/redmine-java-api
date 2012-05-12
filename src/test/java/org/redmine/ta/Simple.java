@@ -11,7 +11,7 @@ import org.redmine.ta.internal.logging.LoggerFactory;
 
 public class Simple {
     private static final Logger logger = LoggerFactory.getLogger(Simple.class);
-    private static final String projectKey = "test";
+	private static final String projectKey = "test1336839552181";
 
     private static final Integer queryId = null; // any
 
@@ -20,8 +20,8 @@ public class Simple {
         String apiAccessKey = "e665eabdddfa3744e3cbea0f122445d098f2f4b2";
         RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
         try {
-//			getIssueWithRelations(mgr);
-//			tryCreateIssue(mgr);
+			// getIssueWithRelations(mgr);
+			tryCreateIssue(mgr);
 //			tryGetIssues(mgr);
 //            tryGetAllIssues(mgr);
 //			printCurrentUser(mgr);
@@ -33,12 +33,13 @@ public class Simple {
 //            tryGetNews(mgr);
 //            getProject(mgr);
 //            changeIssueStatus(mgr);
-            getVersion(mgr);
+			// getVersion(mgr);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+	@SuppressWarnings("unused")
     private static void getVersion(RedmineManager mgr) throws RedmineException {
         // see Redmine bug http://www.redmine.org/issues/10241
         Version version = mgr.getVersionById(294);
@@ -89,7 +90,7 @@ public class Simple {
 
 	@SuppressWarnings("unused")
     private static void getIssueWithRelations(RedmineManager mgr) throws RedmineException {
-        Issue issue = mgr.getIssueById(24580, INCLUDE.relations);
+		Issue issue = mgr.getIssueById(22751, INCLUDE.relations);
         List<IssueRelation> r = issue.getRelations();
         logger.debug("Retrieved relations " + r);
 
@@ -99,6 +100,12 @@ public class Simple {
     private static void tryCreateIssue(RedmineManager mgr) throws RedmineException {
         Issue issue = new Issue();
         issue.setSubject("test123");
+		final Version ver = new Version();
+		ver.setId(512);
+		issue.setTargetVersion(ver);
+		final IssueCategory cat = new IssueCategory();
+		cat.setId(673);
+		issue.setCategory(cat);
         mgr.createIssue(projectKey, issue);
     }
 

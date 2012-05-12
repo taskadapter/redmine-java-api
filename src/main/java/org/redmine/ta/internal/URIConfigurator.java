@@ -79,7 +79,7 @@ public class URIConfigurator {
                 path += "/" + query;
             }
             uri = URIUtils.createURI(url.getProtocol(), url.getHost(), url.getPort(), path,
-                    URLEncodedUtils.format(params, "UTF-8"), null);
+					URLEncodedUtils.format(params, "UTF-8"), null);
         } catch (URISyntaxException e) {
             throw new RedmineInternalError(e);
         }

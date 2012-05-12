@@ -56,6 +56,25 @@ public class JsonOutput {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
+	 * @throws IOException
+	 *             if io error occurs.
+	 */
+	public static void addIfNotNull(JsonWriter writer, String field, Float value)
+			throws IOException {
+		if (value == null)
+			return;
+		writer.name(field).value(value);
+	}
+
+	/**
+	 * Adds a value to a writer if value is not <code>null</code>.
+	 * 
+	 * @param writer
+	 *            writer to add object to.
+	 * @param field
+	 *            field name to set.
+	 * @param value
+	 *            field value.
 	 * @param format
 	 *            date foramt to use.
 	 * @throws IOException
@@ -66,6 +85,29 @@ public class JsonOutput {
 		if (value == null)
 			return;
 		writer.name(field).value(format.format(value));
+	}
+
+	/**
+	 * Adds an object if object is not null.
+	 * 
+	 * @param writer
+	 *            object writer.
+	 * @param field
+	 *            field writer.
+	 * @param value
+	 *            value writer.
+	 * @param objWriter
+	 *            object value writer.
+	 * @throws IOException
+	 *             if io error occurs.
+	 */
+	public static <T> void addIfNotNull(JsonWriter writer, String field,
+			T value, JsonObjectWriter<T> objWriter) throws IOException {
+		if (value == null)
+			return;
+		writer.name(field).beginObject();
+		objWriter.write(writer, value);
+		writer.endObject();
 	}
 
 	/**

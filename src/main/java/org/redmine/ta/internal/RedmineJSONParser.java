@@ -9,9 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.redmine.ta.RedmineFormatException;
+import org.redmine.ta.beans.Attachment;
+import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueCategory;
+import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.Journal;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
@@ -43,6 +50,63 @@ public class RedmineJSONParser {
 		@Override
 		public Project parse(JsonElement input) throws JsonFormatException {
 			return parseProject(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<Issue> ISSUE_PARSER = new JsonObjectParser<Issue>() {
+		@Override
+		public Issue parse(JsonElement input) throws JsonFormatException {
+			return parseIssue(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<User> USER_PARSER = new JsonObjectParser<User>() {
+		@Override
+		public User parse(JsonElement input) throws JsonFormatException {
+			return parseUser(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<CustomField> CUSTOM_FIELD_PARSER = new JsonObjectParser<CustomField>() {
+		@Override
+		public CustomField parse(JsonElement input) throws JsonFormatException {
+			return parseCustomField(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<Journal> JOURNAL_PARSER = new JsonObjectParser<Journal>() {
+		@Override
+		public Journal parse(JsonElement input) throws JsonFormatException {
+			return parseJournal(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<Attachment> ATTACHMENT_PARSER = new JsonObjectParser<Attachment>() {
+		@Override
+		public Attachment parse(JsonElement input) throws JsonFormatException {
+			return parseAttachments(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<IssueRelation> RELATION_PARSER = new JsonObjectParser<IssueRelation>() {
+		@Override
+		public IssueRelation parse(JsonElement input)
+				throws JsonFormatException {
+			return parseRelation(JsonInput.toObject(input));
+		}
+	};
+
+	public static final JsonObjectParser<Version> VERSION_PARSER = new JsonObjectParser<Version>() {
+		@Override
+		public Version parse(JsonElement input) throws JsonFormatException {
+			return parseVersion(JsonInput.toObject(input));
+		}
+	};
+	public static final JsonObjectParser<IssueCategory> CATEGORY_PARSER = new JsonObjectParser<IssueCategory>() {
+		@Override
+		public IssueCategory parse(JsonElement input)
+				throws JsonFormatException {
+			return parseCategory(JsonInput.toObject(input));
 		}
 	};
 
@@ -106,7 +170,7 @@ public class RedmineJSONParser {
 			throws JsonFormatException {
 		final Project result = new Project();
 		result.setId(JsonInput.getInt(content, "id"));
-		result.setIdentifier(JsonInput.getStringNotNull(content, "identifier"));
+		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		result.setDescription(JsonInput.getStringOrNull(content, "description"));
 		result.setHomepage(JsonInput.getStringOrNull(content, "homepage"));
@@ -118,6 +182,126 @@ public class RedmineJSONParser {
 			result.setParentId(JsonInput.getInt(parentProject, "id"));
 		result.setTrackers(JsonInput.getListOrNull(content, "trackers",
 				TRACKER_PARSER));
+		return result;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static Issue parseIssue(JsonObject content)
+			throws JsonFormatException {
+		final Issue result = new Issue();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setSubject(JsonInput.getStringOrNull(content, "subject"));
+		final JsonObject parentIssueObject = JsonInput.getObjectOrNull(content,
+				"parent");
+		if (parentIssueObject != null)
+			result.setParentId(JsonInput.getInt(parentIssueObject, "id"));
+		result.setEstimatedHours(JsonInput.getFloatOrNull(content,
+				"estimated_hours"));
+		result.setSpentHours(JsonInput.getFloatOrNull(content, "spent_hours"));
+		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to",
+				USER_PARSER));
+
+		final JsonObject priorityObject = JsonInput.getObjectOrNull(content,
+				"priority");
+		if (priorityObject != null) {
+			result.setPriorityText(JsonInput.getStringOrNull(priorityObject,
+					"name"));
+			result.setPriorityId(JsonInput.getIntOrNull(priorityObject, "id"));
+		}
+
+		result.setDoneRatio(JsonInput.getIntOrNull(content, "done_ratio"));
+		result.setProject(JsonInput.getObjectOrNull(content, "project",
+				PROJECT_PARSER));
+		result.setAuthor(JsonInput.getObjectOrNull(content, "author",
+				USER_PARSER));
+		result.setStartDate(getShortDateOrNull(content, "start_date"));
+		result.setDueDate(getShortDateOrNull(content, "due_date"));
+		result.setTracker(JsonInput.getObjectOrNull(content, "tracker",
+				TRACKER_PARSER));
+		result.setDescription(JsonInput.getStringOrNull(content, "description"));
+		result.setCreatedOn(getDateOrNull(content, "created_on"));
+		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
+		final JsonObject statusObject = JsonInput.getObjectOrNull(content,
+				"status");
+		if (statusObject != null) {
+			result.setStatusName(JsonInput
+					.getStringOrNull(statusObject, "name"));
+			result.setStatusId(JsonInput.getIntOrNull(statusObject, "id"));
+		}
+
+		result.setCustomFields(JsonInput.getListOrNull(content,
+				"custom_fields", CUSTOM_FIELD_PARSER));
+		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
+		result.setJournals(JsonInput.getListOrEmpty(content, "journals",
+				JOURNAL_PARSER));
+		result.getAttachments().addAll(
+				JsonInput.getListOrEmpty(content, "attachements",
+						ATTACHMENT_PARSER));
+		result.getRelations()
+				.addAll(JsonInput.getListOrEmpty(content, "relations",
+						RELATION_PARSER));
+		result.setTargetVersion(JsonInput.getObjectOrNull(statusObject,
+				"fixed_version", VERSION_PARSER));
+		result.setCategory(JsonInput.getObjectOrNull(statusObject, "category",
+				CATEGORY_PARSER));
+		return result;
+	}
+
+	public static IssueCategory parseCategory(JsonObject content) {
+		// FIXME: Other fields
+		final IssueCategory result = new IssueCategory();
+		return result;
+	}
+
+	public static Version parseVersion(JsonObject content) {
+		// FIXME: Other fields
+		final Version result = new Version();
+		return result;
+	}
+
+	public static IssueRelation parseRelation(JsonObject content)
+			throws JsonFormatException {
+		final IssueRelation result = new IssueRelation();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setIssueId(JsonInput.getIntOrNull(content, "issue_id"));
+		result.setIssueToId(JsonInput.getIntOrNull(content, "issue_to_id"));
+		result.setType(JsonInput.getStringOrNull(content, "relation_type"));
+		result.setDelay(JsonInput.getIntOrNull(content, "delay"));
+		return result;
+	}
+
+	public static Attachment parseAttachments(JsonObject content) {
+		// FIXME:
+		final Attachment result = new Attachment();
+		return result;
+	}
+
+	public static CustomField parseCustomField(JsonObject content)
+			throws JsonFormatException {
+		final CustomField result = new CustomField();
+		result.setId(JsonInput.getInt(content, "id"));
+		result.setName(JsonInput.getStringOrNull(content, "name"));
+		result.setValue(JsonInput.getStringOrNull(content, "value"));
+		return result;
+	}
+
+	public static Journal parseJournal(JsonObject content)
+			throws JsonFormatException {
+		final Journal result = new Journal();
+		result.setId(JsonInput.getInt(content, "id"));
+		result.setCreatedOn(getDateOrNull(content, "created_on"));
+		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+		return result;
+	}
+
+	public static User parseUser(JsonObject content) throws JsonFormatException {
+		// FIXME: other fields!!!
+		final User result = new User();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final String name = JsonInput.getStringOrNull(content, "name");
+		if (name != null)
+			result.setFullName(name);
 		return result;
 	}
 
@@ -143,6 +327,23 @@ public class RedmineJSONParser {
 	private static Date getDateOrNull(JsonObject obj, String field)
 			throws JsonFormatException {
 		final SimpleDateFormat dateFormat = RedmineDateUtils.FULL_DATE_FORMAT
+				.get();
+		return JsonInput.getDateOrNull(obj, field, dateFormat);
+	}
+
+	/**
+	 * Fetches an optional date from an object.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws RedmineFormatException
+	 *             if value is not valid
+	 */
+	private static Date getShortDateOrNull(JsonObject obj, String field)
+			throws JsonFormatException {
+		final SimpleDateFormat dateFormat = RedmineDateUtils.SHORT_DATE_FORMAT
 				.get();
 		return JsonInput.getDateOrNull(obj, field, dateFormat);
 	}

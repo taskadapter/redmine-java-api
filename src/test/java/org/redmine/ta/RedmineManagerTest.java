@@ -62,7 +62,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateIssue() {
         try {
@@ -143,7 +143,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateIssueWithParent() {
         try {
@@ -193,7 +193,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetIssuesBySummary() {
         String summary = "issue with subject ABC";
@@ -234,7 +234,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testTryFindNonExistingIssue() {
         String summary = "some summary here for issue which does not exist";
@@ -297,7 +297,7 @@ public class RedmineManagerTest {
         redmineMgrInvalidKey.createIssue(projectKey, issue);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testUpdateIssue() {
         try {
@@ -331,7 +331,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetIssueById() throws RedmineException {
         Issue issue = new Issue();
@@ -379,7 +379,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetIssues() {
         try {
@@ -408,7 +408,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testGetIssuesInvalidQueryId() throws RedmineException {
         Integer invalidQueryId = 9999999;
@@ -518,7 +518,7 @@ public class RedmineManagerTest {
         return project;
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateIssueNonUnicodeSymbols() {
         try {
@@ -532,7 +532,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateIssueSummaryOnly() {
         try {
@@ -553,7 +553,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testCreateIssueInvalidProjectKey() throws RedmineException {
         Issue issueToCreate = new Issue();
@@ -573,14 +573,14 @@ public class RedmineManagerTest {
         mgr.deleteProject("some-non-existing-key");
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testGetIssueNonExistingId() throws RedmineException {
         int someNonExistingID = 999999;
         mgr.getIssueById(someNonExistingID);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testUpdateIssueNonExistingId() throws RedmineException {
         int nonExistingId = 999999;
@@ -742,7 +742,7 @@ public class RedmineManagerTest {
         mgr.deleteUser(999999);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetIssuesPaging() {
         try {
@@ -893,7 +893,7 @@ public class RedmineManagerTest {
         return mgr.createTimeEntry(entry);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testDeleteIssue() throws RedmineException {
         Issue issue = createIssues(1).get(0);
@@ -904,7 +904,7 @@ public class RedmineManagerTest {
         mgr.getIssueById(issue.getId());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testUpdateIssueSpecialXMLtags() throws Exception {
         Issue issue = createIssues(1).get(0);
@@ -925,7 +925,7 @@ public class RedmineManagerTest {
      * <p/>
      * See feature request http://www.redmine.org/issues/9664
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCustomFields() throws Exception {
         Issue issue = createIssues(1).get(0);
@@ -953,7 +953,7 @@ public class RedmineManagerTest {
         Assert.assertEquals(custom2Value, updatedIssue.getCustomField(custom2FieldName));
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testUpdateIssueDoesNotChangeEstimatedTime() {
         try {
@@ -1015,8 +1015,8 @@ public class RedmineManagerTest {
         return mgr.createProject(project);
     }
 
-	@Ignore("Отключен до перехода на json")
-    @Test
+	@Ignore("---?---")
+	@Test
     public void testIssueDoneRatio() {
         try {
             Issue issue = new Issue();
@@ -1041,7 +1041,9 @@ public class RedmineManagerTest {
                 mgr.update(reloadedFromRedmineIssue);
             } catch (RedmineProcessingException e) {
                 Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
-                Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0));
+				Assert.assertEquals("Checking error text",
+						"[\"done_ratio\",\"is not included in the list\"]", e
+								.getErrors().get(0));
             }
 
             Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
@@ -1053,7 +1055,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testIssueNullDescriptionDoesNotEraseIt() {
         try {
@@ -1088,7 +1090,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testIssueJournals() {
         try {
@@ -1575,7 +1577,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetIssueWithAttachments() throws RedmineException {
         Issue newIssue = null;

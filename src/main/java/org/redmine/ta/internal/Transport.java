@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.RedmineManager;
 import org.redmine.ta.beans.Identifiable;
+import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
@@ -51,8 +53,12 @@ public final class Transport {
 		OBJECT_CONFIGS.put(
 				Project.class,
 				config("project", "projects",
-						RedmineJSONBuilder.CREATE_PROJECT_WRITER,
+						RedmineJSONBuilder.PROJECT_WRITER,
 						RedmineJSONParser.PROJECT_PARSER));
+		OBJECT_CONFIGS.put(
+				Issue.class,
+				config("issue", "issues", RedmineJSONBuilder.ISSUE_WRITER,
+						RedmineJSONParser.ISSUE_PARSER));
 	}
 
 	/** Uri configurator */
@@ -87,6 +93,7 @@ public final class Transport {
 				object, config.writer);
 		setEntity(httpPost, body);
 		String response = getCommunicator().sendRequest(httpPost);
+		logger.debug(response);
 		return parseResponce(response, config.singleObjectName, config.parser);
 	}
 
@@ -109,7 +116,6 @@ public final class Transport {
 
 		getCommunicator().sendRequest(http);
 	}
-
 
 	/**
 	 * Deletes an object.
@@ -148,7 +154,32 @@ public final class Transport {
 		final URI uri = getURIConfigurator().getItemURI(classs, key, args);
 		final HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
+		logger.debug(response);
 		return parseResponce(response, config.singleObjectName, config.parser);
+	}
+
+	/**
+	 * @param classs
+	 *            target class
+	 * @param key
+	 *            item key
+	 * @param args
+	 *            extra arguments.
+	 * @throws RedmineAuthenticationException
+	 *             invalid or no API access key is used with the server, which
+	 *             requires authorization. Check the constructor arguments.
+	 * @throws NotFoundException
+	 *             the object with the given key is not found
+	 * @throws RedmineException
+	 */
+	public <T> T getObject(Class<T> classs, Integer key, NameValuePair... args)
+			throws RedmineException {
+		return getObject(classs, key.toString(), args);
+	}
+
+	public <T> List<T> getObjectsList(Class<T> objectClass,
+			NameValuePair... params) throws RedmineException {
+		return getObjectsList(objectClass, Arrays.asList(params));
 	}
 
 	/**
@@ -157,12 +188,12 @@ public final class Transport {
 	 * @return objects list, never NULL
 	 */
 	public <T> List<T> getObjectsList(Class<T> objectClass,
-			NameValuePair... params) throws RedmineException {
+			Collection<? extends NameValuePair> params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(objectClass);
 		final List<T> result = new ArrayList<T>();
 
 		final List<NameValuePair> newParams = new ArrayList<NameValuePair>(
-				Arrays.asList(params));
+				params);
 
 		newParams.add(new BasicNameValuePair("limit", String
 				.valueOf(objectsPerPage)));

@@ -45,8 +45,6 @@ import java.util.Map.Entry;
 public class RedmineManager {
 
 	@Deprecated
-    private static final String URI_SUFFIX = "json";
-	@Deprecated
     private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 
     // TODO add tests for "relations" to RedmineManagerTest class
@@ -125,13 +123,15 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Issue createIssue(String projectKey, Issue issue) throws RedmineException {
-        URI uri = getURIConfigurator().createURI("issues." + URI_SUFFIX);
-        HttpPost http = new HttpPost(uri);
-        String body = RedmineJSONBuilder.toJSON(projectKey, issue);
-
-        setEntity(http, body);
-        String response = getCommunicator().sendRequest(http);
-        return RedmineJSONParser.parseObject(Issue.class, response);
+		final Project oldProject = issue.getProject();
+		final Project newProject = new Project();
+		newProject.setIdentifier(projectKey);
+		issue.setProject(newProject);
+		try {
+			return transport.addObject(issue);
+		} finally {
+			issue.setProject(oldProject);
+		}
     }
 
 
@@ -174,14 +174,14 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
-        params.add(new BasicNameValuePair("subject", summaryField));
-
         if ((projectKey != null) && (projectKey.length() > 0)) {
-            params.add(new BasicNameValuePair("project_id", projectKey));
+			return transport.getObjectsList(Issue.class,
+					new BasicNameValuePair("subject", summaryField),
+					new BasicNameValuePair("project_id", projectKey));
+		} else {
+			return transport.getObjectsList(Issue.class,
+					new BasicNameValuePair("subject", summaryField));
         }
-
-        return getObjectsList(Issue.class, params);
     }
 
     /**
@@ -215,8 +215,8 @@ public class RedmineManager {
      */
     public Issue getIssueById(Integer id, INCLUDE... include) throws RedmineException {
         String value = join(",", include);
-        // there's no harm in adding "include" parameter even if it's empty
-        return getObject(Issue.class, id, new BasicNameValuePair("include", value));
+		return transport.getObject(Issue.class, id, new BasicNameValuePair(
+				"include", value));
     }
 
     // TODO move to a separate utility class or find a replacement in Google Guava
@@ -256,7 +256,7 @@ public class RedmineManager {
     }
 
     public void deleteIssue(Integer id) throws RedmineException {
-        deleteObject(Issue.class, Integer.toString(id));
+		transport.deleteObject(Issue.class, Integer.toString(id));
     }
 
     /**
@@ -271,7 +271,7 @@ public class RedmineManager {
      * @see Issue
      */
     public List<Issue> getIssues(String projectKey, Integer queryId, INCLUDE... include) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
         if (queryId != null) {
             params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
         }
@@ -282,7 +282,7 @@ public class RedmineManager {
         String includeStr = join(",", include);
         params.add(new BasicNameValuePair("include", includeStr));
 
-        return getObjectsList(Issue.class, params);
+		return transport.getObjectsList(Issue.class, params);
     }
 
     /**
