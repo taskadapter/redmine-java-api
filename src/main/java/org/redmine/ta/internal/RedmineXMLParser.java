@@ -224,13 +224,17 @@ public class RedmineXMLParser {
         /* I don't want to use Castor XML here with all these "include mapping" for errors file
           * and making sure the mapping files are accessible in a plugin/jar/classpath and so on */
         String lines[] = responseBody.split("\\r?\\n");
-        // skip first two lines: xml declaration and <errors> tag
-        int lineToStartWith = 2;
-        // skip last line with </errors> tag
-        int lastLine = lines.length - 1;
+        int lineToStartWith = 0;
+        int lastLine = lines.length-1;
+        if (lines.length > 1) {
+            // skip first two lines: xml declaration and <errors> tag
+            lineToStartWith = 2;
+            // skip last line with </errors> tag
+            lastLine = lines.length - 1;
+        }
         String openTag = "<error>";
         String closeTag = "</error>";
-        for (int i = lineToStartWith; i < lastLine; i++) {
+        for (int i = lineToStartWith; i <= lastLine; i++) {
             int begin = lines[i].indexOf(openTag) + openTag.length();
             int end = lines[i].indexOf(closeTag);
             if (begin >= 0 && end >= 0) {

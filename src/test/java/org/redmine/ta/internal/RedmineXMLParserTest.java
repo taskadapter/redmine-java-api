@@ -337,4 +337,11 @@ public class RedmineXMLParserTest {
         RedmineXMLParser.verifyStartsAsXML("<html");
     }
 
+    @Test
+    public void errorsFromRedmine142ParsedOK() {
+        String errorStringRedmine142 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><errors type=\"array\"><error>% Done is not included in the list</error></errors>";
+        List<String> strings = RedmineXMLParser.parseErrors(errorStringRedmine142);
+        assertEquals(1, strings.size());
+        assertEquals("% Done is not included in the list", strings.get(0));
+    }
 }
