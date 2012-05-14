@@ -88,6 +88,29 @@ public class JsonOutput {
 	}
 
 	/**
+	 * Adds a value to a writer.
+	 * 
+	 * @param writer
+	 *            writer to add object to.
+	 * @param field
+	 *            field name to set.
+	 * @param value
+	 *            field value.
+	 * @param format
+	 *            date foramt to use.
+	 * @throws IOException
+	 *             if io error occurs.
+	 */
+	public static void add(JsonWriter writer, String field,
+			Date value, final SimpleDateFormat format) throws IOException {
+		writer.name(field);
+		if (value == null)
+			writer.nullValue();
+		else
+			writer.value(format.format(value));
+	}
+
+	/**
 	 * Adds an object if object is not null.
 	 * 
 	 * @param writer

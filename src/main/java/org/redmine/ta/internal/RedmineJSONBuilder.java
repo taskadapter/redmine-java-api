@@ -11,7 +11,9 @@ import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
+import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
@@ -61,6 +63,14 @@ public class RedmineJSONBuilder {
 		}
 	};
 
+	public static JsonObjectWriter<IssueRelation> RELATION_WRITER = new JsonObjectWriter<IssueRelation>() {
+		@Override
+		public void write(JsonWriter writer, IssueRelation object)
+				throws IOException {
+			writeRelation(writer, object);
+		}
+	};
+
 	public static JsonObjectWriter<IssueCategory> CATEGORY_WRITER = new JsonObjectWriter<IssueCategory>() {
 		@Override
 		public void write(JsonWriter writer, IssueCategory object)
@@ -71,11 +81,19 @@ public class RedmineJSONBuilder {
 
 	public static JsonObjectWriter<Version> VERSION_WRITER = new JsonObjectWriter<Version>() {
 		@Override
-		public void write(JsonWriter writer, Version object)
-				throws IOException {
+		public void write(JsonWriter writer, Version object) throws IOException {
 			writeVersion(writer, object);
 		}
 	};
+
+	public static JsonObjectWriter<TimeEntry> TIME_ENTRY_WRITER = new JsonObjectWriter<TimeEntry>() {
+		@Override
+		public void write(JsonWriter writer, TimeEntry object)
+				throws IOException {
+			writeTimeEntry(writer, object);
+		}
+	};
+
 	/**
 	 * Writes a "create project" request.
 	 * 
@@ -101,6 +119,21 @@ public class RedmineJSONBuilder {
 		writeProject(project, writer);
 	}
 
+	static void writeTimeEntry(JsonWriter writer, TimeEntry timeEntry)
+			throws IOException {
+		JsonOutput.addIfNotNull(writer, "id", timeEntry.getId());
+		JsonOutput.addIfNotNull(writer, "project_id", timeEntry.getProjectId());
+		JsonOutput.addIfNotNull(writer, "issue_id", timeEntry.getIssueId());
+		JsonOutput.addIfNotNull(writer, "user_id", timeEntry.getUserId());
+		JsonOutput.addIfNotNull(writer, "activity_id",
+				timeEntry.getActivityId());
+		JsonOutput.addIfNotNull(writer, "hours", timeEntry.getHours());
+		JsonOutput.addIfNotNull(writer, "comment", timeEntry.getComment());
+		addIfNotNullShort(writer, "spent_on", timeEntry.getSpentOn());
+		addIfNotNullFull(writer, "created_on", timeEntry.getSpentOn());
+		addIfNotNullFull(writer, "updated_on", timeEntry.getSpentOn());
+	}
+
 	/**
 	 * Writes a tracker.
 	 * 
@@ -115,6 +148,13 @@ public class RedmineJSONBuilder {
 			throws IOException {
 		writer.name("id").value(tracker.getId());
 		writer.name("name").value(tracker.getName());
+	}
+
+	static void writeRelation(JsonWriter writer, IssueRelation relation)
+			throws IOException {
+		JsonOutput.addIfNotNull(writer, "issue_to_id", relation.getIssueToId());
+		JsonOutput.addIfNotNull(writer, "relation_type", relation.getType());
+		JsonOutput.addIfNotNull(writer, "delay", relation.getDelay());
 	}
 
 	static void writeVersion(JsonWriter writer, Version version)
@@ -224,7 +264,7 @@ public class RedmineJSONBuilder {
 		if (issue.getAuthor() != null)
 			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
 					.getId());
-		addIfNotNullFull(writer, "start_date", issue.getStartDate());
+		addFull(writer, "start_date", issue.getStartDate());
 		addIfNotNullFull(writer, "due_date", issue.getDueDate());
 		if (issue.getTracker() != null)
 			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker()
@@ -281,6 +321,24 @@ public class RedmineJSONBuilder {
 			Date value) throws IOException {
 		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
+	}
+
+	/**
+	 * Adds a value to a writer.
+	 * 
+	 * @param writer
+	 *            writer to add object to.
+	 * @param field
+	 *            field name to set.
+	 * @param value
+	 *            field value.
+	 * @throws IOException
+	 *             if io error occurs.
+	 */
+	public static void addFull(JsonWriter writer, String field,
+			Date value) throws IOException {
+		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
+		JsonOutput.add(writer, field, value, format);
 	}
 
 	/**

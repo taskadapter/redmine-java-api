@@ -26,7 +26,13 @@ import org.redmine.ta.RedmineManager;
 import org.redmine.ta.beans.Identifiable;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
+import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.IssueStatus;
+import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.SavedQuery;
+import org.redmine.ta.beans.TimeEntry;
+import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonFormatException;
@@ -76,6 +82,30 @@ public final class Transport {
 				config("version", "versions",
 						RedmineJSONBuilder.VERSION_WRITER,
 						RedmineJSONParser.VERSION_PARSER));
+		OBJECT_CONFIGS.put(
+				TimeEntry.class,
+				config("time_entry", "time_entries",
+						RedmineJSONBuilder.TIME_ENTRY_WRITER,
+						RedmineJSONParser.TIME_ENTRY_PARSER));
+		OBJECT_CONFIGS.put(News.class,
+				config("news", "news", null, RedmineJSONParser.NEWS_PARSER));
+		OBJECT_CONFIGS.put(
+				IssueRelation.class,
+				config("relation", "relations",
+						RedmineJSONBuilder.RELATION_WRITER,
+						RedmineJSONParser.RELATION_PARSER));
+		OBJECT_CONFIGS.put(
+				Tracker.class,
+				config("tracker", "trackers", null,
+						RedmineJSONParser.TRACKER_PARSER));
+		OBJECT_CONFIGS.put(
+				IssueStatus.class,
+				config("status", "issue_statuses", null,
+						RedmineJSONParser.STATUS_PARSER));
+		OBJECT_CONFIGS
+				.put(SavedQuery.class,
+						config("query", "queries", null,
+								RedmineJSONParser.QUERY_PARSER));
 	}
 
 	/** Uri configurator */
@@ -137,6 +167,32 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(object.getClass());
 		URI uri = getURIConfigurator().createURI(
 				"projects/" + projectId + "/" + config.multiObjectName
+						+ FORMAT_SUFFIX, params);
+		HttpPost httpPost = new HttpPost(uri);
+		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
+				object, config.writer);
+		setEntity(httpPost, body);
+		String response = getCommunicator().sendRequest(httpPost);
+		logger.debug(response);
+		return parseResponce(response, config.singleObjectName, config.parser);
+	}
+
+	/**
+	 * Performs an "add issue object" request.
+	 * 
+	 * @param object
+	 *            object to use.
+	 * @param params
+	 *            name params.
+	 * @return object to use.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public <T> T addIssueEntry(int issueId, T object, NameValuePair... params)
+			throws RedmineException {
+		final EntityConfig<T> config = getConfig(object.getClass());
+		URI uri = getURIConfigurator().createURI(
+				"issues/" + issueId + "/" + config.multiObjectName
 						+ FORMAT_SUFFIX, params);
 		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
@@ -269,10 +325,16 @@ public final class Transport {
 			try {
 				final JsonObject responceObject = RedmineJSONParser
 						.getResponce(response);
-				totalObjectsFoundOnServer = JsonInput.getInt(responceObject,
-						KEY_TOTAL_COUNT);
 				foundItems = JsonInput.getListOrNull(responceObject,
 						config.multiObjectName, config.parser);
+				result.addAll(foundItems);
+
+				/* Necessary for trackers */
+				if (!responceObject.has(KEY_TOTAL_COUNT)) {
+					break;
+				}
+				totalObjectsFoundOnServer = JsonInput.getInt(responceObject,
+						KEY_TOTAL_COUNT);
 			} catch (JsonFormatException e) {
 				throw new RedmineFormatException(e);
 			}
@@ -280,7 +342,6 @@ public final class Transport {
 			if (foundItems.size() == 0) {
 				break;
 			}
-			result.addAll(foundItems);
 
 			offset += foundItems.size();
 		} while (offset < totalObjectsFoundOnServer);
@@ -389,6 +450,16 @@ public final class Transport {
 		this.useBasicAuth = true;
 	}
 
+	public void setPassword(String password) {
+		this.password = password;
+		this.useBasicAuth = true;
+	}
+
+	public void setLogin(String login) {
+		this.login = login;
+		this.useBasicAuth = true;
+	}
+
 	/**
 	 * Entity config.
 	 * 
@@ -409,6 +480,6 @@ public final class Transport {
 			this.writer = writer;
 			this.parser = parser;
 		}
-
 	}
+
 }

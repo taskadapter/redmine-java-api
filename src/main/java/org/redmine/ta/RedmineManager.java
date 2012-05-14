@@ -16,23 +16,14 @@
 
 package org.redmine.ta;
 
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.*;
-import org.redmine.ta.internal.logging.Logger;
-import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URL;
 import java.util.*;
 import java.util.Map.Entry;
@@ -44,9 +35,6 @@ import java.util.Map.Entry;
  */
 public class RedmineManager {
 
-	@Deprecated
-    private static final String CONTENT_TYPE = "application/json; charset=utf-8";
-
     // TODO add tests for "relations" to RedmineManagerTest class
     public static enum INCLUDE {
         // these values MUST BE exactly as they are written here,
@@ -55,25 +43,6 @@ public class RedmineManager {
         journals, relations, attachments
     }
 
-    // TODO delete REDMINE_1_0 mode. there's no method to set "current mode" on RedmineManager anyway.
-	@Deprecated
-    private static enum MODE {
-        REDMINE_1_0, REDMINE_1_1_OR_CHILIPROJECT_1_2,
-    }
-
-    private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
-
-	@Deprecated
-    private final URIConfigurator configurator;
-	@Deprecated
-    private String login;
-	@Deprecated
-    private String password;
-	@Deprecated
-    private boolean useBasicAuth = false;
-
-    private MODE currentMode = MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2;
-
 	private final Transport transport;
 
     public RedmineManager(String uri) {
@@ -81,12 +50,8 @@ public class RedmineManager {
     }
 
     public RedmineManager(String uri, String login, String password) {
-        this.configurator = new URIConfigurator(uri, null);
-        this.login = login;
-        this.password = password;
-		this.transport = new Transport(configurator);
+		this.transport = new Transport(new URIConfigurator(uri, null));
 		transport.setCredentials(login, password);
-        useBasicAuth = true;
     }
 
     /**
@@ -98,9 +63,7 @@ public class RedmineManager {
      *                     This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public".
      */
     public RedmineManager(String host, String apiAccessKey) {
-        this.configurator = new URIConfigurator(host, apiAccessKey);
-        this.useBasicAuth = false;
-		this.transport = new Transport(configurator);
+		this.transport = new Transport(new URIConfigurator(host, apiAccessKey));
     }
 
     /**
@@ -134,18 +97,6 @@ public class RedmineManager {
 		}
     }
 
-
-    private void setEntity(HttpEntityEnclosingRequest request, String body) {
-        StringEntity entity;
-        try {
-            entity = new StringEntity(body, Communicator.CHARSET);
-        } catch (UnsupportedEncodingException e) {
-            throw new RedmineInternalError("Required charset "
-                    + Communicator.CHARSET + " is not supported", e);
-        }
-        entity.setContentType(CONTENT_TYPE);
-        request.setEntity(entity);
-    }
 
     /**
      * Load the list of projects available to the user, which is represented by the API access key.
@@ -201,7 +152,7 @@ public class RedmineManager {
             params.add(new BasicNameValuePair(param.getKey(), param.getValue()));
         }
 
-        return getObjectsList(Issue.class, params);
+		return transport.getObjectsList(Issue.class, params);
     }
 
     /**
@@ -285,133 +236,6 @@ public class RedmineManager {
 		return transport.getObjectsList(Issue.class, params);
     }
 
-    /**
-     * Redmine 1.0 - specific version
-     *
-     * @return objects list, never NULL
-     */
-	@SuppressWarnings("null")
-	@Deprecated
-	private <T> List<T> getObjectsListV104(Class<T> objectClass,
-			Set<NameValuePair> params) throws RedmineException {
-        List<T> objects = new ArrayList<T>();
-
-        final int FIRST_REDMINE_PAGE = 1;
-        int pageNum = FIRST_REDMINE_PAGE;
-        // Redmine 1.0.4 returns the same page1 when no other pages are available!!
-        String firstPage = null;
-
-		params.add(new BasicNameValuePair("per_page", String
-				.valueOf(getObjectsPerPage())));
-
-        do {
-            List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
-            paramsList.add(new BasicNameValuePair("page", String.valueOf(pageNum)));
-
-            URI uri = getURIConfigurator().getRetrieveObjectsListURI(objectClass, paramsList);
-
-            HttpGet http = new HttpGet(uri);
-            String response = getCommunicator().sendRequest(http);
-
-            if (pageNum == FIRST_REDMINE_PAGE) {
-                firstPage = response;
-            } else {
-                // check that the response is NOT equal to the First Page
-                // - this would indicate that no more pages are available (for Redmine 1.0.*);
-                if (firstPage.equals(response)) {
-                    // done, no more pages. exit the loop
-                    break;
-                }
-            }
-            List<T> foundItems = RedmineXMLParser.parseObjectsFromXML(objectClass, response);
-            if (foundItems.size() == 0) {
-                break;
-            }
-            objects.addAll(foundItems);
-
-            pageNum++;
-        } while (true);
-
-        return objects;
-    }
-
-    /**
-     * @return objects list, never NULL
-     */
-	@Deprecated
-    private <T> List<T> getObjectsList(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
-        if (currentMode.equals(MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2)) {
-            return getObjectsListV11(objectClass, params);
-        } else if (currentMode.equals(MODE.REDMINE_1_0)) {
-            return getObjectsListV104(objectClass, params);
-        } else {
-            throw new RuntimeException("unsupported mode:" + currentMode
-                    + ". supported modes are: " + MODE.REDMINE_1_0 + " and "
-                    + MODE.REDMINE_1_1_OR_CHILIPROJECT_1_2);
-        }
-    }
-
-    /**
-     * Redmine 1.1+ / Chiliproject 1.2 - specific version
-     *
-     * @return objects list, never NULL
-     */
-	@Deprecated
-    private <T> List<T> getObjectsListV11(Class<T> objectClass, Set<NameValuePair> params) throws RedmineException {
-        List<T> objects = new ArrayList<T>();
-
-		params.add(new BasicNameValuePair("limit", String
-				.valueOf(getObjectsPerPage())));
-        int offset = 0;
-        int totalObjectsFoundOnServer;
-        do {
-            List<NameValuePair> paramsList = new ArrayList<NameValuePair>(params);
-            paramsList.add(new BasicNameValuePair("offset", String.valueOf(offset)));
-
-            URI uri = getURIConfigurator().getRetrieveObjectsListURI(objectClass, paramsList);
-
-            logger.debug(uri.toString());
-            HttpGet http = new HttpGet(uri);
-
-            String response = getCommunicator().sendRequest(http);
-            logger.debug("received: " + response);
-            totalObjectsFoundOnServer = RedmineJSONParser.parseObjectsTotalCount(objectClass,response);
-
-            List<T> foundItems = RedmineJSONParser.parseObjects(objectClass, response);
-            if (foundItems.size() == 0) {
-                break;
-            }
-            objects.addAll(foundItems);
-
-            offset += foundItems.size();
-        } while (offset < totalObjectsFoundOnServer);
-
-        return objects;
-    }
-
-    private <T> T getObject(Class<T> objectClass, Integer id, NameValuePair... params)
-            throws RedmineException {
-
-        URI uri = getURIConfigurator().getRetrieveObjectURI(objectClass, id, Arrays.asList(params));
-        String body = getCommunicator().sendGet(uri);
-        return RedmineXMLParser.parseObjectFromXML(objectClass, body);
-    }
-
-    // TODO is there a way to get rid of the 1st parameter and use generics?
-    private <T> T createObject(Class<T> classs, T obj) throws RedmineException {
-        URI uri = getURIConfigurator().getCreateURI(obj.getClass());
-        return createObject(classs, obj, uri);
-    }
-
-    private <T> T createObject(Class<T> classs, T obj, URI uri) throws RedmineException {
-        HttpPost http = new HttpPost(uri);
-        String xml = RedmineXMLGenerator.toXML(obj);
-        setEntity(http, xml);
-
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseObjectFromXML(classs, response);
-    }
-
     /*
       * note: This method cannot return the updated object from Redmine
       * because the server does not provide any XML in response.
@@ -430,13 +254,6 @@ public class RedmineManager {
         if (obj instanceof  TimeEntry && !((TimeEntry) obj).isValid()) {
             throw createIllegalTimeEntryException();
         }
-    }
-
-	@Deprecated
-    private <T extends Identifiable> void deleteObject(Class<T> classs, String id) throws RedmineException {
-        URI uri = getURIConfigurator().getUpdateURI(classs, id);
-        HttpDelete http = new HttpDelete(uri);
-        getCommunicator().sendRequest(http);
     }
 
     /**
@@ -526,30 +343,28 @@ public class RedmineManager {
     }
 
     public List<TimeEntry> getTimeEntries() throws RedmineException {
-        return getObjectsList(TimeEntry.class, new HashSet<NameValuePair>());
+		return transport.getObjectsList(TimeEntry.class);
     }
 
     /**
      * @param id the database Id of the TimeEntry record
      */
     public TimeEntry getTimeEntry(Integer id) throws RedmineException {
-        return getObject(TimeEntry.class, id);
+		return transport.getObject(TimeEntry.class, id);
     }
 
     public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
-        params.add(new BasicNameValuePair("issue_id", Integer.toString(issueId)));
-
-        return getObjectsList(TimeEntry.class, params);
+		return transport.getObjectsList(TimeEntry.class,
+				new BasicNameValuePair("issue_id", Integer.toString(issueId)));
     }
 
     public TimeEntry createTimeEntry(TimeEntry obj) throws RedmineException {
         validate(obj);
-        return createObject(TimeEntry.class, obj);
+		return transport.addObject(obj);
     }
 
     public void deleteTimeEntry(Integer id) throws RedmineException {
-        deleteObject(TimeEntry.class, Integer.toString(id));
+		transport.deleteObject(TimeEntry.class, Integer.toString(id));
     }
 
     private IllegalArgumentException createIllegalTimeEntryException() {
@@ -563,13 +378,13 @@ public class RedmineManager {
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
      */
     public List<SavedQuery> getSavedQueries(String projectKey) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
+		Set<NameValuePair> params = new HashSet<NameValuePair>();
 
-        if ((projectKey != null) && (projectKey.length() > 0)) {
-            params.add(new BasicNameValuePair("project_id", projectKey));
-        }
+		if ((projectKey != null) && (projectKey.length() > 0)) {
+			params.add(new BasicNameValuePair("project_id", projectKey));
+		}
 
-        return getObjectsList(SavedQuery.class, params);
+		return transport.getObjectsList(SavedQuery.class, params);
     }
 
     /**
@@ -578,29 +393,22 @@ public class RedmineManager {
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
      */
     public List<SavedQuery> getSavedQueries() throws RedmineException {
-        return getObjectsList(SavedQuery.class, new HashSet<NameValuePair>());
+		return transport.getObjectsList(SavedQuery.class);
     }
 
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
-        URI uri = getURIConfigurator().createURI("issues/" + issueId + "/relations.xml");
-
-        HttpPost http = new HttpPost(uri);
         IssueRelation toCreate = new IssueRelation();
         toCreate.setIssueId(issueId);
         toCreate.setIssueToId(issueToId);
         toCreate.setType(type);
-        String xml = RedmineXMLGenerator.toXML(toCreate);
-        setEntity(http, xml);
-
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseRelationFromXML(response);
+		return transport.addIssueEntry(issueId, toCreate);
     }
 
     /**
      * Delete Issue Relation with the given ID.
      */
     public void deleteRelation(Integer id) throws RedmineException {
-        deleteObject(IssueRelation.class, Integer.toString(id));
+		transport.deleteObject(IssueRelation.class, Integer.toString(id));
     }
 
     /**
@@ -631,7 +439,7 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<IssueStatus> getStatuses() throws RedmineException {
-        return getObjectsList(IssueStatus.class, new HashSet<NameValuePair>());
+		return transport.getObjectsList(IssueStatus.class);
     }
 
     /**
@@ -742,7 +550,7 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<Tracker> getTrackers() throws RedmineException {
-        return getObjectsList(Tracker.class, new HashSet<NameValuePair>());
+		return transport.getObjectsList(Tracker.class);
     }
 
     /**
@@ -785,13 +593,11 @@ public class RedmineManager {
     }
 
     public void setLogin(String login) {
-		transport.setCredentials(login, password);
-        this.login = login;
+		transport.setLogin(login);
     }
 
     public void setPassword(String password) {
-		transport.setCredentials(login, password);
-        this.password = password;
+		transport.setPassword(password);
     }
 
     /**
@@ -804,18 +610,6 @@ public class RedmineManager {
         if ((projectKey != null) && (projectKey.length() > 0)) {
             params.add(new BasicNameValuePair("project_id", projectKey));
         }
-        return getObjectsList(News.class, params);
-    }
-    
-    private URIConfigurator getURIConfigurator() {
-		return configurator;
-    }
-    
-    private Communicator getCommunicator() {
-        Communicator communicator = new Communicator();
-        if (useBasicAuth) {
-            communicator.setCredentials(login, password);
-        }
-        return communicator;
+		return transport.getObjectsList(News.class, params);
     }
 }

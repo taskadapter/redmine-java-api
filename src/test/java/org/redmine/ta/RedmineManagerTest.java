@@ -175,7 +175,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testStartDateNull() {
         try {
@@ -265,21 +265,21 @@ public class RedmineManagerTest {
         return user;
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
     public void testNULLHostParameter() {
         new RedmineManager(null);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = IllegalArgumentException.class)
 	@SuppressWarnings("unused")
     public void testEmptyHostParameter() throws RuntimeException {
         new RedmineManager("");
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = RedmineAuthenticationException.class)
     public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
         RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI());
@@ -288,7 +288,7 @@ public class RedmineManagerTest {
         redmineMgrEmpty.createIssue(projectKey, issue);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = RedmineAuthenticationException.class)
     public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
         RedmineManager redmineMgrInvalidKey = new RedmineManager(testConfig.getURI(), "wrong_key");
@@ -810,14 +810,14 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetTimeEntries() throws RedmineException {
         List<TimeEntry> list = mgr.getTimeEntries();
         Assert.assertNotNull(list);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateGetTimeEntry() throws RedmineException {
         Issue issue = createIssues(1).get(0);
@@ -845,7 +845,7 @@ public class RedmineManagerTest {
         Assert.assertEquals(newHours, updatedEntry.getHours());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testCreateDeleteTimeEntry() throws RedmineException {
         Issue issue = createIssues(1).get(0);
@@ -863,7 +863,7 @@ public class RedmineManagerTest {
         mgr.getTimeEntry(createdEntry.getId());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetTimeEntriesForIssue() throws RedmineException {
         Issue issue = createIssues(1).get(0);
@@ -1127,7 +1127,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateRelation() {
         try {
@@ -1154,7 +1154,7 @@ public class RedmineManagerTest {
         return mgr.createRelation(src.getId(), target.getId(), relationText);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void issueRelationsAreCreatedAndLoadedOK() {
         try {
@@ -1179,7 +1179,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testIssureRelationDelete() throws RedmineException {
         IssueRelation relation = createTwoRelatedIssues();
@@ -1189,7 +1189,7 @@ public class RedmineManagerTest {
         Assert.assertEquals(0, issue.getRelations().size());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testIssueRelationsDelete() throws RedmineException {
         List<Issue> issues = createIssues(3);
@@ -1255,7 +1255,7 @@ public class RedmineManagerTest {
         }
     }
 
-    @Ignore
+	@Ignore
     @Test
     public void testSpentTimeFieldLoaded() {
         try {
@@ -1273,13 +1273,13 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnCreate() throws RedmineException {
         mgr.createTimeEntry(createIncompleteTimeEntry());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnUpdate() throws RedmineException {
         mgr.update(createIncompleteTimeEntry());
@@ -1293,7 +1293,7 @@ public class RedmineManagerTest {
         return timeEntry;
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testViolateTimeEntryConstraint_ProjectOrIssueID_issue66() throws RedmineException {
         TimeEntry timeEntry = createIncompleteTimeEntry();
@@ -1318,7 +1318,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetStatuses() throws RedmineException {
         // TODO we should create some statuses first, but the Redmine Java API does not support this presently
@@ -1564,7 +1564,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetTrackers() throws RedmineException {
         List<Tracker> trackers = mgr.getTrackers();
@@ -1691,25 +1691,25 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void getNewsDoesNotFailForNULLProject() throws RedmineException {
         mgr.getNews(null);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void getNewsDoesNotFailForTempProject() throws RedmineException {
         mgr.getNews(projectKey);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void getSavedQueriesDoesNotFailForTempProject() throws RedmineException {
         mgr.getSavedQueries(projectKey);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void getSavedQueriesDoesNotFailForNULLProject() throws RedmineException {
         mgr.getSavedQueries(null);
