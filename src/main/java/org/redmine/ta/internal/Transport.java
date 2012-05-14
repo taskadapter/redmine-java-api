@@ -52,7 +52,6 @@ import com.google.gson.JsonObject;
  */
 public final class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<Class<?>, EntityConfig<?>>();
-	private static final String FORMAT_SUFFIX = ".json";
 	private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
@@ -140,8 +139,7 @@ public final class Transport {
 	public <T> T addObject(T object, NameValuePair... params)
 			throws RedmineException {
 		final EntityConfig<T> config = getConfig(object.getClass());
-		URI uri = getURIConfigurator().createURI(
-				config.multiObjectName + FORMAT_SUFFIX, params);
+		URI uri = getURIConfigurator().getObjectsURI(object.getClass(), params);
 		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
 				object, config.writer);
@@ -152,8 +150,10 @@ public final class Transport {
 	}
 
 	/**
-	 * Performs an "add project object" request.
+	 * Performs an "add child object" request.
 	 * 
+	 * @param parentClass
+	 *            parent object id.
 	 * @param object
 	 *            object to use.
 	 * @param params
@@ -162,38 +162,11 @@ public final class Transport {
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 */
-	public <T> T addProjectEntry(int projectId, T object,
+	public <T> T addChildEntry(Class<?> parentClass, int parentId, T object,
 			NameValuePair... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(object.getClass());
-		URI uri = getURIConfigurator().createURI(
-				"projects/" + projectId + "/" + config.multiObjectName
-						+ FORMAT_SUFFIX, params);
-		HttpPost httpPost = new HttpPost(uri);
-		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
-				object, config.writer);
-		setEntity(httpPost, body);
-		String response = getCommunicator().sendRequest(httpPost);
-		logger.debug(response);
-		return parseResponce(response, config.singleObjectName, config.parser);
-	}
-
-	/**
-	 * Performs an "add issue object" request.
-	 * 
-	 * @param object
-	 *            object to use.
-	 * @param params
-	 *            name params.
-	 * @return object to use.
-	 * @throws RedmineException
-	 *             if something goes wrong.
-	 */
-	public <T> T addIssueEntry(int issueId, T object, NameValuePair... params)
-			throws RedmineException {
-		final EntityConfig<T> config = getConfig(object.getClass());
-		URI uri = getURIConfigurator().createURI(
-				"issues/" + issueId + "/" + config.multiObjectName
-						+ FORMAT_SUFFIX, params);
+		URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
+				parentId, object.getClass(), params);
 		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
 				object, config.writer);
@@ -212,7 +185,7 @@ public final class Transport {
 	public <T extends Identifiable> void updateObject(T obj,
 			NameValuePair... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(obj.getClass());
-		final URI uri = getURIConfigurator().getItemURI(obj.getClass(),
+		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
 				Integer.toString(obj.getId()));
 		final HttpPut http = new HttpPut(uri);
 
@@ -235,7 +208,7 @@ public final class Transport {
 	 */
 	public <T extends Identifiable> void deleteObject(Class<T> classs, String id)
 			throws RedmineException {
-		final URI uri = getURIConfigurator().getItemURI(classs, id);
+		final URI uri = getURIConfigurator().getObjectURI(classs, id);
 		final HttpDelete http = new HttpDelete(uri);
 		getCommunicator().sendRequest(http);
 	}
@@ -257,7 +230,7 @@ public final class Transport {
 	public <T> T getObject(Class<T> classs, String key, NameValuePair... args)
 			throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
-		final URI uri = getURIConfigurator().getItemURI(classs, key, args);
+		final URI uri = getURIConfigurator().getObjectURI(classs, key, args);
 		final HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
 		logger.debug(response);
@@ -312,8 +285,8 @@ public final class Transport {
 			paramsList.add(new BasicNameValuePair("offset", String
 					.valueOf(offset)));
 
-			final URI uri = getURIConfigurator().createURI(
-					config.multiObjectName + FORMAT_SUFFIX, paramsList);
+			final URI uri = getURIConfigurator().getObjectsURI(objectClass,
+					paramsList);
 
 			logger.debug(uri.toString());
 			final HttpGet http = new HttpGet(uri);
@@ -358,19 +331,17 @@ public final class Transport {
 	}
 
 	/**
-	 * Delivers a list of of a project entries.
+	 * Delivers a list of a child entries.
 	 * 
 	 * @param classs
 	 *            target class.
-	 * @param projectID
-	 *            the ID of the {@link Project}
 	 */
-	public <T> List<T> getProjectEntries(Class<T> classs, int projectID)
-			throws RedmineException {
+	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId,
+			Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
-		URI uri = getURIConfigurator().createURI(
-				"projects/" + projectID + "/" + config.multiObjectName
-						+ FORMAT_SUFFIX);
+		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
+				parentId, classs);
+
 		HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
 		final JsonObject responceObject;

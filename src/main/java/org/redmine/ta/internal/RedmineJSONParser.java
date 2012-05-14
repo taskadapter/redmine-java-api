@@ -468,6 +468,8 @@ public class RedmineJSONParser {
 		try {
 			final JsonObject bodyJson = JsonInput.toObject(new JsonParser()
 					.parse(body));
+			if (bodyJson == null)
+				throw new JsonFormatException("Empty input");
 			final JsonObject contentJSon = JsonInput.getObjectNotNull(bodyJson,
 					key);
 			return contentJSon;

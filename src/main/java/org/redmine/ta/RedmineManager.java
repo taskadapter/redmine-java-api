@@ -401,7 +401,7 @@ public class RedmineManager {
         toCreate.setIssueId(issueId);
         toCreate.setIssueToId(issueToId);
         toCreate.setType(type);
-		return transport.addIssueEntry(issueId, toCreate);
+		return transport.addChildEntry(Issue.class, issueId, toCreate);
     }
 
     /**
@@ -461,7 +461,8 @@ public class RedmineManager {
 			throw new IllegalArgumentException(
 					"Version must contain an existing project");
         }
-		return transport.addProjectEntry(version.getProject().getId(), version);
+		return transport.addChildEntry(Project.class, version.getProject()
+				.getId(), version);
     }
 
     /**
@@ -487,7 +488,8 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<Version> getVersions(int projectID) throws RedmineException {
-		return transport.getProjectEntries(Version.class, projectID);
+		return transport.getChildEntries(Project.class, projectID,
+				Version.class);
     }
 
     // TODO add test
@@ -505,7 +507,8 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<IssueCategory> getCategories(int projectID) throws RedmineException {
-		return transport.getProjectEntries(IssueCategory.class, projectID);
+		return transport.getChildEntries(Project.class, projectID,
+				IssueCategory.class);
     }
 
     /**
@@ -527,7 +530,8 @@ public class RedmineManager {
 					"IssueCategory must contain an existing project");
         }
 
-		return transport.addProjectEntry(category.getProject().getId(), category);
+		return transport.addChildEntry(Project.class, category.getProject()
+				.getId(), category);
     }
 
     /**
