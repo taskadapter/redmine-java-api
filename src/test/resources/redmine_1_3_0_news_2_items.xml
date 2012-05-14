@@ -1,3 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><news type="array" offset="0" limit="25" total_count="2"><news><id>2</id><project name="test" id="1"/><author name="rest last" id="95"/><title>item 2</title><summary>another summary</summary><description>duh</description><created_on>2012-02-06T21:35:41-08:00</created_on></news><news><id>1</id><project name="test" id="1"/><author name="rest last" id="95"/><title>my title 1</title><summary>some summary here</summary><description>*description* and other stuff
-
-one more line</description><created_on>2012-02-06T21:28:13-08:00</created_on></news></news>
