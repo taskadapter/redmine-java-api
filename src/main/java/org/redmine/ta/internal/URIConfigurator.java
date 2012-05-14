@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class URIConfigurator {
-    private static final String XML_URL_POSTFIX = ".xml";
     private static final String JSON_URL_POSTFIX = ".json";
 
     private static final Map<Class<?>, String> urls = new HashMap<Class<?>, String>();
@@ -53,10 +52,12 @@ public class URIConfigurator {
         this.apiAccessKey = apiAccessKey;
     }
 
+	@Deprecated
     public URI createURI(String query) {
         return createURI(query, new ArrayList<NameValuePair>());
     }
 
+	@Deprecated
     public URI createURI(String query, NameValuePair... param) {
         return createURI(query, Arrays.asList(param));
     }
@@ -65,6 +66,7 @@ public class URIConfigurator {
      * @param query e.g. "/issues.xml"
      * @return URI with auth parameter "key" if not in "basic auth mode.
      */
+	@Deprecated
     public URI createURI(String query, List<NameValuePair> params) {
         if (apiAccessKey != null) {
         	/* NEVER modify passed parameters list! It may be unmodifiable list.*/
@@ -94,37 +96,8 @@ public class URIConfigurator {
    		return result;
    	}
 
-    public URI getCreateURI(Class<?> zz) {
-        String query = getClassUrl(zz) + XML_URL_POSTFIX;
-        return createURI(query);
-    }
-
-    public URI getUpdateURI(Class<?> zz, String id) {
-        String query = getClassUrl(zz) + "/" + id + XML_URL_POSTFIX;
-        return createURI(query);
-    }
-
 	public URI getItemURI(Class<?> zz, String id, NameValuePair... args) {
 		final String query = getClassUrl(zz) + "/" + id + JSON_URL_POSTFIX;
 		return createURI(query, args);
 	}
-
-    public URI getUpdateURI(Class<?> zz, String id, NameValuePair... param) {
-        String query = getClassUrl(zz) + "/" + id + XML_URL_POSTFIX;
-        return createURI(query, param);
-    }
-
-    public URI getCreateURIIssueCategory(Integer projectID) {
-        return createURI("projects/" + projectID + "/issue_categories.xml");
-    }
-
-    public URI getRetrieveObjectsListURI(Class<?> className, List<NameValuePair> param) {
-        String query = getClassUrl(className) + JSON_URL_POSTFIX;
-        return createURI(query, param);
-    }
-
-    public URI getRetrieveObjectURI(Class<?> className, Integer id, List<NameValuePair> param) {
-        String query = getClassUrl(className) + "/" + id + XML_URL_POSTFIX;
-        return createURI(query, param);
-    }
 }

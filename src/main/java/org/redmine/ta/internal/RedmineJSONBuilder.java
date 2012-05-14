@@ -2,7 +2,6 @@ package org.redmine.ta.internal;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -20,13 +19,6 @@ import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonObjectWriter;
 import org.redmine.ta.internal.json.JsonOutput;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.stream.JsonWriter;
 
 /**
@@ -358,40 +350,5 @@ public class RedmineJSONBuilder {
 		final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT
 				.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
-	}
-
-	/**
-	 * Creates a Redmine-compatible JSON representation of a {@link Issue}.
-	 * 
-	 * @param projectKey
-	 *            the ID of the {@link Project}
-	 * @param issue
-	 *            the {@link Issue}
-	 * @return the Redmine-compatible JSON representation of the {@link Issue}
-	 */
-	public static String toJSON(String projectKey, Issue issue) {
-		// TODO we need IDs here for the member entities (project, etc)
-		// Another possibility would be to create the JSONObject "manually" here
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(User.class, new UserIDSerializer());
-		Gson gson = gsonBuilder.create();
-		JsonObject jsonObject = gson.toJsonTree(issue).getAsJsonObject();
-		jsonObject.add("project_id", new JsonPrimitive(projectKey));
-		return wrapJSONProperty("issue", gson.toJson(jsonObject));
-	}
-
-	private static String wrapJSONProperty(String property, String jsonEntity) {
-		// TODO is there a better way to wrap the entity in a property?
-		StringBuilder jsonPropertyWrapper = new StringBuilder();
-		jsonPropertyWrapper.append("{\"").append(property).append("\":")
-				.append(jsonEntity).append("}");
-		return jsonPropertyWrapper.toString();
-	}
-
-	static class UserIDSerializer implements JsonSerializer<User> {
-		public JsonElement serialize(User user, Type type,
-				JsonSerializationContext context) {
-			return new JsonPrimitive(user.getId());
-		}
 	}
 }

@@ -1,12 +1,8 @@
 package org.redmine.ta.internal;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.beans.Attachment;
@@ -27,21 +23,15 @@ import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 /**
- * A parser for JSON items sent by Redmine. * TODO use maps for keys common to
- * builder and parser
+ * A parser for JSON items sent by Redmine.
  */
 public class RedmineJSONParser {
-
-	private static final String KEY_TOTAL_COUNT = "total_count";
 
 	public static final JsonObjectParser<Tracker> TRACKER_PARSER = new JsonObjectParser<Tracker>() {
 		@Override
@@ -149,32 +139,6 @@ public class RedmineJSONParser {
 			return input.toString();
 		}
 	};
-
-	private static final Map<Class<?>, String> redmineSingleResponseKeys = new HashMap<Class<?>, String>() {
-		private static final long serialVersionUID = 9127978873143743650L;
-
-		{
-			put(Project.class, "project");
-			put(Issue.class, "issue");
-		}
-	};
-	private static final Map<Class<?>, String> redmineListResponseKeys = new HashMap<Class<?>, String>() {
-		private static final long serialVersionUID = -3514773352872587112L;
-
-		{
-			put(Project.class, "projects");
-			put(Issue.class, "issues");
-		}
-	};
-
-	private static JsonParser jsonParser = new JsonParser();
-
-	private static Gson gson = null;
-
-	static {
-		gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
-
-	}
 
 	/**
 	 * Parses a tracker.
@@ -522,49 +486,4 @@ public class RedmineJSONParser {
 			throw new JsonFormatException(e);
 		}
 	}
-
-	public static <T> T parseObject(Class<T> clazz, String body) {
-		// determine key for objects list in Redmine response from map
-		String key = redmineSingleResponseKeys.get(clazz);
-		if (key == null) {
-			throw new UnsupportedOperationException(
-					"Parsing Redmine object from JSON is presently not supported for class "
-							+ clazz);
-		}
-		// fetch JSON object list from body by key
-		JsonObject jsonResponseObject = (JsonObject) jsonParser.parse(body);
-		JsonElement jsonElement = jsonResponseObject.get(key);
-		// parse
-		return gson.fromJson(jsonElement, clazz);
-	}
-
-	public static <T> List<T> parseObjects(Class<T> clazz, String body) {
-		// determine key for objects list in Redmine response from map
-		String key = redmineListResponseKeys.get(clazz);
-		if (key == null) {
-			throw new UnsupportedOperationException(
-					"Parsing Redmine objects from JSON is not supported for class "
-							+ clazz);
-		}
-		// fetch JSON objects list from body by key
-		JsonObject jsonResponseObject = (JsonObject) jsonParser.parse(body);
-		JsonArray projectsJsonArray = jsonResponseObject.getAsJsonArray(key);
-		// parse objects from JSON objects list
-		// we can not use a generic collection solution here as GSON is not able
-		// to resolve the correct generic type. Hence, we traverse the list of
-		// JSON elements.
-		List<T> result = new ArrayList<T>(projectsJsonArray.size());
-		Iterator<JsonElement> iterator = projectsJsonArray.iterator();
-		while (iterator.hasNext()) {
-			result.add(gson.fromJson(iterator.next(), clazz));
-		}
-		return result;
-	}
-
-	public static <T> int parseObjectsTotalCount(Class<T> clazz, String body) {
-		JsonObject jsonResponseObject = (JsonObject) jsonParser.parse(body);
-		return jsonResponseObject.getAsJsonPrimitive(KEY_TOTAL_COUNT)
-				.getAsInt();
-	}
-
 }
