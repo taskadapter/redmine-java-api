@@ -1,5 +1,6 @@
 package org.redmine.ta.internal;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -8,7 +9,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.castor.core.util.Base64Encoder;
 import org.redmine.ta.*;
 import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.logging.Logger;
@@ -45,7 +45,10 @@ public class Communicator {
 //                new UsernamePasswordCredentials(login, password));
             String credentials;
             try {
-                credentials = String.valueOf(Base64Encoder.encode((login + ':' + password).getBytes(CHARSET)));
+				credentials = "\""
+						+ Base64.encodeBase64String(
+								(login + ':' + password).getBytes(CHARSET))
+								.trim() + "\"";
             } catch (UnsupportedEncodingException e) {
                 throw new RedmineInternalError(e);
             }
