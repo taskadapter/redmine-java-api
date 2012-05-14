@@ -96,7 +96,6 @@
             <artifactId>gson</artifactId>
             <version>2.1</version>
         </dependency>
-        <!-- TODO remove castor once JSON is implemented -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
