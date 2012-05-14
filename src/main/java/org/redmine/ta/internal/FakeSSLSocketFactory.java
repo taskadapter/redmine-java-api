@@ -2,7 +2,6 @@ package org.redmine.ta.internal;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -24,10 +23,12 @@ class FakeSSLSocketFactory extends SSLSocketFactory {
         TrustManager tm = new X509TrustManager() {
             public void checkClientTrusted(X509Certificate[] chain,
                                            String authType) throws CertificateException {
+				// Check always succeed
             }
 
             public void checkServerTrusted(X509Certificate[] chain,
                                            String authType) throws CertificateException {
+				// Check always succeed
             }
 
             public X509Certificate[] getAcceptedIssuers() {

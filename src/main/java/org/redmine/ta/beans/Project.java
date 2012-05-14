@@ -8,10 +8,11 @@ import java.util.List;
  * Redmine's Project.
  */
 public class Project implements Identifiable, Serializable {
+	private static final long serialVersionUID = 4529305420978716446L;
 
-    /**
-     * database ID
-     */
+	/**
+	 * database ID
+	 */
     private Integer id;
 
     /**

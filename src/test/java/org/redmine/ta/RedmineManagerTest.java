@@ -7,7 +7,6 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -261,12 +260,15 @@ public class RedmineManagerTest {
         return user;
     }
 
-    @Test(expected = IllegalArgumentException.class)
+
+	@SuppressWarnings("unused")
+	@Test(expected = IllegalArgumentException.class)
     public void testNULLHostParameter() {
         new RedmineManager(null);
     }
 
     @Test(expected = IllegalArgumentException.class)
+	@SuppressWarnings("unused")
     public void testEmptyHostParameter() throws RuntimeException {
         new RedmineManager("");
     }
@@ -478,7 +480,8 @@ public class RedmineManagerTest {
         } catch (RedmineProcessingException e) {
             Assert.assertNotNull(e.getErrors());
             Assert.assertEquals(1, e.getErrors().size());
-            Assert.assertEquals("Identifier is reserved", e.getErrors().get(0));
+			Assert.assertEquals("\"Identifier is reserved\"", e
+					.getErrors().get(0));
         } finally {
             if (key != null) {
                 mgr.deleteProject(key);
@@ -969,7 +972,7 @@ public class RedmineManagerTest {
         return mgr.createProject(project);
     }
 
-    @Test
+	@Test
     public void testIssueDoneRatio() {
         try {
             Issue issue = new Issue();
@@ -994,7 +997,9 @@ public class RedmineManagerTest {
                 mgr.update(reloadedFromRedmineIssue);
             } catch (RedmineProcessingException e) {
                 Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
-                Assert.assertEquals("Checking error text", "% Done is not included in the list", e.getErrors().get(0));
+				Assert.assertEquals("Checking error text",
+						"\"% Done is not included in the list\"", e
+								.getErrors().get(0));
             }
 
             Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
@@ -1155,11 +1160,13 @@ public class RedmineManagerTest {
     }
 
     /**
-     * this test is ignored because:
-     * 1) we can't create Versions. see http://www.redmine.org/issues/9088
-     * 2) we don't currently set versions when creating issues.
-     */
-    @Ignore
+	 * this test is ignored because: 1) we can't create Versions. see
+	 * http://www.redmine.org/issues/9088 2) we don't currently set versions
+	 * when creating issues.
+	 * 
+	 * 3) setting "fixed_version_id" does not work on creating issue.
+	 */
+	@Ignore
     @Test
     public void issueFixVersionIsSet() throws Exception {
 
@@ -1169,6 +1176,8 @@ public class RedmineManagerTest {
         String versionName = "1.0";
         v.setName("1.0");
         v.setId(1);
+		v.setProject(mgr.getProjectByKey(projectKey));
+		v = mgr.createVersion(v);
         toCreate.setTargetVersion(v);
         Issue createdIssue = mgr.createIssue(existingProjectKey, toCreate);
 
@@ -1177,17 +1186,18 @@ public class RedmineManagerTest {
     }
 
     // Redmine ignores this parameter for "get projects" request. see bug http://www.redmine.org/issues/8545
-    @Ignore
+	@Ignore
     @Test
     public void testGetProjectsIncludesTrackers() {
         try {
             List<Project> projects = mgr.getProjects();
             Assert.assertTrue(projects.size() > 0);
             Project p1 = projects.get(0);
-            Assert.assertNotNull(p1.getTrackers());
-            // XXX there could be a case when a project does not have any trackers
-            // need to create a project with some trackers to make this test deterministic
-            Assert.assertTrue(!p1.getTrackers().isEmpty());
+			Assert.assertNotNull(p1.getTrackers());
+			for (Project p : projects)
+				if (!p.getTrackers().isEmpty())
+					return;
+			Assert.fail("No projects with trackers found");
             logger.debug("Created trackers " + p1.getTrackers());
         } catch (Exception e) {
             e.printStackTrace();
@@ -1195,7 +1205,7 @@ public class RedmineManagerTest {
         }
     }
 
-    @Ignore
+	@Ignore
     @Test
     public void testSpentTimeFieldLoaded() {
         try {
@@ -1217,6 +1227,7 @@ public class RedmineManagerTest {
     public void invalidTimeEntryFailsWithIAEOnCreate() throws RedmineException {
         mgr.createTimeEntry(createIncompleteTimeEntry());
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnUpdate() throws RedmineException {
@@ -1355,7 +1366,8 @@ public class RedmineManagerTest {
         }
     }
 
-    @Ignore // see Redmine bug http://www.redmine.org/issues/10241
+	@Ignore
+	// see Redmine bug http://www.redmine.org/issues/10241
     @Test
     public void versionIsRetrievedById() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1459,15 +1471,19 @@ public class RedmineManagerTest {
     }
 
     /**
-     * tests the deletion of an invalid {@link IssueCategory}. Expects a
-     * {@link NotFoundException} to be thrown.
-     *
-     * @throws RedmineException        thrown in case something went wrong in Redmine
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException       thrown in case the objects requested for could not be found
-     */
+	 * tests the deletion of an invalid {@link IssueCategory}. Expects a
+	 * {@link NotFoundException} to be thrown.
+	 * 
+	 * @throws RedmineException
+	 *             thrown in case something went wrong in Redmine
+	 * @throws IOException
+	 *             thrown in case something went wrong while performing I/O
+	 *             operations
+	 * @throws RedmineAuthenticationException
+	 *             thrown in case something went wrong while trying to login
+	 * @throws NotFoundException
+	 *             thrown in case the objects requested for could not be found
+	 */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidIssueCategory() throws RedmineException {
         // create new test category

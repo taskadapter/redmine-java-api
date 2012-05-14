@@ -80,7 +80,7 @@ public final class LoggerFactory {
      * @param clazz the {@link Class}
      * @return the {@link Logger}
      */
-    public static Logger getLogger(Class clazz) {
+	public static Logger getLogger(Class<?> clazz) {
         return getLogger(clazz.getSimpleName());
     }
 
