@@ -1,8 +1,9 @@
 package org.redmine.ta;
 
 public class RedmineException extends Exception {
+	private static final long serialVersionUID = -1592189045756043062L;
 
-    public RedmineException() {
+	public RedmineException() {
     }
 
     public RedmineException(String message, Throwable cause) {
