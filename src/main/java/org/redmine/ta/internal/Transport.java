@@ -25,7 +25,10 @@ import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.RedmineManager;
 import org.redmine.ta.beans.Identifiable;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
@@ -59,6 +62,20 @@ public final class Transport {
 				Issue.class,
 				config("issue", "issues", RedmineJSONBuilder.ISSUE_WRITER,
 						RedmineJSONParser.ISSUE_PARSER));
+		OBJECT_CONFIGS.put(
+				User.class,
+				config("user", "users", RedmineJSONBuilder.USER_WRITER,
+						RedmineJSONParser.USER_PARSER));
+		OBJECT_CONFIGS.put(
+				IssueCategory.class,
+				config("issue_category", "issue_categories",
+						RedmineJSONBuilder.CATEGORY_WRITER,
+						RedmineJSONParser.CATEGORY_PARSER));
+		OBJECT_CONFIGS.put(
+				Version.class,
+				config("version", "versions",
+						RedmineJSONBuilder.VERSION_WRITER,
+						RedmineJSONParser.VERSION_PARSER));
 	}
 
 	/** Uri configurator */
@@ -70,6 +87,13 @@ public final class Transport {
 
 	public Transport(URIConfigurator configurator) {
 		this.configurator = configurator;
+	}
+
+	public User getCurrentUser() throws RedmineException {
+		URI uri = getURIConfigurator().createURI("users/current.json");
+		HttpGet http = new HttpGet(uri);
+		String response = getCommunicator().sendRequest(http);
+		return parseResponce(response, "user", RedmineJSONParser.USER_PARSER);
 	}
 
 	/**
@@ -88,6 +112,32 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(object.getClass());
 		URI uri = getURIConfigurator().createURI(
 				config.multiObjectName + FORMAT_SUFFIX, params);
+		HttpPost httpPost = new HttpPost(uri);
+		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
+				object, config.writer);
+		setEntity(httpPost, body);
+		String response = getCommunicator().sendRequest(httpPost);
+		logger.debug(response);
+		return parseResponce(response, config.singleObjectName, config.parser);
+	}
+
+	/**
+	 * Performs an "add project object" request.
+	 * 
+	 * @param object
+	 *            object to use.
+	 * @param params
+	 *            name params.
+	 * @return object to use.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public <T> T addProjectEntry(int projectId, T object,
+			NameValuePair... params) throws RedmineException {
+		final EntityConfig<T> config = getConfig(object.getClass());
+		URI uri = getURIConfigurator().createURI(
+				"projects/" + projectId + "/" + config.multiObjectName
+						+ FORMAT_SUFFIX, params);
 		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
 				object, config.writer);
@@ -246,7 +296,32 @@ public final class Transport {
 		return objectsPerPage;
 	}
 
-	// TODO add test
+	/**
+	 * Delivers a list of of a project entries.
+	 * 
+	 * @param classs
+	 *            target class.
+	 * @param projectID
+	 *            the ID of the {@link Project}
+	 */
+	public <T> List<T> getProjectEntries(Class<T> classs, int projectID)
+			throws RedmineException {
+		final EntityConfig<T> config = getConfig(classs);
+		URI uri = getURIConfigurator().createURI(
+				"projects/" + projectID + "/" + config.multiObjectName
+						+ FORMAT_SUFFIX);
+		HttpGet http = new HttpGet(uri);
+		String response = getCommunicator().sendRequest(http);
+		final JsonObject responceObject;
+		try {
+			responceObject = RedmineJSONParser.getResponce(response);
+			return JsonInput.getListNotNull(responceObject,
+					config.multiObjectName, config.parser);
+		} catch (JsonFormatException e) {
+			throw new RedmineFormatException("Bad categories responce "
+					+ response, e);
+		}
+	}
 
 	/**
 	 * This number of objects (tasks, projects, users) will be requested from

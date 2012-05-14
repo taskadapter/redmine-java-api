@@ -188,6 +188,50 @@ public class JsonInput {
 	}
 
 	/**
+	 * Fetches a long from an object.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws JsonFormatException
+	 *             if value is not valid, not exists, etc...
+	 */
+	public static long getLong(JsonObject obj, String field)
+			throws JsonFormatException {
+		final JsonPrimitive primitive = JsonInput.getPrimitiveNotNull(obj,
+				field);
+		try {
+			return primitive.getAsLong();
+		} catch (NumberFormatException e) {
+			throw new JsonFormatException("Bad integer value " + primitive);
+		}
+	}
+
+	/**
+	 * Fetches an optional long from an object.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws JsonFormatException
+	 *             if value is not valid, not exists, etc...
+	 */
+	public static Long getLongOrNull(JsonObject obj, String field)
+			throws JsonFormatException {
+		final JsonPrimitive primitive = JsonInput
+				.getPrimitiveOrNull(obj, field);
+		if (primitive == null)
+			return null;
+		try {
+			return primitive.getAsLong();
+		} catch (NumberFormatException e) {
+			throw new JsonFormatException("Bad integer value " + primitive);
+		}
+	}
+
+	/**
 	 * Fetches an optional float from an object.
 	 * 
 	 * @param obj

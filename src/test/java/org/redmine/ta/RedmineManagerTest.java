@@ -590,7 +590,7 @@ public class RedmineManagerTest {
     }
 
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetUsers() {
         try {
@@ -612,7 +612,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetCurrentUser() throws RedmineException {
         User currentUser = mgr.getCurrentUser();
@@ -620,7 +620,7 @@ public class RedmineManagerTest {
         Assert.assertEquals(getOurUser().getLogin(), currentUser.getLogin());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetUserById() throws RedmineException {
         User loadedUser = mgr.getUserById(getOurUser().getId());
@@ -628,13 +628,13 @@ public class RedmineManagerTest {
         Assert.assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testGetUserNonExistingId() throws RedmineException {
         mgr.getUserById(999999);
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testInvalidGetCurrentUser() throws RedmineException {
         RedmineManager invalidManager = new RedmineManager(testConfig.getURI() + "/INVALID");
@@ -643,7 +643,7 @@ public class RedmineManagerTest {
         invalidManager.getCurrentUser();
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateUser() throws RedmineException {
         User createdUser = null;
@@ -680,7 +680,7 @@ public class RedmineManagerTest {
         return user;
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testUpdateUser() throws RedmineAuthenticationException, NotFoundException {
         User userToCreate = new User();
@@ -716,7 +716,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void userCanBeDeleted() throws RedmineException {
         User user = generateRandomUser();
@@ -736,7 +736,7 @@ public class RedmineManagerTest {
         }
     }
 
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void deletingNonExistingUserThrowsNFE() throws RedmineException {
         mgr.deleteUser(999999);
@@ -1210,11 +1210,13 @@ public class RedmineManagerTest {
     }
 
     /**
-     * this test is ignored because:
-     * 1) we can't create Versions. see http://www.redmine.org/issues/9088
-     * 2) we don't currently set versions when creating issues.
-     */
-    @Ignore
+	 * this test is ignored because: 1) we can't create Versions. see
+	 * http://www.redmine.org/issues/9088 2) we don't currently set versions
+	 * when creating issues.
+	 * 
+	 * 3) setting "fixed_version_id" does not work on creating issue.
+	 */
+	@Ignore
     @Test
     public void issueFixVersionIsSet() throws Exception {
 
@@ -1224,6 +1226,8 @@ public class RedmineManagerTest {
         String versionName = "1.0";
         v.setName("1.0");
         v.setId(1);
+		v.setProject(mgr.getProjectByKey(projectKey));
+		v = mgr.createVersion(v);
         toCreate.setTargetVersion(v);
         Issue createdIssue = mgr.createIssue(existingProjectKey, toCreate);
 
@@ -1334,7 +1338,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidVersion() throws RedmineException {
         Version version = new Version(null, "Invalid test version " + UUID.randomUUID().toString());
@@ -1349,7 +1353,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidVersion() throws RedmineException {
         // create new test version
@@ -1368,7 +1372,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testDeleteVersion() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1393,7 +1397,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetVersions() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1419,7 +1423,8 @@ public class RedmineManagerTest {
         }
     }
 
-    @Ignore // see Redmine bug http://www.redmine.org/issues/10241
+	@Ignore
+	// see Redmine bug http://www.redmine.org/issues/10241
     @Test
     public void versionIsRetrievedById() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1449,7 +1454,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1477,7 +1482,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testGetIssueCategories() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1518,7 +1523,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidIssueCategory() throws RedmineException {
         IssueCategory category = new IssueCategory(null, "InvalidCategory" + new Date().getTime());
@@ -1526,16 +1531,20 @@ public class RedmineManagerTest {
     }
 
     /**
-     * tests the deletion of an invalid {@link IssueCategory}. Expects a
-     * {@link NotFoundException} to be thrown.
-     *
-     * @throws RedmineException        thrown in case something went wrong in Redmine
-     * @throws IOException             thrown in case something went wrong while performing I/O
-     *                                 operations
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException       thrown in case the objects requested for could not be found
-     */
-	@Ignore("Отключен до перехода на json")
+	 * tests the deletion of an invalid {@link IssueCategory}. Expects a
+	 * {@link NotFoundException} to be thrown.
+	 * 
+	 * @throws RedmineException
+	 *             thrown in case something went wrong in Redmine
+	 * @throws IOException
+	 *             thrown in case something went wrong while performing I/O
+	 *             operations
+	 * @throws RedmineAuthenticationException
+	 *             thrown in case something went wrong while trying to login
+	 * @throws NotFoundException
+	 *             thrown in case the objects requested for could not be found
+	 */
+	@Ignore("---?---")
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidIssueCategory() throws RedmineException {
         // create new test category
@@ -1649,7 +1658,7 @@ public class RedmineManagerTest {
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws NotFoundException       thrown in case the objects requested for could not be found
      */
-	@Ignore("Отключен до перехода на json")
+	@Ignore("---?---")
     @Test
     public void testCreateAndGetIssueWithCategory() throws RedmineException {
         IssueCategory newIssueCategory = null;

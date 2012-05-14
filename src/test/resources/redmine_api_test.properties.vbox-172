@@ -1,0 +1,11 @@
+# test config for Redmine API
+redmine.host=http://172.17.10.37:3000
+redmine.apikey=bc69c87134aa0df44e40f12aba6d91c5261771b8
+redmine.user=admin
+
+## redmine.projectKey=rw
+# query 5: "created last day" issues
+## redmine.queryId=5
+
+createissue.userid=1
+createissue.userFirstAndLastName=Redmine Admin

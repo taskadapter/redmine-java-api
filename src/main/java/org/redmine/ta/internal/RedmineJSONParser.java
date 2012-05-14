@@ -102,6 +102,7 @@ public class RedmineJSONParser {
 			return parseVersion(JsonInput.toObject(input));
 		}
 	};
+
 	public static final JsonObjectParser<IssueCategory> CATEGORY_PARSER = new JsonObjectParser<IssueCategory>() {
 		@Override
 		public IssueCategory parse(JsonElement input)
@@ -240,22 +241,37 @@ public class RedmineJSONParser {
 		result.getRelations()
 				.addAll(JsonInput.getListOrEmpty(content, "relations",
 						RELATION_PARSER));
-		result.setTargetVersion(JsonInput.getObjectOrNull(statusObject,
+		result.setTargetVersion(JsonInput.getObjectOrNull(content,
 				"fixed_version", VERSION_PARSER));
-		result.setCategory(JsonInput.getObjectOrNull(statusObject, "category",
+		result.setCategory(JsonInput.getObjectOrNull(content, "category",
 				CATEGORY_PARSER));
 		return result;
 	}
 
-	public static IssueCategory parseCategory(JsonObject content) {
-		// FIXME: Other fields
+	public static IssueCategory parseCategory(JsonObject content)
+			throws JsonFormatException {
 		final IssueCategory result = new IssueCategory();
+		result.setId(JsonInput.getInt(content, "id"));
+		result.setName(JsonInput.getStringOrNull(content, "name"));
+		result.setProject(JsonInput.getObjectOrNull(content, "project",
+				PROJECT_PARSER));
+		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to",
+				USER_PARSER));
 		return result;
 	}
 
-	public static Version parseVersion(JsonObject content) {
-		// FIXME: Other fields
+	public static Version parseVersion(JsonObject content)
+			throws JsonFormatException {
 		final Version result = new Version();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setProject(JsonInput.getObjectOrNull(content, "project",
+				PROJECT_PARSER));
+		result.setName(JsonInput.getStringOrNull(content, "name"));
+		result.setDescription(JsonInput.getStringOrNull(content, "description"));
+		result.setStatus(JsonInput.getStringOrNull(content, "status"));
+		result.setDueDate(getShortDateOrNull(content, "due_date"));
+		result.setCreatedOn(getDateOrNull(content, "created_on"));
+		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
 		return result;
 	}
 
@@ -270,9 +286,19 @@ public class RedmineJSONParser {
 		return result;
 	}
 
-	public static Attachment parseAttachments(JsonObject content) {
-		// FIXME:
+	public static Attachment parseAttachments(JsonObject content)
+			throws JsonFormatException {
 		final Attachment result = new Attachment();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setFileName(JsonInput.getStringOrNull(content, "filename"));
+		result.setFileSize(JsonInput.getLong(content, "filesize"));
+		result.setContentType(JsonInput
+				.getStringOrNull(content, "content_type"));
+		result.setContentURL(JsonInput.getStringOrNull(content, "content_url"));
+		result.setDescription(JsonInput.getStringOrNull(content, "description"));
+		result.setCreatedOn(getDateOrNull(content, "created_on"));
+		result.setAuthor(JsonInput.getObjectOrNull(content, "author",
+				USER_PARSER));
 		return result;
 	}
 
@@ -296,9 +322,17 @@ public class RedmineJSONParser {
 	}
 
 	public static User parseUser(JsonObject content) throws JsonFormatException {
-		// FIXME: other fields!!!
 		final User result = new User();
 		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setLogin(JsonInput.getStringOrNull(content, "login"));
+		result.setPassword(JsonInput.getStringOrNull(content, "password"));
+		result.setFirstName(JsonInput.getStringOrNull(content, "firstname"));
+		result.setLastName(JsonInput.getStringOrNull(content, "lastname"));
+		result.setMail(JsonInput.getStringOrNull(content, "mail"));
+		result.setCreatedOn(getDateOrNull(content, "created_on"));
+		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
+		result.setCustomFields(JsonInput.getListOrNull(content,
+				"custom_fields", CUSTOM_FIELD_PARSER));
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
 			result.setFullName(name);

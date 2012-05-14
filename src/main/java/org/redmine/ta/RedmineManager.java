@@ -496,25 +496,22 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public List<User> getUsers() throws RedmineException {
-        return getObjectsList(User.class, new HashSet<NameValuePair>());
+		return transport.getObjectsList(User.class);
     }
 
     public User getUserById(Integer userId) throws RedmineException {
-        return getObject(User.class, userId);
+		return transport.getObject(User.class, userId);
     }
 
     /**
      * @return the current user logged into Redmine
      */
     public User getCurrentUser() throws RedmineException {
-        URI uri = getURIConfigurator().createURI("users/current.xml");
-        HttpGet http = new HttpGet(uri);
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseUserFromXML(response);
+		return transport.getCurrentUser();
     }
 
     public User createUser(User user) throws RedmineException {
-        return createObject(User.class, user);
+		return transport.addObject(user);
     }
 
     /**
@@ -525,7 +522,7 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public void deleteUser(Integer userId) throws RedmineException {
-        deleteObject(User.class, Integer.toString(userId));
+		transport.deleteObject(User.class, Integer.toString(userId));
     }
 
     public List<TimeEntry> getTimeEntries() throws RedmineException {
@@ -651,18 +648,12 @@ public class RedmineManager {
      */
     public Version createVersion(Version version) throws RedmineException {
         // check project
-        if (version.getProject() == null) {
-            throw new IllegalArgumentException("Version must contain a project");
+		if (version.getProject() == null
+				|| version.getProject().getId() == null) {
+			throw new IllegalArgumentException(
+					"Version must contain an existing project");
         }
-        // create URI and entity
-        int projectID = version.getProject().getId();
-        URI uri = getURIConfigurator().createURI("projects/" + projectID + "/versions.xml");
-        HttpPost httpPost = new HttpPost(uri);
-        String createVersionXML = RedmineXMLGenerator.toXML(version);
-        setEntity(httpPost, createVersionXML);
-        String response = getCommunicator().sendRequest(httpPost);
-        logger.debug(response);
-        return RedmineXMLParser.parseVersionFromXML(response);
+		return transport.addProjectEntry(version.getProject().getId(), version);
     }
 
     /**
@@ -674,7 +665,8 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public void deleteVersion(Version version) throws RedmineException {
-        deleteObject(Version.class, Integer.toString(version.getId()));
+		transport
+				.deleteObject(Version.class, Integer.toString(version.getId()));
     }
 
     /**
@@ -687,18 +679,12 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<Version> getVersions(int projectID) throws RedmineException {
-        URI uri = getURIConfigurator().createURI("projects/" + projectID + "/versions.xml", new BasicNameValuePair("include", "projects"));
-        HttpGet http = new HttpGet(uri);
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseVersionsFromXML(response);
+		return transport.getProjectEntries(Version.class, projectID);
     }
 
     // TODO add test
     public Version getVersionById(int versionId) throws RedmineException {
-        URI uri = getURIConfigurator().createURI("versions/" + versionId + ".xml");
-        HttpGet http = new HttpGet(uri);
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseVersionFromXML(response);
+		return transport.getObject(Version.class, versionId);
     }
 
     /**
@@ -711,10 +697,7 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public List<IssueCategory> getCategories(int projectID) throws RedmineException {
-        URI uri = getURIConfigurator().createURI("projects/" + projectID + "/issue_categories.xml");
-        HttpGet http = new HttpGet(uri);
-        String response = getCommunicator().sendRequest(http);
-        return RedmineXMLParser.parseIssueCategoriesFromXML(response);
+		return transport.getProjectEntries(IssueCategory.class, projectID);
     }
 
     /**
@@ -730,11 +713,13 @@ public class RedmineManager {
      * @throws NotFoundException        thrown in case an object can not be found
      */
     public IssueCategory createCategory(IssueCategory category) throws RedmineException {
-        if (category.getProject() == null) {
-            throw new IllegalArgumentException("IssueCategory must contain a project");
+		if (category.getProject() == null
+				|| category.getProject().getId() == null) {
+			throw new IllegalArgumentException(
+					"IssueCategory must contain an existing project");
         }
-        URI uri = getURIConfigurator().getCreateURIIssueCategory(category.getProject().getId());
-        return createObject(IssueCategory.class, category, uri);
+
+		return transport.addProjectEntry(category.getProject().getId(), category);
     }
 
     /**
@@ -746,7 +731,8 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public void deleteCategory(IssueCategory category) throws RedmineException {
-        deleteObject(IssueCategory.class, Integer.toString(category.getId()));
+		transport.deleteObject(IssueCategory.class,
+				Integer.toString(category.getId()));
     }
 
     /**
@@ -769,7 +755,7 @@ public class RedmineManager {
      * @throws NotFoundException       thrown in case an object can not be found
      */
     public Attachment getAttachmentById(int attachmentID) throws RedmineException {
-        return getObject(Attachment.class, attachmentID);
+		return transport.getObject(Attachment.class, attachmentID);
     }
 
     /**

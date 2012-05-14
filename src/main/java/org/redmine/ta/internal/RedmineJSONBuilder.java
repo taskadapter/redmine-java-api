@@ -10,9 +10,11 @@ import java.util.List;
 import org.redmine.ta.RedmineInternalError;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonObjectWriter;
 import org.redmine.ta.internal.json.JsonOutput;
 
@@ -52,6 +54,28 @@ public class RedmineJSONBuilder {
 		}
 	};
 
+	public static JsonObjectWriter<User> USER_WRITER = new JsonObjectWriter<User>() {
+		@Override
+		public void write(JsonWriter writer, User object) throws IOException {
+			writeUser(object, writer);
+		}
+	};
+
+	public static JsonObjectWriter<IssueCategory> CATEGORY_WRITER = new JsonObjectWriter<IssueCategory>() {
+		@Override
+		public void write(JsonWriter writer, IssueCategory object)
+				throws IOException {
+			writeCategory(object, writer);
+		}
+	};
+
+	public static JsonObjectWriter<Version> VERSION_WRITER = new JsonObjectWriter<Version>() {
+		@Override
+		public void write(JsonWriter writer, Version object)
+				throws IOException {
+			writeVersion(writer, object);
+		}
+	};
 	/**
 	 * Writes a "create project" request.
 	 * 
@@ -91,6 +115,21 @@ public class RedmineJSONBuilder {
 			throws IOException {
 		writer.name("id").value(tracker.getId());
 		writer.name("name").value(tracker.getName());
+	}
+
+	static void writeVersion(JsonWriter writer, Version version)
+			throws IOException {
+		JsonOutput.addIfNotNull(writer, "id", version.getId());
+		if (version.getProject() != null)
+			JsonOutput.addIfNotNull(writer, "project_id", version.getProject()
+					.getId());
+		JsonOutput.addIfNotNull(writer, "name", version.getName());
+		JsonOutput
+				.addIfNotNull(writer, "description", version.getDescription());
+		JsonOutput.addIfNotNull(writer, "status", version.getStatus());
+		addIfNotNullShort(writer, "due_date", version.getDueDate());
+		addIfNotNullFull(writer, "created_on", version.getCreatedOn());
+		addIfNotNullFull(writer, "updated_on", version.getUpdatedOn());
 	}
 
 	/**
@@ -137,6 +176,33 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "parent_id", project.getParentId());
 		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(),
 				TRACKER_WRITER);
+	}
+
+	public static void writeCategory(IssueCategory category,
+			final JsonWriter writer) throws IOException {
+		writer.name("id").value(category.getId());
+		JsonOutput.addIfNotNull(writer, "name", category.getName());
+		if (category.getProject() != null)
+			JsonOutput.addIfNotNull(writer, "project_id", category.getProject()
+					.getId());
+		if (category.getAssignee() != null)
+			JsonOutput.addIfNotNull(writer, "assigned_to_id", category
+					.getAssignee().getId());
+	}
+
+	public static void writeUser(User user, final JsonWriter writer)
+			throws IOException {
+		JsonOutput.addIfNotNull(writer, "id", user.getId());
+		JsonOutput.addIfNotNull(writer, "login", user.getLogin());
+		JsonOutput.addIfNotNull(writer, "password", user.getPassword());
+		JsonOutput.addIfNotNull(writer, "firstname", user.getFirstName());
+		JsonOutput.addIfNotNull(writer, "lastname", user.getLastName());
+		JsonOutput.addIfNotNull(writer, "name", user.getFullName());
+		JsonOutput.addIfNotNull(writer, "mail", user.getMail());
+		addIfNotNullFull(writer, "created_on", user.getCreatedOn());
+		addIfNotNullFull(writer, "last_login_on", user.getLastLoginOn());
+		writeCustomFields(writer, user.getCustomFields());
+
 	}
 
 	public static void writeIssue(Issue issue, final JsonWriter writer)
@@ -214,6 +280,25 @@ public class RedmineJSONBuilder {
 	public static void addIfNotNullFull(JsonWriter writer, String field,
 			Date value) throws IOException {
 		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
+		JsonOutput.addIfNotNull(writer, field, value, format);
+	}
+
+	/**
+	 * Adds a value to a writer if value is not <code>null</code>.
+	 * 
+	 * @param writer
+	 *            writer to add object to.
+	 * @param field
+	 *            field name to set.
+	 * @param value
+	 *            field value.
+	 * @throws IOException
+	 *             if io error occurs.
+	 */
+	public static void addIfNotNullShort(JsonWriter writer, String field,
+			Date value) throws IOException {
+		final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT
+				.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
 	}
 
