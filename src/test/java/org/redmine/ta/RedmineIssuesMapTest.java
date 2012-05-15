@@ -1,5 +1,9 @@
 package org.redmine.ta;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -8,8 +12,8 @@ import org.junit.Assert;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.User;
+import org.redmine.ta.internal.RedmineXMLParser;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class RedmineIssuesMapTest {
@@ -17,8 +21,7 @@ public class RedmineIssuesMapTest {
 //	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";
 //	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 13;
 
-	// private static final String REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME =
-	// "redmine_1_1_issues.xml";
+    private static final String REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME = "redmine_1_1_issues.xml";
     private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 26;
 
     private List<Issue> issuesList;
@@ -27,28 +30,23 @@ public class RedmineIssuesMapTest {
     @Before
     // Is executed before each test method
     public void setup() throws Exception {
-		// String str =
-		// MyIOUtils.getResourceAsString(REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME);
-		// this.issuesList = RedmineXMLParser.parseObjectsFromXML(Issue.class,
-		// str);
-		//
-		// RedmineIssuesMap loader = new RedmineIssuesMap(issuesList);
-		// issuesMap = loader.getIssuesMap();
+        String str = MyIOUtils.getResourceAsString(REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME);
+        this.issuesList = RedmineXMLParser.parseObjectsFromXML(Issue.class, str);
+
+        RedmineIssuesMap loader = new RedmineIssuesMap(issuesList);
+        issuesMap = loader.getIssuesMap();
     }
 
-	@Ignore
     @Test
     public void testAllIssuesAreLoadedToList() {
         Assert.assertEquals("There must be " + FILE_1_REQUIRED_ISSUES_NUMBER + " issues loaded to the list.", FILE_1_REQUIRED_ISSUES_NUMBER, issuesList.size());
     }
 
-	@Ignore
     @Test
     public void testMapHasSameSizeAsList() {
         Assert.assertEquals("There must be equal number of issues in map and list", issuesList.size(), issuesMap.size());
     }
 
-	@Ignore
     @Test
     public void testListHasIssueWithID39() {
         Integer id = 39;
@@ -64,14 +62,12 @@ public class RedmineIssuesMapTest {
         Assert.assertTrue("The list does not contain issue with ID " + id, found);
     }
 
-	@Ignore
     @Test
     public void testMapHasIssueWithID39() {
         Integer id = 39;
         Assert.assertNotNull("The map must contain issue with ID " + id, issuesMap.get(id));
     }
 
-	@Ignore
     @Test
     public void testParentId() {
         Integer childId = 67;
@@ -90,7 +86,6 @@ public class RedmineIssuesMapTest {
         Assert.assertEquals("Parent Issue id " + parentIdExpected + " must be equal to the value provided by getId()", parentIdExpected, parent.getId());
     }
 
-	@Ignore
     @Test
     public void testNullParentId() {
         Integer childId = 66;
@@ -98,14 +93,12 @@ public class RedmineIssuesMapTest {
         Assert.assertEquals("Issue " + childId + " must have NULL parent ID ", null, child.getParentId());
     }
 
-	@Ignore
     @Test
     public void testPriorityTextIsLoaded() {
         Issue issue = issuesMap.get(39);
         Assert.assertEquals("Comparing 'priority' field.", "High", issue.getPriorityText());
     }
 
-	@Ignore
     @Test
     public void testDoneRatioIsLoaded() {
         Issue issue67 = issuesMap.get(67);
@@ -121,7 +114,6 @@ public class RedmineIssuesMapTest {
         Assert.assertEquals("Comparing 'done_ratio' field.", expectedDoneRatio55, issue55.getDoneRatio());
     }
 
-	@Ignore
     @Test
     public void testProject1() {
         Issue issue67 = issuesMap.get(67);
@@ -133,7 +125,6 @@ public class RedmineIssuesMapTest {
         Assert.assertEquals("Comparing project name", expectedProjectName, actualProect.getName());
     }
 
-	@Ignore
     @Test
     public void testAssignee() {
         Issue issue = issuesMap.get(68);

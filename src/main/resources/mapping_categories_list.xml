@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+        "http://castor.org/mapping.dtd">
+<mapping>
+    <description>Redmine XML -> Java API binding.</description>
+
+    <class name="org.redmine.ta.beans.IssueCategory">
+        <map-to xml="issue_category"/>
+
+        <field name="id" type="integer">
+            <bind-xml name="id" node="element"/>
+        </field>
+        <field name="name" type="string">
+            <bind-xml name="name" node="element"/>
+        </field>
+        <field name="project" type="org.redmine.ta.beans.Project">
+            <bind-xml name="project"/>
+        </field>
+        <field name="assignee" type="org.redmine.ta.beans.User">
+            <bind-xml name="assigned_to"/>
+        </field>
+    </class>
+
+    <class name="org.redmine.ta.beans.Project">
+        <field name="id" type="integer">
+            <bind-xml name="id" node="attribute"/>
+        </field>
+        <field name="name" type="string">
+            <bind-xml name="name" node="attribute"/>
+        </field>
+        <field name="identifier" type="string">
+            <bind-xml name="identifier" node="attribute"/>
+        </field>
+    </class>
+
+    <class name="org.redmine.ta.beans.User">
+        <field name="id" type="integer">
+            <bind-xml name="id" node="attribute"/>
+        </field>
+        <field name="fullName" type="string">
+            <bind-xml name="name" node="attribute"/>
+        </field>
+    </class>
+</mapping>

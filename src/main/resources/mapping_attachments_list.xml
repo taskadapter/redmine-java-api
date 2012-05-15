@@ -1,0 +1,41 @@
+<mapping>
+    <description>Redmine XML -> Java API binding.</description>
+
+    <class name="org.redmine.ta.beans.Attachment">
+        <map-to xml="attachment"/>
+
+        <field name="id" type="integer">
+            <bind-xml name="id" node="element"/>
+        </field>
+        <field name="fileName" type="string">
+            <bind-xml name="filename" node="element"/>
+        </field>
+        <field name="fileSize" type="long">
+            <bind-xml name="filesize" node="element"/>
+        </field>
+        <field name="contentType" type="string">
+            <bind-xml name="content_type" node="element"/>
+        </field>
+        <field name="description" type="string">
+            <bind-xml name="description" node="element"/>
+        </field>
+        <field name="contentURL" type="string">
+            <bind-xml name="content_url" node="element"/>
+        </field>
+        <field name="createdOn" type="date">
+            <bind-xml name="created_on" node="element"/>
+        </field>
+        <field name="author" type="org.redmine.ta.beans.User">
+            <bind-xml name="author"/>
+        </field>
+    </class>
+
+    <class name="org.redmine.ta.beans.User">
+        <field name="id" type="integer">
+            <bind-xml name="id" node="attribute"/>
+        </field>
+        <field name="fullName" type="string">
+            <bind-xml name="name" node="attribute"/>
+        </field>
+    </class>
+</mapping>

@@ -1,9 +1,11 @@
 package org.redmine.ta;
 
+import java.util.Date;
 import java.util.List;
 
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.*;
+import org.redmine.ta.internal.RedmineXMLGenerator;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -107,6 +109,29 @@ public class Simple {
         mgr.createIssue(projectKey, issue);
     }
 
+	@SuppressWarnings("unused")
+    private static void generateXMLForTimeEntry() {
+        TimeEntry o = new TimeEntry();
+        o.setId(13);
+        o.setIssueId(45);
+        o.setActivityId(3);
+        o.setProjectId(55);
+        o.setUserId(66);
+        o.setHours(123f);
+        o.setComment("text here");
+        o.setSpentOn(new Date());
+        String xml = RedmineXMLGenerator.toXML(o);
+        logger.debug(xml);
+    }
+
+	@SuppressWarnings("unused")
+    private static void generateXMLForUser() {
+        User u = new User();
+        u.setLogin("newlogin");
+        String xml = RedmineXMLGenerator.toXML(u);
+        logger.debug(xml);
+
+    }
 
 	@SuppressWarnings("unused")
     private static void tryGetIssues(RedmineManager mgr) throws Exception {
