@@ -1,7 +1,5 @@
 package org.redmine.ta.beans;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,33 +14,22 @@ public class Issue implements Identifiable {
     private Integer id;
     private String subject;
     private Integer parentId;
-    @SerializedName("estimated_hours")
     private Float estimatedHours;
     private Float spentHours;
-    @SerializedName("assigned_to")
-    // @SerializedName("assigned_to_id") REST API not consistent here: see http://www.redmine.org/issues/10583
     private User assignee;
     private String priorityText;
-    @SerializedName("priority_id")
     private Integer priorityId;
-    @SerializedName("done_ratio")
     private Integer doneRatio;
     private Project project;
     private User author;
-    @SerializedName("start_date")
     private Date startDate;
-    @SerializedName("due_date")
     private Date dueDate;
     private Tracker tracker;
     private String description;
-    @SerializedName("created_on")
     private Date createdOn;
-    @SerializedName("updated_on")
     private Date updatedOn;
-    @SerializedName("status_id")
     private Integer statusId;
     private String statusName;
-    @SerializedName("target_version")
     private Version targetVersion;
     private IssueCategory category;
 

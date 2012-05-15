@@ -27,9 +27,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 /**
  * A parser for JSON items sent by Redmine.
  */
