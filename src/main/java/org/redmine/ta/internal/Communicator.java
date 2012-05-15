@@ -9,8 +9,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 import org.redmine.ta.*;
-import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -91,7 +91,7 @@ public class Communicator {
 			List<String> errors;
 			try {
 				errors = RedmineJSONParser.parseErrors(responseBody);
-			} catch (JsonFormatException e) {
+			} catch (JSONException e) {
 				throw new RedmineFormatException("Bad redmine error responce",
 						e);
 			}

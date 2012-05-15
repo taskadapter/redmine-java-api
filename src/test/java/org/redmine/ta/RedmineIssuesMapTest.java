@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
@@ -12,8 +13,6 @@ import org.redmine.ta.internal.RedmineJSONParser;
 import org.redmine.ta.internal.json.JsonInput;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.google.gson.JsonObject;
 
 public class RedmineIssuesMapTest {
 
@@ -26,7 +25,7 @@ public class RedmineIssuesMapTest {
     // Is executed before each test method
     public void setup() throws Exception {
 		String str = MyIOUtils.getResourceAsString("redmine_issues.json");
-		final JsonObject object = RedmineJSONParser.getResponce(str);
+		final JSONObject object = RedmineJSONParser.getResponce(str);
 		this.issuesList = JsonInput.getListNotNull(object, "issues",
 				RedmineJSONParser.ISSUE_PARSER);
 

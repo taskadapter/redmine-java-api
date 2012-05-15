@@ -6,10 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class JsonInput {
 	/**
@@ -22,16 +21,16 @@ public class JsonInput {
 	 * @param parser
 	 *            single item parser.
 	 * @return parsed objects.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if format is invalid.
 	 */
-	public static <T> List<T> getListNotNull(JsonObject obj, String field,
-			JsonObjectParser<T> parser) throws JsonFormatException {
-		final JsonArray items = JsonInput.getArrayNotNull(obj, field);
-		final int length = items.size();
+	public static <T> List<T> getListNotNull(JSONObject obj, String field,
+			JsonObjectParser<T> parser) throws JSONException {
+		final JSONArray items = getArrayNotNull(obj, field);
+		final int length = items.length();
 		final List<T> result = new ArrayList<T>(length);
 		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.get(i)));
+			result.add(parser.parse(items.getJSONObject(i)));
 		return result;
 	}
 
@@ -45,18 +44,18 @@ public class JsonInput {
 	 * @param parser
 	 *            single item parser.
 	 * @return parsed objects.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if format is invalid.
 	 */
-	public static <T> List<T> getListOrNull(JsonObject obj, String field,
-			JsonObjectParser<T> parser) throws JsonFormatException {
-		final JsonArray items = JsonInput.getArrayOrNull(obj, field);
-		if (items == null)
+	public static <T> List<T> getListOrNull(JSONObject obj, String field,
+			JsonObjectParser<T> parser) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		final int length = items.size();
+		final JSONArray items = obj.getJSONArray(field);
+		final int length = items.length();
 		final List<T> result = new ArrayList<T>(length);
 		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.get(i)));
+			result.add(parser.parse(items.getJSONObject(i)));
 		return result;
 	}
 
@@ -70,18 +69,20 @@ public class JsonInput {
 	 * @param parser
 	 *            single item parser.
 	 * @return parsed objects.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if format is invalid.
 	 */
-	public static <T> List<T> getListOrEmpty(JsonObject obj, String field,
-			JsonObjectParser<T> parser) throws JsonFormatException {
-		final JsonArray items = JsonInput.getArrayOrNull(obj, field);
+	public static <T> List<T> getListOrEmpty(JSONObject obj, String field,
+			JsonObjectParser<T> parser) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
+			return new ArrayList<T>();
+		final JSONArray items = obj.getJSONArray(field);
 		if (items == null)
 			return new ArrayList<T>();
-		final int length = items.size();
+		final int length = items.length();
 		final List<T> result = new ArrayList<T>(length);
 		for (int i = 0; i < length; i++)
-			result.add(parser.parse(items.get(i)));
+			result.add(parser.parse(items.getJSONObject(i)));
 		return result;
 	}
 
@@ -95,18 +96,18 @@ public class JsonInput {
 	 * @param dateFormat
 	 *            field date format.
 	 * @return data format.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if error occurs.
 	 */
-	public static Date getDateOrNull(JsonObject obj, String field,
-			final SimpleDateFormat dateFormat) throws JsonFormatException {
-		final JsonPrimitive guess = JsonInput.getPrimitiveOrNull(obj, field);
-		if (guess == null)
+	public static Date getDateOrNull(JSONObject obj, String field,
+			final SimpleDateFormat dateFormat) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
+		final String guess = obj.getString(field);
 		try {
-			return dateFormat.parse(guess.getAsString());
+			return dateFormat.parse(guess);
 		} catch (ParseException e) {
-			throw new JsonFormatException("Bad date value " + guess);
+			throw new JSONException("Bad date value " + guess);
 		}
 	}
 
@@ -117,15 +118,14 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid
 	 */
-	public static String getStringOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonPrimitive guess = JsonInput.getPrimitiveOrNull(obj, field);
-		if (guess == null)
+	public static String getStringOrNull(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		return guess.getAsString();
+		return obj.getString(field);
 	}
 
 	/**
@@ -135,12 +135,12 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static String getStringNotNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		return JsonInput.getPrimitiveNotNull(obj, field).getAsString();
+	public static String getStringNotNull(JSONObject obj, String field)
+			throws JSONException {
+		return obj.getString(field);
 	}
 
 	/**
@@ -150,18 +150,11 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static int getInt(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput.getPrimitiveNotNull(obj,
-				field);
-		try {
-			return primitive.getAsInt();
-		} catch (NumberFormatException e) {
-			throw new JsonFormatException("Bad integer value " + primitive);
-		}
+	public static int getInt(JSONObject obj, String field) throws JSONException {
+		return obj.getInt(field);
 	}
 
 	/**
@@ -171,20 +164,14 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static Integer getIntOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput
-				.getPrimitiveOrNull(obj, field);
-		if (primitive == null)
+	public static Integer getIntOrNull(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		try {
-			return primitive.getAsInt();
-		} catch (NumberFormatException e) {
-			throw new JsonFormatException("Bad integer value " + primitive);
-		}
+		return obj.getInt(field);
 	}
 
 	/**
@@ -194,18 +181,12 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static long getLong(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput.getPrimitiveNotNull(obj,
-				field);
-		try {
-			return primitive.getAsLong();
-		} catch (NumberFormatException e) {
-			throw new JsonFormatException("Bad integer value " + primitive);
-		}
+	public static long getLong(JSONObject obj, String field)
+			throws JSONException {
+		return obj.getLong(field);
 	}
 
 	/**
@@ -215,20 +196,14 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static Long getLongOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput
-				.getPrimitiveOrNull(obj, field);
-		if (primitive == null)
+	public static Long getLongOrNull(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		try {
-			return primitive.getAsLong();
-		} catch (NumberFormatException e) {
-			throw new JsonFormatException("Bad integer value " + primitive);
-		}
+		return obj.getLong(field);
 	}
 
 	/**
@@ -238,20 +213,14 @@ public class JsonInput {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid, not exists, etc...
 	 */
-	public static Float getFloatOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonPrimitive primitive = JsonInput
-				.getPrimitiveOrNull(obj, field);
-		if (primitive == null)
+	public static Float getFloatOrNull(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		try {
-			return primitive.getAsFloat();
-		} catch (NumberFormatException e) {
-			throw new JsonFormatException("Bad float value " + primitive);
-		}
+		return (float) obj.getDouble(field);
 	}
 
 	/**
@@ -264,15 +233,14 @@ public class JsonInput {
 	 * @param parser
 	 *            parset ojbect.
 	 * @return parsed object.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if value is not valid.
 	 */
-	public static <T> T getObjectOrNull(JsonObject obj, String field,
-			JsonObjectParser<T> parser) throws JsonFormatException {
-		final JsonObject res = getObjectOrNull(obj, field);
-		if (res == null)
+	public static <T> T getObjectOrNull(JSONObject obj, String field,
+			JsonObjectParser<T> parser) throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		return parser.parse(res);
+		return parser.parse(obj.getJSONObject(field));
 	}
 
 	/**
@@ -284,9 +252,11 @@ public class JsonInput {
 	 *            field to get a value from.
 	 * @return json array.
 	 */
-	public static JsonArray getArrayOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		return JsonInput.toArray(obj.get(field));
+	public static JSONArray getArrayOrNull(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
+			return null;
+		return obj.getJSONArray(field);
 	}
 
 	/**
@@ -298,60 +268,9 @@ public class JsonInput {
 	 *            field to get a value from.
 	 * @return json array.
 	 */
-	public static JsonArray getArrayNotNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		return JsonInput.toArray(JsonInput.getNotNull(obj, field));
-	}
-
-	/**
-	 * Returns a json primitive as "maybe-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json primitive.
-	 */
-	public static JsonPrimitive getPrimitiveOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		return JsonInput.toPrimitive(obj.get(field));
-	}
-
-	/**
-	 * Returns a json primitive as "not-null" value.
-	 * 
-	 * @param obj
-	 *            object to get a value from.
-	 * @param field
-	 *            field to get a value from.
-	 * @return json primitive.
-	 */
-	public static JsonPrimitive getPrimitiveNotNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		return JsonInput.toPrimitive(JsonInput.getNotNull(obj, field));
-	}
-
-	/**
-	 * Returns an object as non-null value.
-	 * 
-	 * @param obj
-	 *            object to get a field from.
-	 * @param field
-	 *            field to get a value.
-	 * @return json value.
-	 * @throws JsonFormatException
-	 *             if field is not present.
-	 */
-	public static JsonElement getNotNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonElement resultElt = obj.get(field);
-		if (!obj.has(field))
-			throw new JsonFormatException("Missing required field " + field
-					+ " in " + obj);
-		if (resultElt.isJsonNull())
-			throw new JsonFormatException("Missing required field " + field
-					+ " in " + obj);
-		return resultElt;
+	public static JSONArray getArrayNotNull(JSONObject obj, String field)
+			throws JSONException {
+		return obj.getJSONArray(field);
 	}
 
 	/**
@@ -362,12 +281,12 @@ public class JsonInput {
 	 * @param field
 	 *            returned field.
 	 * @return object field.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if target field is not an object.
 	 */
-	public static JsonObject getObjectNotNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		return JsonInput.toObject(getNotNull(obj, field));
+	public static JSONObject getObjectNotNull(JSONObject obj, String field)
+			throws JSONException {
+		return obj.getJSONObject(field);
 	}
 
 	/**
@@ -378,69 +297,13 @@ public class JsonInput {
 	 * @param field
 	 *            returned field.
 	 * @return object field.
-	 * @throws JsonFormatException
+	 * @throws JSONException
 	 *             if target field is not an object.
 	 */
-	public static JsonObject getObjectOrNull(JsonObject obj, String field)
-			throws JsonFormatException {
-		final JsonElement elt = obj.get(field);
-		return JsonInput.toObject(elt);
-	}
-
-	/**
-	 * Converts element to object.
-	 * 
-	 * @param elt
-	 *            element to convert.
-	 * @return element as object value.
-	 * @throws JsonFormatException
-	 *             if element is not an object value.
-	 */
-	public static JsonObject toObject(JsonElement elt)
-			throws JsonFormatException {
-		if (elt == null || elt.isJsonNull())
+	public static JSONObject getObjectOrNull(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
 			return null;
-		if (elt.isJsonObject())
-			return elt.getAsJsonObject();
-		throw new JsonFormatException("Expected object but got "
-				+ elt.getClass() + " in content " + elt);
+		return obj.getJSONObject(field);
 	}
-
-	/**
-	 * Converts element to array.
-	 * 
-	 * @param elt
-	 *            element to convert.
-	 * @return element as object value.
-	 * @throws JsonFormatException
-	 *             if element is not an object value.
-	 */
-	public static JsonArray toArray(JsonElement elt) throws JsonFormatException {
-		if (elt == null || elt.isJsonNull())
-			return null;
-		if (elt.isJsonArray())
-			return elt.getAsJsonArray();
-		throw new JsonFormatException("Expected array but got "
-				+ elt.getClass() + " in content " + elt);
-	}
-
-	/**
-	 * Converts element to primitive.
-	 * 
-	 * @param elt
-	 *            element to convert.
-	 * @return element as a primitive value.
-	 * @throws JsonFormatException
-	 *             if element is not an primitive value.
-	 */
-	public static JsonPrimitive toPrimitive(JsonElement elt)
-			throws JsonFormatException {
-		if (elt == null || elt.isJsonNull())
-			return null;
-		if (elt.isJsonPrimitive())
-			return elt.getAsJsonPrimitive();
-		throw new JsonFormatException("Expected primitive but got "
-				+ elt.getClass() + " in content " + elt);
-	}
-
 }

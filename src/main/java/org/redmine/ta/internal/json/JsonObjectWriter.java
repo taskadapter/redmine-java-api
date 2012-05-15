@@ -1,8 +1,7 @@
 package org.redmine.ta.internal.json;
 
-import java.io.IOException;
-
-import com.google.gson.stream.JsonWriter;
+import org.json.JSONException;
+import org.json.JSONWriter;
 
 /**
  * Json object writer.
@@ -11,5 +10,5 @@ import com.google.gson.stream.JsonWriter;
  * 
  */
 public interface JsonObjectWriter<T> {
-	public void write(JsonWriter writer, T object) throws IOException;
+	public void write(JSONWriter writer, T object) throws JSONException;
 }

@@ -17,6 +17,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.redmine.ta.NotFoundException;
 import org.redmine.ta.RedmineAuthenticationException;
 import org.redmine.ta.RedmineException;
@@ -35,14 +37,11 @@ import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
-import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 import org.redmine.ta.internal.json.JsonObjectWriter;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
-
-import com.google.gson.JsonObject;
 
 /**
  * Redmine transport utilities.
@@ -296,7 +295,7 @@ public final class Transport {
 
 			final List<T> foundItems;
 			try {
-				final JsonObject responceObject = RedmineJSONParser
+				final JSONObject responceObject = RedmineJSONParser
 						.getResponce(response);
 				foundItems = JsonInput.getListOrNull(responceObject,
 						config.multiObjectName, config.parser);
@@ -308,7 +307,7 @@ public final class Transport {
 				}
 				totalObjectsFoundOnServer = JsonInput.getInt(responceObject,
 						KEY_TOTAL_COUNT);
-			} catch (JsonFormatException e) {
+			} catch (JSONException e) {
 				throw new RedmineFormatException(e);
 			}
 
@@ -344,12 +343,12 @@ public final class Transport {
 
 		HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
-		final JsonObject responceObject;
+		final JSONObject responceObject;
 		try {
 			responceObject = RedmineJSONParser.getResponce(response);
 			return JsonInput.getListNotNull(responceObject,
 					config.multiObjectName, config.parser);
-		} catch (JsonFormatException e) {
+		} catch (JSONException e) {
 			throw new RedmineFormatException("Bad categories responce "
 					+ response, e);
 		}
@@ -380,7 +379,7 @@ public final class Transport {
 		try {
 			return parser.parse(RedmineJSONParser.getResponceSingleObject(
 					responce, tag));
-		} catch (JsonFormatException e) {
+		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}
 	}

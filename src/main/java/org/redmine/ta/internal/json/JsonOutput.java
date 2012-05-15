@@ -1,11 +1,11 @@
 package org.redmine.ta.internal.json;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 
-import com.google.gson.stream.JsonWriter;
+import org.json.JSONException;
+import org.json.JSONWriter;
 
 public class JsonOutput {
 
@@ -18,14 +18,15 @@ public class JsonOutput {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addIfNotNull(JsonWriter writer, String field,
-			String value) throws IOException {
+	public static void addIfNotNull(JSONWriter writer, String field,
+			String value) throws JSONException {
 		if (value == null)
 			return;
-		writer.name(field).value(value);
+		writer.key(field);
+		writer.value(value);
 	}
 
 	/**
@@ -37,14 +38,15 @@ public class JsonOutput {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addIfNotNull(JsonWriter writer, String field,
-			Integer value) throws IOException {
+	public static void addIfNotNull(JSONWriter writer, String field,
+			Integer value) throws JSONException {
 		if (value == null)
 			return;
-		writer.name(field).value(value);
+		writer.key(field);
+		writer.value(value);
 	}
 
 	/**
@@ -56,14 +58,15 @@ public class JsonOutput {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addIfNotNull(JsonWriter writer, String field, Float value)
-			throws IOException {
+	public static void addIfNotNull(JSONWriter writer, String field, Float value)
+			throws JSONException {
 		if (value == null)
 			return;
-		writer.name(field).value(value);
+		writer.key(field);
+		writer.value(value);
 	}
 
 	/**
@@ -77,14 +80,15 @@ public class JsonOutput {
 	 *            field value.
 	 * @param format
 	 *            date foramt to use.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addIfNotNull(JsonWriter writer, String field,
-			Date value, final SimpleDateFormat format) throws IOException {
+	public static void addIfNotNull(JSONWriter writer, String field,
+			Date value, final SimpleDateFormat format) throws JSONException {
 		if (value == null)
 			return;
-		writer.name(field).value(format.format(value));
+		writer.key(field);
+		writer.value(format.format(value));
 	}
 
 	/**
@@ -98,14 +102,15 @@ public class JsonOutput {
 	 *            field value.
 	 * @param format
 	 *            date foramt to use.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void add(JsonWriter writer, String field,
-			Date value, final SimpleDateFormat format) throws IOException {
-		writer.name(field);
+	public static void add(JSONWriter writer, String field,
+ Date value,
+			final SimpleDateFormat format) throws JSONException {
+		writer.key(field);
 		if (value == null)
-			writer.nullValue();
+			writer.value(null);
 		else
 			writer.value(format.format(value));
 	}
@@ -121,14 +126,15 @@ public class JsonOutput {
 	 *            value writer.
 	 * @param objWriter
 	 *            object value writer.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static <T> void addIfNotNull(JsonWriter writer, String field,
-			T value, JsonObjectWriter<T> objWriter) throws IOException {
+	public static <T> void addIfNotNull(JSONWriter writer, String field,
+			T value, JsonObjectWriter<T> objWriter) throws JSONException {
 		if (value == null)
 			return;
-		writer.name(field).beginObject();
+		writer.key(field);
+		writer.object();
 		objWriter.write(writer, value);
 		writer.endObject();
 	}
@@ -145,14 +151,15 @@ public class JsonOutput {
 	 * @param objWriter
 	 *            single object writer.
 	 */
-	public static <T> void addArrayIfNotNull(JsonWriter writer, String field,
+	public static <T> void addArrayIfNotNull(JSONWriter writer, String field,
 			Collection<T> items, JsonObjectWriter<T> objWriter)
-			throws IOException {
+			throws JSONException {
 		if (items == null)
 			return;
-		writer.name(field).beginArray();
+		writer.key(field);
+		writer.array();
 		for (T item : items) {
-			writer.beginObject();
+			writer.object();
 			objWriter.write(writer, item);
 			writer.endObject();
 		}

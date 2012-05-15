@@ -1,6 +1,5 @@
 package org.redmine.ta.internal;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,69 +18,72 @@ import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonObjectWriter;
 import org.redmine.ta.internal.json.JsonOutput;
 
-import com.google.gson.stream.JsonWriter;
+import org.json.JSONWriter;
+import org.json.JSONException;
 
 /**
- * Builder for requests to Redmine in JSON format. TODO use maps for keys common
- * to builder and parser
+ * Builder for requests to Redmine in JSON format.
  */
 public class RedmineJSONBuilder {
 
 	private static JsonObjectWriter<Tracker> TRACKER_WRITER = new JsonObjectWriter<Tracker>() {
 		@Override
-		public void write(JsonWriter writer, Tracker object) throws IOException {
+		public void write(JSONWriter writer, Tracker object)
+				throws JSONException {
 			writeTracker(writer, object);
 		}
 	};
 
 	public static JsonObjectWriter<Project> PROJECT_WRITER = new JsonObjectWriter<Project>() {
 		@Override
-		public void write(JsonWriter writer, Project object) throws IOException {
+		public void write(JSONWriter writer, Project object)
+				throws JSONException {
 			writeProject(writer, object);
 		}
 	};
 
 	public static JsonObjectWriter<Issue> ISSUE_WRITER = new JsonObjectWriter<Issue>() {
 		@Override
-		public void write(JsonWriter writer, Issue object) throws IOException {
+		public void write(JSONWriter writer, Issue object) throws JSONException {
 			writeIssue(object, writer);
 		}
 	};
 
 	public static JsonObjectWriter<User> USER_WRITER = new JsonObjectWriter<User>() {
 		@Override
-		public void write(JsonWriter writer, User object) throws IOException {
+		public void write(JSONWriter writer, User object) throws JSONException {
 			writeUser(object, writer);
 		}
 	};
 
 	public static JsonObjectWriter<IssueRelation> RELATION_WRITER = new JsonObjectWriter<IssueRelation>() {
 		@Override
-		public void write(JsonWriter writer, IssueRelation object)
-				throws IOException {
+		public void write(JSONWriter writer, IssueRelation object)
+				throws JSONException {
 			writeRelation(writer, object);
 		}
 	};
 
 	public static JsonObjectWriter<IssueCategory> CATEGORY_WRITER = new JsonObjectWriter<IssueCategory>() {
 		@Override
-		public void write(JsonWriter writer, IssueCategory object)
-				throws IOException {
+		public void write(JSONWriter writer, IssueCategory object)
+				throws JSONException {
 			writeCategory(object, writer);
 		}
 	};
 
 	public static JsonObjectWriter<Version> VERSION_WRITER = new JsonObjectWriter<Version>() {
 		@Override
-		public void write(JsonWriter writer, Version object) throws IOException {
+		public void write(JSONWriter writer, Version object)
+				throws JSONException {
 			writeVersion(writer, object);
 		}
 	};
 
 	public static JsonObjectWriter<TimeEntry> TIME_ENTRY_WRITER = new JsonObjectWriter<TimeEntry>() {
 		@Override
-		public void write(JsonWriter writer, TimeEntry object)
-				throws IOException {
+		public void write(JSONWriter writer, TimeEntry object)
+				throws JSONException {
 			writeTimeEntry(writer, object);
 		}
 	};
@@ -95,11 +97,11 @@ public class RedmineJSONBuilder {
 	 *            project to create.
 	 * @throws IllegalArgumentException
 	 *             if some project fields are not configured.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if IO error occurs.
 	 */
-	public static void writeProject(JsonWriter writer, Project project)
-			throws IllegalArgumentException, IOException {
+	public static void writeProject(JSONWriter writer, Project project)
+			throws IllegalArgumentException, JSONException {
 		/* Validate project */
 		if (project.getName() == null)
 			throw new IllegalArgumentException(
@@ -111,8 +113,8 @@ public class RedmineJSONBuilder {
 		writeProject(project, writer);
 	}
 
-	static void writeTimeEntry(JsonWriter writer, TimeEntry timeEntry)
-			throws IOException {
+	static void writeTimeEntry(JSONWriter writer, TimeEntry timeEntry)
+			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", timeEntry.getId());
 		JsonOutput.addIfNotNull(writer, "project_id", timeEntry.getProjectId());
 		JsonOutput.addIfNotNull(writer, "issue_id", timeEntry.getIssueId());
@@ -133,24 +135,26 @@ public class RedmineJSONBuilder {
 	 *            used writer.
 	 * @param tracker
 	 *            tracker to writer.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if error occurs.
 	 */
-	static void writeTracker(JsonWriter writer, Tracker tracker)
-			throws IOException {
-		writer.name("id").value(tracker.getId());
-		writer.name("name").value(tracker.getName());
+	static void writeTracker(JSONWriter writer, Tracker tracker)
+			throws JSONException {
+		writer.key("id");
+		writer.value(tracker.getId());
+		writer.key("name");
+		writer.value(tracker.getName());
 	}
 
-	static void writeRelation(JsonWriter writer, IssueRelation relation)
-			throws IOException {
+	static void writeRelation(JSONWriter writer, IssueRelation relation)
+			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "issue_to_id", relation.getIssueToId());
 		JsonOutput.addIfNotNull(writer, "relation_type", relation.getType());
 		JsonOutput.addIfNotNull(writer, "delay", relation.getDelay());
 	}
 
-	static void writeVersion(JsonWriter writer, Version version)
-			throws IOException {
+	static void writeVersion(JSONWriter writer, Version version)
+			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", version.getId());
 		if (version.getProject() != null)
 			JsonOutput.addIfNotNull(writer, "project_id", version.getProject()
@@ -180,23 +184,23 @@ public class RedmineJSONBuilder {
 	public static <T> String toSimpleJSON(String tag, T object,
 			JsonObjectWriter<T> writer) throws RedmineInternalError {
 		final StringWriter swriter = new StringWriter();
-		final JsonWriter jsWriter = new JsonWriter(swriter);
+		final JSONWriter jsWriter = new JSONWriter(swriter);
 		try {
-			jsWriter.beginObject();
-			jsWriter.name(tag);
-			jsWriter.beginObject();
+			jsWriter.object();
+			jsWriter.key(tag);
+			jsWriter.object();
 			writer.write(jsWriter, object);
 			jsWriter.endObject();
 			jsWriter.endObject();
-		} catch (IOException e) {
-			throw new RedmineInternalError("Unexpected IOException", e);
+		} catch (JSONException e) {
+			throw new RedmineInternalError("Unexpected JSONException", e);
 		}
 
 		return swriter.toString();
 	}
 
-	public static void writeProject(Project project, final JsonWriter writer)
-			throws IOException {
+	public static void writeProject(Project project, final JSONWriter writer)
+			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", project.getId());
 		JsonOutput.addIfNotNull(writer, "identifier", project.getIdentifier());
 		JsonOutput.addIfNotNull(writer, "name", project.getName());
@@ -211,8 +215,9 @@ public class RedmineJSONBuilder {
 	}
 
 	public static void writeCategory(IssueCategory category,
-			final JsonWriter writer) throws IOException {
-		writer.name("id").value(category.getId());
+			final JSONWriter writer) throws JSONException {
+		writer.key("id");
+		writer.value(category.getId());
 		JsonOutput.addIfNotNull(writer, "name", category.getName());
 		if (category.getProject() != null)
 			JsonOutput.addIfNotNull(writer, "project_id", category.getProject()
@@ -222,8 +227,8 @@ public class RedmineJSONBuilder {
 					.getAssignee().getId());
 	}
 
-	public static void writeUser(User user, final JsonWriter writer)
-			throws IOException {
+	public static void writeUser(User user, final JSONWriter writer)
+			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", user.getId());
 		JsonOutput.addIfNotNull(writer, "login", user.getLogin());
 		JsonOutput.addIfNotNull(writer, "password", user.getPassword());
@@ -237,8 +242,8 @@ public class RedmineJSONBuilder {
 
 	}
 
-	public static void writeIssue(Issue issue, final JsonWriter writer)
-			throws IOException {
+	public static void writeIssue(Issue issue, final JSONWriter writer)
+			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", issue.getId());
 		JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
 		JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
@@ -286,14 +291,14 @@ public class RedmineJSONBuilder {
 		 */
 	}
 
-	private static void writeCustomFields(JsonWriter writer,
-			List<CustomField> customFields) throws IOException {
+	private static void writeCustomFields(JSONWriter writer,
+			List<CustomField> customFields) throws JSONException {
 		if (customFields == null || customFields.isEmpty())
 			return;
-		writer.name("custom_field_values").beginObject();
-		for (CustomField field : customFields)
-			writer.name(Integer.toString(field.getId()))
-					.value(field.getValue());
+		writer.key("custom_field_values").object();
+		for (CustomField field : customFields) {
+			writer.key(Integer.toString(field.getId())).value(field.getValue());
+		}
 		writer.endObject();
 	}
 
@@ -306,11 +311,11 @@ public class RedmineJSONBuilder {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addIfNotNullFull(JsonWriter writer, String field,
-			Date value) throws IOException {
+	public static void addIfNotNullFull(JSONWriter writer, String field,
+			Date value) throws JSONException {
 		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
 	}
@@ -324,11 +329,11 @@ public class RedmineJSONBuilder {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addFull(JsonWriter writer, String field,
-			Date value) throws IOException {
+	public static void addFull(JSONWriter writer, String field, Date value)
+			throws JSONException {
 		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
 		JsonOutput.add(writer, field, value, format);
 	}
@@ -342,11 +347,11 @@ public class RedmineJSONBuilder {
 	 *            field name to set.
 	 * @param value
 	 *            field value.
-	 * @throws IOException
+	 * @throws JSONException
 	 *             if io error occurs.
 	 */
-	public static void addIfNotNullShort(JsonWriter writer, String field,
-			Date value) throws IOException {
+	public static void addIfNotNullShort(JSONWriter writer, String field,
+			Date value) throws JSONException {
 		final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT
 				.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);

@@ -480,7 +480,7 @@ public class RedmineManagerTest {
         } catch (RedmineProcessingException e) {
             Assert.assertNotNull(e.getErrors());
             Assert.assertEquals(1, e.getErrors().size());
-			Assert.assertEquals("\"Identifier is reserved\"", e
+			Assert.assertEquals("Identifier is reserved", e
 					.getErrors().get(0));
         } finally {
             if (key != null) {
@@ -998,7 +998,7 @@ public class RedmineManagerTest {
             } catch (RedmineProcessingException e) {
                 Assert.assertEquals("Must be 1 error", 1, e.getErrors().size());
 				Assert.assertEquals("Checking error text",
-						"\"% Done is not included in the list\"", e
+						"% Done is not included in the list", e
 								.getErrors().get(0));
             }
 

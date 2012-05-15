@@ -7,11 +7,7 @@
     "author":{"name":"Jérémie H", "id":3},
     "assigned_to":{"name":"Jérémie H", "id":3},
     "subject":"Test patch for multiline description",
-    "description":"This is a description 
-with more than 
-
-
-one line.",
+    "description":"This is a description \nwith more than \n\n\none line.",
     "start_date":"2011/07/25",
     "due_date":null,
     "done_ratio":50,

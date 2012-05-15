@@ -109,9 +109,7 @@
 		"author":{"name":"Redmine Admin","id":1},
 		"assigned_to":{"name":"Redmine Admin","id":1},
 		"subject":"test zzx",
-		"description":"This is the description for the new task.
-It has several lines.
-This is the last line.",
+		"description":"This is the description for the new task.\nIt has several lines.\nThis is the last line.",
 		"start_date":"2011/01/29",
 		"due_date":"2011/02/24",
 		"done_ratio":80,

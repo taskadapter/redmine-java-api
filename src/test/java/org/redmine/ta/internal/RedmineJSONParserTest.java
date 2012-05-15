@@ -24,8 +24,9 @@ import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
-import org.redmine.ta.internal.json.JsonFormatException;
 import org.redmine.ta.internal.json.JsonInput;
+
+import org.json.JSONException;
 
 /**
  * Redmine JSON parser tests.
@@ -38,7 +39,7 @@ public class RedmineJSONParserTest {
 	private static final String REDMINE_ISSUES = "redmine_issues.json";
 
 	@Test
-	public void testParseProject1() throws ParseException, JsonFormatException {
+	public void testParseProject1() throws ParseException, JSONException {
 		final String projectString = "{\"project\":{\"created_on\":\"2012/05/11 06:53:21 -0700\",\"updated_on\":\"2012/05/11 06:53:20 -0700\",\"homepage\":\"\",\"trackers\":[{\"name\":\"Bug\",\"id\":1},{\"name\":\"Feature\",\"id\":2},{\"name\":\"Support\",\"id\":3}],\"identifier\":\"test1336744548920\",\"name\":\"test project\",\"id\":6143}}";
 		final Project project = RedmineJSONParser.PROJECT_PARSER
 				.parse(RedmineJSONParser.getResponceSingleObject(projectString,
@@ -89,7 +90,7 @@ public class RedmineJSONParserTest {
 	}
 
 	private List<Issue> loadRedmine11Issues() throws IOException,
-			JsonFormatException {
+ JSONException {
 		String json = MyIOUtils.getResourceAsString(REDMINE_ISSUES);
 		return JsonInput.getListOrEmpty(RedmineJSONParser.getResponce(json),
 				"issues", RedmineJSONParser.ISSUE_PARSER);
@@ -98,21 +99,21 @@ public class RedmineJSONParserTest {
 	/* Gson parser is bad at detecting errors :( */
 	@Ignore
 	@Test
-	public void testMailformedProject() throws IOException, JsonFormatException {
+	public void testMailformedProject() throws IOException, JSONException {
 		/* Check parser correctness */
 		try {
 			String json = MyIOUtils
 					.getResourceAsString("mailformed_redmine_project.json");
 			RedmineJSONParser.parseProject(RedmineJSONParser
 					.getResponceSingleObject(json, "project"));
-		} catch (JsonFormatException e) {
+		} catch (JSONException e) {
 			Assert.assertNotSame("Empty input", e.getMessage());
 		}
 	}
 
 	@Test
 	public void testParseProjectRedmine() throws IOException,
-			JsonFormatException {
+ JSONException {
 		String json = MyIOUtils.getResourceAsString("redmine_project.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
 				.getResponceSingleObject(json, "project"));
@@ -136,7 +137,7 @@ public class RedmineJSONParserTest {
 
 	@Test
 	public void testParseProjectNoTracker() throws IOException,
-			JsonFormatException {
+ JSONException {
 		String json = MyIOUtils
 				.getResourceAsString("redmine_project_no_trackers.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
@@ -146,7 +147,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void estimatedTimeIsNULL() throws JsonFormatException {
+	public void estimatedTimeIsNULL() throws JSONException {
 		try {
 			List<Issue> issues = loadRedmine11Issues();
 			Integer issueID = 52;
@@ -163,7 +164,7 @@ public class RedmineJSONParserTest {
 
 	@Test
 	public void testParseIssueNonUnicodeSymbols() throws IOException,
-			JsonFormatException {
+			JSONException {
 		String json = MyIOUtils
 				.getResourceAsString("issues_foreign_symbols.json");
 		String nonLatinAccentSymbols = "Accent symbols: Ação";
@@ -187,7 +188,7 @@ public class RedmineJSONParserTest {
 			Assert.fail("Must have failed with RuntimeException");
 		} catch (IOException e) {
 			Assert.fail(e.getMessage());
-		} catch (JsonFormatException e) {
+		} catch (JSONException e) {
 			// success
 		}
 	}
@@ -207,7 +208,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testParseUsers() throws IOException, JsonFormatException {
+	public void testParseUsers() throws IOException, JSONException {
 		String json = MyIOUtils.getResourceAsString("redmine_users.json");
 		List<User> users = JsonInput.getListOrEmpty(
 				RedmineJSONParser.getResponce(json), "users",
@@ -222,7 +223,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testParseIssues() throws IOException, JsonFormatException {
+	public void testParseIssues() throws IOException, JSONException {
 		List<Issue> objects = loadRedmine11Issues();
 		Integer issueId = 68;
 		Issue issue68 = RedmineTestUtils.findIssueInList(objects, issueId);
@@ -239,7 +240,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testParseTimeEntries() throws IOException, JsonFormatException {
+	public void testParseTimeEntries() throws IOException, JSONException {
 		String xml = MyIOUtils.getResourceAsString("redmine_time_entries.json");
 		List<TimeEntry> objects = JsonInput.getListOrEmpty(
 				RedmineJSONParser.getResponce(xml), "time_entries",
@@ -279,7 +280,7 @@ public class RedmineJSONParserTest {
 
 	@Test
 	public void testMultilineIssueDescription() throws IOException,
-			JsonFormatException {
+			JSONException {
 		final String json = MyIOUtils
 				.getResourceAsString("issue_with_multiline_description.json");
 		final Issue issue = RedmineJSONParser.parseIssue(RedmineJSONParser
@@ -290,7 +291,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testCreatedOn() throws IOException, JsonFormatException {
+	public void testCreatedOn() throws IOException, JSONException {
 		List<Issue> redmine11Issues = loadRedmine11Issues();
 		Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
 		DateComparator.testLongDate(2011, Calendar.FEBRUARY, 12, 16, 0, 31,
@@ -298,7 +299,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testUpdatedOn() throws IOException, JsonFormatException {
+	public void testUpdatedOn() throws IOException, JSONException {
 		List<Issue> redmine11Issues = loadRedmine11Issues();
 		Issue issue = RedmineTestUtils.findIssueInList(redmine11Issues, 39);
 		DateComparator.testLongDate(2011, Calendar.SEPTEMBER, 17, 21, 28, 45,
