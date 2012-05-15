@@ -1,0 +1,20 @@
+{"issues":[
+    {
+        "subject":"Russian symbols: Привет",
+        "project_id":97,
+        "tracker_id":3,
+        "start_date":"2010/12/20",
+        "due_date":"2010/12/23",
+        "done_ratio":50,
+        "estimated_hours":8
+    },
+    {
+        "subject":"Accent symbols: Ação",
+        "project_id":98,
+        "tracker_id":3,
+        "start_date":"2010/12/20",
+        "due_date":"2010/12/23",
+        "done_ratio":50,
+        "estimated_hours":8
+    }
+]}

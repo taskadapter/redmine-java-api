@@ -8,7 +8,9 @@ package org.redmine.ta;
  * </ul>
  */
 public class RedmineSecurityException extends RedmineException {
-    public RedmineSecurityException(String message) {
+	private static final long serialVersionUID = -7112215624257956273L;
+
+	public RedmineSecurityException(String message) {
         super(message);
     }
 }

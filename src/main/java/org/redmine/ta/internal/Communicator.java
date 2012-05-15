@@ -1,5 +1,6 @@
 package org.redmine.ta.internal;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.*;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -8,7 +9,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.castor.core.util.Base64Encoder;
+import org.json.JSONException;
 import org.redmine.ta.*;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
@@ -44,7 +45,10 @@ public class Communicator {
 //                new UsernamePasswordCredentials(login, password));
             String credentials;
             try {
-                credentials = String.valueOf(Base64Encoder.encode((login + ':' + password).getBytes(CHARSET)));
+				credentials = "\""
+						+ Base64.encodeBase64String(
+								(login + ':' + password).getBytes(CHARSET))
+								.trim() + "\"";
             } catch (UnsupportedEncodingException e) {
                 throw new RedmineInternalError(e);
             }
@@ -84,7 +88,13 @@ public class Communicator {
         }
 
         if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
-            List<String> errors = RedmineXMLParser.parseErrors(responseBody);
+			List<String> errors;
+			try {
+				errors = RedmineJSONParser.parseErrors(responseBody);
+			} catch (JSONException e) {
+				throw new RedmineFormatException("Bad redmine error responce",
+						e);
+			}
             throw new RedmineProcessingException(errors);
         }
         /* 422 "invalid"

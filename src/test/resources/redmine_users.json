@@ -1,0 +1,24 @@
+{
+  "total_count":2,
+  "limit":25,
+  "offset":0,
+  "users":[
+    {
+		"id":1,
+		"login":"admin",
+		"firstname":"Redmine",
+		"lastname":"Admin",
+		"mail":"admin@example.net",
+		"created_on":"2011/01/10 20:44:56 -0800",
+		"last_login_on":"2011/01/28 10:54:22 -0800"
+	},{
+		"id":3,
+		"login":"dina",
+		"firstname":"Dina",
+		"lastname":"TheDog",
+		"mail":"thedog@domain.com",
+		"created_on":"2011/01/10 20:52:22 -0800",
+		"last_login_on":null
+	}
+   ]
+}

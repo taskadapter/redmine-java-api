@@ -1,0 +1,14 @@
+{"offset":0, "limit":25, "total_count":2, "news":[
+  {"id":2,"project":{"name":"test","id":1},
+   "author":{"name":"rest last","id":95},
+   "title":"item 2",
+   "summary":"another summary",
+   "description":"duh",
+   "created_on":"2012/02/06 21:35:41 -0800"
+   },{
+   "id":1,"project":{"name":"test", "id":1},
+   "author":{name:"rest last","id":95},
+   "title":"my title 1",
+   "summary":"some summary here",
+   "description":"*description* and other stuff\n\none more line",
+   "created_on":"2012/02/06 21:28:13 -0800"}]}
