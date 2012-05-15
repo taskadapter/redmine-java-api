@@ -4,9 +4,12 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.redmine.ta.beans.Project;
-import org.redmine.ta.internal.RedmineXMLParser;
+import org.redmine.ta.internal.RedmineJSONParser;
+import org.redmine.ta.internal.json.JsonInput;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.gson.JsonObject;
 
 public class ProjectsTest {
 
@@ -15,8 +18,10 @@ public class ProjectsTest {
     @Before
     // Is executed before each test method
     public void setup() throws Exception {
-        String text = MyIOUtils.getResourceAsString("redmine_1_1_projects.xml");
-        projectsList = RedmineXMLParser.parseProjectsFromXML(text);
+		String text = MyIOUtils.getResourceAsString("redmine_projects.json");
+		final JsonObject object=  RedmineJSONParser.getResponce(text);
+		projectsList = JsonInput.getListNotNull(object, "projects",
+				RedmineJSONParser.PROJECT_PARSER);
     }
 
     @Test

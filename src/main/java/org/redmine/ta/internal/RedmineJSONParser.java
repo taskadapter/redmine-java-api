@@ -173,6 +173,9 @@ public class RedmineJSONParser {
 		if (object.has("is_default"))
 			result.setDefaultStatus(Boolean.parseBoolean(JsonInput
 					.getStringOrNull(object, "is_default")));
+		if (object.has("is_closed"))
+			result.setClosed(Boolean.parseBoolean(JsonInput
+					.getStringOrNull(object, "is_closed")));
 		return result;
 	}
 
@@ -234,7 +237,7 @@ public class RedmineJSONParser {
 			result.setActivityName(JsonInput.getStringOrNull(activity, "name"));
 		}
 		result.setHours(JsonInput.getFloatOrNull(object, "hours"));
-		result.setComment(JsonInput.getStringOrNull(object, "comment"));
+		result.setComment(JsonInput.getStringOrNull(object, "comments"));
 		result.setSpentOn(getShortDateOrNull(object, "spent_on"));
 		result.setCreatedOn(getDateOrNull(object, "created_on"));
 		result.setUpdatedOn(getDateOrNull(object, "updated_on"));

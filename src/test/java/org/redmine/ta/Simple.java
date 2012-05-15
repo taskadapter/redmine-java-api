@@ -1,11 +1,9 @@
 package org.redmine.ta;
 
-import java.util.Date;
 import java.util.List;
 
 import org.redmine.ta.RedmineManager.INCLUDE;
 import org.redmine.ta.beans.*;
-import org.redmine.ta.internal.RedmineXMLGenerator;
 import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
@@ -21,19 +19,21 @@ public class Simple {
         RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
         try {
 			// getIssueWithRelations(mgr);
-			tryCreateIssue(mgr);
-//			tryGetIssues(mgr);
+			// tryCreateIssue(mgr);
+			// tryGetIssues(mgr);
+			// tryGetIssue(mgr);
 //            tryGetAllIssues(mgr);
 //			printCurrentUser(mgr);
 //			generateXMLForUser();
 //			generateXMLForTimeEntry();
 //			getSavedQueries(mgr);
-//			getProjects(mgr);
+			// getProjects(mgr);
 //			tryCreateRelation(mgr);
 //            tryGetNews(mgr);
 //            getProject(mgr);
 //            changeIssueStatus(mgr);
 			// getVersion(mgr);
+			getStatuses(mgr);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,6 +59,11 @@ public class Simple {
         Project test = mgr.getProjectByKey("test");
         System.out.println(test);
     }
+
+	@SuppressWarnings("unused")
+	private static void getStatuses(RedmineManager mgr) throws RedmineException {
+		mgr.getStatuses();
+	}
 
 	@SuppressWarnings("unused")
     private static void tryGetNews(RedmineManager mgr) throws RedmineException {
@@ -110,36 +115,18 @@ public class Simple {
     }
 
 	@SuppressWarnings("unused")
-    private static void generateXMLForTimeEntry() {
-        TimeEntry o = new TimeEntry();
-        o.setId(13);
-        o.setIssueId(45);
-        o.setActivityId(3);
-        o.setProjectId(55);
-        o.setUserId(66);
-        o.setHours(123f);
-        o.setComment("text here");
-        o.setSpentOn(new Date());
-        String xml = RedmineXMLGenerator.toXML(o);
-        logger.debug(xml);
-    }
-
-	@SuppressWarnings("unused")
-    private static void generateXMLForUser() {
-        User u = new User();
-        u.setLogin("newlogin");
-        String xml = RedmineXMLGenerator.toXML(u);
-        logger.debug(xml);
-
-    }
-
-	@SuppressWarnings("unused")
     private static void tryGetIssues(RedmineManager mgr) throws Exception {
-        List<Issue> issues = mgr.getIssues(projectKey, queryId);
+		List<Issue> issues = mgr.getIssuesBySummary(projectKey, "Russian");
         for (Issue issue : issues) {
             logger.debug(issue.toString());
         }
     }
+
+	@SuppressWarnings("unused")
+	private static void tryGetIssue(RedmineManager mgr) throws Exception {
+		mgr.getIssueById(4808, INCLUDE.journals,
+				INCLUDE.relations, INCLUDE.attachments);
+	}
 
 	@SuppressWarnings("unused")
     private static void tryGetAllIssues(RedmineManager mgr) throws Exception {

@@ -1,9 +1,5 @@
 package org.redmine.ta;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,16 +8,15 @@ import org.junit.Assert;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.User;
-import org.redmine.ta.internal.RedmineXMLParser;
+import org.redmine.ta.internal.RedmineJSONParser;
+import org.redmine.ta.internal.json.JsonInput;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.gson.JsonObject;
+
 public class RedmineIssuesMapTest {
 
-//	private static final String FILE_1_ISSUES_XML_FILE_NAME = "issues.xml";
-//	private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 13;
-
-    private static final String REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME = "redmine_1_1_issues.xml";
     private static final int FILE_1_REQUIRED_ISSUES_NUMBER = 26;
 
     private List<Issue> issuesList;
@@ -30,8 +25,10 @@ public class RedmineIssuesMapTest {
     @Before
     // Is executed before each test method
     public void setup() throws Exception {
-        String str = MyIOUtils.getResourceAsString(REDMINE_1_1_FILE_1_ISSUES_XML_FILE_NAME);
-        this.issuesList = RedmineXMLParser.parseObjectsFromXML(Issue.class, str);
+		String str = MyIOUtils.getResourceAsString("redmine_issues.json");
+		final JsonObject object = RedmineJSONParser.getResponce(str);
+		this.issuesList = JsonInput.getListNotNull(object, "issues",
+				RedmineJSONParser.ISSUE_PARSER);
 
         RedmineIssuesMap loader = new RedmineIssuesMap(issuesList);
         issuesMap = loader.getIssuesMap();

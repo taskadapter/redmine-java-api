@@ -250,7 +250,7 @@ public class JsonInput {
 		try {
 			return primitive.getAsFloat();
 		} catch (NumberFormatException e) {
-			throw new JsonFormatException("Bad integer value " + primitive);
+			throw new JsonFormatException("Bad float value " + primitive);
 		}
 	}
 
