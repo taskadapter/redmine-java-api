@@ -176,6 +176,23 @@ public class JsonInput {
 	}
 
 	/**
+	 * Fetches an int from an object.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @param deflt
+	 *            default value.
+	 * @throws JSONException
+	 *             if value is not valid, not exists, etc...
+	 */
+	public static int getInt(JSONObject obj, String field, int deflt)
+			throws JSONException {
+		return obj.optInt(field, deflt);
+	}
+
+	/**
 	 * Fetches an optional int from an object.
 	 * 
 	 * @param obj

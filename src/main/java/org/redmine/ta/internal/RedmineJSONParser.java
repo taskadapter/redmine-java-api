@@ -240,7 +240,7 @@ public class RedmineJSONParser {
 			result.setActivityName(JsonInput.getStringOrNull(activity, "name"));
 		}
 		result.setHours(JsonInput.getFloatOrNull(object, "hours"));
-		result.setComment(JsonInput.getStringOrNull(object, "comments"));
+		result.setComment(JsonInput.getStringOrEmpty(object, "comments"));
 		result.setSpentOn(getShortDateOrNull(object, "spent_on"));
 		result.setCreatedOn(getDateOrNull(object, "created_on"));
 		result.setUpdatedOn(getDateOrNull(object, "updated_on"));
@@ -321,7 +321,8 @@ public class RedmineJSONParser {
 		result.setDueDate(getShortDateOrNull(content, "due_date"));
 		result.setTracker(JsonInput.getObjectOrNull(content, "tracker",
 				TRACKER_PARSER));
-		result.setDescription(JsonInput.getStringOrNull(content, "description"));
+		result.setDescription(JsonInput
+				.getStringOrEmpty(content, "description"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
 		final JSONObject statusObject = JsonInput.getObjectOrNull(content,
@@ -383,7 +384,7 @@ public class RedmineJSONParser {
 		result.setIssueId(JsonInput.getIntOrNull(content, "issue_id"));
 		result.setIssueToId(JsonInput.getIntOrNull(content, "issue_to_id"));
 		result.setType(JsonInput.getStringOrNull(content, "relation_type"));
-		result.setDelay(JsonInput.getIntOrNull(content, "delay"));
+		result.setDelay(JsonInput.getInt(content, "delay", 0));
 		return result;
 	}
 
@@ -431,7 +432,7 @@ public class RedmineJSONParser {
 		result.setMail(JsonInput.getStringOrNull(content, "mail"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
-		result.setCustomFields(JsonInput.getListOrNull(content,
+		result.setCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
