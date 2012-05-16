@@ -1653,4 +1653,32 @@ public class RedmineManagerTest {
         assertEquals("Description must be an empty string, not NULL", "", createdIssue.getDescription());
     }
 
+	@Test
+	public void updateIssueDescription() throws RedmineException {
+		Issue issue = new Issue();
+		issue.setSubject("test123");
+		final Issue iss1 = mgr.createIssue(projectKey, issue);
+		final Issue iss2 = new Issue();
+		iss2.setId(iss1.getId());
+		iss2.setDescription("This is a test");
+		mgr.update(iss2);
+		final Issue iss3 = mgr.getIssueById(iss2.getId());
+		assertEquals("test123", iss3.getSubject());
+		assertEquals("This is a test", iss3.getDescription());
+	}
+
+	@Test
+	public void updateIssueTitle() throws RedmineException {
+		Issue issue = new Issue();
+		issue.setSubject("test123");
+		issue.setDescription("Original description");
+		final Issue iss1 = mgr.createIssue(projectKey, issue);
+		final Issue iss2 = new Issue();
+		iss2.setId(iss1.getId());
+		iss2.setSubject("New subject");
+		mgr.update(iss2);
+		final Issue iss3 = mgr.getIssueById(iss2.getId());
+		assertEquals("New subject", iss3.getSubject());
+		assertEquals("Original description", iss3.getDescription());
+	}
 }
