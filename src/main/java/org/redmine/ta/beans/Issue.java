@@ -25,11 +25,7 @@ public class Issue implements Identifiable {
     private Date startDate;
     private Date dueDate;
     private Tracker tracker;
-
-    /**
-     * Description is an empty string by default, not NULL.
-     */
-    private String description = "";
+    private String description;
     private Date createdOn;
     private Date updatedOn;
     private Integer statusId;
