@@ -38,6 +38,7 @@ import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
+import org.redmine.ta.internal.comm.Communicator;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 import org.redmine.ta.internal.json.JsonObjectWriter;
