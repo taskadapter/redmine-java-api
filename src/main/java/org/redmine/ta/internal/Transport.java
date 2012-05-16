@@ -39,6 +39,8 @@ import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.comm.Communicator;
+import org.redmine.ta.internal.comm.BaseCommunicator;
+import org.redmine.ta.internal.comm.Communicators;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 import org.redmine.ta.internal.json.JsonObjectWriter;
@@ -58,9 +60,7 @@ public final class Transport {
 	private static final String KEY_TOTAL_COUNT = "total_count";
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 	private Communicator communicator;
-	private final RedmineOptions options;
-
-	private boolean shutDown;
+	private final BaseCommunicator baseCommunicator;
 
 	static {
 		OBJECT_CONFIGS.put(
@@ -116,24 +116,12 @@ public final class Transport {
 	private final URIConfigurator configurator;
 	private String login;
 	private String password;
-	private boolean useBasicAuth = false;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 
-	public Transport(URIConfigurator configurator,
-			RedmineOptions options) {
+	public Transport(URIConfigurator configurator, RedmineOptions options) {
 		this.configurator = configurator;
-		this.options = options;
-	}
-
-	/**
-	 * Checks, if current transport is active.
-	 * 
-	 * @throws RedmineException
-	 *             if manager is not active.
-	 */
-	private void ensureActive() throws RedmineException {
-		if (shutDown)
-			throw new RedmineException("Manager is shut down");
+		this.baseCommunicator = new BaseCommunicator(options);
+		this.communicator = baseCommunicator;
 	}
 
 	public User getCurrentUser() throws RedmineException {
@@ -386,15 +374,6 @@ public final class Transport {
 	}
 
 	private Communicator getCommunicator() throws RedmineException {
-		ensureActive();
-		final Communicator currentCommunicator = this.communicator;
-		if (currentCommunicator != null)
-			return currentCommunicator;
-		Communicator communicator = new Communicator(options);
-		if (useBasicAuth) {
-			communicator.setCredentials(login, password);
-		}
-		this.communicator = communicator;
 		return communicator;
 	}
 
@@ -411,10 +390,10 @@ public final class Transport {
 	private void setEntity(HttpEntityEnclosingRequest request, String body) {
 		StringEntity entity;
 		try {
-			entity = new StringEntity(body, Communicator.CHARSET);
+			entity = new StringEntity(body, BaseCommunicator.CHARSET);
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineInternalError("Required charset "
-					+ Communicator.CHARSET + " is not supported", e);
+					+ BaseCommunicator.CHARSET + " is not supported", e);
 		}
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
@@ -441,35 +420,20 @@ public final class Transport {
 	public void setCredentials(String login, String password) {
 		this.login = login;
 		this.password = password;
-		this.useBasicAuth = true;
-		invalidateCommunicator();
-	}
-
-	/**
-	 * Marks communicator as invalid.
-	 */
-	private void invalidateCommunicator() {
-		final Communicator oldCommunicator = communicator;
-		this.communicator = null;
-		if (oldCommunicator != null)
-			oldCommunicator.shutdown();
+		communicator = Communicators.addBasicAuth(login, password,
+				BaseCommunicator.CHARSET, baseCommunicator);
 	}
 
 	public void shutdown() {
-		shutDown = true;
-		invalidateCommunicator();
+		baseCommunicator.shutdown();
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
-		this.useBasicAuth = true;
-		invalidateCommunicator();
+		setCredentials(login, password);
 	}
 
 	public void setLogin(String login) {
-		this.login = login;
-		invalidateCommunicator();
-		this.useBasicAuth = true;
+		setCredentials(login, password);
 	}
 
 	/**
