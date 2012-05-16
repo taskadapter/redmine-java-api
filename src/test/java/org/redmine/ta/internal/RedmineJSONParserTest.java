@@ -56,6 +56,7 @@ public class RedmineJSONParserTest {
 				.parse("11.05.2012 06:53:20 -0700"));
 		template.setTrackers(Arrays.asList(new Tracker(1, "Bug"), new Tracker(
 				2, "Feature"), new Tracker(3, "Support")));
+		template.setDescription("");
 		Assert.assertEquals(template, project);
 	}
 
