@@ -25,7 +25,8 @@ import java.util.List;
 public class BaseCommunicator implements Communicator {
 	public static final String CHARSET = "UTF-8";
 
-	private final Logger logger = LoggerFactory.getLogger(BaseCommunicator.class);
+	private final Logger logger = LoggerFactory
+			.getLogger(BaseCommunicator.class);
 
 	/**
 	 * Used redmine options.
@@ -48,8 +49,12 @@ public class BaseCommunicator implements Communicator {
 	// check if we can process 404 code in this method instead of forcing
 	// clients to deal with it.
 
-	/* (non-Javadoc)
-	 * @see org.redmine.ta.internal.comm.Communicator#sendRequest(org.apache.http.HttpRequest)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.redmine.ta.internal.comm.Communicator#sendRequest(org.apache.http
+	 * .HttpRequest)
 	 */
 	@Override
 	public String sendRequest(HttpRequest request) throws RedmineException {
@@ -57,16 +62,34 @@ public class BaseCommunicator implements Communicator {
 
 		request.addHeader("Accept-Encoding", "gzip,deflate");
 		final HttpClient httpclient = client;
-		HttpResponse httpResponse;
 		try {
-			httpResponse = httpclient.execute((HttpUriRequest) request);
+			final HttpResponse httpResponse = httpclient
+					.execute((HttpUriRequest) request);
+			try {
+				checkErrors(httpResponse);
+				final HttpEntity responseEntity = httpResponse.getEntity();
+				return getContent(responseEntity);
+			} finally {
+				EntityUtils.consume(httpResponse.getEntity());
+
+			}
 		} catch (ClientProtocolException e1) {
 			throw new RedmineFormatException(e1);
 		} catch (IOException e1) {
 			throw new RedmineTransportException(e1);
 		}
-		
-		int responseCode = httpResponse.getStatusLine().getStatusCode();
+	}
+
+	/**
+	 * Checks http response for an error marks.
+	 * 
+	 * @param httpResponse
+	 *            response to check.
+	 * @throws IOException
+	 */
+	private void checkErrors(HttpResponse httpResponse)
+			throws RedmineException, IOException {
+		final int responseCode = httpResponse.getStatusLine().getStatusCode();
 		if (responseCode == HttpStatus.SC_UNAUTHORIZED) {
 			throw new RedmineAuthenticationException(
 					"Authorization error. Please check if you provided a valid API access key or Login and Password and REST API service is enabled on the server.");
@@ -75,40 +98,23 @@ public class BaseCommunicator implements Communicator {
 			throw new NotAuthorizedException(
 					"Forbidden. Please check the user has proper permissions.");
 		}
-		
-		HttpEntity responseEntity = httpResponse.getEntity();
-		String responseBody;
-		try {
-			responseBody = getContent(responseEntity);
-		} catch (ParseException e) {
-			throw new RedmineFormatException(e);
-		} catch (IOException e) {
-			throw new RedmineTransportException(e);
-		} finally {
-			try {
-				EntityUtils.consume(responseEntity);
-			} catch (IOException e) {
-				throw new RedmineTransportException(e);
-			}
-		}
-		
 		if (responseCode == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException(
 					"Server returned '404 not found'. response body:"
-							+ responseBody);
+							+ getContent(httpResponse.getEntity()));
 		}
-		
+
 		if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
 			List<String> errors;
 			try {
-				errors = RedmineJSONParser.parseErrors(responseBody);
+				errors = RedmineJSONParser.parseErrors(getContent(httpResponse
+						.getEntity()));
 			} catch (JSONException e) {
 				throw new RedmineFormatException("Bad redmine error responce",
 						e);
 			}
 			throw new RedmineProcessingException(errors);
 		}
-		return responseBody;
 	}
 
 	/**
