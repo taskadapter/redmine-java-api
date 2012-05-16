@@ -42,7 +42,6 @@ final class ConnectionEvictor implements Runnable {
 	@Override
 	public void run() {
 		while (getNextEviction()) {
-			System.err.println("Eviction!");
 			connManager.closeExpiredConnections();
 			connManager.closeIdleConnections(idleTimeout, TimeUnit.SECONDS);
 		}
