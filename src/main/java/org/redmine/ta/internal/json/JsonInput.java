@@ -129,6 +129,24 @@ public class JsonInput {
 	}
 
 	/**
+	 * Fetches an optional string from an object. Absent value is returned as an
+	 * empty string instead of null.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value from.
+	 * @throws JSONException
+	 *             if value is not valid
+	 */
+	public static String getStringOrEmpty(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field))
+			return "";
+		return obj.getString(field);
+	}
+
+	/**
 	 * Fetches a string from an object.
 	 * 
 	 * @param obj

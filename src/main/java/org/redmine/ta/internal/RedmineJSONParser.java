@@ -46,6 +46,13 @@ public class RedmineJSONParser {
 		}
 	};
 
+	public static final JsonObjectParser<Project> MINIMAL_PROJECT_PARSER = new JsonObjectParser<Project>() {
+		@Override
+		public Project parse(JSONObject input) throws JSONException {
+			return parseMinimalProject(input);
+		}
+	};
+
 	public static final JsonObjectParser<Project> PROJECT_PARSER = new JsonObjectParser<Project>() {
 		@Override
 		public Project parse(JSONObject input) throws JSONException {
@@ -190,7 +197,7 @@ public class RedmineJSONParser {
 		final News result = new News();
 		result.setId(JsonInput.getIntOrNull(object, "id"));
 		result.setProject(JsonInput.getObjectOrNull(object, "project",
-				PROJECT_PARSER));
+				MINIMAL_PROJECT_PARSER));
 		result.setUser(JsonInput.getObjectOrNull(object, "author", USER_PARSER));
 		result.setTitle(JsonInput.getStringOrNull(object, "title"));
 		result.setDescription(JsonInput.getStringOrNull(object, "description"));
@@ -241,6 +248,22 @@ public class RedmineJSONParser {
 	}
 
 	/**
+	 * Parses a "minimal" version of a project.
+	 * 
+	 * @param content
+	 *            content to parse.
+	 * @return parsed project.
+	 */
+	public static Project parseMinimalProject(JSONObject content)
+			throws JSONException {
+		final Project result = new Project();
+		result.setId(JsonInput.getInt(content, "id"));
+		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
+		result.setName(JsonInput.getStringNotNull(content, "name"));
+		return result;
+	}
+
+	/**
 	 * Parses a project.
 	 * 
 	 * @param content
@@ -252,8 +275,9 @@ public class RedmineJSONParser {
 		result.setId(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
-		result.setDescription(JsonInput.getStringOrNull(content, "description"));
-		result.setHomepage(JsonInput.getStringOrNull(content, "homepage"));
+		result.setDescription(JsonInput
+				.getStringOrEmpty(content, "description"));
+		result.setHomepage(JsonInput.getStringOrEmpty(content, "homepage"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
 		final JSONObject parentProject = JsonInput.getObjectOrNull(content,
@@ -290,7 +314,7 @@ public class RedmineJSONParser {
 
 		result.setDoneRatio(JsonInput.getIntOrNull(content, "done_ratio"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				PROJECT_PARSER));
+				MINIMAL_PROJECT_PARSER));
 		result.setAuthor(JsonInput.getObjectOrNull(content, "author",
 				USER_PARSER));
 		result.setStartDate(getShortDateOrNull(content, "start_date"));
@@ -332,7 +356,7 @@ public class RedmineJSONParser {
 		result.setId(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				PROJECT_PARSER));
+				MINIMAL_PROJECT_PARSER));
 		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to",
 				USER_PARSER));
 		return result;
@@ -342,7 +366,7 @@ public class RedmineJSONParser {
 		final Version result = new Version();
 		result.setId(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				PROJECT_PARSER));
+				MINIMAL_PROJECT_PARSER));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setDescription(JsonInput.getStringOrNull(content, "description"));
 		result.setStatus(JsonInput.getStringOrNull(content, "status"));
