@@ -2,9 +2,8 @@ package org.redmine.ta.internal;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.*;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -26,6 +25,23 @@ public class Communicator {
     private String login;
     private String password;
 
+	/**
+	 * Used redmine options.
+	 */
+	private final RedmineOptions options;
+
+	/**
+	 * Used HTTP client.
+	 */
+	private final HttpClient client;
+
+	public Communicator(RedmineOptions options) {
+		this.options = options;
+		final DefaultHttpClient clientImpl = HttpUtil.getNewHttpClient(options
+				.getMaxOpen());
+		this.client = clientImpl;
+	}
+
     // TODO lots of usages process 404 code themselves, but some don't.
     // check if we can process 404 code in this method instead of forcing clients to deal with it.
 
@@ -34,9 +50,6 @@ public class Communicator {
      */
     public String sendRequest(HttpRequest request) throws RedmineException {
         logger.debug(request.getRequestLine().toString());
-        DefaultHttpClient httpclient = HttpUtil.getNewHttpClient();
-
-        configureProxy(httpclient);
 
         if (login != null) {
             // replaced because of http://code.google.com/p/redmine-java-api/issues/detail?id=72
@@ -55,8 +68,22 @@ public class Communicator {
             request.addHeader("Authorization", "Basic: " + credentials);
         }
 
-        request.addHeader("Accept-Encoding", "gzip,deflate");
-        HttpResponse httpResponse;
+		request.addHeader("Accept-Encoding", "");
+        return sendRequestImpl(request);
+    }
+
+	/**
+	 * Sends a request.
+	 * 
+	 * @param request
+	 *            request to send.
+	 * @return request result.
+	 * @throws RedmineException
+	 */
+	private String sendRequestImpl(HttpRequest request)
+			throws RedmineException {
+		final HttpClient httpclient = client;
+		HttpResponse httpResponse;
         try {
             httpResponse = httpclient.execute((HttpUriRequest) request);
         } catch (ClientProtocolException e1) {
@@ -81,6 +108,12 @@ public class Communicator {
             throw new RedmineFormatException(e);
         } catch (IOException e) {
             throw new RedmineTransportException(e);
+		} finally {
+			try {
+				EntityUtils.consume(responseEntity);
+			} catch (IOException e) {
+				throw new RedmineTransportException(e);
+			}
         }
 
         if (responseCode == HttpStatus.SC_NOT_FOUND) {
@@ -97,40 +130,10 @@ public class Communicator {
 			}
             throw new RedmineProcessingException(errors);
         }
-        /* 422 "invalid"
-          <?xml version="1.0" encoding="UTF-8"?>
-          <errors>
-            <error>Name can't be blank</error>
-            <error>Identifier has already been taken</error>
-          </errors>
-           */
-        httpclient.getConnectionManager().shutdown();
         return responseBody;
-    }
+	}
 
-    private void configureProxy(DefaultHttpClient httpclient) {
-        String proxyHost = System.getProperty("http.proxyHost");
-        String proxyPort = System.getProperty("http.proxyPort");
-        if (proxyHost != null && proxyPort != null) {
-            int port;
-            try {
-                port = Integer.parseInt(proxyPort);
-            } catch (NumberFormatException e) {
-                throw new RedmineConfigurationException("Illegal proxy port " + proxyPort, e);
-            }
-            HttpHost proxy = new HttpHost(proxyHost, port);
-            httpclient.getParams().setParameter(org.apache.http.conn.params.ConnRoutePNames.DEFAULT_PROXY, proxy);
-            String proxyUser = System.getProperty("http.proxyUser");
-            if (proxyUser != null) {
-                String proxyPassword = System.getProperty("http.proxyPassword");
-                httpclient.getCredentialsProvider().setCredentials(
-                        new AuthScope(proxyHost, port),
-                        new UsernamePasswordCredentials(proxyUser, proxyPassword));
-            }
-        }
-    }
-
-    public void setCredentials(String login, String password) {
+	public void setCredentials(String login, String password) {
         this.login = login;
         this.password = password;
     }
@@ -139,4 +142,11 @@ public class Communicator {
         HttpGet http = new HttpGet(uri);
         return sendRequest(http);
     }
+
+	/**
+	 * Shutdowns a communicator.
+	 */
+	public void shutdown() {
+		client.getConnectionManager().shutdown();
+	}
 }

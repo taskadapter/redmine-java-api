@@ -19,6 +19,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.redmine.ta.RedmineOptions;
 import org.redmine.ta.NotFoundException;
 import org.redmine.ta.RedmineAuthenticationException;
 import org.redmine.ta.RedmineException;
@@ -55,6 +56,10 @@ public final class Transport {
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
+	private Communicator communicator;
+	private final RedmineOptions options;
+
+	private boolean shutDown;
 
 	static {
 		OBJECT_CONFIGS.put(
@@ -113,8 +118,21 @@ public final class Transport {
 	private boolean useBasicAuth = false;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 
-	public Transport(URIConfigurator configurator) {
+	public Transport(URIConfigurator configurator,
+			RedmineOptions options) {
 		this.configurator = configurator;
+		this.options = options;
+	}
+
+	/**
+	 * Checks, if current transport is active.
+	 * 
+	 * @throws RedmineException
+	 *             if manager is not active.
+	 */
+	private void ensureActive() throws RedmineException {
+		if (shutDown)
+			throw new RedmineException("Manager is shut down");
 	}
 
 	public User getCurrentUser() throws RedmineException {
@@ -366,11 +384,16 @@ public final class Transport {
 		this.objectsPerPage = pageSize;
 	}
 
-	private Communicator getCommunicator() {
-		Communicator communicator = new Communicator();
+	private Communicator getCommunicator() throws RedmineException {
+		ensureActive();
+		final Communicator currentCommunicator = this.communicator;
+		if (currentCommunicator != null)
+			return currentCommunicator;
+		Communicator communicator = new Communicator(options);
 		if (useBasicAuth) {
 			communicator.setCredentials(login, password);
 		}
+		this.communicator = communicator;
 		return communicator;
 	}
 
@@ -418,15 +441,33 @@ public final class Transport {
 		this.login = login;
 		this.password = password;
 		this.useBasicAuth = true;
+		invalidateCommunicator();
+	}
+
+	/**
+	 * Marks communicator as invalid.
+	 */
+	private void invalidateCommunicator() {
+		final Communicator oldCommunicator = communicator;
+		this.communicator = null;
+		if (oldCommunicator != null)
+			oldCommunicator.shutdown();
+	}
+
+	public void shutdown() {
+		shutDown = true;
+		invalidateCommunicator();
 	}
 
 	public void setPassword(String password) {
 		this.password = password;
 		this.useBasicAuth = true;
+		invalidateCommunicator();
 	}
 
 	public void setLogin(String login) {
 		this.login = login;
+		invalidateCommunicator();
 		this.useBasicAuth = true;
 	}
 

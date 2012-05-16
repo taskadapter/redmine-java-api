@@ -46,13 +46,30 @@ public class RedmineManager {
 	private final Transport transport;
 
     public RedmineManager(String uri) {
-        this(uri, null, null);
+		this(uri, RedmineOptions.simpleOptions());
     }
 
     public RedmineManager(String uri, String login, String password) {
-		this.transport = new Transport(new URIConfigurator(uri, null));
-		transport.setCredentials(login, password);
+		this(uri, login, password, RedmineOptions.simpleOptions());
     }
+
+	/**
+	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
+	 * not checked at this moment.
+	 * 
+	 * @param host
+	 *            complete Redmine server web URI, including protocol and port
+	 *            number. Example: http://demo.redmine.org:8080
+	 * @param apiAccessKey
+	 *            Redmine API access key. It is shown on "My Account" /
+	 *            "API access key" webpage (check
+	 *            <i>http://redmine_server_url/my/account<i> URL). This
+	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
+	 *            projects, which are "public".
+	 */
+	public RedmineManager(String host, String apiAccessKey) {
+		this(host, apiAccessKey, RedmineOptions.simpleOptions());
+	}
 
     /**
      * Creates an instance of RedmineManager class. Host and apiAccessKey are not checked at this moment.
@@ -62,9 +79,21 @@ public class RedmineManager {
      *                     (check  <i>http://redmine_server_url/my/account<i> URL).
      *                     This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public".
      */
-    public RedmineManager(String host, String apiAccessKey) {
-		this.transport = new Transport(new URIConfigurator(host, apiAccessKey));
-    }
+	public RedmineManager(String host, String apiAccessKey,
+			RedmineOptions options) {
+		this.transport = new Transport(new URIConfigurator(host, apiAccessKey),
+				options);
+	}
+
+	public RedmineManager(String uri, RedmineOptions options) {
+		this(uri, null, null, options);
+	}
+
+	public RedmineManager(String uri, String login, String password,
+			RedmineOptions options) {
+		this.transport = new Transport(new URIConfigurator(uri, null), options);
+		transport.setCredentials(login, password);
+	}
 
     /**
      * Sample usage:
@@ -616,4 +645,11 @@ public class RedmineManager {
         }
 		return transport.getObjectsList(News.class, params);
     }
+
+	/**
+	 * Shutdowns a communicator.
+	 */
+	public void shutdown() {
+		transport.shutdown();
+	}
 }
