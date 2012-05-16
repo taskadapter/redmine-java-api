@@ -2,7 +2,12 @@ package org.redmine.ta.internal.comm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
@@ -14,6 +19,7 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -46,36 +52,43 @@ class HttpUtil {
 		});
 	}
 
-	@SuppressWarnings("deprecation")
-	public static DefaultHttpClient getNewHttpClient(int maxConnections) {
+	public static DefaultHttpClient getNewHttpClient(
+			ClientConnectionManager connectionManager) {
 		try {
-			KeyStore trustStore = KeyStore.getInstance(KeyStore
-					.getDefaultType());
-			trustStore.load(null, null);
-
-			SSLSocketFactory sf = new FakeSSLSocketFactory(trustStore);
-			sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 
 			HttpParams params = new BasicHttpParams();
 			HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
 			HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
 
-			SchemeRegistry registry = new SchemeRegistry();
-			registry.register(new Scheme("http", PlainSocketFactory
-					.getSocketFactory(), 80));
-			registry.register(new Scheme("https", sf, 443));
-
-			ThreadSafeClientConnManager ccm = new ThreadSafeClientConnManager(
-					params, registry);
-			ccm.setMaxTotal(maxConnections);
-			ccm.setDefaultMaxPerRoute(maxConnections);
-
-			final DefaultHttpClient result = new DefaultHttpClient(ccm, params);
+			final DefaultHttpClient result = new DefaultHttpClient(
+					connectionManager, params);
 			configureProxy(result);
 			return result;
 		} catch (Exception e) {
 			return new DefaultHttpClient();
 		}
+	}
+
+	@SuppressWarnings("deprecation")
+	static ThreadSafeClientConnManager createConnectionManager(
+			int maxConnections) throws KeyStoreException,
+			NoSuchAlgorithmException, CertificateException, IOException,
+			KeyManagementException, UnrecoverableKeyException {
+		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		trustStore.load(null, null);
+		SSLSocketFactory sf = new FakeSSLSocketFactory(trustStore);
+		sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+		SchemeRegistry registry = new SchemeRegistry();
+		registry.register(new Scheme("http", 80, PlainSocketFactory
+				.getSocketFactory()));
+		registry.register(new Scheme("https", 443, sf));
+
+		ThreadSafeClientConnManager ccm = new ThreadSafeClientConnManager(
+				registry);
+		ccm.setMaxTotal(maxConnections);
+		ccm.setDefaultMaxPerRoute(maxConnections);
+		return ccm;
 	}
 
 	private static void configureProxy(DefaultHttpClient httpclient) {

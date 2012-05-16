@@ -36,7 +36,7 @@ public final class RedmineOptions {
 		return new RedmineOptions(maxOpen, 30, 30);
 	}
 
-	public int getMaxOpen() {
+	public int getMaxOpenConnecitons() {
 		return maxOpen;
 	}
 
@@ -44,7 +44,7 @@ public final class RedmineOptions {
 		return idleTimeout;
 	}
 
-	public int getEvictionCheck() {
+	public int getEvictionCheckInterval() {
 		return evictionCheck;
 	}
 

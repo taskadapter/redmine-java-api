@@ -5,6 +5,7 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
@@ -29,20 +30,51 @@ public class BaseCommunicator implements Communicator {
 			.getLogger(BaseCommunicator.class);
 
 	/**
-	 * Used redmine options.
-	 */
-	private final RedmineOptions options;
-
-	/**
 	 * Used HTTP client.
 	 */
 	private final HttpClient client;
 
+	/**
+	 * Connection evictor
+	 */
+	private final ConnectionEvictor evictor;
+
 	public BaseCommunicator(RedmineOptions options) {
-		this.options = options;
-		final DefaultHttpClient clientImpl = HttpUtil.getNewHttpClient(options
-				.getMaxOpen());
+		DefaultHttpClient clientImpl;
+		ClientConnectionManager connManager;
+		try {
+			connManager = HttpUtil.createConnectionManager(options
+					.getMaxOpenConnecitons());
+			clientImpl = HttpUtil.getNewHttpClient(connManager);
+		} catch (Exception e) {
+			connManager = null;
+			clientImpl = new DefaultHttpClient();
+		}
+
+		if (connManager != null) {
+			evictor = new ConnectionEvictor(connManager,
+					options.getEvictionCheckInterval(),
+					options.getIdleTimeout());
+			runEvictor(evictor);
+		} else {
+			evictor = null;
+		}
+
 		this.client = clientImpl;
+	}
+
+	/**
+	 * Runs an evictor thread.
+	 * 
+	 * @param evictor2
+	 *            evictor to run.
+	 */
+	private void runEvictor(ConnectionEvictor evictor2) {
+		final Thread evictorThread = new Thread(evictor2);
+		evictorThread.setDaemon(true);
+		evictorThread
+				.setName("Redmine communicator connection eviction thread");
+		evictorThread.start();
 	}
 
 	// TODO lots of usages process 404 code themselves, but some don't.
@@ -125,6 +157,10 @@ public class BaseCommunicator implements Communicator {
 	 * @return entity content as string.
 	 */
 	private final String getContent(HttpEntity entity) throws IOException {
+		/*
+		 * Use our own content parsing. Apache http client is overarchitected
+		 * and does not support connection reuse with compressed streams.
+		 */
 		final String charset = HttpUtil.getCharset(entity);
 		final InputStream contentStream = HttpUtil.getEntityStream(entity);
 
@@ -156,5 +192,24 @@ public class BaseCommunicator implements Communicator {
 	 */
 	public void shutdown() {
 		client.getConnectionManager().shutdown();
+		if (evictor != null)
+			evictor.shutdown();
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		/*
+		 * We MUST terminate evictor on finalization. Threads (even daemon
+		 * threads) will not be garbage-collected automatically. Thus we should
+		 * release such threads even if client forget to call
+		 * "manager.shutdown".
+		 */
+		try {
+			if (evictor != null)
+				evictor.shutdown();
+		} catch (Exception e) {
+			// ignore;
+		}
+		super.finalize();
 	}
 }
