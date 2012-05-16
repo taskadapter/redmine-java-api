@@ -25,7 +25,11 @@ public class Issue implements Identifiable {
     private Date startDate;
     private Date dueDate;
     private Tracker tracker;
-    private String description;
+
+    /**
+     * Description is an empty string by default, not NULL.
+     */
+    private String description = "";
     private Date createdOn;
     private Date updatedOn;
     private Integer statusId;
@@ -159,6 +163,9 @@ public class Issue implements Identifiable {
         this.tracker = tracker;
     }
 
+    /**
+     * Description is empty by default, not NULL.
+     */
     public String getDescription() {
         return description;
     }
