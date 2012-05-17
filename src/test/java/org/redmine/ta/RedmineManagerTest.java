@@ -1681,4 +1681,24 @@ public class RedmineManagerTest {
 		assertEquals("New subject", iss3.getSubject());
 		assertEquals("Original description", iss3.getDescription());
 	}
+
+	@Test
+	public void tryUpdateProjectWithLongHomepage() throws RedmineException {
+		final Project project = new Project();
+		project.setIdentifier("issue7testproject");
+		project.setName("issue 7 test project");
+		project.setDescription("test");
+		final String longHomepageName = "http://www.localhost.com/asdf?a=\"&b=\"&c=\"&d=\"&e=\"&f=\"&g=\"&h=\"&i=\"&j=\"&k=\"&l=\"&m=\"&n=\"&o=\"&p=\"&q=\"&r=\"&s=\"&t=\"&u=\"&v=\"&w=\"&x=\"&y=\"&zо=авфбвоафжывлдаофжывладоджлфоывадлфоываждфлоываждфлоываждлфоываждлфова&&\\&&&&&&&&&&&&&&&&&&\\&&&&&&&&&&&&&&&&&&&&&&&&&&&&<>>";
+		project.setHomepage(longHomepageName);
+		final Project created = mgr.createProject(project);
+		created.setDescription("updated description");
+		try {
+			mgr.update(created);
+			final Project updated = mgr
+					.getProjectByKey(project.getIdentifier());
+			Assert.assertEquals(longHomepageName, updated.getHomepage());
+		} finally {
+			mgr.deleteProject(created.getIdentifier());
+		}
+	}
 }
