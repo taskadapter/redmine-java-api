@@ -1,5 +1,6 @@
 package org.redmine.ta;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.redmine.ta.RedmineManager.INCLUDE;
@@ -14,8 +15,8 @@ public class Simple {
     private static final Integer queryId = null; // any
 
     public static void main(String[] args) {
-        String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.3.1";
-        String apiAccessKey = "e665eabdddfa3744e3cbea0f122445d098f2f4b2";
+		String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.4.2";
+		String apiAccessKey = "917ec69ef2aa38ab55581a7435571231e5bb8884";
         RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
         try {
 			// getIssueWithRelations(mgr);
@@ -33,11 +34,20 @@ public class Simple {
 //            getProject(mgr);
 //            changeIssueStatus(mgr);
 			// getVersion(mgr);
-			getStatuses(mgr);
+			// getStatuses(mgr);
+			tryUpload(mgr);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+	@SuppressWarnings("unused")
+	private static void tryUpload(RedmineManager mgr) throws RedmineException,
+			IOException {
+		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+		System.out.println(mgr.uploadAttachment("test.bin",
+				"application/binary", content));
+	}
 
 	@SuppressWarnings("unused")
     private static void getVersion(RedmineManager mgr) throws RedmineException {

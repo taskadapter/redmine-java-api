@@ -137,6 +137,16 @@ public class RedmineJSONParser {
 		}
 	};
 
+	/**
+	 * Parser for upload tokens.
+	 */
+	public static final JsonObjectParser<String> UPLOAD_TOKEN_PARSER = new JsonObjectParser<String>() {
+		@Override
+		public String parse(JSONObject input) throws JSONException {
+			return JsonInput.getStringNotNull(input, "token");
+		}
+	};
+
 	public static final JsonObjectParser<String> ERROR_PARSER = new JsonObjectParser<String>() {
 		@Override
 		public String parse(JSONObject input) throws JSONException {

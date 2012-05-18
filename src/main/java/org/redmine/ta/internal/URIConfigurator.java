@@ -121,4 +121,8 @@ public class URIConfigurator {
 					+ item.getCanonicalName());
 		return guess;
 	}
+
+	public URI getUploadURI() {
+		return createURI("uploads" + URL_POSTFIX);
+	}
 }

@@ -1,5 +1,6 @@
 package org.redmine.ta.internal;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
@@ -234,6 +237,28 @@ public final class Transport {
 		String response = getCommunicator().sendRequest(http);
 		logger.debug(response);
 		return parseResponce(response, config.singleObjectName, config.parser);
+	}
+
+	/**
+	 * UPloads content on a server.
+	 * 
+	 * @param content
+	 *            content stream.
+	 * @return uploaded item token.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public String upload(InputStream content) throws RedmineException {
+		final URI uploadURI = getURIConfigurator().getUploadURI();
+		final HttpPost request = new HttpPost(uploadURI);
+		final AbstractHttpEntity entity = new InputStreamEntity(content, -1);
+		/* Content type required by a Redmine */
+		entity.setContentType("application/octet-stream");
+		request.setEntity(entity);
+
+		final String result = getCommunicator().sendRequest(request);
+		return parseResponce(result, "upload",
+				RedmineJSONParser.UPLOAD_TOKEN_PARSER);
 	}
 
 	/**
