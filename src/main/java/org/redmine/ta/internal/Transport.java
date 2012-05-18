@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -49,6 +50,7 @@ import org.redmine.ta.internal.comm.Communicator;
 import org.redmine.ta.internal.comm.Communicators;
 import org.redmine.ta.internal.comm.ContentHandler;
 import org.redmine.ta.internal.comm.SimpleCommunicator;
+import org.redmine.ta.internal.comm.redmine.RedmineAuthenticator;
 import org.redmine.ta.internal.comm.redmine.RedmineErrorHandler;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
@@ -71,6 +73,7 @@ public final class Transport {
 	private SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final BaseCommunicator baseCommunicator;
+	private final RedmineAuthenticator<HttpResponse> authenticator;
 	private final Communicator<String> coreCommunicator;
 
 	static {
@@ -135,13 +138,16 @@ public final class Transport {
 	private String login;
 	private String password;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
+	private static final String CHARSET = "UTF-8";
 
 	public Transport(URIConfigurator configurator, RedmineOptions options) {
 		this.configurator = configurator;
 		this.baseCommunicator = new BaseCommunicator(options);
+		this.authenticator = new RedmineAuthenticator<HttpResponse>(
+				baseCommunicator, CHARSET);
 		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
 		errorCheckingCommunicator = Communicators.fmap(
-				baseCommunicator,
+				authenticator,
 				Communicators.compose(errorProcessor,
 						Communicators.transportDecoder()));
 		coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
@@ -439,10 +445,10 @@ public final class Transport {
 	private void setEntity(HttpEntityEnclosingRequest request, String body) {
 		StringEntity entity;
 		try {
-			entity = new StringEntity(body, BaseCommunicator.CHARSET);
+			entity = new StringEntity(body, CHARSET);
 		} catch (UnsupportedEncodingException e) {
-			throw new RedmineInternalError("Required charset "
-					+ BaseCommunicator.CHARSET + " is not supported", e);
+			throw new RedmineInternalError("Required charset " + CHARSET
+					+ " is not supported", e);
 		}
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
@@ -469,9 +475,7 @@ public final class Transport {
 	public void setCredentials(String login, String password) {
 		this.login = login;
 		this.password = password;
-		communicator = Communicators.simplify(Communicators.addBasicAuth(login,
-				password, BaseCommunicator.CHARSET, coreCommunicator),
-				Communicators.<String> identityHandler());
+		authenticator.setCredentials(login, password);
 	}
 
 	public void shutdown() {

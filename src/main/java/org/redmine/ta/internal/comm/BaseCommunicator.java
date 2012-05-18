@@ -14,8 +14,6 @@ import org.redmine.ta.internal.logging.LoggerFactory;
 import java.io.IOException;
 
 public class BaseCommunicator implements Communicator<HttpResponse> {
-	public static final String CHARSET = "UTF-8";
-
 	private final Logger logger = LoggerFactory
 			.getLogger(BaseCommunicator.class);
 
