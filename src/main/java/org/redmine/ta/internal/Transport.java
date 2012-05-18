@@ -35,6 +35,7 @@ import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.IssueStatus;
 import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.Role;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
@@ -107,6 +108,8 @@ public final class Transport {
 				.put(SavedQuery.class,
 						config("query", "queries", null,
 								RedmineJSONParser.QUERY_PARSER));
+		OBJECT_CONFIGS.put(Role.class,
+				config("role", "roles", null, RedmineJSONParser.ROLE_PARSER));
 	}
 
 	/** Uri configurator */

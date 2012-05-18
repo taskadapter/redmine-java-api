@@ -1725,4 +1725,9 @@ public class RedmineManagerTest {
 			mgr.deleteIssue(createdIssue.getId());
 		}
 	}
+
+	@Test
+	public void testGetRoles() throws RedmineException {
+		Assert.assertTrue(mgr.getRoles().size() > 0);
+	}
 }

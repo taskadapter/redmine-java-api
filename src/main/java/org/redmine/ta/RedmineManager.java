@@ -812,4 +812,8 @@ public class RedmineManager {
 			is.close();
 		}
 	}
+
+	public List<Role> getRoles() throws RedmineException {
+		return transport.getObjectsList(Role.class);
+	}
 }

@@ -36,6 +36,7 @@ public class URIConfigurator {
 		urls.put(Attachment.class, "attachments");
 		urls.put(News.class, "news");
 		urls.put(IssueRelation.class, "relations");
+		urls.put(Role.class, "roles");
 	}
 
 	private final URL baseURL;

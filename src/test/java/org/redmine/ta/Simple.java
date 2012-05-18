@@ -35,7 +35,8 @@ public class Simple {
 			// changeIssueStatus(mgr);
 			// getVersion(mgr);
 			// getStatuses(mgr);
-			tryUpload(mgr);
+			// tryUpload(mgr);
+			tryGetRoles(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -181,5 +182,9 @@ public class Simple {
 		User currentUser2 = mgr.getCurrentUser();
 		logger.debug("updated user's mail: " + currentUser2.getMail());
 
+	}
+
+	private static void tryGetRoles(RedmineManager mgr) throws Exception {
+		System.out.println(mgr.getRoles());
 	}
 }

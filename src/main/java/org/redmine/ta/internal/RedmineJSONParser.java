@@ -15,6 +15,7 @@ import org.redmine.ta.beans.IssueStatus;
 import org.redmine.ta.beans.Journal;
 import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.Role;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
@@ -144,6 +145,13 @@ public class RedmineJSONParser {
 		@Override
 		public String parse(JSONObject input) throws JSONException {
 			return JsonInput.getStringNotNull(input, "token");
+		}
+	};
+
+	public static final JsonObjectParser<Role> ROLE_PARSER = new JsonObjectParser<Role>() {
+		@Override
+		public Role parse(JSONObject input) throws JSONException {
+			return parseRole(input);
 		}
 	};
 
@@ -448,6 +456,15 @@ public class RedmineJSONParser {
 		if (name != null)
 			result.setFullName(name);
 		return result;
+	}
+
+	public static Role parseRole(JSONObject content) throws JSONException {
+		final Role role = new Role();
+		role.setId(JsonInput.getIntOrNull(content, "id"));
+		role.setName(JsonInput.getStringOrNull(content, "name"));
+		role.setInherited(content.has("inherited")
+				&& content.getBoolean("inherited"));
+		return role;
 	}
 
 	/**
