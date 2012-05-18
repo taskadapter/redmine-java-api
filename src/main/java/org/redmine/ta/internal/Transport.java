@@ -10,9 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -46,6 +44,7 @@ import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.comm.BaseCommunicator;
+import org.redmine.ta.internal.comm.BasicHttpResponse;
 import org.redmine.ta.internal.comm.Communicator;
 import org.redmine.ta.internal.comm.Communicators;
 import org.redmine.ta.internal.comm.ContentHandler;
@@ -70,6 +69,7 @@ public final class Transport {
 	private static final String KEY_TOTAL_COUNT = "total_count";
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 	private SimpleCommunicator<String> communicator;
+	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final BaseCommunicator baseCommunicator;
 	private final Communicator<String> coreCommunicator;
 
@@ -139,10 +139,13 @@ public final class Transport {
 	public Transport(URIConfigurator configurator, RedmineOptions options) {
 		this.configurator = configurator;
 		this.baseCommunicator = new BaseCommunicator(options);
-		final ContentHandler<HttpResponse, HttpEntity> errorProcessor = new RedmineErrorHandler();
-		final ContentHandler<HttpResponse, String> contentParser1 = Communicators
-				.compose(Communicators.contentReader(), errorProcessor);
-		coreCommunicator = Communicators.fmap(baseCommunicator, contentParser1);
+		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
+		errorCheckingCommunicator = Communicators.fmap(
+				baseCommunicator,
+				Communicators.compose(errorProcessor,
+						Communicators.transportDecoder()));
+		coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
+				Communicators.contentReader());
 		this.communicator = Communicators.simplify(coreCommunicator,
 				Communicators.<String> identityHandler());
 	}

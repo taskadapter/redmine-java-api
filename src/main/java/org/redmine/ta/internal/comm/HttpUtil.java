@@ -117,6 +117,7 @@ class HttpUtil {
 		}
 	}
 
+	@Deprecated
 	public static InputStream getEntityStream(HttpEntity entity)
 			throws IOException {
 		final String encoding = getEntityEncoding(entity);
@@ -133,7 +134,7 @@ class HttpUtil {
 	 *            entitity to get encoding.
 	 * @return entity encoding string.
 	 */
-	private static String getEntityEncoding(HttpEntity entity) {
+	public static String getEntityEncoding(HttpEntity entity) {
 		final Header header = entity.getContentEncoding();
 		if (header == null)
 			return null;

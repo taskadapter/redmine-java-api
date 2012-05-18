@@ -1,12 +1,16 @@
 package org.redmine.ta.internal.comm;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.redmine.ta.RedmineException;
 import org.redmine.ta.RedmineInternalError;
+import org.redmine.ta.RedmineTransportException;
 
 /**
  * Communicator utilities.
@@ -22,7 +26,47 @@ public final class Communicators {
 		}
 	};
 
-	private static final ContentHandler<HttpEntity, String> CONTENT_READER = new EntityToStringHandler();
+	private static final ContentHandler<HttpResponse, BasicHttpResponse> TRANSPORT_DECODER = new TransportDecoder();
+
+	private static final ContentHandler<BasicHttpResponse, Reader> CHARACTER_DECODER = new ContentHandler<BasicHttpResponse, Reader>() {
+		@Override
+		public Reader processContent(BasicHttpResponse content)
+				throws RedmineException {
+			final String charset = content.getCharset();
+			try {
+				return new InputStreamReader(content.getStream(), charset);
+			} catch (UnsupportedEncodingException e) {
+				throw new RedmineTransportException(
+						"Unsupported response charset " + charset, e);
+			}
+		}
+	};
+
+	private static final ContentHandler<Reader, String> READ_CHARS = new ContentHandler<Reader, String>() {
+		@Override
+		public String processContent(Reader content) throws RedmineException {
+			return readAll(content);
+		}
+	};
+
+	private static final ContentHandler<BasicHttpResponse, String> CHAR_CONTENT_READER = compose(
+			READ_CHARS, CHARACTER_DECODER);
+
+	static String readAll(Reader r) throws RedmineException {
+		final StringWriter writer = new StringWriter();
+		final char[] buffer = new char[4096];
+		int readed;
+		try {
+			while ((readed = r.read(buffer)) > 0) {
+				writer.write(buffer, 0, readed);
+			}
+			r.close();
+			writer.close();
+			return writer.toString();
+		} catch (IOException e) {
+			throw new RedmineTransportException(e);
+		}
+	}
 
 	/**
 	 * Adds a basic authentication.
@@ -64,8 +108,8 @@ public final class Communicators {
 		return (ContentHandler<K, K>) IDENTITY_HANDLER;
 	}
 
-	public static ContentHandler<HttpEntity, String> contentReader() {
-		return CONTENT_READER;
+	public static ContentHandler<BasicHttpResponse, String> contentReader() {
+		return CHAR_CONTENT_READER;
 	}
 
 	public static <K, I, R> ContentHandler<K, R> compose(
@@ -76,5 +120,17 @@ public final class Communicators {
 	public static <K, R> Communicator<R> fmap(Communicator<K> comm,
 			ContentHandler<K, R> handler) {
 		return new FmapCommunicator<R, K>(handler, comm);
+	}
+
+	public static ContentHandler<HttpResponse, BasicHttpResponse> transportDecoder() {
+		return TRANSPORT_DECODER;
+	}
+
+	public static ContentHandler<BasicHttpResponse, Reader> characterDecoder() {
+		return CHARACTER_DECODER;
+	}
+
+	public static ContentHandler<Reader, String> readChars() {
+		return READ_CHARS;
 	}
 }
