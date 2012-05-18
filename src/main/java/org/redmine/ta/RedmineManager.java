@@ -354,11 +354,13 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public List<User> getUsers() throws RedmineException {
-		return transport.getObjectsList(User.class);
+		return transport.getObjectsList(User.class, new BasicNameValuePair(
+				"include", "memberships"));
     }
 
     public User getUserById(Integer userId) throws RedmineException {
-		return transport.getObject(User.class, userId);
+		return transport.getObject(User.class, userId, new BasicNameValuePair(
+				"include", "memberships"));
     }
 
     /**
