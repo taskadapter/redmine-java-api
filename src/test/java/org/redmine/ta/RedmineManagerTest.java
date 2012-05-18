@@ -1681,4 +1681,112 @@ public class RedmineManagerTest {
 		assertEquals("New subject", iss3.getSubject());
 		assertEquals("Original description", iss3.getDescription());
 	}
+
+	@Test
+	public void tryUpdateProjectWithLongHomepage() throws RedmineException {
+		final Project project = generateRandomProject();
+		project.setName("issue 7 test project");
+		project.setDescription("test");
+		final String longHomepageName = "http://www.localhost.com/asdf?a=\"&b=\"&c=\"&d=\"&e=\"&f=\"&g=\"&h=\"&i=\"&j=\"&k=\"&l=\"&m=\"&n=\"&o=\"&p=\"&q=\"&r=\"&s=\"&t=\"&u=\"&v=\"&w=\"&x=\"&y=\"&zо=авфбвоафжывлдаофжывладоджлфоывадлфоываждфлоываждфлоываждлфоываждлфова&&\\&&&&&&&&&&&&&&&&&&\\&&&&&&&&&&&&&&&&&&&&&&&&&&&&<>>";
+		project.setHomepage(longHomepageName);
+		final Project created = mgr.createProject(project);
+		created.setDescription("updated description");
+		try {
+			mgr.update(created);
+			final Project updated = mgr
+					.getProjectByKey(project.getIdentifier());
+			Assert.assertEquals(longHomepageName, updated.getHomepage());
+		} finally {
+			mgr.deleteProject(created.getIdentifier());
+		}
+	}
+
+	@Test
+	public void testAttachementUploads() throws RedmineException, IOException {
+		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+		final Attachment attach1 = mgr.uploadAttachment("test.bin",
+				"application/ternary", content);
+		final Issue testIssue = new Issue();
+		testIssue.setSubject("This is upload ticket!");
+		testIssue.getAttachments().add(attach1);
+		final Issue createdIssue = mgr.createIssue(projectKey, testIssue);
+		try {
+			final List<Attachment> attachments = createdIssue.getAttachments();
+			Assert.assertEquals(1, attachments.size());
+			final Attachment added = attachments.get(0);
+			Assert.assertEquals("test.bin", added.getFileName());
+			Assert.assertEquals("application/ternary", added.getContentType());
+			// FIXME: fix "download attachment content" and enable content check
+			// final byte[] receivedContent =
+			// mgr.downloadAttachmentContent(added);
+			// Assert.assertArrayEquals(content, receivedContent);
+		} finally {
+			mgr.deleteIssue(createdIssue.getId());
+		}
+	}
+
+	@Test
+	public void testGetRoles() throws RedmineException {
+		Assert.assertTrue(mgr.getRoles().size() > 0);
+	}
+
+	@Test
+	public void testGetMemberships() throws RedmineException {
+		final List<Membership> result = mgr.getMemberships(projectKey);
+		Assert.assertNotNull(result);
+	}
+
+	@Test
+	public void testMemberships() throws RedmineException {
+		final List<Role> roles = mgr.getRoles();
+		
+		final Membership newMembership = new Membership();
+		final Project project = new Project();
+		project.setIdentifier(projectKey);
+		newMembership.setProject(project);
+		final User currentUser = mgr.getCurrentUser();
+		newMembership.setUser(currentUser);
+		newMembership.setRoles(roles);
+
+		mgr.addMembership(newMembership);
+		final List<Membership> memberships1 = mgr.getMemberships(project);
+		Assert.assertEquals(1, memberships1.size());
+		final Membership createdMembership = memberships1.get(0);
+		Assert.assertEquals(currentUser.getId(), createdMembership.getUser()
+				.getId());
+		Assert.assertEquals(roles.size(), createdMembership.getRoles().size());
+		
+		final Membership membershipById = mgr.getMembership(createdMembership.getId());
+		Assert.assertEquals(createdMembership, membershipById);
+
+		final Membership emptyMembership = new Membership();
+		emptyMembership.setId(createdMembership.getId());
+		emptyMembership.setProject(createdMembership.getProject());
+		emptyMembership.setUser(createdMembership.getUser());
+		emptyMembership.setRoles(Collections.singletonList(roles.get(0)));
+
+		mgr.update(emptyMembership);
+		final Membership updatedEmptyMembership = mgr
+				.getMembership(createdMembership.getId());
+		
+		Assert.assertEquals(1, updatedEmptyMembership.getRoles().size());
+		mgr.delete(updatedEmptyMembership);
+	}
+
+	@Test
+	public void testUserMemberships() throws RedmineException {
+		final List<Role> roles = mgr.getRoles();
+		final Membership newMembership = new Membership();
+		final Project project = new Project();
+		project.setIdentifier(projectKey);
+		newMembership.setProject(project);
+		final User currentUser = mgr.getCurrentUser();
+		newMembership.setUser(currentUser);
+		newMembership.setRoles(roles);
+
+		mgr.addMembership(newMembership);
+
+		final User userWithMembership = mgr.getUserById(currentUser.getId());
+		Assert.assertTrue(userWithMembership.getMemberships().size() > 0);
+	}
 }

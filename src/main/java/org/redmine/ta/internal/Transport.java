@@ -1,5 +1,6 @@
 package org.redmine.ta.internal;
 
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
@@ -31,8 +34,10 @@ import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.IssueStatus;
+import org.redmine.ta.beans.Membership;
 import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.Role;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
@@ -110,6 +115,13 @@ public final class Transport {
 				.put(SavedQuery.class,
 						config("query", "queries", null,
 								RedmineJSONParser.QUERY_PARSER));
+		OBJECT_CONFIGS.put(Role.class,
+				config("role", "roles", null, RedmineJSONParser.ROLE_PARSER));
+		OBJECT_CONFIGS.put(
+				Membership.class,
+				config("membership", "memberships",
+						RedmineJSONBuilder.MEMBERSHIP_WRITER,
+						RedmineJSONParser.MEMBERSHIP_PARSER));
 	}
 
 	/** Uri configurator */
@@ -124,8 +136,8 @@ public final class Transport {
 		this.communicator = baseCommunicator;
 	}
 
-	public User getCurrentUser() throws RedmineException {
-		URI uri = getURIConfigurator().createURI("users/current.json");
+	public User getCurrentUser(NameValuePair... params) throws RedmineException {
+		URI uri = getURIConfigurator().createURI("users/current.json", params);
 		HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
 		return parseResponce(response, "user", RedmineJSONParser.USER_PARSER);
@@ -168,7 +180,7 @@ public final class Transport {
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 */
-	public <T> T addChildEntry(Class<?> parentClass, int parentId, T object,
+	public <T> T addChildEntry(Class<?> parentClass, String parentId, T object,
 			NameValuePair... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(object.getClass());
 		URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
@@ -241,6 +253,28 @@ public final class Transport {
 		String response = getCommunicator().sendRequest(http);
 		logger.debug(response);
 		return parseResponce(response, config.singleObjectName, config.parser);
+	}
+
+	/**
+	 * UPloads content on a server.
+	 * 
+	 * @param content
+	 *            content stream.
+	 * @return uploaded item token.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public String upload(InputStream content) throws RedmineException {
+		final URI uploadURI = getURIConfigurator().getUploadURI();
+		final HttpPost request = new HttpPost(uploadURI);
+		final AbstractHttpEntity entity = new InputStreamEntity(content, -1);
+		/* Content type required by a Redmine */
+		entity.setContentType("application/octet-stream");
+		request.setEntity(entity);
+
+		final String result = getCommunicator().sendRequest(request);
+		return parseResponce(result, "upload",
+				RedmineJSONParser.UPLOAD_TOKEN_PARSER);
 	}
 
 	/**
@@ -342,7 +376,7 @@ public final class Transport {
 	 * @param classs
 	 *            target class.
 	 */
-	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId,
+	public <T> List<T> getChildEntries(Class<?> parentClass, String parentId,
 			Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,

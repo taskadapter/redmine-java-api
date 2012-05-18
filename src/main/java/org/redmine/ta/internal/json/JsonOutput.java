@@ -156,6 +156,32 @@ public class JsonOutput {
 			throws JSONException {
 		if (items == null)
 			return;
+		addCollection(writer, field, items, objWriter);
+	}
+
+	/**
+	 * Adds a list.
+	 * 
+	 * @param writer
+	 *            used writer.
+	 * @param field
+	 *            field to write.
+	 * @param items
+	 *            used items.
+	 * @param objWriter
+	 *            single object writer.
+	 */
+	public static <T> void addArrayIfNotEmpty(JSONWriter writer, String field,
+			Collection<T> items, JsonObjectWriter<T> objWriter)
+			throws JSONException {
+		if (items == null || items.size() == 0)
+			return;
+		addCollection(writer, field, items, objWriter);
+	}
+
+	private static <T> void addCollection(JSONWriter writer, String field,
+			Collection<T> items, JsonObjectWriter<T> objWriter)
+			throws JSONException {
 		writer.key(field);
 		writer.array();
 		for (T item : items) {

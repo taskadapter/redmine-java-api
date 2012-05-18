@@ -13,8 +13,10 @@ import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.IssueStatus;
 import org.redmine.ta.beans.Journal;
+import org.redmine.ta.beans.Membership;
 import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.Role;
 import org.redmine.ta.beans.SavedQuery;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
@@ -134,6 +136,30 @@ public class RedmineJSONParser {
 		@Override
 		public SavedQuery parse(JSONObject input) throws JSONException {
 			return parseSavedQuery(input);
+		}
+	};
+
+	/**
+	 * Parser for upload tokens.
+	 */
+	public static final JsonObjectParser<String> UPLOAD_TOKEN_PARSER = new JsonObjectParser<String>() {
+		@Override
+		public String parse(JSONObject input) throws JSONException {
+			return JsonInput.getStringNotNull(input, "token");
+		}
+	};
+
+	public static final JsonObjectParser<Role> ROLE_PARSER = new JsonObjectParser<Role>() {
+		@Override
+		public Role parse(JSONObject input) throws JSONException {
+			return parseRole(input);
+		}
+	};
+
+	public static final JsonObjectParser<Membership> MEMBERSHIP_PARSER = new JsonObjectParser<Membership>() {
+		@Override
+		public Membership parse(JSONObject input) throws JSONException {
+			return parseMembership(input);
 		}
 	};
 
@@ -339,7 +365,7 @@ public class RedmineJSONParser {
 		result.setJournals(JsonInput.getListOrEmpty(content, "journals",
 				JOURNAL_PARSER));
 		result.getAttachments().addAll(
-				JsonInput.getListOrEmpty(content, "attachements",
+				JsonInput.getListOrEmpty(content, "attachments",
 						ATTACHMENT_PARSER));
 		result.getRelations()
 				.addAll(JsonInput.getListOrEmpty(content, "relations",
@@ -437,6 +463,33 @@ public class RedmineJSONParser {
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
 			result.setFullName(name);
+		result.setMemberships(JsonInput.getListOrEmpty(content, "memberships",
+				MEMBERSHIP_PARSER));
+
+		/* Fix user for membership */
+		for (Membership m : result.getMemberships())
+			m.setUser(result);
+
+		return result;
+	}
+
+	public static Role parseRole(JSONObject content) throws JSONException {
+		final Role role = new Role();
+		role.setId(JsonInput.getIntOrNull(content, "id"));
+		role.setName(JsonInput.getStringOrNull(content, "name"));
+		role.setInherited(content.has("inherited")
+				&& content.getBoolean("inherited"));
+		return role;
+	}
+
+	public static Membership parseMembership(JSONObject content)
+			throws JSONException {
+		final Membership result = new Membership();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setProject(JsonInput.getObjectOrNull(content, "project",
+				MINIMAL_PROJECT_PARSER));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+		result.setRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
 		return result;
 	}
 
