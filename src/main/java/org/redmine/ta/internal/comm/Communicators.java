@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpEntity;
 import org.redmine.ta.RedmineException;
 import org.redmine.ta.RedmineInternalError;
 
@@ -20,6 +21,8 @@ public final class Communicators {
 			return content;
 		}
 	};
+
+	private static final ContentHandler<HttpEntity, String> CONTENT_READER = new EntityToStringHandler();
 
 	/**
 	 * Adds a basic authentication.
@@ -59,5 +62,19 @@ public final class Communicators {
 	@SuppressWarnings("unchecked")
 	public static <K> ContentHandler<K, K> identityHandler() {
 		return (ContentHandler<K, K>) IDENTITY_HANDLER;
+	}
+
+	public static ContentHandler<HttpEntity, String> contentReader() {
+		return CONTENT_READER;
+	}
+
+	public static <K, I, R> ContentHandler<K, R> compose(
+			ContentHandler<I, R> cont1, ContentHandler<K, I> cont2) {
+		return new ComposingHandler<K, I, R>(cont1, cont2);
+	}
+
+	public static <K, R> Communicator<R> fmap(Communicator<K> comm,
+			ContentHandler<K, R> handler) {
+		return new FmapCommunicator<R, K>(handler, comm);
 	}
 }
