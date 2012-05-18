@@ -1684,8 +1684,7 @@ public class RedmineManagerTest {
 
 	@Test
 	public void tryUpdateProjectWithLongHomepage() throws RedmineException {
-		final Project project = new Project();
-		project.setIdentifier("issue7testproject");
+		final Project project = generateRandomProject();
 		project.setName("issue 7 test project");
 		project.setDescription("test");
 		final String longHomepageName = "http://www.localhost.com/asdf?a=\"&b=\"&c=\"&d=\"&e=\"&f=\"&g=\"&h=\"&i=\"&j=\"&k=\"&l=\"&m=\"&n=\"&o=\"&p=\"&q=\"&r=\"&s=\"&t=\"&u=\"&v=\"&w=\"&x=\"&y=\"&zо=авфбвоафжывлдаофжывладоджлфоывадлфоываждфлоываждфлоываждлфоываждлфова&&\\&&&&&&&&&&&&&&&&&&\\&&&&&&&&&&&&&&&&&&&&&&&&&&&&<>>";
