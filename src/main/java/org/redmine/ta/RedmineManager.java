@@ -678,6 +678,9 @@ public class RedmineManager {
 		return transport.getObject(Attachment.class, attachmentID);
 	}
 
+	/*
+	 * It does not work at all. It requires authentication!
+	 */
 	/**
 	 * Downloads the content of an {@link org.redmine.ta.beans.Attachment} from
 	 * the Redmine server.
