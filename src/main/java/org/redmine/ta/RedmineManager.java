@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -611,6 +611,12 @@ public class RedmineManager {
 		return transport.getObject(Attachment.class, attachmentID);
     }
 
+	public void downloadAttachmentContent(Attachment issueAttachment,
+			OutputStream stream) throws RedmineException {
+		transport.download(issueAttachment.getContentURL(),
+				new CopyBytesHandler(stream));
+	}
+
     /**
      * Downloads the content of an {@link org.redmine.ta.beans.Attachment} from the Redmine server.
      *
@@ -618,23 +624,16 @@ public class RedmineManager {
      * @return the content of the attachment as a byte[] array
      * @throws RedmineCommunicationException thrown in case the download fails
      */
-    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws RedmineCommunicationException {
-        try {
-            final URL url = new URL(issueAttachment.getContentURL());
-            final InputStream is = url.openStream();
-            try {
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                final byte[] buffer = new byte[65536];
-                int read;
-                while ((read = is.read(buffer)) != -1)
-                    baos.write(buffer, 0, read);
-                return baos.toByteArray();
-            } finally {
-                is.close();
-            }
-        } catch (IOException e) {
-            throw new RedmineTransportException(e);
-        }
+	public byte[] downloadAttachmentContent(Attachment issueAttachment)
+			throws RedmineException {
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		downloadAttachmentContent(issueAttachment, baos);
+		try {
+			baos.close();
+		} catch (IOException e) {
+			throw new RedmineInternalError();
+		}
+		return baos.toByteArray();
     }
 
     public void setLogin(String login) {

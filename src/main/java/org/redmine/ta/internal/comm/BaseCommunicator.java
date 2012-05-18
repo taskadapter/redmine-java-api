@@ -81,7 +81,7 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 			ContentHandler<HttpResponse, R> handler) throws RedmineException {
 		logger.debug(request.getRequestLine().toString());
 
-		request.addHeader("Accept-Encoding", "gzip,deflate");
+		request.addHeader("Accept-Encoding", "gzip");
 		final HttpClient httpclient = client;
 		try {
 			final HttpResponse httpResponse = httpclient

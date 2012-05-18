@@ -276,6 +276,24 @@ public final class Transport {
 	}
 
 	/**
+	 * Downloads a redmine content.
+	 * 
+	 * @param uri
+	 *            target uri.
+	 * @param handler
+	 *            content handler.
+	 * @return handler result.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public <R> R download(String uri,
+			ContentHandler<BasicHttpResponse, R> handler)
+			throws RedmineException {
+		final HttpGet request = new HttpGet(uri);
+		return errorCheckingCommunicator.sendRequest(request, handler);
+	}
+
+	/**
 	 * UPloads content on a server.
 	 * 
 	 * @param content
