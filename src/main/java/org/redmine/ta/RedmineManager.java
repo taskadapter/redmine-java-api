@@ -103,7 +103,8 @@ public class RedmineManager {
 		newProject.setIdentifier(projectKey);
 		issue.setProject(newProject);
 		try {
-			return transport.addObject(issue);
+			return transport.addObject(issue, new BasicNameValuePair("include",
+					INCLUDE.attachments.toString()));
 		} finally {
 			issue.setProject(oldProject);
 		}

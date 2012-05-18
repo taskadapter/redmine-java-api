@@ -146,6 +146,7 @@ public final class Transport {
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
 				object, config.writer);
 		setEntity(httpPost, body);
+		logger.debug(body);
 		String response = getCommunicator().sendRequest(httpPost);
 		logger.debug(response);
 		return parseResponce(response, config.singleObjectName, config.parser);

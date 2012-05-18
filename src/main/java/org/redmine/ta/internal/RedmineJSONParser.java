@@ -349,7 +349,7 @@ public class RedmineJSONParser {
 		result.setJournals(JsonInput.getListOrEmpty(content, "journals",
 				JOURNAL_PARSER));
 		result.getAttachments().addAll(
-				JsonInput.getListOrEmpty(content, "attachements",
+				JsonInput.getListOrEmpty(content, "attachments",
 						ATTACHMENT_PARSER));
 		result.getRelations()
 				.addAll(JsonInput.getListOrEmpty(content, "relations",

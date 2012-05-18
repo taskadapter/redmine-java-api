@@ -2,10 +2,12 @@ package org.redmine.ta.internal;
 
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.redmine.ta.RedmineInternalError;
+import org.redmine.ta.beans.Attachment;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
@@ -85,6 +87,14 @@ public class RedmineJSONBuilder {
 		public void write(JSONWriter writer, TimeEntry object)
 				throws JSONException {
 			writeTimeEntry(writer, object);
+		}
+	};
+
+	public static JsonObjectWriter<Attachment> UPLOAD_WRITER = new JsonObjectWriter<Attachment>() {
+		@Override
+		public void write(JSONWriter writer, Attachment object)
+				throws JSONException {
+			writeUpload(writer, object);
 		}
 	};
 
@@ -280,15 +290,28 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
 
+		if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
+			final List<Attachment> uploads = new ArrayList<Attachment>();
+			for (Attachment attach : issue.getAttachments())
+				if (attach.getToken() != null)
+					uploads.add(attach);
+			JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
+					UPLOAD_WRITER);
+		}
+		
+
 		/*
 		 * Journals and Relations cannot be set for an issue during creation or
 		 * updates.
 		 */
-		/*
-		 * Attachement creation is supported in API 1.4, but actual beans does
-		 * not carry sufficient information to add an attachement now (token
-		 * required but not provided).
-		 */
+	}
+
+	public static void writeUpload(JSONWriter writer, Attachment attachment)
+			throws JSONException {
+		JsonOutput.addIfNotNull(writer, "token", attachment.getToken());
+		JsonOutput.addIfNotNull(writer, "filename", attachment.getFileName());
+		JsonOutput.addIfNotNull(writer, "content_type",
+				attachment.getContentType());
 	}
 
 	private static void writeCustomFields(JSONWriter writer,
