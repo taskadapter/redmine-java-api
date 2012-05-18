@@ -9,7 +9,7 @@ import org.redmine.ta.RedmineException;
  * @author maxkar
  * 
  */
-final class SetHeaderTransformer implements Communicator {
+final class SetHeaderTransformer<K> implements Communicator<K> {
 	/**
 	 * Header name.
 	 */
@@ -23,18 +23,20 @@ final class SetHeaderTransformer implements Communicator {
 	/**
 	 * Peer communicator.
 	 */
-	private final Communicator peer;
+	private final Communicator<K> peer;
 
-	public SetHeaderTransformer(String header, String value, Communicator peer) {
+	public SetHeaderTransformer(String header, String value,
+			Communicator<K> peer) {
 		this.header = header;
 		this.value = value;
 		this.peer = peer;
 	}
 
 	@Override
-	public String sendRequest(HttpRequest request) throws RedmineException {
+	public <R> R sendRequest(HttpRequest request, ContentHandler<K, R> handler)
+			throws RedmineException {
 		request.addHeader(header, value);
-		return peer.sendRequest(request);
+		return peer.sendRequest(request, handler);
 	}
 
 }

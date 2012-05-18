@@ -43,9 +43,9 @@ import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
-import org.redmine.ta.internal.comm.Communicator;
 import org.redmine.ta.internal.comm.BaseCommunicator;
 import org.redmine.ta.internal.comm.Communicators;
+import org.redmine.ta.internal.comm.SimpleCommunicator;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 import org.redmine.ta.internal.json.JsonObjectWriter;
@@ -64,7 +64,7 @@ public final class Transport {
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
-	private Communicator communicator;
+	private SimpleCommunicator<String> communicator;
 	private final BaseCommunicator baseCommunicator;
 
 	static {
@@ -133,7 +133,8 @@ public final class Transport {
 	public Transport(URIConfigurator configurator, RedmineOptions options) {
 		this.configurator = configurator;
 		this.baseCommunicator = new BaseCommunicator(options);
-		this.communicator = baseCommunicator;
+		this.communicator = Communicators.simplify(baseCommunicator,
+				Communicators.<String> identityHandler());
 	}
 
 	public User getCurrentUser(NameValuePair... params) throws RedmineException {
@@ -407,7 +408,8 @@ public final class Transport {
 		this.objectsPerPage = pageSize;
 	}
 
-	private Communicator getCommunicator() throws RedmineException {
+	private SimpleCommunicator<String> getCommunicator()
+			throws RedmineException {
 		return communicator;
 	}
 
@@ -454,8 +456,9 @@ public final class Transport {
 	public void setCredentials(String login, String password) {
 		this.login = login;
 		this.password = password;
-		communicator = Communicators.addBasicAuth(login, password,
-				BaseCommunicator.CHARSET, baseCommunicator);
+		communicator = Communicators.simplify(Communicators.addBasicAuth(login,
+				password, BaseCommunicator.CHARSET, baseCommunicator),
+				Communicators.<String> identityHandler());
 	}
 
 	public void shutdown() {

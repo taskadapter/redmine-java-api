@@ -3,14 +3,14 @@ package org.redmine.ta.internal.comm;
 import org.apache.http.HttpRequest;
 import org.redmine.ta.RedmineException;
 
-public interface Communicator {
+public interface Communicator<K> {
 
 	/**
 	 * Performs a request.
 	 * 
 	 * @return the response body.
 	 */
-	public abstract String sendRequest(HttpRequest request)
-			throws RedmineException;
+	public abstract <R> R sendRequest(HttpRequest request,
+			ContentHandler<K, R> contentHandler) throws RedmineException;
 
 }

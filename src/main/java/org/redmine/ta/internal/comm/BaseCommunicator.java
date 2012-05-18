@@ -3,7 +3,6 @@ package org.redmine.ta.internal.comm;
 import org.apache.http.*;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -20,10 +19,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.List;
 
-public class BaseCommunicator implements Communicator {
+public class BaseCommunicator implements Communicator<String> {
 	public static final String CHARSET = "UTF-8";
 
 	private final Logger logger = LoggerFactory
@@ -89,7 +87,8 @@ public class BaseCommunicator implements Communicator {
 	 * .HttpRequest)
 	 */
 	@Override
-	public String sendRequest(HttpRequest request) throws RedmineException {
+	public <R> R sendRequest(HttpRequest request,
+			ContentHandler<String, R> handler) throws RedmineException {
 		logger.debug(request.getRequestLine().toString());
 
 		request.addHeader("Accept-Encoding", "gzip,deflate");
@@ -100,7 +99,7 @@ public class BaseCommunicator implements Communicator {
 			try {
 				checkErrors(httpResponse);
 				final HttpEntity responseEntity = httpResponse.getEntity();
-				return getContent(responseEntity);
+				return handler.processContent(getContent(responseEntity));
 			} finally {
 				EntityUtils.consume(httpResponse.getEntity());
 
@@ -180,11 +179,6 @@ public class BaseCommunicator implements Communicator {
 		} finally {
 			contentStream.close();
 		}
-	}
-
-	public String sendGet(URI uri) throws RedmineException {
-		HttpGet http = new HttpGet(uri);
-		return sendRequest(http);
 	}
 
 	/**
