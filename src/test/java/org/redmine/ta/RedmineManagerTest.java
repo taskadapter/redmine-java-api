@@ -1924,7 +1924,6 @@ public class RedmineManagerTest {
 			final Attachment added = attachments.get(0);
 			Assert.assertEquals("test.bin", added.getFileName());
 			Assert.assertEquals("application/ternary", added.getContentType());
-			// FIXME: fix "download attachment content" and enable content check
 			final byte[] receivedContent = mgr.downloadAttachmentContent(added);
 			Assert.assertArrayEquals(content, receivedContent);
 		} finally {

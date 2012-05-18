@@ -29,7 +29,7 @@ final class CopyBytesHandler implements ContentHandler<BasicHttpResponse, Void> 
 		try {
 			final InputStream input = content.getStream();
 			try {
-				while ((readed = input.read()) > 0)
+				while ((readed = input.read(buffer)) > 0)
 					outStream.write(buffer, 0, readed);
 			} finally {
 				input.close();
