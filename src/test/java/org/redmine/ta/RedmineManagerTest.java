@@ -1701,4 +1701,26 @@ public class RedmineManagerTest {
 			mgr.deleteProject(created.getIdentifier());
 		}
 	}
+
+	@Test
+	public void testAttachementUploads() throws RedmineException, IOException {
+		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+		final Attachment attach1 = mgr.uploadAttachment("test.bin",
+				"application/ternary", content);
+		final Issue testIssue = new Issue();
+		testIssue.setSubject("This is upload ticket!");
+		testIssue.getAttachments().add(attach1);
+		final Issue createdIssue = mgr.createIssue(projectKey, testIssue);
+		try {
+			final List<Attachment> attachments = createdIssue.getAttachments();
+			Assert.assertEquals(1, attachments.size());
+			final Attachment added = attachments.get(0);
+			Assert.assertEquals("test.bin", added.getFileName());
+			Assert.assertEquals("application/ternary", added.getContentType());
+			final byte[] receivedContent = mgr.downloadAttachmentContent(added);
+			Assert.assertArrayEquals(content, receivedContent);
+		} finally {
+			mgr.deleteIssue(createdIssue.getId());
+		}
+	}
 }
