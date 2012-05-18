@@ -1773,4 +1773,21 @@ public class RedmineManagerTest {
 		Assert.assertEquals(1, updatedEmptyMembership.getRoles().size());
 		mgr.delete(updatedEmptyMembership);
 	}
+
+	@Test
+	public void testUserMemberships() throws RedmineException {
+		final List<Role> roles = mgr.getRoles();
+		final Membership newMembership = new Membership();
+		final Project project = new Project();
+		project.setIdentifier(projectKey);
+		newMembership.setProject(project);
+		final User currentUser = mgr.getCurrentUser();
+		newMembership.setUser(currentUser);
+		newMembership.setRoles(roles);
+
+		mgr.addMembership(newMembership);
+
+		final User userWithMembership = mgr.getUserById(currentUser.getId());
+		Assert.assertTrue(userWithMembership.getMemberships().size() > 0);
+	}
 }

@@ -60,7 +60,7 @@ public class URIConfigurator {
 		return createURI(query, new ArrayList<NameValuePair>());
 	}
 
-	private URI createURI(String query, NameValuePair... param) {
+	public URI createURI(String query, NameValuePair... param) {
 		return createURI(query, Arrays.asList(param));
 	}
 

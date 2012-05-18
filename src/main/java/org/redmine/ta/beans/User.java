@@ -20,6 +20,7 @@ public class User implements Identifiable {
     private Date lastLoginOn;
     // TODO add tests after http://code.google.com/p/redmine-java-api/issues/detail?id=100 is implemented
     private List<CustomField> customFields = new ArrayList<CustomField>();
+	private List<Membership> memberships = new ArrayList<Membership>();
 
     public Integer getId() {
         return id;
@@ -214,4 +215,12 @@ public class User implements Identifiable {
     public void setCustomFields(List<CustomField> customFields) {
         this.customFields = customFields;
     }
+
+	public List<Membership> getMemberships() {
+		return memberships;
+	}
+
+	public void setMemberships(List<Membership> memberships) {
+		this.memberships = memberships;
+	}
 }

@@ -129,8 +129,8 @@ public final class Transport {
 		this.configurator = configurator;
 	}
 
-	public User getCurrentUser() throws RedmineException {
-		URI uri = getURIConfigurator().createURI("users/current.json");
+	public User getCurrentUser(NameValuePair... params) throws RedmineException {
+		URI uri = getURIConfigurator().createURI("users/current.json", params);
 		HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
 		return parseResponce(response, "user", RedmineJSONParser.USER_PARSER);

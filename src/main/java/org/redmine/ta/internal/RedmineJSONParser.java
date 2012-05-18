@@ -463,6 +463,13 @@ public class RedmineJSONParser {
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
 			result.setFullName(name);
+		result.setMemberships(JsonInput.getListOrEmpty(content, "memberships",
+				MEMBERSHIP_PARSER));
+
+		/* Fix user for membership */
+		for (Membership m : result.getMemberships())
+			m.setUser(result);
+
 		return result;
 	}
 

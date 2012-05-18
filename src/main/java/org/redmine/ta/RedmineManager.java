@@ -367,22 +367,26 @@ public class RedmineManager {
 	 * @throws RedmineException
 	 */
 	public List<User> getUsers() throws RedmineException {
-		return transport.getObjectsList(User.class);
+		return transport.getObjectsList(User.class, new BasicNameValuePair(
+				"include", "memberships"));
 	}
 
 	public User getUserById(Integer userId) throws RedmineException {
-		return transport.getObject(User.class, userId);
+		return transport.getObject(User.class, userId, new BasicNameValuePair(
+				"include", "memberships"));
 	}
 
 	/**
 	 * @return the current user logged into Redmine
 	 */
 	public User getCurrentUser() throws RedmineException {
-		return transport.getCurrentUser();
+		return transport.getCurrentUser(new BasicNameValuePair("include",
+				"memberships"));
 	}
 
 	public User createUser(User user) throws RedmineException {
-		return transport.addObject(user);
+		return transport.addObject(user, new BasicNameValuePair("include",
+				"memberships"));
 	}
 
 	/**
