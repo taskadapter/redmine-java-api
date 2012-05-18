@@ -1,17 +1,12 @@
 package org.redmine.ta.internal.comm;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -34,24 +29,6 @@ import org.apache.http.util.EntityUtils;
 import org.redmine.ta.RedmineConfigurationException;
 
 class HttpUtil {
-	private static final Map<String, ContentStreamAdapter> ENCODING_ADAPTERS = new HashMap<String, ContentStreamAdapter>();
-	static {
-		ENCODING_ADAPTERS.put("gzip", new ContentStreamAdapter() {
-			@Override
-			public InputStream adaptInput(InputStream stream)
-					throws IOException {
-				return new GZIPInputStream(stream);
-			}
-		});
-		ENCODING_ADAPTERS.put("deflate", new ContentStreamAdapter() {
-			@Override
-			public InputStream adaptInput(InputStream stream)
-					throws IOException {
-				return new InflaterInputStream(stream);
-			}
-		});
-	}
-
 	public static DefaultHttpClient getNewHttpClient(
 			ClientConnectionManager connectionManager) {
 		try {
@@ -115,16 +92,6 @@ class HttpUtil {
 								proxyPassword));
 			}
 		}
-	}
-
-	@Deprecated
-	public static InputStream getEntityStream(HttpEntity entity)
-			throws IOException {
-		final String encoding = getEntityEncoding(entity);
-		final ContentStreamAdapter adapter = ENCODING_ADAPTERS.get(encoding);
-		if (adapter == null)
-			return entity.getContent();
-		return adapter.adaptInput(entity.getContent());
 	}
 
 	/**
