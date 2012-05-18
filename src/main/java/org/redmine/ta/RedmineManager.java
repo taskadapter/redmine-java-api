@@ -20,6 +20,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.*;
+import org.redmine.ta.internal.io.MarkedIOException;
+import org.redmine.ta.internal.io.MarkedInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -49,13 +51,13 @@ public class RedmineManager {
 
 	private final Transport transport;
 
-    public RedmineManager(String uri) {
+	public RedmineManager(String uri) {
 		this(uri, RedmineOptions.simpleOptions());
-    }
+	}
 
-    public RedmineManager(String uri, String login, String password) {
+	public RedmineManager(String uri, String login, String password) {
 		this(uri, login, password, RedmineOptions.simpleOptions());
-    }
+	}
 
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
@@ -75,14 +77,20 @@ public class RedmineManager {
 		this(host, apiAccessKey, RedmineOptions.simpleOptions());
 	}
 
-    /**
-     * Creates an instance of RedmineManager class. Host and apiAccessKey are not checked at this moment.
-     *
-     * @param host         complete Redmine server web URI, including protocol and port number. Example: http://demo.redmine.org:8080
-     * @param apiAccessKey Redmine API access key. It is shown on "My Account" / "API access key" webpage
-     *                     (check  <i>http://redmine_server_url/my/account<i> URL).
-     *                     This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public".
-     */
+	/**
+	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
+	 * not checked at this moment.
+	 * 
+	 * @param host
+	 *            complete Redmine server web URI, including protocol and port
+	 *            number. Example: http://demo.redmine.org:8080
+	 * @param apiAccessKey
+	 *            Redmine API access key. It is shown on "My Account" /
+	 *            "API access key" webpage (check
+	 *            <i>http://redmine_server_url/my/account<i> URL). This
+	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
+	 *            projects, which are "public".
+	 */
 	public RedmineManager(String host, String apiAccessKey,
 			RedmineOptions options) {
 		this.transport = new Transport(new URIConfigurator(host, apiAccessKey),
@@ -759,7 +767,7 @@ public class RedmineManager {
 			params.add(new BasicNameValuePair("project_id", projectKey));
 		}
 		return transport.getObjectsList(News.class, params);
-    }
+	}
 
 	/**
 	 * Shutdowns a communicator.
@@ -788,12 +796,42 @@ public class RedmineManager {
 	 */
 	public Attachment uploadAttachment(String fileName, String contentType,
 			InputStream content) throws RedmineException, IOException {
-		final String token = transport.upload(content);
-		final Attachment result = new Attachment();
-		result.setToken(token);
-		result.setContentType(contentType);
-		result.setFileName(fileName);
-		return result;
+		final InputStream wrapper = new MarkedInputStream(content,
+				"uploadStream");
+		final String token;
+		try {
+			token = transport.upload(wrapper);
+			final Attachment result = new Attachment();
+			result.setToken(token);
+			result.setContentType(contentType);
+			result.setFileName(fileName);
+			return result;
+		} catch (RedmineException e) {
+			unwrapIO(e, "uploadStream");
+			throw e;
+		}
+	}
+
+	/**
+	 * Unwraps an IO.
+	 * 
+	 * @param e
+	 *            exception to unwrap.
+	 * @param tag
+	 *            target tag.
+	 * @throws IOException
+	 * @throws RedmineException
+	 */
+	private void unwrapIO(RedmineException orig, String tag) throws IOException {
+		Throwable e = orig;
+		while (e != null) {
+			if (e instanceof MarkedIOException) {
+				final MarkedIOException marked = (MarkedIOException) e;
+				if (tag.equals(marked.getTag()))
+					throw marked.getIOException();
+			}
+			e = e.getCause();
+		}
 	}
 
 	/**
