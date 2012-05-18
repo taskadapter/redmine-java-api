@@ -1730,4 +1730,47 @@ public class RedmineManagerTest {
 	public void testGetRoles() throws RedmineException {
 		Assert.assertTrue(mgr.getRoles().size() > 0);
 	}
+
+	@Test
+	public void testGetMemberships() throws RedmineException {
+		final List<Membership> result = mgr.getMemberships(projectKey);
+		Assert.assertNotNull(result);
+	}
+
+	@Test
+	public void testMemberships() throws RedmineException {
+		final List<Role> roles = mgr.getRoles();
+		
+		final Membership newMembership = new Membership();
+		final Project project = new Project();
+		project.setIdentifier(projectKey);
+		newMembership.setProject(project);
+		final User currentUser = mgr.getCurrentUser();
+		newMembership.setUser(currentUser);
+		newMembership.setRoles(roles);
+
+		mgr.addMembership(newMembership);
+		final List<Membership> memberships1 = mgr.getMemberships(project);
+		Assert.assertEquals(1, memberships1.size());
+		final Membership createdMembership = memberships1.get(0);
+		Assert.assertEquals(currentUser.getId(), createdMembership.getUser()
+				.getId());
+		Assert.assertEquals(roles.size(), createdMembership.getRoles().size());
+		
+		final Membership membershipById = mgr.getMembership(createdMembership.getId());
+		Assert.assertEquals(createdMembership, membershipById);
+
+		final Membership emptyMembership = new Membership();
+		emptyMembership.setId(createdMembership.getId());
+		emptyMembership.setProject(createdMembership.getProject());
+		emptyMembership.setUser(createdMembership.getUser());
+		emptyMembership.setRoles(Collections.singletonList(roles.get(0)));
+
+		mgr.update(emptyMembership);
+		final Membership updatedEmptyMembership = mgr
+				.getMembership(createdMembership.getId());
+		
+		Assert.assertEquals(1, updatedEmptyMembership.getRoles().size());
+		mgr.delete(updatedEmptyMembership);
+	}
 }

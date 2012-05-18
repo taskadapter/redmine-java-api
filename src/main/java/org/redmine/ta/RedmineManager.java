@@ -467,7 +467,8 @@ public class RedmineManager {
 		toCreate.setIssueId(issueId);
 		toCreate.setIssueToId(issueToId);
 		toCreate.setType(type);
-		return transport.addChildEntry(Issue.class, issueId, toCreate);
+		return transport.addChildEntry(Issue.class, issueId.toString(),
+				toCreate);
 	}
 
 	/**
@@ -539,7 +540,7 @@ public class RedmineManager {
 					"Version must contain an existing project");
 		}
 		return transport.addChildEntry(Project.class, version.getProject()
-				.getId(), version);
+				.getId().toString(), version);
 	}
 
 	/**
@@ -573,8 +574,8 @@ public class RedmineManager {
 	 *             thrown in case an object can not be found
 	 */
 	public List<Version> getVersions(int projectID) throws RedmineException {
-		return transport.getChildEntries(Project.class, projectID,
-				Version.class);
+		return transport.getChildEntries(Project.class,
+				Integer.toString(projectID), Version.class);
 	}
 
 	// TODO add test
@@ -597,8 +598,8 @@ public class RedmineManager {
 	 */
 	public List<IssueCategory> getCategories(int projectID)
 			throws RedmineException {
-		return transport.getChildEntries(Project.class, projectID,
-				IssueCategory.class);
+		return transport.getChildEntries(Project.class,
+				Integer.toString(projectID), IssueCategory.class);
 	}
 
 	/**
@@ -627,7 +628,7 @@ public class RedmineManager {
 		}
 
 		return transport.addChildEntry(Project.class, category.getProject()
-				.getId(), category);
+				.getId().toString(), category);
 	}
 
 	/**
@@ -815,5 +816,50 @@ public class RedmineManager {
 
 	public List<Role> getRoles() throws RedmineException {
 		return transport.getObjectsList(Role.class);
+	}
+
+	public List<Membership> getMemberships(String project)
+			throws RedmineException {
+		return transport.getChildEntries(Project.class, project,
+				Membership.class);
+	}
+
+	public List<Membership> getMemberships(Project project)
+			throws RedmineException {
+		return getMemberships(getProjectKey(project));
+	}
+
+	/**
+	 * Add a membership.
+	 * 
+	 * @param membership
+	 *            membership.
+	 * @throws RedmineException
+	 */
+	public void addMembership(Membership membership) throws RedmineException {
+		final Project project = membership.getProject();
+		if (project == null)
+			throw new IllegalArgumentException("Project must be set");
+		if (membership.getUser() == null)
+			throw new IllegalArgumentException("User must be set");
+		transport.addChildEntry(Project.class, getProjectKey(project),
+				membership);
+	}
+
+	public Membership getMembership(int id) throws RedmineException {
+		return transport.getObject(Membership.class, id);
+	}
+
+	public void deleteMembership(int id) throws RedmineException {
+		transport.deleteObject(Membership.class, Integer.toString(id));
+	}
+
+	public void delete(Membership membership) throws RedmineException {
+		transport.deleteObject(Membership.class, membership.getId().toString());
+	}
+
+	private String getProjectKey(Project project) {
+		return project.getId() != null ? project.getId().toString() : project
+				.getIdentifier();
 	}
 }

@@ -37,6 +37,7 @@ public class URIConfigurator {
 		urls.put(News.class, "news");
 		urls.put(IssueRelation.class, "relations");
 		urls.put(Role.class, "roles");
+		urls.put(Membership.class, "memberships");
 	}
 
 	private final URL baseURL;
@@ -91,7 +92,7 @@ public class URIConfigurator {
 		return uri;
 	}
 
-	public URI getChildObjectsURI(Class<?> parent, int parentId,
+	public URI getChildObjectsURI(Class<?> parent, String parentId,
 			Class<?> child, NameValuePair... args) {
 		final String base = getConfig(parent);
 		final String detal = getConfig(child);

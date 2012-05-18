@@ -13,6 +13,7 @@ import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.IssueStatus;
 import org.redmine.ta.beans.Journal;
+import org.redmine.ta.beans.Membership;
 import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Role;
@@ -152,6 +153,13 @@ public class RedmineJSONParser {
 		@Override
 		public Role parse(JSONObject input) throws JSONException {
 			return parseRole(input);
+		}
+	};
+
+	public static final JsonObjectParser<Membership> MEMBERSHIP_PARSER = new JsonObjectParser<Membership>() {
+		@Override
+		public Membership parse(JSONObject input) throws JSONException {
+			return parseMembership(input);
 		}
 	};
 
@@ -465,6 +473,17 @@ public class RedmineJSONParser {
 		role.setInherited(content.has("inherited")
 				&& content.getBoolean("inherited"));
 		return role;
+	}
+
+	public static Membership parseMembership(JSONObject content)
+			throws JSONException {
+		final Membership result = new Membership();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setProject(JsonInput.getObjectOrNull(content, "project",
+				MINIMAL_PROJECT_PARSER));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+		result.setRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
+		return result;
 	}
 
 	/**

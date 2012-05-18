@@ -33,6 +33,7 @@ import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.IssueRelation;
 import org.redmine.ta.beans.IssueStatus;
+import org.redmine.ta.beans.Membership;
 import org.redmine.ta.beans.News;
 import org.redmine.ta.beans.Project;
 import org.redmine.ta.beans.Role;
@@ -110,6 +111,11 @@ public final class Transport {
 								RedmineJSONParser.QUERY_PARSER));
 		OBJECT_CONFIGS.put(Role.class,
 				config("role", "roles", null, RedmineJSONParser.ROLE_PARSER));
+		OBJECT_CONFIGS.put(
+				Membership.class,
+				config("membership", "memberships",
+						RedmineJSONBuilder.MEMBERSHIP_WRITER,
+						RedmineJSONParser.MEMBERSHIP_PARSER));
 	}
 
 	/** Uri configurator */
@@ -167,7 +173,7 @@ public final class Transport {
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 */
-	public <T> T addChildEntry(Class<?> parentClass, int parentId, T object,
+	public <T> T addChildEntry(Class<?> parentClass, String parentId, T object,
 			NameValuePair... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(object.getClass());
 		URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
@@ -363,7 +369,7 @@ public final class Transport {
 	 * @param classs
 	 *            target class.
 	 */
-	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId,
+	public <T> List<T> getChildEntries(Class<?> parentClass, String parentId,
 			Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,

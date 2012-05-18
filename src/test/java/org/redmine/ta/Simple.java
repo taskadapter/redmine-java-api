@@ -36,7 +36,7 @@ public class Simple {
 			// getVersion(mgr);
 			// getStatuses(mgr);
 			// tryUpload(mgr);
-			tryGetRoles(mgr);
+//			tryGetRoles(mgr);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

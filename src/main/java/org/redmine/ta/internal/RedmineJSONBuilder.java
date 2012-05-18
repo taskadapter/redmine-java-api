@@ -12,7 +12,9 @@ import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
 import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.Membership;
 import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.Role;
 import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
@@ -95,6 +97,14 @@ public class RedmineJSONBuilder {
 		public void write(JSONWriter writer, Attachment object)
 				throws JSONException {
 			writeUpload(writer, object);
+		}
+	};
+
+	public static JsonObjectWriter<Membership> MEMBERSHIP_WRITER = new JsonObjectWriter<Membership>() {
+		@Override
+		public void write(JSONWriter writer, Membership object)
+				throws JSONException {
+			writeMembership(writer, object);
 		}
 	};
 
@@ -312,6 +322,21 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "filename", attachment.getFileName());
 		JsonOutput.addIfNotNull(writer, "content_type",
 				attachment.getContentType());
+	}
+
+	public static void writeMembership(JSONWriter writer, Membership membership)
+			throws JSONException {
+		if (membership.getUser() != null)
+			JsonOutput.addIfNotNull(writer, "user_id", membership.getUser()
+					.getId());
+		if (membership.getRoles() != null) {
+			writer.key("role_ids");
+			writer.array();
+			for (Role role : membership.getRoles()) {
+				writer.value(role.getId().longValue());
+			}
+			writer.endArray();
+		}
 	}
 
 	private static void writeCustomFields(JSONWriter writer,
