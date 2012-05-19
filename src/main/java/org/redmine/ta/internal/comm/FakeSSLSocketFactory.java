@@ -1,4 +1,4 @@
-package org.redmine.ta.internal;
+package org.redmine.ta.internal.comm;
 
 import java.io.IOException;
 import java.net.Socket;
