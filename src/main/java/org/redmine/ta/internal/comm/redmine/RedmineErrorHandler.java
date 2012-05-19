@@ -1,6 +1,9 @@
 package org.redmine.ta.internal.comm.redmine;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
@@ -17,6 +20,14 @@ import org.redmine.ta.internal.comm.ContentHandler;
 
 public final class RedmineErrorHandler implements
 		ContentHandler<BasicHttpResponse, BasicHttpResponse> {
+
+	private static Map<String, String> ERROR_REMAP = new HashMap<String, String>();
+
+	static {
+		ERROR_REMAP
+				.put("Priority can't be blank",
+						"Priority can't be blank. No default priority is set in the Redmine server settings. please use menu \"Administration -> Enumerations -> Issue Priorities\" to set the default priority.");
+	}
 
 	@Override
 	public BasicHttpResponse processContent(BasicHttpResponse httpResponse)
@@ -41,6 +52,7 @@ public final class RedmineErrorHandler implements
 			try {
 				errors = RedmineJSONParser
 						.parseErrors(getContent(httpResponse));
+				errors = remap(errors);
 			} catch (JSONException e) {
 				throw new RedmineFormatException("Bad redmine error responce",
 						e);
@@ -48,6 +60,18 @@ public final class RedmineErrorHandler implements
 			throw new RedmineProcessingException(errors);
 		}
 		return httpResponse;
+	}
+
+	private List<String> remap(List<String> errors) {
+		final List<String> result = new ArrayList<String>(errors.size());
+		for (String message : errors)
+			result.add(remap(message));
+		return result;
+	}
+
+	private String remap(String message) {
+		final String guess = ERROR_REMAP.get(message);
+		return guess != null ? guess : message;
 	}
 
 	private String getContent(BasicHttpResponse entity) throws RedmineException {
