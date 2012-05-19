@@ -8,6 +8,7 @@ import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -2006,5 +2007,18 @@ public class RedmineManagerTest {
 			}
 		};
 		mgr.uploadAttachment("test.bin", "application/ternary", content);
+	}
+
+	@Test
+	public void testUnknownHostException() throws RedmineException, IOException {
+		final RedmineManager mgr1 = new RedmineManager(
+				"http://The.unknown.host");
+		try {
+			mgr1.getProjects();
+		} catch (RedmineTransportException e1) {
+			Assert.assertTrue(e1.getMessage().startsWith(
+					"Cannot fetch data from http://The.unknown.host/"));
+			Assert.assertTrue(e1.getCause() instanceof UnknownHostException);
+		}
 	}
 }

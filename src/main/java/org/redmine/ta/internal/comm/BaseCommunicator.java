@@ -95,7 +95,9 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 		} catch (ClientProtocolException e1) {
 			throw new RedmineFormatException(e1);
 		} catch (IOException e1) {
-			throw new RedmineTransportException(e1);
+			throw new RedmineTransportException("Cannot fetch data from "
+					+ request.getRequestLine().getUri() + " : "
+							+ e1.toString(), e1);
 		}
 	}
 
