@@ -12,6 +12,7 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.IOException;
+import java.net.URI;
 
 public class BaseCommunicator implements Communicator<HttpResponse> {
 	private final Logger logger = LoggerFactory
@@ -96,9 +97,17 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 			throw new RedmineFormatException(e1);
 		} catch (IOException e1) {
 			throw new RedmineTransportException("Cannot fetch data from "
-					+ request.getRequestLine().getUri() + " : "
+					+ getMessageURI(request) + " : "
 							+ e1.toString(), e1);
 		}
+	}
+
+	private String getMessageURI(HttpRequest request) {
+		final String uri = request.getRequestLine().getUri();
+		final int paramsIndex = uri.indexOf('?');
+		if (paramsIndex >= 0)
+			return uri.substring(0, paramsIndex);
+		return uri;
 	}
 
 	/**
