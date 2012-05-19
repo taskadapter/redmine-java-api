@@ -20,7 +20,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.*;
-import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -171,7 +170,6 @@ public class RedmineManager {
      */
     public Issue getIssueById(Integer id, INCLUDE... include) throws RedmineException {
         String value = join(",", include);
-        LoggerFactory.getLogger(RedmineManager.class).info(value);
 		return transport.getObject(Issue.class, id, new BasicNameValuePair(
 				"include", value));
     }
