@@ -215,7 +215,6 @@
     </class>
     
     <class name="org.redmine.ta.beans.Changeset">
-        <map-to xml="changeset"/>
         <field name="revision" type="string">
             <bind-xml name="revision" node="attribute"/>
         </field>
@@ -225,7 +224,7 @@
         <field name="comments" type="string">
             <bind-xml name="comments" node="element"/>
         </field>
-        <field name="commitedOn" type="string">
+        <field name="commitedOn" type="date">
             <bind-xml name="committed_on" node="element" />
         </field>
     </class>

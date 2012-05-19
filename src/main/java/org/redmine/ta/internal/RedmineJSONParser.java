@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.beans.Attachment;
+import org.redmine.ta.beans.Changeset;
 import org.redmine.ta.beans.CustomField;
 import org.redmine.ta.beans.Issue;
 import org.redmine.ta.beans.IssueCategory;
@@ -169,6 +170,13 @@ public class RedmineJSONParser {
 			return input.toString();
 		}
 	};
+
+    public static final JsonObjectParser<Changeset> CHANGESET_PARSER = new JsonObjectParser<Changeset>() {
+        @Override
+        public Changeset parse(JSONObject input) throws JSONException {
+            return parseChangeset(input);
+        }
+    };
 
 	/**
 	 * Parses a tracker.
@@ -374,6 +382,8 @@ public class RedmineJSONParser {
 				"fixed_version", VERSION_PARSER));
 		result.setCategory(JsonInput.getObjectOrNull(content, "category",
 				CATEGORY_PARSER));
+        result.setChangesets(JsonInput.getListOrEmpty(content, "changesets",
+            CHANGESET_PARSER));
 		return result;
 	}
 
@@ -447,6 +457,16 @@ public class RedmineJSONParser {
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
 		return result;
 	}
+
+    public static Changeset parseChangeset(JSONObject content)
+            throws JSONException {
+        final Changeset result = new Changeset();
+        result.setRevision(JsonInput.getStringOrNull(content, "revision"));
+        result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+        result.setComments(JsonInput.getStringOrNull(content, "comments"));
+        result.setCommitedOn(getDateOrNull(content, "committed_on"));
+        return result;
+    }
 
 	public static User parseUser(JSONObject content) throws JSONException {
 		final User result = new User();

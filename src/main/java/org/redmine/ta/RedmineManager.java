@@ -20,6 +20,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.*;
+import org.redmine.ta.internal.logging.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +44,7 @@ public class RedmineManager {
         // these values MUST BE exactly as they are written here,
         // can't use capital letters or rename.
         // they are provided in "?include=..." HTTP request
-        journals, relations, attachments
+        journals, relations, attachments, changesets
     }
 
 	private final Transport transport;
@@ -170,6 +171,7 @@ public class RedmineManager {
      */
     public Issue getIssueById(Integer id, INCLUDE... include) throws RedmineException {
         String value = join(",", include);
+        LoggerFactory.getLogger(RedmineManager.class).info(value);
 		return transport.getObject(Issue.class, id, new BasicNameValuePair(
 				"include", value));
     }
