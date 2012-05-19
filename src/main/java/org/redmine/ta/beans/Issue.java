@@ -41,6 +41,7 @@ public class Issue implements Identifiable {
     private List<Journal> journals = new ArrayList<Journal>();
     private List<IssueRelation> relations = new ArrayList<IssueRelation>();
     private List<Attachment> attachments = new ArrayList<Attachment>();
+    private List<Changeset> changesets = new ArrayList<Changeset>();
 
     public Project getProject() {
         return project;
@@ -235,6 +236,14 @@ public class Issue implements Identifiable {
         this.journals = journals;
     }
 
+    public List<Changeset> getChangesets() {
+        return changesets;
+    }
+
+    public void setChangesets(List<Changeset> changesets) {
+        this.changesets = changesets;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -278,6 +287,8 @@ public class Issue implements Identifiable {
         result = prime * result + ((tracker == null) ? 0 : tracker.hashCode());
         result = prime * result
                 + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+        result = prime * result
+            + ((changesets == null) ? 0 : changesets.hashCode());
         return result;
     }
 
@@ -459,6 +470,13 @@ public class Issue implements Identifiable {
                 return false;
             }
         } else if (!attachments.equals(other.attachments)) {
+            return false;
+        }
+        if (changesets == null) {
+            if (other.changesets != null) {
+                return false;
+            }
+        } else if (!changesets.equals(other.changesets)) {
             return false;
         }
         return true;
