@@ -6,4 +6,13 @@ public class RedmineTransportException extends RedmineCommunicationException {
 	public RedmineTransportException(Throwable cause) {
         super(cause);
     }
+
+	public RedmineTransportException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public RedmineTransportException(String message) {
+		super(message);
+	}
+
 }

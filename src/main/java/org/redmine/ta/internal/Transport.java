@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -22,6 +23,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.redmine.ta.RedmineOptions;
 import org.redmine.ta.NotFoundException;
 import org.redmine.ta.RedmineAuthenticationException;
 import org.redmine.ta.RedmineException;
@@ -42,6 +44,14 @@ import org.redmine.ta.beans.TimeEntry;
 import org.redmine.ta.beans.Tracker;
 import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
+import org.redmine.ta.internal.comm.BaseCommunicator;
+import org.redmine.ta.internal.comm.BasicHttpResponse;
+import org.redmine.ta.internal.comm.Communicator;
+import org.redmine.ta.internal.comm.Communicators;
+import org.redmine.ta.internal.comm.ContentHandler;
+import org.redmine.ta.internal.comm.SimpleCommunicator;
+import org.redmine.ta.internal.comm.redmine.RedmineAuthenticator;
+import org.redmine.ta.internal.comm.redmine.RedmineErrorHandler;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
 import org.redmine.ta.internal.json.JsonObjectWriter;
@@ -60,6 +70,11 @@ public final class Transport {
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
+	private SimpleCommunicator<String> communicator;
+	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
+	private final BaseCommunicator baseCommunicator;
+	private final RedmineAuthenticator<HttpResponse> authenticator;
+	private final Communicator<String> coreCommunicator;
 
 	static {
 		OBJECT_CONFIGS.put(
@@ -122,11 +137,23 @@ public final class Transport {
 	private final URIConfigurator configurator;
 	private String login;
 	private String password;
-	private boolean useBasicAuth = false;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
+	private static final String CHARSET = "UTF-8";
 
-	public Transport(URIConfigurator configurator) {
+	public Transport(URIConfigurator configurator, RedmineOptions options) {
 		this.configurator = configurator;
+		this.baseCommunicator = new BaseCommunicator(options);
+		this.authenticator = new RedmineAuthenticator<HttpResponse>(
+				baseCommunicator, CHARSET);
+		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
+		errorCheckingCommunicator = Communicators.fmap(
+				authenticator,
+				Communicators.compose(errorProcessor,
+						Communicators.transportDecoder()));
+		coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
+				Communicators.contentReader());
+		this.communicator = Communicators.simplify(coreCommunicator,
+				Communicators.<String> identityHandler());
 	}
 
 	public User getCurrentUser(NameValuePair... params) throws RedmineException {
@@ -246,6 +273,24 @@ public final class Transport {
 		String response = getCommunicator().sendRequest(http);
 		logger.debug(response);
 		return parseResponce(response, config.singleObjectName, config.parser);
+	}
+
+	/**
+	 * Downloads a redmine content.
+	 * 
+	 * @param uri
+	 *            target uri.
+	 * @param handler
+	 *            content handler.
+	 * @return handler result.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public <R> R download(String uri,
+			ContentHandler<BasicHttpResponse, R> handler)
+			throws RedmineException {
+		final HttpGet request = new HttpGet(uri);
+		return errorCheckingCommunicator.sendRequest(request, handler);
 	}
 
 	/**
@@ -400,11 +445,8 @@ public final class Transport {
 		this.objectsPerPage = pageSize;
 	}
 
-	private Communicator getCommunicator() {
-		Communicator communicator = new Communicator();
-		if (useBasicAuth) {
-			communicator.setCredentials(login, password);
-		}
+	private SimpleCommunicator<String> getCommunicator()
+			throws RedmineException {
 		return communicator;
 	}
 
@@ -421,10 +463,10 @@ public final class Transport {
 	private void setEntity(HttpEntityEnclosingRequest request, String body) {
 		StringEntity entity;
 		try {
-			entity = new StringEntity(body, Communicator.CHARSET);
+			entity = new StringEntity(body, CHARSET);
 		} catch (UnsupportedEncodingException e) {
-			throw new RedmineInternalError("Required charset "
-					+ Communicator.CHARSET + " is not supported", e);
+			throw new RedmineInternalError("Required charset " + CHARSET
+					+ " is not supported", e);
 		}
 		entity.setContentType(CONTENT_TYPE);
 		request.setEntity(entity);
@@ -451,17 +493,19 @@ public final class Transport {
 	public void setCredentials(String login, String password) {
 		this.login = login;
 		this.password = password;
-		this.useBasicAuth = true;
+		authenticator.setCredentials(login, password);
+	}
+
+	public void shutdown() {
+		baseCommunicator.shutdown();
 	}
 
 	public void setPassword(String password) {
-		this.password = password;
-		this.useBasicAuth = true;
+		setCredentials(login, password);
 	}
 
 	public void setLogin(String login) {
-		this.login = login;
-		this.useBasicAuth = true;
+		setCredentials(login, password);
 	}
 
 	/**
