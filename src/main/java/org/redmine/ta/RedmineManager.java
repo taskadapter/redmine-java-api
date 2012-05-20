@@ -20,6 +20,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.redmine.ta.beans.*;
 import org.redmine.ta.internal.*;
+import org.redmine.ta.internal.io.MarkedIOException;
+import org.redmine.ta.internal.io.MarkedInputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,7 +29,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -48,26 +50,61 @@ public class RedmineManager {
 
 	private final Transport transport;
 
-    public RedmineManager(String uri) {
-        this(uri, null, null);
-    }
+	public RedmineManager(String uri) {
+		this(uri, RedmineOptions.simpleOptions());
+	}
 
-    public RedmineManager(String uri, String login, String password) {
-		this.transport = new Transport(new URIConfigurator(uri, null));
+	public RedmineManager(String uri, String login, String password) {
+		this(uri, login, password, RedmineOptions.simpleOptions());
+	}
+
+	/**
+	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
+	 * not checked at this moment.
+	 * 
+	 * @param host
+	 *            complete Redmine server web URI, including protocol and port
+	 *            number. Example: http://demo.redmine.org:8080
+	 * @param apiAccessKey
+	 *            Redmine API access key. It is shown on "My Account" /
+	 *            "API access key" webpage (check
+	 *            <i>http://redmine_server_url/my/account<i> URL). This
+	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
+	 *            projects, which are "public".
+	 */
+	public RedmineManager(String host, String apiAccessKey) {
+		this(host, apiAccessKey, RedmineOptions.simpleOptions());
+	}
+
+	/**
+	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
+	 * not checked at this moment.
+	 * 
+	 * @param host
+	 *            complete Redmine server web URI, including protocol and port
+	 *            number. Example: http://demo.redmine.org:8080
+	 * @param apiAccessKey
+	 *            Redmine API access key. It is shown on "My Account" /
+	 *            "API access key" webpage (check
+	 *            <i>http://redmine_server_url/my/account<i> URL). This
+	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
+	 *            projects, which are "public".
+	 */
+	public RedmineManager(String host, String apiAccessKey,
+			RedmineOptions options) {
+		this.transport = new Transport(new URIConfigurator(host, apiAccessKey),
+				options);
+	}
+
+	public RedmineManager(String uri, RedmineOptions options) {
+		this(uri, null, null, options);
+	}
+
+	public RedmineManager(String uri, String login, String password,
+			RedmineOptions options) {
+		this.transport = new Transport(new URIConfigurator(uri, null), options);
 		transport.setCredentials(login, password);
-    }
-
-    /**
-     * Creates an instance of RedmineManager class. Host and apiAccessKey are not checked at this moment.
-     *
-     * @param host         complete Redmine server web URI, including protocol and port number. Example: http://demo.redmine.org:8080
-     * @param apiAccessKey Redmine API access key. It is shown on "My Account" / "API access key" webpage
-     *                     (check  <i>http://redmine_server_url/my/account<i> URL).
-     *                     This parameter is <b>optional</b> (can be set to NULL) for Redmine projects, which are "public".
-     */
-    public RedmineManager(String host, String apiAccessKey) {
-		this.transport = new Transport(new URIConfigurator(host, apiAccessKey));
-    }
+	}
 
     /**
      * Sample usage:
@@ -577,6 +614,12 @@ public class RedmineManager {
 		return transport.getObject(Attachment.class, attachmentID);
     }
 
+	public void downloadAttachmentContent(Attachment issueAttachment,
+			OutputStream stream) throws RedmineException {
+		transport.download(issueAttachment.getContentURL(),
+				new CopyBytesHandler(stream));
+	}
+
     /**
      * Downloads the content of an {@link org.redmine.ta.beans.Attachment} from the Redmine server.
      *
@@ -584,23 +627,16 @@ public class RedmineManager {
      * @return the content of the attachment as a byte[] array
      * @throws RedmineCommunicationException thrown in case the download fails
      */
-    public byte[] downloadAttachmentContent(Attachment issueAttachment) throws RedmineCommunicationException {
-        try {
-            final URL url = new URL(issueAttachment.getContentURL());
-            final InputStream is = url.openStream();
-            try {
-                final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                final byte[] buffer = new byte[65536];
-                int read;
-                while ((read = is.read(buffer)) != -1)
-                    baos.write(buffer, 0, read);
-                return baos.toByteArray();
-            } finally {
-                is.close();
-            }
-        } catch (IOException e) {
-            throw new RedmineTransportException(e);
-        }
+	public byte[] downloadAttachmentContent(Attachment issueAttachment)
+			throws RedmineException {
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		downloadAttachmentContent(issueAttachment, baos);
+		try {
+			baos.close();
+		} catch (IOException e) {
+			throw new RedmineInternalError();
+		}
+		return baos.toByteArray();
     }
 
     public void setLogin(String login) {
@@ -625,6 +661,13 @@ public class RedmineManager {
     }
 
 	/**
+	 * Shutdowns a communicator.
+	 */
+	public void shutdown() {
+		transport.shutdown();
+	}
+
+	/**
 	 * Uploads an attachement.
 	 * 
 	 * @param fileName
@@ -644,12 +687,42 @@ public class RedmineManager {
 	 */
 	public Attachment uploadAttachment(String fileName, String contentType,
 			InputStream content) throws RedmineException, IOException {
-		final String token = transport.upload(content);
-		final Attachment result = new Attachment();
-		result.setToken(token);
-		result.setContentType(contentType);
-		result.setFileName(fileName);
-		return result;
+		final InputStream wrapper = new MarkedInputStream(content,
+				"uploadStream");
+		final String token;
+		try {
+			token = transport.upload(wrapper);
+			final Attachment result = new Attachment();
+			result.setToken(token);
+			result.setContentType(contentType);
+			result.setFileName(fileName);
+			return result;
+		} catch (RedmineException e) {
+			unwrapIO(e, "uploadStream");
+			throw e;
+		}
+	}
+
+	/**
+	 * Unwraps an IO.
+	 * 
+	 * @param e
+	 *            exception to unwrap.
+	 * @param tag
+	 *            target tag.
+	 * @throws IOException
+	 * @throws RedmineException
+	 */
+	private void unwrapIO(RedmineException orig, String tag) throws IOException {
+		Throwable e = orig;
+		while (e != null) {
+			if (e instanceof MarkedIOException) {
+				final MarkedIOException marked = (MarkedIOException) e;
+				if (tag.equals(marked.getTag()))
+					throw marked.getIOException();
+			}
+			e = e.getCause();
+		}
 	}
 
 	/**
