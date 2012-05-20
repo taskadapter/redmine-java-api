@@ -83,7 +83,9 @@
         <field name="category" type="org.redmine.ta.beans.IssueCategory">
             <bind-xml name="category" />
         </field>
-
+        <field name="changesets" type="org.redmine.ta.beans.Changeset" collection="arraylist">
+            <bind-xml name="changeset" location="changesets"/>
+        </field>
 	</class>
 	
 	<class name="org.redmine.ta.beans.Tracker">
@@ -209,6 +211,21 @@
         </field>
         <field name="name" type="string">
             <bind-xml name="name" node="attribute"/>
+        </field>
+    </class>
+    
+    <class name="org.redmine.ta.beans.Changeset">
+        <field name="revision" type="string">
+            <bind-xml name="revision" node="attribute"/>
+        </field>
+        <field name="user" type="org.redmine.ta.beans.User">
+            <bind-xml name="user" />
+        </field>
+        <field name="comments" type="string">
+            <bind-xml name="comments" node="element"/>
+        </field>
+        <field name="commitedOn" type="date">
+            <bind-xml name="committed_on" node="element" />
         </field>
     </class>
 
