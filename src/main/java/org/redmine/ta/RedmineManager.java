@@ -45,7 +45,7 @@ public class RedmineManager {
         // these values MUST BE exactly as they are written here,
         // can't use capital letters or rename.
         // they are provided in "?include=..." HTTP request
-        journals, relations, attachments
+        journals, relations, attachments, changesets
     }
 
 	private final Transport transport;

@@ -2021,4 +2021,13 @@ public class RedmineManagerTest {
 			Assert.assertTrue(e1.getCause() instanceof UnknownHostException);
 		}
 	}
+
+	@Ignore
+	@Test
+	public void testChangesets() throws RedmineException {
+		final Issue issue = mgr.getIssueById(89, INCLUDE.changesets);
+		Assert.assertEquals(2, issue.getChangesets().size());
+		final Changeset firstChange = issue.getChangesets().get(0);
+		Assert.assertNotNull(firstChange.getComments());
+	}
 }
