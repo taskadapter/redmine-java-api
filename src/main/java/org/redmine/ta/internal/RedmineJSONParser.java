@@ -440,6 +440,7 @@ public class RedmineJSONParser {
 		return result;
 	}
 
+	//add "multible customfield"
 	public static CustomField parseCustomField(JSONObject content)
 			throws JSONException {
 		final CustomField result = new CustomField();
