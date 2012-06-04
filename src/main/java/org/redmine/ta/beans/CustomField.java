@@ -12,7 +12,6 @@ public class CustomField {
     private int id;
     private boolean multiple = false;
     private String name;
-    
     private String value;
     private ArrayList<String> values;
 
