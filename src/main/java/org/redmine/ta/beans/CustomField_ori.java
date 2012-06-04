@@ -1,28 +1,23 @@
 package org.redmine.ta.beans;
 
-import java.util.ArrayList;
-
 /**
  * Redmine custom field
  *
  * @author Yuri Lupol
  */
-public class CustomField {
+public class CustomField_ori {
 
     private int id;
-    private boolean multiple = false;
     private String name;
-    
     private String value;
-    private ArrayList<String> values;
 
     /**
      * This default empty constructor is required for Castor XML library.
      */
-    public CustomField() {
+    public CustomField_ori() {
     }
 
-    public CustomField(int id, String name, String value) {
+    public CustomField_ori(int id, String name, String value) {
         this.id = id;
         this.name = name;
         this.value = value;
@@ -52,49 +47,21 @@ public class CustomField {
         this.value = value;
     }
 
-	/**
-	 * @return the values
-	 */
-	public ArrayList<String> getValues() {
-		return values;
-	}
-
-	/**
-	 * @param values the values to set
-	 */
-	public void setValues(ArrayList<String> values) {
-		this.values = values;
-	}
-
-	/**
-	 * @return the multiple
-	 */
-	public boolean isMultiple() {
-		return multiple;
-	}
-
-	/**
-	 * @param multiple the multiple to set
-	 */
-	public void setMultiple(boolean multiple) {
-		this.multiple = multiple;
-	}
-
-	@Override
+    @Override
     public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
 
-        CustomField that = (CustomField) o;
+//        CustomField that = (CustomField) o;
 
-        if (id != that.id)
-            return false;
-        if (name != null ? !name.equals(that.name) : that.name != null)
-            return false;
-        if (value != null ? !value.equals(that.value) : that.value != null)
-            return false;
+//        if (id != that.id)
+//            return false;
+//        if (name != null ? !name.equals(that.name) : that.name != null)
+//            return false;
+//        if (value != null ? !value.equals(that.value) : that.value != null)
+//            return false;
 
         return true;
     }

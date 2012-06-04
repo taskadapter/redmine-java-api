@@ -1,7 +1,5 @@
 package org.redmine.ta.beans;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -16,33 +14,22 @@ public class Issue implements Identifiable {
     private Integer id;
     private String subject;
     private Integer parentId;
-    @SerializedName("estimated_hours")
     private Float estimatedHours;
     private Float spentHours;
-    @SerializedName("assigned_to")
-    // @SerializedName("assigned_to_id") REST API not consistent here: see http://www.redmine.org/issues/10583
     private User assignee;
     private String priorityText;
-    @SerializedName("priority_id")
     private Integer priorityId;
-    @SerializedName("done_ratio")
     private Integer doneRatio;
     private Project project;
     private User author;
-    @SerializedName("start_date")
     private Date startDate;
-    @SerializedName("due_date")
     private Date dueDate;
     private Tracker tracker;
     private String description;
-    @SerializedName("created_on")
     private Date createdOn;
-    @SerializedName("updated_on")
     private Date updatedOn;
-    @SerializedName("status_id")
     private Integer statusId;
     private String statusName;
-    @SerializedName("target_version")
     private Version targetVersion;
     private IssueCategory category;
 
@@ -54,6 +41,7 @@ public class Issue implements Identifiable {
     private List<Journal> journals = new ArrayList<Journal>();
     private List<IssueRelation> relations = new ArrayList<IssueRelation>();
     private List<Attachment> attachments = new ArrayList<Attachment>();
+    private List<Changeset> changesets = new ArrayList<Changeset>();
 
     public Project getProject() {
         return project;
@@ -172,6 +160,9 @@ public class Issue implements Identifiable {
         this.tracker = tracker;
     }
 
+    /**
+     * Description is empty by default, not NULL.
+     */
     public String getDescription() {
         return description;
     }
@@ -245,6 +236,14 @@ public class Issue implements Identifiable {
         this.journals = journals;
     }
 
+    public List<Changeset> getChangesets() {
+        return changesets;
+    }
+
+    public void setChangesets(List<Changeset> changesets) {
+        this.changesets = changesets;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -288,6 +287,8 @@ public class Issue implements Identifiable {
         result = prime * result + ((tracker == null) ? 0 : tracker.hashCode());
         result = prime * result
                 + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+        result = prime * result
+            + ((changesets == null) ? 0 : changesets.hashCode());
         return result;
     }
 
@@ -471,6 +472,13 @@ public class Issue implements Identifiable {
         } else if (!attachments.equals(other.attachments)) {
             return false;
         }
+        if (changesets == null) {
+            if (other.changesets != null) {
+                return false;
+            }
+        } else if (!changesets.equals(other.changesets)) {
+            return false;
+        }
         return true;
     }
 
@@ -492,7 +500,11 @@ public class Issue implements Identifiable {
     }
 
     /**
+     * Relations are only loaded if you include INCLUDE.relations when loading the Issue.
+     *
      * @return list of relations or EMPTY list if no relations, never returns NULL
+     *
+     * @see org.redmine.ta.RedmineManager#getIssueById(Integer id, INCLUDE... include)
      */
     public List<IssueRelation> getRelations() {
         return relations;

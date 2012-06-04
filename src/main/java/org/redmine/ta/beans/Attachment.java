@@ -16,6 +16,7 @@ public class Attachment implements Identifiable {
     private String description;
     private Date createdOn;
     private User author;
+	private String token;
 
     @Override
     /**
@@ -85,7 +86,15 @@ public class Attachment implements Identifiable {
         this.fileSize = fileSize;
     }
 
-    @Override
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -100,6 +109,7 @@ public class Attachment implements Identifiable {
         if (description != null ? !description.equals(that.description) : that.description != null) return false;
         if (fileName != null ? !fileName.equals(that.fileName) : that.fileName != null) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (token != null ? !token.equals(that.token) : that.token != null) return false;
 
         return true;
     }
@@ -114,6 +124,7 @@ public class Attachment implements Identifiable {
         result = 31 * result + (description != null ? description.hashCode() : 0);
         result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
         result = 31 * result + (author != null ? author.hashCode() : 0);
+		result = 31 * result + (token != null ? token.hashCode() : 0);
         return result;
     }
 
@@ -128,6 +139,7 @@ public class Attachment implements Identifiable {
                 ", description='" + description + '\'' +
                 ", createdOn=" + createdOn +
                 ", author=" + author +
+                ", token=" + token +
                 '}';
     }
 }
