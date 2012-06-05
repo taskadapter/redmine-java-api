@@ -445,7 +445,19 @@ public class RedmineJSONParser {
 		final CustomField result = new CustomField();
 		result.setId(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
-		result.setValue(JsonInput.getStringOrNull(content, "value"));
+		
+		if(!content.has("multiple"))
+			result.setValue(JsonInput.getStringOrNull(content, "value"));
+		else{
+			JSONArray tmp = JsonInput.getArrayOrNull(content, "value");
+			ArrayList<String> strings = new ArrayList<String>();
+			for (int i = 0; i < tmp.length(); i++) {
+				strings.add(String.valueOf(tmp.get(i)));
+			}
+			result.setMultiple(true);
+			result.setValues(strings);
+		}
+		
 		return result;
 	}
 
