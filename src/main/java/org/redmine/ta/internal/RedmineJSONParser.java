@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.redmine.ta.RedmineFormatException;
 import org.redmine.ta.beans.Attachment;
 import org.redmine.ta.beans.Changeset;
@@ -25,10 +28,6 @@ import org.redmine.ta.beans.User;
 import org.redmine.ta.beans.Version;
 import org.redmine.ta.internal.json.JsonInput;
 import org.redmine.ta.internal.json.JsonObjectParser;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONException;
 
 /**
  * A parser for JSON items sent by Redmine.
@@ -454,7 +453,6 @@ public class RedmineJSONParser {
 			for (int i = 0; i < tmp.length(); i++) {
 				strings.add(String.valueOf(tmp.get(i)));
 			}
-			result.setMultiple(true);
 			result.setValues(strings);
 		}
 		
