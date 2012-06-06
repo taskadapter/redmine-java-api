@@ -1,6 +1,6 @@
 package org.redmine.ta.beans;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Redmine custom field
@@ -13,7 +13,7 @@ public class CustomField {
     private String name;
     private String value;
     private boolean multiple = false;
-    private ArrayList<String> values;
+	private List<String> values;
 
     /**
      * This default empty constructor is required for Castor XML library.
@@ -56,14 +56,14 @@ public class CustomField {
 	/**
 	 * @return the values
 	 */
-	public ArrayList<String> getValues() {
+	public List<String> getValues() {
 		return values;
 	}
 
 	/**
 	 * @param values the values to set
 	 */
-	public void setValues(ArrayList<String> values) {
+	public void setValues(List<String> values) {
 		this.values = values;
 		this.value = null;
 		this.multiple = true;
