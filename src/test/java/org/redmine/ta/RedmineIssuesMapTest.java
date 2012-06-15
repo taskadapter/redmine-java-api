@@ -25,7 +25,7 @@ public class RedmineIssuesMapTest {
     // Is executed before each test method
     public void setup() throws Exception {
 		String str = MyIOUtils.getResourceAsString("redmine_issues.json");
-		final JSONObject object = RedmineJSONParser.getResponce(str);
+		final JSONObject object = RedmineJSONParser.getResponse(str);
 		this.issuesList = JsonInput.getListNotNull(object, "issues",
 				RedmineJSONParser.ISSUE_PARSER);
 

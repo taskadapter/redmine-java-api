@@ -17,7 +17,7 @@ import org.redmine.ta.internal.logging.Logger;
 import org.redmine.ta.internal.logging.LoggerFactory;
 
 /**
- * Tests "default" redmine manager values in a responce. Tries to provides
+ * Tests "default" redmine manager values in a response. Tries to provides
  * behavior compatible with an XML version, see issue 29,
  * https://github.com/redminedev/redmine-java-api/issues/29
  * 

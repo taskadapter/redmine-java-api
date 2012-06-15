@@ -528,7 +528,7 @@ public class RedmineJSONParser {
 	 */
 	public static List<String> parseErrors(String responseBody)
 			throws JSONException {
-		final JSONObject body = getResponce(responseBody);
+		final JSONObject body = getResponse(responseBody);
 		final JSONArray errorsList = JsonInput.getArrayNotNull(body, "errors");
 		final List<String> result = new ArrayList<String>(errorsList.length());
 		for (int i = 0; i < errorsList.length(); i++) {
@@ -571,7 +571,7 @@ public class RedmineJSONParser {
 		return JsonInput.getDateOrNull(obj, field, dateFormat);
 	}
 
-	public static JSONObject getResponceSingleObject(String body, String key)
+	public static JSONObject getResponseSingleObject(String body, String key)
 			throws JSONException {
 		final JSONObject bodyJson = new JSONObject(body);
 		final JSONObject contentJSon = JsonInput
@@ -579,7 +579,7 @@ public class RedmineJSONParser {
 		return contentJSon;
 	}
 
-	public static JSONObject getResponce(String body) throws JSONException {
+	public static JSONObject getResponse(String body) throws JSONException {
 		return new JSONObject(body);
 	}
 }

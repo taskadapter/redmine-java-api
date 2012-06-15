@@ -373,17 +373,17 @@ public final class Transport {
 
 			final List<T> foundItems;
 			try {
-				final JSONObject responceObject = RedmineJSONParser
-						.getResponce(response);
-				foundItems = JsonInput.getListOrNull(responceObject,
+				final JSONObject responseObject = RedmineJSONParser
+						.getResponse(response);
+				foundItems = JsonInput.getListOrNull(responseObject,
 						config.multiObjectName, config.parser);
 				result.addAll(foundItems);
 
 				/* Necessary for trackers */
-				if (!responceObject.has(KEY_TOTAL_COUNT)) {
+				if (!responseObject.has(KEY_TOTAL_COUNT)) {
 					break;
 				}
-				totalObjectsFoundOnServer = JsonInput.getInt(responceObject,
+				totalObjectsFoundOnServer = JsonInput.getInt(responseObject,
 						KEY_TOTAL_COUNT);
 			} catch (JSONException e) {
 				throw new RedmineFormatException(e);
@@ -421,14 +421,13 @@ public final class Transport {
 
 		HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
-		final JSONObject responceObject;
+		final JSONObject responseObject;
 		try {
-			responceObject = RedmineJSONParser.getResponce(response);
-			return JsonInput.getListNotNull(responceObject,
+			responseObject = RedmineJSONParser.getResponse(response);
+			return JsonInput.getListNotNull(responseObject,
 					config.multiObjectName, config.parser);
 		} catch (JSONException e) {
-			throw new RedmineFormatException("Bad categories responce "
-					+ response, e);
+			throw new RedmineFormatException("Bad categories response " + response, e);
 		}
 	}
 
@@ -449,11 +448,10 @@ public final class Transport {
 		return communicator;
 	}
 
-	private static <T> T parseResponse(String responce, String tag,
+	private static <T> T parseResponse(String response, String tag,
                                      JsonObjectParser<T> parser) throws RedmineFormatException {
 		try {
-			return parser.parse(RedmineJSONParser.getResponceSingleObject(
-					responce, tag));
+			return parser.parse(RedmineJSONParser.getResponseSingleObject(response, tag));
 		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}

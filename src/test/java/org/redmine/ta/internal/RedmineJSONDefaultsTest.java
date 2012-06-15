@@ -53,8 +53,8 @@ public class RedmineJSONDefaultsTest {
 
 	private static <T> T parse(String text, String tag,
 			JsonObjectParser<T> parser) throws JSONException {
-		final JSONObject content = RedmineJSONParser.getResponceSingleObject(
-				text, tag);
+		final JSONObject content = RedmineJSONParser.getResponseSingleObject(
+            text, tag);
 		return parser.parse(content);
 	}
 }

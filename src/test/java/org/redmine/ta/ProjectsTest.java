@@ -18,7 +18,7 @@ public class ProjectsTest {
     // Is executed before each test method
     public void setup() throws Exception {
 		String text = MyIOUtils.getResourceAsString("redmine_projects.json");
-		final JSONObject object = RedmineJSONParser.getResponce(text);
+		final JSONObject object = RedmineJSONParser.getResponse(text);
 		projectsList = JsonInput.getListNotNull(object, "projects",
 				RedmineJSONParser.PROJECT_PARSER);
     }

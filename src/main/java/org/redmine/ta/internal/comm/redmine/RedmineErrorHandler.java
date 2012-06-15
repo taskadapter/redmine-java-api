@@ -50,12 +50,10 @@ public final class RedmineErrorHandler implements
 		if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
 			List<String> errors;
 			try {
-				errors = RedmineJSONParser
-						.parseErrors(getContent(httpResponse));
+				errors = RedmineJSONParser.parseErrors(getContent(httpResponse));
 				errors = remap(errors);
 			} catch (JSONException e) {
-				throw new RedmineFormatException("Bad redmine error responce",
-						e);
+				throw new RedmineFormatException("Bad redmine error response", e);
 			}
 			throw new RedmineProcessingException(errors);
 		}
