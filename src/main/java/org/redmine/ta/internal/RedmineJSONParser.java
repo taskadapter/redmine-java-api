@@ -1,5 +1,6 @@
 package org.redmine.ta.internal;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -170,12 +171,12 @@ public class RedmineJSONParser {
 		}
 	};
 
-    public static final JsonObjectParser<Changeset> CHANGESET_PARSER = new JsonObjectParser<Changeset>() {
-        @Override
-        public Changeset parse(JSONObject input) throws JSONException {
-            return parseChangeset(input);
-        }
-    };
+	public static final JsonObjectParser<Changeset> CHANGESET_PARSER = new JsonObjectParser<Changeset>() {
+		@Override
+		public Changeset parse(JSONObject input) throws JSONException {
+			return parseChangeset(input);
+		}
+	};
 
 	/**
 	 * Parses a tracker.
@@ -381,8 +382,8 @@ public class RedmineJSONParser {
 				"fixed_version", VERSION_PARSER));
 		result.setCategory(JsonInput.getObjectOrNull(content, "category",
 				CATEGORY_PARSER));
-        result.setChangesets(JsonInput.getListOrEmpty(content, "changesets",
-            CHANGESET_PARSER));
+		result.setChangesets(JsonInput.getListOrEmpty(content, "changesets",
+				CHANGESET_PARSER));
 		return result;
 	}
 
@@ -444,10 +445,10 @@ public class RedmineJSONParser {
 		final CustomField result = new CustomField();
 		result.setId(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
-		
-		if(!content.has("multiple"))
+
+		if (!content.has("multiple"))
 			result.setValue(JsonInput.getStringOrNull(content, "value"));
-		else{
+		else {
 			JSONArray tmp = JsonInput.getArrayOrNull(content, "value");
 			ArrayList<String> strings = new ArrayList<String>();
 			for (int i = 0; i < tmp.length(); i++) {
@@ -455,7 +456,7 @@ public class RedmineJSONParser {
 			}
 			result.setValues(strings);
 		}
-		
+
 		return result;
 	}
 
@@ -468,15 +469,15 @@ public class RedmineJSONParser {
 		return result;
 	}
 
-    public static Changeset parseChangeset(JSONObject content)
-            throws JSONException {
-        final Changeset result = new Changeset();
-        result.setRevision(JsonInput.getStringOrNull(content, "revision"));
-        result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
-        result.setComments(JsonInput.getStringOrNull(content, "comments"));
-        result.setCommitedOn(getDateOrNull(content, "committed_on"));
-        return result;
-    }
+	public static Changeset parseChangeset(JSONObject content)
+			throws JSONException {
+		final Changeset result = new Changeset();
+		result.setRevision(JsonInput.getStringOrNull(content, "revision"));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+		result.setComments(JsonInput.getStringOrNull(content, "comments"));
+		result.setCommitedOn(getDateOrNull(content, "committed_on"));
+		return result;
+	}
 
 	public static User parseUser(JSONObject content) throws JSONException {
 		final User result = new User();
@@ -549,9 +550,30 @@ public class RedmineJSONParser {
 	 */
 	private static Date getDateOrNull(JSONObject obj, String field)
 			throws JSONException {
-		final SimpleDateFormat dateFormat = RedmineDateUtils.FULL_DATE_FORMAT
-				.get();
-		return JsonInput.getDateOrNull(obj, field, dateFormat);
+		String dateStr = JsonInput.getStringOrNull(obj, field);
+		if (dateStr == null)
+			return null;
+		try {
+			return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(dateStr);
+		} catch (ParseException e) {
+			if (dateStr.endsWith("Z")) {
+				dateStr = dateStr.substring(0, dateStr.length() - 1)
+						+ "GMT-00:00";
+			} else {
+				final int inset = 6;
+				if (dateStr.length() <= inset)
+					throw new JSONException("Bad date value " + dateStr);
+				String s0 = dateStr.substring(0, dateStr.length() - inset);
+				String s1 = dateStr.substring(dateStr.length() - inset,
+						dateStr.length());
+				dateStr = s0 + "GMT" + s1;
+			}
+			try {
+				return RedmineDateUtils.FULL_DATE_FORMAT_2.get().parse(dateStr);
+			} catch (ParseException e1) {
+				throw new JSONException("Bad date value " + dateStr);
+			}
+		}
 	}
 
 	/**
