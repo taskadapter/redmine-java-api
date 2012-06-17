@@ -1,17 +1,46 @@
 package org.redmine.ta;
 
-import org.junit.*;
-import org.redmine.ta.RedmineManager.INCLUDE;
-import org.redmine.ta.beans.*;
-import org.redmine.ta.internal.logging.Logger;
-import org.redmine.ta.internal.logging.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 
-import static org.junit.Assert.*;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.redmine.ta.RedmineManager.INCLUDE;
+import org.redmine.ta.beans.Attachment;
+import org.redmine.ta.beans.Changeset;
+import org.redmine.ta.beans.CustomField;
+import org.redmine.ta.beans.Issue;
+import org.redmine.ta.beans.IssueCategory;
+import org.redmine.ta.beans.IssueRelation;
+import org.redmine.ta.beans.IssueStatus;
+import org.redmine.ta.beans.Journal;
+import org.redmine.ta.beans.Membership;
+import org.redmine.ta.beans.Project;
+import org.redmine.ta.beans.Role;
+import org.redmine.ta.beans.TimeEntry;
+import org.redmine.ta.beans.Tracker;
+import org.redmine.ta.beans.User;
+import org.redmine.ta.beans.Version;
+import org.redmine.ta.internal.logging.Logger;
+import org.redmine.ta.internal.logging.LoggerFactory;
 
 /**
  * This class and its dependencies are located in org.redmine.ta.api project.
@@ -57,7 +86,7 @@ public class RedmineManagerTest {
 	public static void oneTimeTearDown() {
 		try {
 			if (mgr != null && projectKey != null) {
-				mgr.deleteProject(projectKey);
+                mgr.deleteProject(projectKey);
 			}
 		} catch (Exception e) {
 			logger.error(e, "Exception while deleting test project");

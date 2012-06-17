@@ -554,8 +554,9 @@ public class RedmineJSONParser {
 		if (dateStr == null)
 			return null;
 		try {
-			return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(dateStr);
-		} catch (ParseException e) {
+			if (dateStr.length() >= 5 && dateStr.charAt(4) == '/') {
+				return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(dateStr);
+			}
 			if (dateStr.endsWith("Z")) {
 				dateStr = dateStr.substring(0, dateStr.length() - 1)
 						+ "GMT-00:00";
@@ -568,11 +569,9 @@ public class RedmineJSONParser {
 						dateStr.length());
 				dateStr = s0 + "GMT" + s1;
 			}
-			try {
-				return RedmineDateUtils.FULL_DATE_FORMAT_2.get().parse(dateStr);
-			} catch (ParseException e1) {
-				throw new JSONException("Bad date value " + dateStr);
-			}
+			return RedmineDateUtils.FULL_DATE_FORMAT_V2.get().parse(dateStr);
+		} catch (ParseException e) {
+			throw new JSONException("Bad date value " + dateStr);
 		}
 	}
 
@@ -588,9 +587,21 @@ public class RedmineJSONParser {
 	 */
 	private static Date getShortDateOrNull(JSONObject obj, String field)
 			throws JSONException {
-		final SimpleDateFormat dateFormat = RedmineDateUtils.SHORT_DATE_FORMAT
-				.get();
-		return JsonInput.getDateOrNull(obj, field, dateFormat);
+        final String dateStr = JsonInput.getStringOrNull(obj, field);
+        if (dateStr == null) {
+            return null;
+        }
+        final SimpleDateFormat dateFormat; 
+        if (dateStr.length() >= 5 && dateStr.charAt(4) == '/')
+            dateFormat = RedmineDateUtils.SHORT_DATE_FORMAT.get();
+        else
+            dateFormat = RedmineDateUtils.SHORT_DATE_FORMAT_V2.get();
+
+        try {
+            return dateFormat.parse(dateStr);
+        } catch (ParseException e) {
+            throw new JSONException("Bad date " + dateStr);
+        }
 	}
 
 	public static JSONObject getResponseSingleObject(String body, String key)
