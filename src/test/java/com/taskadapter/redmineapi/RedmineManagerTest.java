@@ -23,6 +23,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
@@ -82,6 +83,9 @@ public class RedmineManagerTest {
 		}
 	}
 
+    /*
+     * Teardown fails due to a redmine bug http://www.redmine.org/issues/11185
+     */
 	@AfterClass
 	public static void oneTimeTearDown() {
 		try {
@@ -185,6 +189,10 @@ public class RedmineManagerTest {
 		}
 	}
 
+    /*
+     * This test caused oneTimeTearDown to fail due to redmine bug
+     * http://www.redmine.org/issues/11185
+     */
 	@Test
 	public void testCreateIssueWithParent() {
 		try {
