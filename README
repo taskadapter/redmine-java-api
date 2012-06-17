@@ -11,5 +11,5 @@ Maven Central dependency:
 <dependency>
     <groupId>com.taskadapter</groupId>
     <artifactId>redmine-java-api</artifactId>
-    <version>1.11.0</version>
+    <version>1.12.0</version>
 </dependency>
