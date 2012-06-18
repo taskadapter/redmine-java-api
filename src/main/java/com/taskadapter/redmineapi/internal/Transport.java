@@ -55,14 +55,11 @@ import com.taskadapter.redmineapi.internal.comm.redmine.RedmineErrorHandler;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
-import com.taskadapter.redmineapi.internal.logging.Logger;
-import com.taskadapter.redmineapi.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Redmine transport utilities.
- * 
- * @author maxkar
- * 
  */
 public final class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<Class<?>, EntityConfig<?>>();

@@ -13,22 +13,19 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.internal.logging.Logger;
-import com.taskadapter.redmineapi.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests "default" redmine manager values in a response. Tries to provides
  * behavior compatible with an XML version, see issue 29,
  * https://github.com/redminedev/redmine-java-api/issues/29
  * 
- * @author maxkar
- * 
  */
 public class RedmineManagerDefaultsTest {
 	private static final Integer ACTIVITY_ID = 8;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(RedmineManagerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
 
 	private static RedmineManager mgr;
 
@@ -51,7 +48,7 @@ public class RedmineManagerDefaultsTest {
 			Project createdProject = mgr.createProject(junitTestProject);
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
-			logger.error(e, "Exception while creating test project");
+			logger.error("Exception while creating test project", e);
 			Assert.fail("can't create a test project. " + e.getMessage());
 		}
 	}
@@ -63,7 +60,7 @@ public class RedmineManagerDefaultsTest {
 				mgr.deleteProject(projectKey);
 			}
 		} catch (Exception e) {
-			logger.error(e, "Exception while deleting test project");
+			logger.error("Exception while deleting test project", e);
 			Assert.fail("can't delete the test project '" + projectKey
 					+ ". reason: " + e.getMessage());
 		}

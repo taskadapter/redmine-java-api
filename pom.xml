@@ -14,7 +14,8 @@
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.
         This project was originally a part of Task Adapter application (http://www.taskadapter.com)
-        and then was open-sourced.</description>
+        and then was open-sourced.
+    </description>
     <url>http://github.com/taskadapter/redmine-java-api</url>
     <scm>
         <connection>scm:git:git://github.com/taskadapter/redmine-java-api.git</connection>
@@ -105,9 +106,20 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-        	<groupId>org.json</groupId>
-        	<artifactId>json</artifactId>
-        	<version>20090211</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20090211</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.6.6</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

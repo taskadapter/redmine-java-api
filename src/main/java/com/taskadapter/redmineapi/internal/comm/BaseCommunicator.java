@@ -11,18 +11,14 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import com.taskadapter.redmineapi.internal.logging.Logger;
-import com.taskadapter.redmineapi.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public class BaseCommunicator implements Communicator<HttpResponse> {
-	private final Logger logger = LoggerFactory
-			.getLogger(BaseCommunicator.class);
+	private final Logger logger = LoggerFactory.getLogger(BaseCommunicator.class);
 
-	/**
-	 * Used HTTP client.
-	 */
 	private final HttpClient client;
 
 	/**

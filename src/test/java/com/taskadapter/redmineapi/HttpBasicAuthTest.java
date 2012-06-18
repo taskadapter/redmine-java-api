@@ -3,8 +3,8 @@ package com.taskadapter.redmineapi;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.internal.logging.Logger;
-import com.taskadapter.redmineapi.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 

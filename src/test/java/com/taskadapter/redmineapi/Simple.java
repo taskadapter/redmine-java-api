@@ -5,8 +5,8 @@ import java.util.List;
 
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.*;
-import com.taskadapter.redmineapi.internal.logging.Logger;
-import com.taskadapter.redmineapi.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Simple {
 	private static final Logger logger = LoggerFactory.getLogger(Simple.class);

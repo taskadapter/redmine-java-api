@@ -40,8 +40,8 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.internal.logging.Logger;
-import com.taskadapter.redmineapi.internal.logging.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class and its dependencies are located in com.taskadapter.redmineapi project.
@@ -52,8 +52,7 @@ public class RedmineManagerTest {
 	// see feature request http://www.redmine.org/issues/7506
 	private static final Integer ACTIVITY_ID = 8;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(RedmineManagerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
 
 	private static RedmineManager mgr;
 
@@ -78,7 +77,7 @@ public class RedmineManagerTest {
 			Project createdProject = mgr.createProject(junitTestProject);
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
-			logger.error(e, "Exception while creating test project");
+			logger.error("Exception while creating test project", e);
 			Assert.fail("can't create a test project. " + e.getMessage());
 		}
 	}
@@ -93,7 +92,7 @@ public class RedmineManagerTest {
                 mgr.deleteProject(projectKey);
 			}
 		} catch (Exception e) {
-			logger.error(e, "Exception while deleting test project");
+			logger.error("Exception while deleting test project", e);
 			Assert.fail("can't delete the test project '" + projectKey
 					+ ". reason: " + e.getMessage());
 		}
@@ -130,7 +129,6 @@ public class RedmineManagerTest {
 			issueToCreate.setEstimatedHours(estimatedHours);
 
 			Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
-			// System.out.println("created: " + newIssue);
 			Assert.assertNotNull("Checking returned result", newIssue);
 			Assert.assertNotNull("New issue must have some ID",
 					newIssue.getId());
