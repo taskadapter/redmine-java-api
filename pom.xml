@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <name>Redmine Java API</name>
     <properties>
@@ -10,7 +8,7 @@
 
     <groupId>com.taskadapter</groupId>
     <artifactId>redmine-java-api</artifactId>
-    <version>1.13.0-SNAPSHOT</version>
+    <version>1.13</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.
         This project was originally a part of Task Adapter application (http://www.taskadapter.com)
