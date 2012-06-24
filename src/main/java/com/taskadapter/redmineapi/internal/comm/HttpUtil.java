@@ -1,13 +1,7 @@
 package com.taskadapter.redmineapi.internal.comm;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-
+import com.taskadapter.redmineapi.RedmineConfigurationException;
+import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -20,13 +14,20 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import com.taskadapter.redmineapi.RedmineConfigurationException;
+
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 class HttpUtil {
 	public static DefaultHttpClient getNewHttpClient(
@@ -46,26 +47,20 @@ class HttpUtil {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
-	static ThreadSafeClientConnManager createConnectionManager(
+	static PoolingClientConnectionManager createConnectionManager(
 			int maxConnections) throws KeyStoreException,
 			NoSuchAlgorithmException, CertificateException, IOException,
 			KeyManagementException, UnrecoverableKeyException {
-		KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		trustStore.load(null, null);
-		SSLSocketFactory sf = new FakeSSLSocketFactory(trustStore);
-		sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        SSLSocketFactory factory = NaiveSSLFactory.createNaiveSSLSocketFactory();
 
-		SchemeRegistry registry = new SchemeRegistry();
-		registry.register(new Scheme("http", 80, PlainSocketFactory
-				.getSocketFactory()));
-		registry.register(new Scheme("https", 443, sf));
+        SchemeRegistry registry = new SchemeRegistry();
+		registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+		registry.register(new Scheme("https", 443, factory));
 
-		ThreadSafeClientConnManager ccm = new ThreadSafeClientConnManager(
-				registry);
-		ccm.setMaxTotal(maxConnections);
-		ccm.setDefaultMaxPerRoute(maxConnections);
-		return ccm;
+        PoolingClientConnectionManager manager = new PoolingClientConnectionManager(registry);
+		manager.setMaxTotal(maxConnections);
+		manager.setDefaultMaxPerRoute(maxConnections);
+		return manager;
 	}
 
 	private static void configureProxy(DefaultHttpClient httpclient) {
