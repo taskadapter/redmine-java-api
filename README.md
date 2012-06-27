@@ -1,11 +1,11 @@
-Redmine/Chiliproject Java API.
+# Redmine/Chiliproject Java API.
 
 * Uses Redmine REST API
 * Does not require any plugins installed to Redmine/Chiliproject server.
 * Runs on any standard Java platform as well as Android OS (version 2.2 or newer)
 * Supports HTTP proxy
 * Supports GZipped responses from servers
-* SLF4J is used for logging. Provide your own SLF4J binding (http://www.slf4j.org/codes.html#StaticLoggerBinder)
+* SLF4J is used for logging. Provide [your own SLF4J binding](http://www.slf4j.org/codes.html#StaticLoggerBinder)
 
 Maven Central dependency:
 
