@@ -9,10 +9,10 @@ Redmine/Chiliproject Java API.
 
 Maven Central dependency:
 
-<dependency>
-    <groupId>com.taskadapter</groupId>
-    <artifactId>redmine-java-api</artifactId>
-    <version>1.14</version>
-</dependency>
+    <dependency>
+        <groupId>com.taskadapter</groupId>
+        <artifactId>redmine-java-api</artifactId>
+        <version>1.14</version>
+    </dependency>
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
