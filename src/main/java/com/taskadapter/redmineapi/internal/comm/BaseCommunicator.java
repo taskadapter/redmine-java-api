@@ -21,9 +21,6 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 
 	private final HttpClient client;
 
-	/**
-	 * Connection evictor
-	 */
 	private final ConnectionEvictor evictor;
 
 	public BaseCommunicator(RedmineOptions options) {
@@ -52,9 +49,6 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 
 	/**
 	 * Runs an evictor thread.
-	 * 
-	 * @param evictor2
-	 *            evictor to run.
 	 */
 	private void runEvictor(ConnectionEvictor evictor2) {
 		final Thread evictorThread = new Thread(evictor2);
