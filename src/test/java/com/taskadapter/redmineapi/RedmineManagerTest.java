@@ -99,7 +99,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testCreateIssue() {
+	public void issueCreated() {
 		try {
 			Issue issueToCreate = new Issue();
 			issueToCreate.setSubject("test zzx");
@@ -187,12 +187,8 @@ public class RedmineManagerTest {
 		}
 	}
 
-    /*
-     * This test caused oneTimeTearDown to fail due to redmine bug
-     * http://www.redmine.org/issues/11185
-     */
 	@Test
-	public void testCreateIssueWithParent() {
+	public void issueWithParentCreated() {
 		try {
 			Issue parentIssue = new Issue();
 			parentIssue.setSubject("parent 1");
@@ -223,7 +219,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testStartDateNull() {
+	public void nullStartDateIsPreserved() {
 		try {
 			Issue issue = new Issue();
 			issue.setSubject("test start date");
@@ -267,15 +263,6 @@ public class RedmineManagerTest {
 					newIssue.getId());
 			Assert.assertNotNull(loadedIssue1);
 			Assert.assertEquals(summary, loadedIssue1.getSubject());
-
-			// User actualAssignee = newIssue.getAssignee();
-
-			// assertNotNull("Checking assignee not null", actualAssignee);
-			// assertEquals("Checking assignee Name", assignee.getName(),
-			// actualAssignee.getName());
-			// assertEquals("Checking assignee Id", assignee.getId(),
-			// actualAssignee.getId());
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
@@ -283,15 +270,13 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testTryFindNonExistingIssue() {
+	public void findByNonExistingSummaryReturnsEmptyList() {
 		String summary = "some summary here for issue which does not exist";
 		try {
 			// try to find the issue
-			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey,
-					summary);
+			List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey, summary);
 			Assert.assertNotNull("Search result must be not null", foundIssues);
-			Assert.assertTrue("Search result list must be empty",
-					foundIssues.isEmpty());
+			Assert.assertTrue("Search result list must be empty", foundIssues.isEmpty());
 		} catch (Exception e) {
 			e.printStackTrace();
 			Assert.fail();
