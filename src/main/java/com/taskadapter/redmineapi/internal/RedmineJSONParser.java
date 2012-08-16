@@ -208,11 +208,10 @@ public class RedmineJSONParser {
 		final String name = JsonInput.getStringNotNull(object, "name");
 		final IssueStatus result = new IssueStatus(id, name);
 		if (object.has("is_default"))
-			result.setDefaultStatus(Boolean.parseBoolean(JsonInput
-					.getStringOrNull(object, "is_default")));
+			result.setDefaultStatus(JsonInput.getOptionalBool(object,
+					"is_default"));
 		if (object.has("is_closed"))
-			result.setClosed(Boolean.parseBoolean(JsonInput.getStringOrNull(
-					object, "is_closed")));
+			result.setClosed(JsonInput.getOptionalBool(object, "is_closed"));
 		return result;
 	}
 
@@ -221,8 +220,7 @@ public class RedmineJSONParser {
 		final SavedQuery result = new SavedQuery();
 		result.setId(JsonInput.getIntOrNull(object, "id"));
 		result.setName(JsonInput.getStringOrNull(object, "name"));
-		result.setPublicQuery(Boolean.parseBoolean(JsonInput.getStringOrNull(
-				object, "is_public")));
+		result.setPublicQuery(JsonInput.getOptionalBool(object, "is_public"));
 		result.setProjectId(JsonInput.getIntOrNull(object, "project_id"));
 		return result;
 	}

@@ -15,8 +15,8 @@ public class Simple {
 	private static final Integer queryId = null; // any
 
 	public static void main(String[] args) {
-		String redmineHost = "http://ta-dev.dyndns.biz:8099/redmine-1.4.2";
-		String apiAccessKey = "917ec69ef2aa38ab55581a7435571231e5bb8884";
+		String redmineHost = "http://ta-dev.dyndns.biz/redmine";
+		String apiAccessKey = "acbd877fa75d53402fc19c0fff8bea48836a1c7f";
 		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
 		try {
 			// getIssueWithRelations(mgr);
@@ -27,7 +27,7 @@ public class Simple {
 			// printCurrentUser(mgr);
 			// generateXMLForUser();
 			// generateXMLForTimeEntry();
-			// getSavedQueries(mgr);
+			getSavedQueries(mgr);
 			// getProjects(mgr);
 			// tryCreateRelation(mgr);
 			// tryGetNews(mgr);
@@ -121,6 +121,7 @@ public class Simple {
 	private static void getSavedQueries(RedmineManager mgr)
 			throws RedmineException {
 		List<SavedQuery> savedQueries = mgr.getSavedQueries("test");
+		System.out.println(savedQueries.size());
 		logger.debug("Retrieved queries " + savedQueries);
 
 	}
