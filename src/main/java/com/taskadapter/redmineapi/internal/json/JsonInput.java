@@ -127,6 +127,26 @@ public class JsonInput {
 			return null;
 		return obj.getString(field);
 	}
+	
+	/**
+	 * Returns an optional "boolean" field value. If field is absent or set to
+	 * <code>null</code>, this method returns <code>false</code>.
+	 * 
+	 * @param obj
+	 *            object to get a field from.
+	 * @param field
+	 *            field to get a value for.
+	 * @return boolean value.
+	 * @throws JSONException
+	 *             if input is not valid (field value is not boolean).
+	 */
+	public static boolean getOptionalBool(JSONObject obj, String field)
+			throws JSONException {
+		if (!obj.has(field) || obj.isNull(field)) {
+			return false;
+		}
+		return obj.getBoolean(field);
+	}
 
 	/**
 	 * Fetches an optional string from an object. Absent value is returned as an

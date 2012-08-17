@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -36,6 +37,7 @@ import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
@@ -2049,5 +2051,12 @@ public class RedmineManagerTest {
 		Assert.assertEquals(2, issue.getChangesets().size());
 		final Changeset firstChange = issue.getChangesets().get(0);
 		Assert.assertNotNull(firstChange.getComments());
+	}
+	
+	@Ignore("This test requires a specific project configuration")
+	@Test
+	public void testSavedQueries() throws RedmineException {
+		final Collection<SavedQuery> queries = mgr.getSavedQueries("test");
+		Assert.assertTrue(queries.size() > 0);
 	}
 }
