@@ -1,6 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class TimeEntry implements Identifiable {
     /**
@@ -27,6 +29,8 @@ public class TimeEntry implements Identifiable {
     private Date spentOn;
     private Date createdOn;
     private Date updatedOn;
+
+	private List<CustomField> customFields = new ArrayList<CustomField>();
 
     public Integer getId() {
         return id;
@@ -130,6 +134,14 @@ public class TimeEntry implements Identifiable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public List<CustomField> getCustomFields() {
+        return customFields;
+    }
+
+    public void setCustomFields(List<CustomField> customFields) {
+       this.customFields = customFields;
     }
 
     @Override
