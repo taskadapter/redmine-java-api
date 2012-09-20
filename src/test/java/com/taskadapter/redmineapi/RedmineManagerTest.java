@@ -1933,7 +1933,7 @@ public class RedmineManagerTest {
 	}
 
 	@Test
-	public void testAttachementUploads() throws RedmineException, IOException {
+	public void testAttachmentUploads() throws RedmineException, IOException {
 		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 		final Attachment attach1 = mgr.uploadAttachment("test.bin",
 				"application/ternary", content);
