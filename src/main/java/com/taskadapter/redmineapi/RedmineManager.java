@@ -669,15 +669,15 @@ public class RedmineManager {
 	}
 
 	/**
-	 * Uploads an attachement.
+	 * Uploads an attachment.
 	 * 
 	 * @param fileName
-	 *            file name of the attachement.
+	 *            file name of the attachment.
 	 * @param contentType
-	 *            content type of the attachement.
+	 *            content type of the attachment.
 	 * @param content
-	 *            attachement content stream.
-	 * @return attachement content.
+	 *            attachment content stream.
+	 * @return attachment content.
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 * @throws IOException
@@ -699,23 +699,19 @@ public class RedmineManager {
 			result.setFileName(fileName);
 			return result;
 		} catch (RedmineException e) {
-			unwrapIO(e, "uploadStream");
+			unwrapException(e, "uploadStream");
 			throw e;
 		}
 	}
 
 	/**
-	 * Unwraps an IO.
-	 * 
-	 * @param e
+	 * @param exception
 	 *            exception to unwrap.
 	 * @param tag
 	 *            target tag.
-	 * @throws IOException
-	 * @throws RedmineException
 	 */
-	private void unwrapIO(RedmineException orig, String tag) throws IOException {
-		Throwable e = orig;
+	private void unwrapException(RedmineException exception, String tag) throws IOException {
+		Throwable e = exception;
 		while (e != null) {
 			if (e instanceof MarkedIOException) {
 				final MarkedIOException marked = (MarkedIOException) e;
@@ -727,15 +723,15 @@ public class RedmineManager {
 	}
 
 	/**
-	 * Uploads an attachement.
+	 * Uploads an attachment.
 	 * 
 	 * @param fileName
-	 *            file name of the attachement.
+	 *            file name of the attachment.
 	 * @param contentType
-	 *            content type of the attachement.
+	 *            content type of the attachment.
 	 * @param content
-	 *            attachement content stream.
-	 * @return attachement content.
+	 *            attachment content stream.
+	 * @return attachment content.
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 * @throws IOException
@@ -756,13 +752,13 @@ public class RedmineManager {
 	}
 
 	/**
-	 * Uploads an attachement.
+	 * Uploads an attachment.
 	 * 
 	 * @param contentType
-	 *            content type of the attachement.
+	 *            content type of the attachment.
 	 * @param content
-	 *            attachement content stream.
-	 * @return attachement content.
+	 *            attachment content stream.
+	 * @return attachment content.
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 * @throws IOException
