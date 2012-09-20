@@ -23,13 +23,17 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.taskadapter.redmineapi.RedmineOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.RedmineOptions;
+import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -55,8 +59,6 @@ import com.taskadapter.redmineapi.internal.comm.redmine.RedmineErrorHandler;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Redmine transport utilities.
@@ -87,6 +89,10 @@ public final class Transport {
 				User.class,
 				config("user", "users", RedmineJSONBuilder.USER_WRITER,
 						RedmineJSONParser.USER_PARSER));
+		OBJECT_CONFIGS.put(
+				Group.class,
+				config("group", "groups", RedmineJSONBuilder.GROUP_WRITER,
+						RedmineJSONParser.GROUP_PARSER));
 		OBJECT_CONFIGS.put(
 				IssueCategory.class,
 				config("issue_category", "issue_categories",
