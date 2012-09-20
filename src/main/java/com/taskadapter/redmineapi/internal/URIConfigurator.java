@@ -25,6 +25,7 @@ public class URIConfigurator {
 
 	static {
 		urls.put(User.class, "users");
+		urls.put(Group.class, "groups");
 		urls.put(Issue.class, "issues");
 		urls.put(Project.class, "projects");
 		urls.put(TimeEntry.class, "time_entries");

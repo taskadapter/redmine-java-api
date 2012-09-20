@@ -9,6 +9,7 @@ import java.util.List;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -57,6 +58,13 @@ public class RedmineJSONBuilder {
 		@Override
 		public void write(JSONWriter writer, User object) throws JSONException {
 			writeUser(object, writer);
+		}
+	};
+	
+	public static JsonObjectWriter<Group> GROUP_WRITER = new JsonObjectWriter<Group>() {
+		@Override
+		public void write(JSONWriter writer, Group object) throws JSONException {
+			writeGroup(object, writer);
 		}
 	};
 
@@ -260,6 +268,12 @@ public class RedmineJSONBuilder {
 		addIfNotNullFull(writer, "last_login_on", user.getLastLoginOn());
 		writeCustomFields(writer, user.getCustomFields());
 
+	}
+	
+	public static void writeGroup(Group group, final JSONWriter writer)
+			throws JSONException {
+		JsonOutput.addIfNotNull(writer, "id", group.getId());
+		JsonOutput.addIfNotNull(writer, "login", group.getName());
 	}
 
 	public static void writeIssue(Issue issue, final JSONWriter writer)

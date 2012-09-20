@@ -9,10 +9,12 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -74,6 +76,13 @@ public class RedmineJSONParser {
 		@Override
 		public User parse(JSONObject input) throws JSONException {
 			return parseUser(input);
+		}
+	};
+	
+	public static final JsonObjectParser<Group> GROUP_PARSER = new JsonObjectParser<Group>() {
+		@Override
+		public Group parse(JSONObject input) throws JSONException {
+			return parseGroup(input);
 		}
 	};
 
@@ -499,6 +508,13 @@ public class RedmineJSONParser {
 		for (Membership m : result.getMemberships())
 			m.setUser(result);
 
+		return result;
+	}
+	
+	public static Group parseGroup(JSONObject content) throws JSONException {
+		final Group result = new Group();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}
 
