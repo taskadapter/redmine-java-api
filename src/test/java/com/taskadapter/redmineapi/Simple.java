@@ -19,6 +19,7 @@ public class Simple {
 		String apiAccessKey = "acbd877fa75d53402fc19c0fff8bea48836a1c7f";
 		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
 		try {
+            getUsersAsNotAdmin(new RedmineManager(redmineHost, "notadmin", "notadmin"));
 			// getIssueWithRelations(mgr);
 			// tryCreateIssue(mgr);
 			// tryGetIssues(mgr);
@@ -27,7 +28,7 @@ public class Simple {
 			// printCurrentUser(mgr);
 			// generateXMLForUser();
 			// generateXMLForTimeEntry();
-			getSavedQueries(mgr);
+            // getSavedQueries(mgr);
 			// getProjects(mgr);
 			// tryCreateRelation(mgr);
 			// tryGetNews(mgr);
@@ -42,7 +43,11 @@ public class Simple {
 		}
 	}
 
-	@SuppressWarnings("unused")
+    private static void getUsersAsNotAdmin(RedmineManager mgr) throws RedmineException {
+        System.out.println("Users: " + mgr.getUsers());
+    }
+
+    @SuppressWarnings("unused")
 	private static void tryUpload(RedmineManager mgr) throws RedmineException,
 			IOException {
 		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
