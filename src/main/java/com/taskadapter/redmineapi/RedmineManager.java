@@ -856,7 +856,7 @@ public class RedmineManager {
 	}
 
 	/**
-	 * Adds the gievn user to the given group.
+	 * Adds the given user to the given group.
 	 * 
 	 * @param user
 	 *            - The user being added.
