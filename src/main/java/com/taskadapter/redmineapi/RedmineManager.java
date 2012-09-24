@@ -379,6 +379,9 @@ public class RedmineManager {
 				"include", "memberships"));
     }
 
+    /**
+     * This does NOT require Admin privileges by default Redmine installation (tested with Redmine 2.0.3).
+     */
     public User getUserById(Integer userId) throws RedmineException {
 		return transport.getObject(User.class, userId, new BasicNameValuePair(
 				"include", "memberships"));

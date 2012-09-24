@@ -1,10 +1,5 @@
 package com.taskadapter.redmineapi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.UnknownHostException;
@@ -45,26 +40,33 @@ import com.taskadapter.redmineapi.bean.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.*;
+
 /**
+ * Integration tests for Redmine Java API.
+ *
  * This class and its dependencies are located in com.taskadapter.redmineapi project.
  */
 public class RedmineManagerTest {
 
-    // TODO We don't know activities IDs!
+    // TODO We don't know activities' IDs!
     // see feature request http://www.redmine.org/issues/7506
     private static final Integer ACTIVITY_ID = 8;
 
     private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
 
     private static RedmineManager mgr;
+    private static Integer nonAdminUserId;
+    private static String nonAdminUserLogin;
+    private static String nonAdminPassword;
 
     private static String projectKey;
     private static TestConfig testConfig;
 
     @BeforeClass
-    public static void oneTimeSetUp() {
+    public static void oneTimeSetup() {
         testConfig = new TestConfig();
-        logger.info("Running redmine tests using: " + testConfig.getURI());
+        logger.info("Running Redmine tests using: " + testConfig.getURI());
         // mgr = new RedmineManager(TestConfig.getURI(),
         // TestConfig.getApiKey());
         mgr = new RedmineManager(testConfig.getURI());
@@ -78,10 +80,19 @@ public class RedmineManagerTest {
         try {
             Project createdProject = mgr.createProject(junitTestProject);
             projectKey = createdProject.getIdentifier();
+            createNonAdminUser();
         } catch (Exception e) {
-            logger.error("Exception while creating test project", e);
-            Assert.fail("can't create a test project. " + e.getMessage());
+            logger.error("Exception while configuring tests", e);
+            Assert.fail("Error: " + e.getMessage());
         }
+    }
+
+    private static void createNonAdminUser() throws RedmineException {
+        User user = generateRandomUser();
+        User nonAdminUser = mgr.createUser(user);
+        nonAdminUserId = nonAdminUser.getId();
+        nonAdminUserLogin = user.getLogin();
+        nonAdminPassword = user.getPassword();
     }
 
     /*
@@ -92,6 +103,9 @@ public class RedmineManagerTest {
         try {
             if (mgr != null && projectKey != null) {
                 mgr.deleteProject(projectKey);
+            }
+            if (nonAdminUserId != null) {
+                mgr.deleteUser(nonAdminUserId);
             }
         } catch (Exception e) {
             logger.error("Exception while deleting test project", e);
@@ -182,7 +196,7 @@ public class RedmineManagerTest {
 
             // PRIORITY
             Assert.assertNotNull(newIssue.getPriorityId());
-            Assert.assertTrue(newIssue.getPriorityId() > 0);
+            assertTrue(newIssue.getPriorityId() > 0);
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -258,7 +272,7 @@ public class RedmineManagerTest {
 
             Assert.assertNotNull("Checking if search results is not NULL",
                     foundIssues);
-            Assert.assertTrue("Search results must be not empty",
+            assertTrue("Search results must be not empty",
                     !(foundIssues.isEmpty()));
 
             Issue loadedIssue1 = RedmineTestUtils.findIssueInList(foundIssues,
@@ -278,7 +292,7 @@ public class RedmineManagerTest {
             // try to find the issue
             List<Issue> foundIssues = mgr.getIssuesBySummary(projectKey, summary);
             Assert.assertNotNull("Search result must be not null", foundIssues);
-            Assert.assertTrue("Search result list must be empty", foundIssues.isEmpty());
+            assertTrue("Search result list must be empty", foundIssues.isEmpty());
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail();
@@ -399,7 +413,7 @@ public class RedmineManagerTest {
         // retrieve projects
         List<Project> projects = mgr.getProjects();
         // asserts
-        Assert.assertTrue(projects.size() > 0);
+        assertTrue(projects.size() > 0);
         boolean found = false;
         for (Project project : projects) {
             if (project.getIdentifier().equals(projectKey)) {
@@ -427,7 +441,7 @@ public class RedmineManagerTest {
             // #"
             // +
             // queryIdIssuesCreatedLast2Days);
-            Assert.assertTrue(issues.size() > 0);
+            assertTrue(issues.size() > 0);
             boolean found = false;
             for (Issue issue : issues) {
                 if (issue.getId().equals(newIssue.getId())) {
@@ -475,7 +489,7 @@ public class RedmineManagerTest {
             List<Tracker> trackers = createdProject.getTrackers();
             Assert.assertNotNull("checking that project has some trackers",
                     trackers);
-            Assert.assertTrue("checking that project has some trackers",
+            assertTrue("checking that project has some trackers",
                     !(trackers.isEmpty()));
         } catch (Exception e) {
             Assert.fail(e.getMessage());
@@ -513,7 +527,7 @@ public class RedmineManagerTest {
             List<Tracker> trackers = updatedProject.getTrackers();
             Assert.assertNotNull("checking that project has some trackers",
                     trackers);
-            Assert.assertTrue("checking that project has some trackers",
+            assertTrue("checking that project has some trackers",
                     !(trackers.isEmpty()));
 
         } catch (Exception e) {
@@ -633,7 +647,7 @@ public class RedmineManagerTest {
     public void usersAreLoadedByAdmin() {
         try {
             List<User> users = mgr.getUsers();
-            Assert.assertTrue(users.size() > 0);
+            assertTrue(users.size() > 0);
         } catch (Exception e) {
             e.printStackTrace();
             fail(e.getMessage());
@@ -642,41 +656,14 @@ public class RedmineManagerTest {
 
     @Test(expected = NotAuthorizedException.class)
     public void usersCannotBeLoadedByNotAdmin() throws RedmineException {
-        User user = generateRandomUser();
-        Integer userId = null;
-        try {
-            User createdUser = mgr.createUser(user);
-            userId = createdUser.getId();
-            RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
-            nonAdminManager.setLogin(user.getLogin());
-            nonAdminManager.setPassword(user.getPassword());
-            nonAdminManager.getUsers();
-            fail("Must have failed with NotAuthorizedException.");
-        } finally {
-            if (userId != null) {
-                mgr.deleteUser(userId);
-            }
-        }
+        getNonAdminManager().getUsers();
+        fail("Must have failed with NotAuthorizedException.");
     }
 
     @Test
     public void userCanBeLoadedByIdByNonAdmin() throws RedmineException {
-        User user = generateRandomUser();
-        Integer userId = null;
-        try {
-            User createdUser = mgr.createUser(user);
-            userId = createdUser.getId();
-            RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
-            nonAdminManager.setLogin(user.getLogin());
-            nonAdminManager.setPassword(user.getPassword());
-            // try to read itself
-            User userById = nonAdminManager.getUserById(userId);
-            assertEquals(createdUser.getFirstName(), userById.getFirstName());
-        } finally {
-            if (userId != null) {
-                mgr.deleteUser(userId);
-            }
-        }
+        User userById = getNonAdminManager().getUserById(nonAdminUserId);
+        assertEquals(nonAdminUserId, userById.getId());
     }
 
     @Test
@@ -817,7 +804,7 @@ public class RedmineManagerTest {
             logger.debug("testGetIssuesPaging() loaded " + issues.size()
                     + " issues");// using query #" +
             // queryIdIssuesCreatedLast2Days);
-            Assert.assertTrue(issues.size() > 26);
+            assertTrue(issues.size() > 26);
 
             Set<Issue> issueSet = new HashSet<Issue>(issues);
             Assert.assertEquals(issues.size(), issueSet.size());
@@ -852,7 +839,7 @@ public class RedmineManagerTest {
         List<Project> projects = createProjects(NUM);
 
         List<Project> loadedProjects = mgr.getProjects();
-        Assert.assertTrue(
+        assertTrue(
                 "Number of projects loaded from the server must be bigger than "
                         + NUM + ", but it's " + loadedProjects.size(),
                 loadedProjects.size() > NUM);
@@ -1163,7 +1150,7 @@ public class RedmineManagerTest {
 
             Issue loadedIssueWithJournals = mgr.getIssueById(newIssue.getId(),
                     INCLUDE.journals);
-            Assert.assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
+            assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
 
             String commentDescribingTheUpdate = "some comment describing the issue update";
             loadedIssueWithJournals.setSubject("new subject");
@@ -1189,7 +1176,7 @@ public class RedmineManagerTest {
 
             Issue loadedIssueWithoutJournals = mgr.getIssueById(newIssue
                     .getId());
-            Assert.assertTrue(loadedIssueWithoutJournals.getJournals()
+            assertTrue(loadedIssueWithoutJournals.getJournals()
                     .isEmpty());
 
         } catch (Exception e) {
@@ -1314,7 +1301,7 @@ public class RedmineManagerTest {
     public void testGetProjectsIncludesTrackers() {
         try {
             List<Project> projects = mgr.getProjects();
-            Assert.assertTrue(projects.size() > 0);
+            assertTrue(projects.size() > 0);
             Project p1 = projects.get(0);
             Assert.assertNotNull(p1.getTrackers());
             for (Project p : projects)
@@ -1463,7 +1450,7 @@ public class RedmineManagerTest {
         mgr.deleteVersion(newVersion);
         // assert that the version is gone
         List<Version> versions = mgr.getVersions(project.getId());
-        Assert.assertTrue(
+        assertTrue(
                 "List of versions of test project must be empty now but is "
                         + versions, versions.isEmpty());
     }
@@ -1561,7 +1548,7 @@ public class RedmineManagerTest {
         mgr.deleteCategory(newIssueCategory);
         // assert that the category is gone
         List<IssueCategory> categories = mgr.getCategories(project.getId());
-        Assert.assertTrue(
+        assertTrue(
                 "List of categories of test project must be empty now but is "
                         + categories, categories.isEmpty());
     }
@@ -1923,7 +1910,7 @@ public class RedmineManagerTest {
 
     @Test
     public void testGetRoles() throws RedmineException {
-        Assert.assertTrue(mgr.getRoles().size() > 0);
+        assertTrue(mgr.getRoles().size() > 0);
     }
 
     @Test
@@ -1984,7 +1971,7 @@ public class RedmineManagerTest {
         mgr.addMembership(newMembership);
 
         final User userWithMembership = mgr.getUserById(currentUser.getId());
-        Assert.assertTrue(userWithMembership.getMemberships().size() > 0);
+        assertTrue(userWithMembership.getMemberships().size() > 0);
     }
 
     @Test(expected = IOException.class)
@@ -2005,9 +1992,9 @@ public class RedmineManagerTest {
         try {
             mgr1.getProjects();
         } catch (RedmineTransportException e1) {
-            Assert.assertTrue(e1.getMessage().startsWith(
+            assertTrue(e1.getMessage().startsWith(
                     "Cannot fetch data from http://The.unknown.host/"));
-            Assert.assertTrue(e1.getCause() instanceof UnknownHostException);
+            assertTrue(e1.getCause() instanceof UnknownHostException);
         }
     }
 
@@ -2024,6 +2011,13 @@ public class RedmineManagerTest {
     @Test
     public void testSavedQueries() throws RedmineException {
         final Collection<SavedQuery> queries = mgr.getSavedQueries("test");
-        Assert.assertTrue(queries.size() > 0);
+        assertTrue(queries.size() > 0);
+    }
+
+    private RedmineManager getNonAdminManager() {
+        RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
+        nonAdminManager.setLogin(nonAdminUserLogin);
+        nonAdminManager.setPassword(nonAdminPassword);
+        return nonAdminManager;
     }
 }
