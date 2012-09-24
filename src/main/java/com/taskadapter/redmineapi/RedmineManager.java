@@ -855,6 +855,21 @@ public class RedmineManager {
 		transport.deleteObject(Membership.class, membership.getId().toString());
 	}
 
+	/**
+	 * Adds the given user to the given group.
+	 * 
+	 * @param user
+	 *            - The user being added.
+	 * @param group
+	 *            - The new group of the user.
+	 * @return - true if the user was added, false if the user is already in the
+	 *         group or if there was an error on the server.
+	 * @throws RedmineException
+	 */
+	public boolean addUserToGroup(User user, Group group) throws RedmineException {
+		return transport.addUserToGroup(user.getId(), group.getId());
+	}
+
 	private String getProjectKey(Project project) {
 		return project.getId() != null ? project.getId().toString() : project
 				.getIdentifier();

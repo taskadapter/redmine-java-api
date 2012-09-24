@@ -445,6 +445,21 @@ public final class Transport {
 		}
 		this.objectsPerPage = pageSize;
 	}
+	
+	public boolean addUserToGroup(int userId, int groupId) throws RedmineException {
+		logger.debug("adding user " + userId + " to group " + groupId + "...");
+		
+		// Tried with json, but couldn't make it work.
+		URI uri = configurator.createURI("groups/" + groupId + "/users.xml");
+		final HttpPost http = new HttpPost(uri);
+		final String body = "<user_id>" + userId + "</user_id>";
+		setEntity(http, body, "text/xml; charset=utf-8");
+		Integer response = authenticator.sendRequest(http, Communicators.httpResponseCodeReader());
+		
+		logger.debug("response code: " + response);
+		
+		return response == 200;
+	}
 
 	private SimpleCommunicator<String> getCommunicator()
 			throws RedmineException {
@@ -461,6 +476,10 @@ public final class Transport {
 	}
 
 	private void setEntity(HttpEntityEnclosingRequest request, String body) {
+		setEntity(request, body, CONTENT_TYPE);
+	}
+
+	private void setEntity(HttpEntityEnclosingRequest request, String body, String contentType) {
 		StringEntity entity;
 		try {
 			entity = new StringEntity(body, CHARSET);
@@ -468,7 +487,7 @@ public final class Transport {
 			throw new RedmineInternalError("Required charset " + CHARSET
 					+ " is not supported", e);
 		}
-		entity.setContentType(CONTENT_TYPE);
+		entity.setContentType(contentType);
 		request.setEntity(entity);
 	}
 

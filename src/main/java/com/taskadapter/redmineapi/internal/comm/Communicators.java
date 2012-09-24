@@ -7,6 +7,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
+
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineTransportException;
 
@@ -37,6 +38,13 @@ public final class Communicators {
 				throw new RedmineTransportException(
 						"Unsupported response charset " + charset, e);
 			}
+		}
+	};
+	
+	private static final ContentHandler<HttpResponse, Integer> HTTP_RESPONSE_CODE = new ContentHandler<HttpResponse, Integer>() {
+		@Override
+		public Integer processContent(HttpResponse content) throws RedmineException {
+			return content.getStatusLine().getStatusCode();
 		}
 	};
 
@@ -100,5 +108,9 @@ public final class Communicators {
 
 	public static ContentHandler<Reader, String> readChars() {
 		return READ_CHARS;
+	}
+	
+	public static ContentHandler<HttpResponse, Integer> httpResponseCodeReader() {
+		return HTTP_RESPONSE_CODE;
 	}
 }
