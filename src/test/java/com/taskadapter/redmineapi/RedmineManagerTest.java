@@ -660,6 +660,26 @@ public class RedmineManagerTest {
     }
 
     @Test
+    public void userCanBeLoadedByIdByNonAdmin() throws RedmineException {
+        User user = generateRandomUser();
+        Integer userId = null;
+        try {
+            User createdUser = mgr.createUser(user);
+            userId = createdUser.getId();
+            RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
+            nonAdminManager.setLogin(user.getLogin());
+            nonAdminManager.setPassword(user.getPassword());
+            // try to read itself
+            User userById = nonAdminManager.getUserById(userId);
+            assertEquals(createdUser.getFirstName(), userById.getFirstName());
+        } finally {
+            if (userId != null) {
+                mgr.deleteUser(userId);
+            }
+        }
+    }
+
+    @Test
     public void testGetCurrentUser() throws RedmineException {
         User currentUser = mgr.getCurrentUser();
         Assert.assertEquals(getOurUser().getId(), currentUser.getId());
