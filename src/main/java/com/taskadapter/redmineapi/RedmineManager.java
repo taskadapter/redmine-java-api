@@ -862,12 +862,10 @@ public class RedmineManager {
 	 *            - The user being added.
 	 * @param group
 	 *            - The new group of the user.
-	 * @return - true if the user was added, false if the user is already in the
-	 *         group or if there was an error on the server.
 	 * @throws RedmineException
 	 */
-	public boolean addUserToGroup(User user, Group group) throws RedmineException {
-		return transport.addUserToGroup(user.getId(), group.getId());
+	public void addUserToGroup(User user, Group group) throws RedmineException {
+		transport.addUserToGroup(user.getId(), group.getId());
 	}
 
 	private String getProjectKey(Project project) {

@@ -24,6 +24,7 @@ import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -2012,6 +2013,19 @@ public class RedmineManagerTest {
     public void testSavedQueries() throws RedmineException {
         final Collection<SavedQuery> queries = mgr.getSavedQueries("test");
         assertTrue(queries.size() > 0);
+    }
+    
+    @Ignore("Enable this when redmine 2.1 is installed")
+    @Test
+    public void testAddUserToGroup() throws RedmineException {
+    	final User newUser = mgr.createUser(generateRandomUser());
+    	try {
+    		final Group group = mgr.getGroups().get(0);
+    		mgr.addUserToGroup(newUser, group);
+    		mgr.addUserToGroup(newUser, group);
+    	} finally {
+    		mgr.deleteUser(newUser.getId());
+    	}
     }
 
     private RedmineManager getNonAdminManager() {

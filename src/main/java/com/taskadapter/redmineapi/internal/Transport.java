@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi.internal;
 
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -446,19 +448,22 @@ public final class Transport {
 		this.objectsPerPage = pageSize;
 	}
 	
-	public boolean addUserToGroup(int userId, int groupId) throws RedmineException {
+	public void addUserToGroup(int userId, int groupId) throws RedmineException {
 		logger.debug("adding user " + userId + " to group " + groupId + "...");
-		
-		// Tried with json, but couldn't make it work.
-		URI uri = configurator.createURI("groups/" + groupId + "/users.xml");
-		final HttpPost http = new HttpPost(uri);
-		final String body = "<user_id>" + userId + "</user_id>";
-		setEntity(http, body, "text/xml; charset=utf-8");
-		Integer response = authenticator.sendRequest(http, Communicators.httpResponseCodeReader());
-		
-		logger.debug("response code: " + response);
-		
-		return response == 200;
+		URI uri = getURIConfigurator().getChildObjectsURI(Group.class, Integer.toString(groupId), User.class);
+		HttpPost httpPost = new HttpPost(uri);
+		final StringWriter writer = new StringWriter();
+		final JSONWriter jsonWriter = new JSONWriter(writer);
+		try {
+			jsonWriter.object().key("user_id").value(userId).endObject();
+		} catch (JSONException e) {
+			throw new RedmineInternalError("Unexpected exception", e);
+		}
+		String body = writer.toString();
+		setEntity(httpPost, body);
+		String response = getCommunicator().sendRequest(httpPost);
+		logger.debug(response);
+		return;
 	}
 
 	private SimpleCommunicator<String> getCommunicator()
