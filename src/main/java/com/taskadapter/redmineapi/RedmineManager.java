@@ -31,6 +31,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -390,6 +392,36 @@ public class RedmineManager {
 		return transport.getObjectsList(TimeEntry.class);
     }
 
+    public List<TimeEntry> getTimeEntries(TimeEntrySearchCriteria criteria) throws RedmineException {
+    	List<NameValuePair> params = new ArrayList<NameValuePair>();
+    	
+    	if (criteria.getProjectKey() != null) {
+    		params.add(new BasicNameValuePair("project_id", criteria.getProjectKey()));
+    	}
+    	
+    	DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+    	
+    	PeriodType periodType = criteria.getPeriodType();
+		if (periodType == PeriodType.Custom) {
+			params.add(new BasicNameValuePair("period_type", "2"));
+			
+			if (criteria.getFrom() != null) {
+				String from = dateFormat.format(criteria.getFrom());
+				params.add(new BasicNameValuePair("from", from));
+			}
+			
+			if (criteria.getTo() != null) {
+				String to = dateFormat.format(criteria.getTo());
+				params.add(new BasicNameValuePair("to", to));
+			}
+		} else if (periodType != null) {
+			params.add(new BasicNameValuePair("period_type", "1"));
+			params.add(new BasicNameValuePair("period", periodType.toString()));
+		}
+    	
+		return transport.getObjectsList(TimeEntry.class, params);
+    }
+    
     /**
      * @param id the database Id of the TimeEntry record
      */
