@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import com.taskadapter.redmineapi.internal.Joiner;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -227,21 +228,8 @@ public class RedmineManager {
      * @throws RedmineException
      */
     public Issue getIssueById(Integer id, INCLUDE... include) throws RedmineException {
-        String value = join(",", include);
-		return transport.getObject(Issue.class, id, new BasicNameValuePair(
-				"include", value));
-    }
-
-    // TODO move to a separate utility class or find a replacement in Google Guava
-    // TODO add unit tests
-    private static String join(String delimToUse, INCLUDE... include) {
-        String delim = "";
-        StringBuilder sb = new StringBuilder();
-        for (INCLUDE i : include) {
-            sb.append(delim).append(i);
-            delim = delimToUse;
-        }
-        return sb.toString();
+        String value = Joiner.join(",", include);
+		return transport.getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
     /**
@@ -292,7 +280,7 @@ public class RedmineManager {
         if ((projectKey != null) && (projectKey.length() > 0)) {
             params.add(new BasicNameValuePair("project_id", projectKey));
         }
-        String includeStr = join(",", include);
+        String includeStr = Joiner.join(",", include);
         params.add(new BasicNameValuePair("include", includeStr));
 
 		return transport.getObjectsList(Issue.class, params);
