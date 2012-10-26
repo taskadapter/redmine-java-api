@@ -1,9 +1,11 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.io.Serializable;
+
 /**
  * Redmine's Tracker (bug/feature/task/...)
  */
-public class Tracker {
+public class Tracker implements Identifiable, Serializable {
 
     private Integer id;
 
