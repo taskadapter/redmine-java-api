@@ -2028,6 +2028,34 @@ public class RedmineManagerTest {
     	}
     }
 
+    /**
+     * Test for issue 64 (time entry format)
+     */
+    @Test
+    public void testTimeEntryComments() throws RedmineException {
+        Issue issue = createIssues(1).get(0);
+        Integer issueId = issue.getId();
+
+        TimeEntry entry = new TimeEntry();
+        Float hours = 11f;
+        entry.setHours(hours);
+        entry.setIssueId(issueId);
+		final String comment = "This is a comment although it may not look like it";
+		entry.setComment(comment);
+        // TODO We don't know activities IDs!
+        // see feature request http://www.redmine.org/issues/7506
+        entry.setActivityId(ACTIVITY_ID);
+        TimeEntry createdEntry = mgr.createTimeEntry(entry);
+
+        Assert.assertNotNull(createdEntry);
+        Assert.assertEquals(comment, createdEntry.getComment());
+        
+        createdEntry.setComment("New comment");
+        mgr.update(createdEntry);
+        final TimeEntry updatedEntry = mgr.getTimeEntry(createdEntry.getId());
+        assertEquals("New comment", updatedEntry.getComment());
+    }
+    
     private RedmineManager getNonAdminManager() {
         RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
         nonAdminManager.setLogin(nonAdminUserLogin);

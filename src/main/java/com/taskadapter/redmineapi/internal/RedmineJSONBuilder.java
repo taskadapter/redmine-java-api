@@ -150,7 +150,7 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "activity_id",
 				timeEntry.getActivityId());
 		JsonOutput.addIfNotNull(writer, "hours", timeEntry.getHours());
-		JsonOutput.addIfNotNull(writer, "comment", timeEntry.getComment());
+		JsonOutput.addIfNotNull(writer, "comments", timeEntry.getComment());
 		addIfNotNullShort(writer, "spent_on", timeEntry.getSpentOn());
 		addIfNotNullFull(writer, "created_on", timeEntry.getSpentOn());
 		addIfNotNullFull(writer, "updated_on", timeEntry.getSpentOn());
