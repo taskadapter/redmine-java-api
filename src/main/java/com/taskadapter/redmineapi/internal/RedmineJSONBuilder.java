@@ -359,7 +359,14 @@ public class RedmineJSONBuilder {
 			return;
 		writer.key("custom_field_values").object();
 		for (CustomField field : customFields) {
-			writer.key(Integer.toString(field.getId())).value(field.getValue());
+            // see https://github.com/taskadapter/redmine-java-api/issues/54
+            Object valueToWrite;
+            if (field.isMultiple()) {
+                valueToWrite = field.getValues();
+            } else {
+			    valueToWrite = field.getValue();
+            }
+            writer.key(Integer.toString(field.getId())).value(valueToWrite);
 		}
 		writer.endObject();
 	}
