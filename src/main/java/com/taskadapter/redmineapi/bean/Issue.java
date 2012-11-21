@@ -42,6 +42,7 @@ public class Issue implements Identifiable {
     private List<IssueRelation> relations = new ArrayList<IssueRelation>();
     private List<Attachment> attachments = new ArrayList<Attachment>();
     private List<Changeset> changesets = new ArrayList<Changeset>();
+    private Boolean resettable = Boolean.FALSE;
 
     public Project getProject() {
         return project;
@@ -289,6 +290,7 @@ public class Issue implements Identifiable {
                 + ((updatedOn == null) ? 0 : updatedOn.hashCode());
         result = prime * result
             + ((changesets == null) ? 0 : changesets.hashCode());
+        result = prime * result + ((resettable == null) ? 0 : resettable.hashCode());
         return result;
     }
 
@@ -479,6 +481,13 @@ public class Issue implements Identifiable {
         } else if (!changesets.equals(other.changesets)) {
             return false;
         }
+        if (resettable == null) {
+            if (other.resettable != null) {
+                return false;
+            }
+        } else if (!resettable.equals(other.resettable)) {
+            return false;
+        }
         return true;
     }
 
@@ -537,5 +546,19 @@ public class Issue implements Identifiable {
 
     public void setCategory(IssueCategory category) {
         this.category = category;
+    }
+
+    /**
+     * @return Returns the resettable.
+     */
+    public Boolean getResettable() {
+        return resettable;
+    }
+
+    /**
+     * @param resettable The resettable to set.
+     */
+    public void setResettable(Boolean resettable) {
+        this.resettable = resettable;
     }
 }
