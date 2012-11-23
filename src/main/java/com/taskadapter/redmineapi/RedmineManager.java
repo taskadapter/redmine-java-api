@@ -31,6 +31,9 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import com.taskadapter.redmineapi.internal.Joiner;
+import com.taskadapter.redmineapi.internal.RedmineJSONParser;
+import com.taskadapter.redmineapi.internal.comm.ContentHandler;
+import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -395,6 +398,10 @@ public class RedmineManager {
      */
     public void deleteUser(Integer userId) throws RedmineException {
 		transport.deleteObject(User.class, Integer.toString(userId));
+    }
+
+    public User connectUser(User user) throws RedmineException {
+        return transport.connectUser(user);
     }
     
     /**

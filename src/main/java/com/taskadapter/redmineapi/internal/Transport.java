@@ -1,5 +1,6 @@
 package com.taskadapter.redmineapi.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -11,9 +12,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.taskadapter.redmineapi.RedmineTransportException;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -21,7 +25,9 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONWriter;
@@ -169,7 +175,7 @@ public final class Transport {
 
 	/**
 	 * Performs an "add object" request.
-	 * 
+	 *
 	 * @param object
 	 *            object to use.
 	 * @param params
@@ -193,7 +199,7 @@ public final class Transport {
 
 	/**
 	 * Performs an "add child object" request.
-	 * 
+	 *
 	 * @param parentClass
 	 *            parent object id.
 	 * @param object
@@ -221,7 +227,7 @@ public final class Transport {
 	/*
 	 * note: This method cannot return the updated object from Redmine because
 	 * the server does not provide any XML in response.
-	 * 
+	 *
 	 * @since 1.8.0
 	 */
 	public <T extends Identifiable> void updateObject(T obj,
@@ -240,7 +246,7 @@ public final class Transport {
 
 	/**
 	 * Deletes an object.
-	 * 
+	 *
 	 * @param classs
 	 *            object class.
 	 * @param id
@@ -281,7 +287,7 @@ public final class Transport {
 
 	/**
 	 * Downloads a redmine content.
-	 * 
+	 *
 	 * @param uri
 	 *            target uri.
 	 * @param handler
@@ -299,7 +305,7 @@ public final class Transport {
 
 	/**
 	 * UPloads content on a server.
-	 * 
+	 *
 	 * @param content
 	 *            content stream.
 	 * @return uploaded item token.
@@ -345,7 +351,7 @@ public final class Transport {
 
 	/**
 	 * Returns an object list.
-	 * 
+	 *
 	 * @return objects list, never NULL
 	 */
 	public <T> List<T> getObjectsList(Class<T> objectClass,
@@ -414,7 +420,7 @@ public final class Transport {
 
 	/**
 	 * Delivers a list of a child entries.
-	 * 
+	 *
 	 * @param classs
 	 *            target class.
 	 */
@@ -447,7 +453,7 @@ public final class Transport {
 		}
 		this.objectsPerPage = pageSize;
 	}
-	
+
 	public void addUserToGroup(int userId, int groupId) throws RedmineException {
 		logger.debug("adding user " + userId + " to group " + groupId + "...");
 		URI uri = getURIConfigurator().getChildObjectsURI(Group.class, Integer.toString(groupId), User.class);
@@ -532,8 +538,32 @@ public final class Transport {
 		setCredentials(login, password);
 	}
 
-	/**
-	 * Entity config.
+    public User connectUser(User user) throws RedmineException {
+        final EntityConfig<User> config = getConfig(User.class);
+        DefaultHttpClient client = new DefaultHttpClient();
+        client.getCredentialsProvider().setCredentials(AuthScope.ANY,
+                new UsernamePasswordCredentials(user.getLogin(), user.getPassword()));
+        HttpGet get = new HttpGet(getURIConfigurator().getCurrentUser());
+        try {
+            final HttpResponse httpResponse = client.execute(get);
+            try {
+                String content = Communicators.compose(
+                        Communicators.contentReader(),
+                        Communicators.transportDecoder()
+                ).processContent(httpResponse);
+                return config.parser.parse(new JSONObject(content));
+            } catch (JSONException e) {
+                throw new RedmineInternalError("Unexpected exception", e);
+            } finally {
+                EntityUtils.consume(httpResponse.getEntity());
+            }
+        } catch (IOException e) {
+            throw new RedmineTransportException("Cannot fetch data from " + get.getURI() + " : " + e.toString(), e);
+        }
+    }
+
+    /**
+     * Entity config.
 	 */
 	static class EntityConfig<T> {
 		final String singleObjectName;

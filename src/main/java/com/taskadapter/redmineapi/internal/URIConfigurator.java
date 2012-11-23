@@ -1,11 +1,25 @@
 package com.taskadapter.redmineapi.internal;
 
-import com.taskadapter.redmineapi.bean.*;
+import com.taskadapter.redmineapi.RedmineInternalError;
+import com.taskadapter.redmineapi.bean.Attachment;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueRelation;
+import com.taskadapter.redmineapi.bean.IssueStatus;
+import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.SavedQuery;
+import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.Version;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import com.taskadapter.redmineapi.RedmineInternalError;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -128,4 +142,8 @@ public class URIConfigurator {
 	public URI getUploadURI() {
 		return createURI("uploads" + URL_POSTFIX);
 	}
+
+    public URI getCurrentUser() {
+        return createURI(getConfig(User.class) + "/current" + URL_POSTFIX);
+    }
 }
