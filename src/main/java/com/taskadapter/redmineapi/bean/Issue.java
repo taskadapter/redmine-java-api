@@ -32,6 +32,7 @@ public class Issue implements Identifiable {
     private String statusName;
     private Version targetVersion;
     private IssueCategory category;
+    private Boolean resettable = Boolean.FALSE;
 
     /**
      * Some comment describing the issue update
@@ -289,6 +290,7 @@ public class Issue implements Identifiable {
                 + ((updatedOn == null) ? 0 : updatedOn.hashCode());
         result = prime * result
             + ((changesets == null) ? 0 : changesets.hashCode());
+        result = prime * result + ((resettable == null) ? 0 : resettable.hashCode());
         return result;
     }
 
@@ -479,6 +481,13 @@ public class Issue implements Identifiable {
         } else if (!changesets.equals(other.changesets)) {
             return false;
         }
+        if (resettable == null) {
+            if (other.resettable != null) {
+                return false;
+            }
+        } else if (!resettable.equals(other.resettable)) {
+            return false;
+        }
         return true;
     }
 
@@ -537,5 +546,13 @@ public class Issue implements Identifiable {
 
     public void setCategory(IssueCategory category) {
         this.category = category;
+    }
+    
+    public Boolean getResettable() {
+        return resettable;
+    }
+
+    public void setResettable(Boolean resettable) {
+        this.resettable = resettable;
     }
 }
