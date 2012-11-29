@@ -191,5 +191,62 @@ public class JsonOutput {
 		}
 		writer.endArray();
 	}
+	
+    /**
+     * Adds a value to a writer. If value is <code>null</code> add null value.
+     * 
+     * @param writer
+     *            writer to add object to.
+     * @param field
+     *            field name to set.
+     * @param value
+     *            field value.
+     * @throws JSONException
+     *             if io error occurs.
+     */
+    public static void add(final JSONWriter writer, final String field,
+            String value) throws JSONException {
+        addEvenNull(writer, field, value);
+    }
+    
+    /**
+     * Adds a value to a writer. If value is <code>null</code> add null value.
+     * 
+     * @param writer
+     *            writer to add object to.
+     * @param field
+     *            field name to set.
+     * @param value
+     *            field value.
+     * @throws JSONException
+     *             if io error occurs.
+     */
+    public static void add(final JSONWriter writer, final String field,
+            Integer value) throws JSONException {
+        addEvenNull(writer, field, value);
+    }
+    
+    /**
+     * Adds a value to a writer. If value is <code>null</code> add null value.
+     * 
+     * @param writer
+     *            writer to add object to.
+     * @param field
+     *            field name to set.
+     * @param value
+     *            field value.
+     * @throws JSONException
+     *             if io error occurs.
+     */
+    public static void add(final JSONWriter writer, final String field,
+            Float value) throws JSONException {
+        addEvenNull(writer, field, value);
+    }
+    
+    private static void addEvenNull(final JSONWriter writer, final String field,
+            Object value) throws JSONException {
+        writer.key(field);
+        writer.value(value);
+    }
 
 }

@@ -276,59 +276,98 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "login", group.getName());
 	}
 
-	public static void writeIssue(Issue issue, final JSONWriter writer)
-			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", issue.getId());
-		JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
-		JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
-		JsonOutput.addIfNotNull(writer, "estimated_hours",
-				issue.getEstimatedHours());
-		JsonOutput.addIfNotNull(writer, "spent_hours", issue.getSpentHours());
-		if (issue.getAssignee() != null)
-			JsonOutput.addIfNotNull(writer, "assigned_to_id", issue
-					.getAssignee().getId());
-		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
-		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
-		if (issue.getProject() != null)
-			JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-					.getIdentifier());
-		if (issue.getAuthor() != null)
-			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
-					.getId());
-		addFull(writer, "start_date", issue.getStartDate());
-		addIfNotNullFull(writer, "due_date", issue.getDueDate());
-		if (issue.getTracker() != null)
-			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker()
-					.getId());
-		JsonOutput.addIfNotNull(writer, "description", issue.getDescription());
-
-		addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
-		addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
-		JsonOutput.addIfNotNull(writer, "status_id", issue.getStatusId());
-		if (issue.getTargetVersion() != null)
-			JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
-					.getTargetVersion().getId());
-		if (issue.getCategory() != null)
-			JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory()
-					.getId());
-		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
-		writeCustomFields(writer, issue.getCustomFields());
-
-		if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
-			final List<Attachment> uploads = new ArrayList<Attachment>();
-			for (Attachment attach : issue.getAttachments())
-				if (attach.getToken() != null)
-					uploads.add(attach);
-			JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
-					UPLOAD_WRITER);
-		}
-		
-
-		/*
-		 * Journals and Relations cannot be set for an issue during creation or
-		 * updates.
-		 */
-	}
+	/**
+     * Add values from issue into writer. 
+     * Allowing reset values depending on resettable issue field.
+     * @param issue
+     * @param writer
+     * @throws JSONException
+     */
+    public static void writeIssue(Issue issue, final JSONWriter writer)
+            throws JSONException {
+        JsonOutput.addIfNotNull(writer, "id", issue.getId());
+        JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
+        JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
+        if (issue.getProject() != null)
+            JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
+                    .getIdentifier());
+        if (issue.getTracker() != null)
+            JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker()
+                    .getId());
+        if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
+            final List<Attachment> uploads = new ArrayList<Attachment>();
+            for (Attachment attach : issue.getAttachments())
+                if (attach.getToken() != null)
+                    uploads.add(attach);
+            JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
+                    UPLOAD_WRITER);
+        }
+        writeCustomFields(writer, issue.getCustomFields());
+        
+        if (issue.getResettable()){
+            writeIssueResettable(issue, writer);
+        }else{
+            writeIssueNotResettable(issue, writer);
+        }
+        
+        /*
+         * Journals and Relations cannot be set for an issue during creation or
+         * updates.
+         */
+    }
+    
+    private static void writeIssueNotResettable(Issue issue, final JSONWriter writer)
+            throws JSONException {
+        JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
+        JsonOutput.addIfNotNull(writer, "estimated_hours", issue.getEstimatedHours());
+        JsonOutput.addIfNotNull(writer, "spent_hours", issue.getSpentHours());
+        if (issue.getAssignee() != null)
+            JsonOutput.addIfNotNull(writer, "assigned_to_id", issue
+                    .getAssignee().getId());
+        JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
+        if (issue.getAuthor() != null)
+            JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
+                    .getId());
+        JsonOutput.addIfNotNull(writer, "description", issue.getDescription());
+        JsonOutput.addIfNotNull(writer, "status_id", issue.getStatusId());
+        if (issue.getTargetVersion() != null)
+            JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
+                    .getTargetVersion().getId());
+        if (issue.getCategory() != null)
+            JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory()
+                    .getId());
+        JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
+        addIfNotNullFull(writer, "start_date", issue.getStartDate());
+        addIfNotNullFull(writer, "due_date", issue.getDueDate());
+        addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
+        addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
+    }
+    
+    public static void writeIssueResettable(Issue issue, final JSONWriter writer)
+            throws JSONException {
+        
+        JsonOutput.add(writer, "parent_issue_id", issue.getParentId());
+        JsonOutput.add(writer, "estimated_hours", issue.getEstimatedHours());
+        JsonOutput.add(writer, "spent_hours", issue.getSpentHours());
+        JsonOutput.add(writer, "assigned_to_id", issue.getAssignee() == null ? null : 
+                    issue.getAssignee().getId());
+        JsonOutput.add(writer, "done_ratio", issue.getDoneRatio());
+        JsonOutput.add(writer, "author_id", issue.getAuthor() == null ? null :
+                    issue.getAuthor().getId());
+        JsonOutput.add(writer, "description", issue.getDescription());
+        JsonOutput.add(writer, "status_id", issue.getStatusId());
+        JsonOutput.add(writer, "fixed_version_id", issue
+                .getTargetVersion() == null ? null : issue
+                    .getTargetVersion().getId());
+        JsonOutput.add(writer, "category_id", issue
+                .getCategory() == null ? null : issue
+                        .getCategory().getId());
+        JsonOutput.add(writer, "notes", issue.getNotes());
+        addFull(writer, "start_date", issue.getStartDate());
+        addFull(writer, "due_date", issue.getDueDate());
+        addFull(writer, "created_on", issue.getCreatedOn());
+        addFull(writer, "updated_on", issue.getUpdatedOn());
+    }
 
 	public static void writeUpload(JSONWriter writer, Attachment attachment)
 			throws JSONException {
