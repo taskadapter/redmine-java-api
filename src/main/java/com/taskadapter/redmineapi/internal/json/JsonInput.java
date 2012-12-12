@@ -127,7 +127,7 @@ public class JsonInput {
 			return null;
 		return obj.getString(field);
 	}
-	
+    
 	/**
 	 * Returns an optional "boolean" field value. If field is absent or set to
 	 * <code>null</code>, this method returns <code>false</code>.

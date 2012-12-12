@@ -30,6 +30,7 @@ import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
+import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
@@ -1174,6 +1175,11 @@ public class RedmineManagerTest {
                     .getFirstName());
             Assert.assertEquals(ourUser.getLastName(), journalItem.getUser()
                     .getLastName());
+            Assert.assertEquals(1, journalItem.getDetails().size());
+            final JournalDetail journalDetail = journalItem.getDetails().get(0);
+            Assert.assertEquals("new subject", journalDetail.getNewValue());
+            Assert.assertEquals("subject", journalDetail.getName());
+            Assert.assertEquals("attr", journalDetail.getProperty());
 
             Issue loadedIssueWithoutJournals = mgr.getIssueById(newIssue
                     .getId());

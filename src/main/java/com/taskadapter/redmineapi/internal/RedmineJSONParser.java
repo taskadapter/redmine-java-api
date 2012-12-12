@@ -20,6 +20,7 @@ import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
+import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
@@ -100,6 +101,13 @@ public class RedmineJSONParser {
 		}
 	};
 
+    public static final JsonObjectParser<JournalDetail> JOURNAL_DETAIL_PARSER = new JsonObjectParser<JournalDetail>() {
+        @Override
+        public JournalDetail parse(JSONObject input) throws JSONException {
+            return parseJournalDetail(input);
+        }
+    };
+    
 	public static final JsonObjectParser<Attachment> ATTACHMENT_PARSER = new JsonObjectParser<Attachment>() {
 		@Override
 		public Attachment parse(JSONObject input) throws JSONException {
@@ -473,9 +481,19 @@ public class RedmineJSONParser {
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+		result.setDetails(JsonInput.getListOrEmpty(content, "details", JOURNAL_DETAIL_PARSER));
 		return result;
 	}
-
+	
+	public static JournalDetail parseJournalDetail(JSONObject content) throws JSONException {
+	    final JournalDetail result = new JournalDetail();
+	    result.setNewValue(JsonInput.getStringOrNull(content, "new_value"));
+        result.setOldValue(JsonInput.getStringOrNull(content, "old_value"));
+        result.setName(JsonInput.getStringOrNull(content, "name"));
+        result.setProperty(JsonInput.getStringOrNull(content, "property"));
+        return result;
+	}
+	
 	public static Changeset parseChangeset(JSONObject content)
 			throws JSONException {
 		final Changeset result = new Changeset();

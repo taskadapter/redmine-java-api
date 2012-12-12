@@ -1,6 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Redmine issue journal field
@@ -13,6 +15,7 @@ public class Journal {
     private String notes;
     private User user;
     private Date createdOn;
+    private List<JournalDetail> details = new ArrayList<JournalDetail>();
 
     /**
      * This default empty constructor is required for Castor XML library.
@@ -27,6 +30,14 @@ public class Journal {
         this.createdOn = createdOn;
     }
 
+    public Journal(int id, String notes, User user, Date createdOn, List<JournalDetail> details) {
+        this.id = id;
+        this.notes = notes;
+        this.user = user;
+        this.createdOn = createdOn;
+        this.details = details;
+    }
+    
     public Date getCreatedOn() {
         return createdOn;
     }
@@ -59,6 +70,13 @@ public class Journal {
         this.user = user;
     }
 
+    public List<JournalDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<JournalDetail> details) {
+        this.details = details;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -83,6 +101,9 @@ public class Journal {
         if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) {
             return false;
         }
+        if (details != null ? !details.equals(that.details) : that.details != null) {
+            return false;
+        }
 
         return true;
     }
@@ -91,12 +112,13 @@ public class Journal {
     public int hashCode() {
         int result = id;
         result = 31 * result + (user != null ? user.hashCode() : 0);
+        result = 31 * result + (details != null ? details.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Journal{" + "id=" + id + " notes=" + notes + " user=" + user + " createdOn=" + createdOn + '}';
+        return "Journal{" + "id=" + id + " notes=" + notes + " user=" + user + " createdOn=" + createdOn + " details=" + details + '}';
     }
 
 }
