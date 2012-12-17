@@ -411,6 +411,18 @@ public class RedmineManager {
 		return transport.getObjectsList(Group.class);
     }
 
+    /**
+     * Returns the group based on its id.
+     * <p><b>This operation requires "Redmine Administrators" permission.</b>
+     *o
+     * @param id the id of the group
+     * @return the group
+     * @throws RedmineException
+     */
+    public Group getGroupById(Integer id) throws RedmineException {
+        return transport.getObject(Group.class, id);
+    }
+
     public List<TimeEntry> getTimeEntries() throws RedmineException {
 		return transport.getObjectsList(TimeEntry.class);
     }
