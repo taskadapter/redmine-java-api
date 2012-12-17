@@ -815,6 +815,16 @@ public class RedmineManager {
 		return transport.getObjectsList(Role.class);
 	}
 
+    public Role getRoleById(Integer id) throws RedmineException {
+        List<Role> roles = transport.getObjectsList(Role.class);
+        for (Role role : roles) {
+            if (id.equals(role.getId())) {
+                return role;
+            }
+        }
+        throw new RedmineException("There is no such role with ID " + id);
+    }
+
 	public List<Membership> getMemberships(String project)
 			throws RedmineException {
 		return transport.getChildEntries(Project.class, project,
