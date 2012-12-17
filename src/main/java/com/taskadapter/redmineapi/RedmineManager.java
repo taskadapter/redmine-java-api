@@ -411,6 +411,18 @@ public class RedmineManager {
 		return transport.getObjectsList(Group.class);
     }
 
+    /**
+     * Returns the group based on its id.
+     * <p><b>This operation requires "Redmine Administrators" permission.</b>
+     *o
+     * @param id the id of the group
+     * @return the group
+     * @throws RedmineException
+     */
+    public Group getGroupById(Integer id) throws RedmineException {
+        return transport.getObject(Group.class, id);
+    }
+
     public List<TimeEntry> getTimeEntries() throws RedmineException {
 		return transport.getObjectsList(TimeEntry.class);
     }
@@ -802,6 +814,16 @@ public class RedmineManager {
 	public List<Role> getRoles() throws RedmineException {
 		return transport.getObjectsList(Role.class);
 	}
+
+    public Role getRoleById(Integer id) throws RedmineException {
+        List<Role> roles = transport.getObjectsList(Role.class);
+        for (Role role : roles) {
+            if (id.equals(role.getId())) {
+                return role;
+            }
+        }
+        throw new RedmineException("There is no such role with ID " + id);
+    }
 
 	public List<Membership> getMemberships(String project)
 			throws RedmineException {
