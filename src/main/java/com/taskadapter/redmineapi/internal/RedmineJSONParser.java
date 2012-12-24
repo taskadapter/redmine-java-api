@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.taskadapter.redmineapi.bean.Detail;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,6 +79,13 @@ public class RedmineJSONParser {
 			return parseUser(input);
 		}
 	};
+
+    public static final JsonObjectParser<Detail> DETAILS_PARSER = new JsonObjectParser<Detail>() {
+        @Override
+        public Detail parse(JSONObject input) throws JSONException {
+            return parseDetail(input);
+        }
+    };
 	
 	public static final JsonObjectParser<Group> GROUP_PARSER = new JsonObjectParser<Group>() {
 		@Override
@@ -473,6 +481,7 @@ public class RedmineJSONParser {
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+        result.setDetails(JsonInput.getListNotNull(content, "details", DETAILS_PARSER));
 		return result;
 	}
 
@@ -510,8 +519,16 @@ public class RedmineJSONParser {
 
 		return result;
 	}
-	
-	public static Group parseGroup(JSONObject content) throws JSONException {
+
+    public static Detail parseDetail(JSONObject content) throws JSONException {
+        final Detail d = new Detail();
+        d.setName(JsonInput.getStringOrNull(content, "name"));
+        d.setNew_value(JsonInput.getStringOrNull(content, "new_value"));
+        d.setOld_value(JsonInput.getStringOrNull(content, "old_value"));
+        return d;
+    }
+
+    public static Group parseGroup(JSONObject content) throws JSONException {
 		final Group result = new Group();
 		result.setId(JsonInput.getIntOrNull(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));

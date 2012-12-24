@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Redmine issue journal field
@@ -14,17 +15,20 @@ public class Journal {
     private User user;
     private Date createdOn;
 
+    private List<Detail> details;
+
     /**
      * This default empty constructor is required for Castor XML library.
      */
     public Journal() {
     }
 
-    public Journal(int id, String notes, User user, Date createdOn) {
+    public Journal(int id, String notes, User user, Date createdOn, List<Detail> details) {
         this.id = id;
         this.notes = notes;
         this.user = user;
         this.createdOn = createdOn;
+        this.details = details;
     }
 
     public Date getCreatedOn() {
@@ -59,6 +63,13 @@ public class Journal {
         this.user = user;
     }
 
+    public List<Detail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<Detail> details) {
+        this.details = details;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -90,7 +101,8 @@ public class Journal {
 
     @Override
     public String toString() {
-        return "Journal{" + "id=" + id + " notes=" + notes + " user=" + user + " createdOn=" + createdOn + '}';
+        return "Journal{" + "id=" + id + " notes=" + notes + " user=" + user + " createdOn=" + createdOn
+                + " details=" + details + '}';
     }
 
 }
