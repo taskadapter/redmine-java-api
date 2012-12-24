@@ -77,12 +77,6 @@ public class Journal {
         if (user != null ? !user.equals(that.user) : that.user != null) {
             return false;
         }
-        if (notes != null ? !notes.equals(that.notes) : that.notes != null) {
-            return false;
-        }
-        if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) {
-            return false;
-        }
 
         return true;
     }
