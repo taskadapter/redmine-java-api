@@ -39,6 +39,7 @@ import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Membership;
@@ -47,6 +48,7 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -802,7 +804,15 @@ public class RedmineManager {
 	public List<Role> getRoles() throws RedmineException {
 		return transport.getObjectsList(Role.class);
 	}
+	
+	public List<IssuePriority> getIssuePriorities() throws RedmineException {
+	    return transport.getObjectsList(IssuePriority.class);
+	}
 
+    public List<TimeEntryActivity> getTimeEntryActivities() throws RedmineException {
+        return transport.getObjectsList(TimeEntryActivity.class);
+    }
+    
 	public List<Membership> getMemberships(String project)
 			throws RedmineException {
 		return transport.getChildEntries(Project.class, project,

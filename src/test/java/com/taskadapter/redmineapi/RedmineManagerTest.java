@@ -2062,6 +2062,16 @@ public class RedmineManagerTest {
         assertEquals("New comment", updatedEntry.getComment());
     }
     
+    @Test
+    public void testIssuePriorities() throws RedmineException {
+        assertTrue(mgr.getIssuePriorities().size() > 0);
+    }
+    
+    @Test
+    public void testTimeEntryActivities() throws RedmineException {
+        assertTrue(mgr.getTimeEntryActivities().size() > 0);
+    }
+    
     private RedmineManager getNonAdminManager() {
         RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
         nonAdminManager.setLogin(nonAdminUserLogin);

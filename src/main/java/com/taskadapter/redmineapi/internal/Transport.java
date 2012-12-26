@@ -35,6 +35,7 @@ import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineOptions;
+import com.taskadapter.redmineapi.RedmineProcessingException;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
@@ -43,10 +44,12 @@ import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -136,6 +139,14 @@ public final class Transport {
 				config("membership", "memberships",
 						RedmineJSONBuilder.MEMBERSHIP_WRITER,
 						RedmineJSONParser.MEMBERSHIP_PARSER));
+        OBJECT_CONFIGS.put(
+                IssuePriority.class,
+                config("issue_priority", "issue_priorities", null,
+                        RedmineJSONParser.ISSUE_PRIORITY_PARSER));
+        OBJECT_CONFIGS.put(
+                TimeEntryActivity.class,
+                config("time_entry_activity", "time_entry_activities", null,
+                        RedmineJSONParser.ISSUE_PRIORITY_PARSER));
 	}
 
 	private final URIConfigurator configurator;

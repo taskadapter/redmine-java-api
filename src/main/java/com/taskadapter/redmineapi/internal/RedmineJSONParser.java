@@ -23,10 +23,12 @@ import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -195,6 +197,20 @@ public class RedmineJSONParser {
 		}
 	};
 
+    public static final JsonObjectParser<IssuePriority> ISSUE_PRIORITY_PARSER = new JsonObjectParser<IssuePriority>() {
+        @Override
+        public IssuePriority parse(JSONObject input) throws JSONException {
+            return parseIssuePriority(input);
+        }
+    };
+    
+    public static final JsonObjectParser<TimeEntryActivity> TIME_ENTRY_ACTIVITY_PARSER = new JsonObjectParser<TimeEntryActivity>() {
+        @Override
+        public TimeEntryActivity parse(JSONObject input) throws JSONException {
+            return parseTimeEntryActivity(input);
+        }
+    };
+    
 	/**
 	 * Parses a tracker.
 	 * 
@@ -555,7 +571,25 @@ public class RedmineJSONParser {
 		result.setRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
 		return result;
 	}
+	
+    public static IssuePriority parseIssuePriority(JSONObject content)
+            throws JSONException {
+        final IssuePriority result = new IssuePriority();
+        result.setId(JsonInput.getInt(content, "id"));
+        result.setName(JsonInput.getStringNotNull(content, "name"));
+        result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
+        return result;
+    }
 
+    public static TimeEntryActivity parseTimeEntryActivity(JSONObject content)
+            throws JSONException {
+        final TimeEntryActivity result = new TimeEntryActivity();
+        result.setId(JsonInput.getInt(content, "id"));
+        result.setName(JsonInput.getStringNotNull(content, "name"));
+        result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
+        return result;
+    }
+    
 	/**
 	 * @param responseBody
 	 */

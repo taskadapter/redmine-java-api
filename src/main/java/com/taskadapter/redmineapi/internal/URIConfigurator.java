@@ -39,6 +39,8 @@ public class URIConfigurator {
 		urls.put(IssueRelation.class, "relations");
 		urls.put(Role.class, "roles");
 		urls.put(Membership.class, "memberships");
+		urls.put(IssuePriority.class, "enumerations/issue_priorities");
+        urls.put(TimeEntryActivity.class, "enumerations/time_entry_activities");
 	}
 
 	private final URL baseURL;
