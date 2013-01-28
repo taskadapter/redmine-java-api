@@ -36,11 +36,9 @@ public class RedmineAuthenticator<K> implements Communicator<K> {
 			return;
 		}
 		try {
-			authKey = "Basic: "
-					+ "\""
+			authKey = "Basic "
 					+ Base64.encodeBase64String(
-							(login + ':' + password).getBytes(charset)).trim()
-					+ "\"";
+							(login + ':' + password).getBytes(charset)).trim();
 		} catch (UnsupportedEncodingException e) {
 			throw new RedmineInternalError(e);
 		}
