@@ -53,6 +53,7 @@ import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.comm.BaseCommunicator;
 import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.Communicator;
@@ -147,6 +148,11 @@ public final class Transport {
                 TimeEntryActivity.class,
                 config("time_entry_activity", "time_entry_activities", null,
                         RedmineJSONParser.ISSUE_PRIORITY_PARSER));
+
+            OBJECT_CONFIGS.put(
+                    Watcher.class,
+                    config("watcher", "watchers", null,
+                            RedmineJSONParser.WATCHER_PARSER));
 	}
 
 	private final URIConfigurator configurator;
@@ -247,6 +253,28 @@ public final class Transport {
 		setEntity(http, body);
 
 		getCommunicator().sendRequest(http);
+	}
+
+	/**
+	 * Performs an "delete child Id" request.
+	 * 
+	 * @param parentClass
+	 *            parent object id.
+	 * @param object
+	 *            object to use.
+	 * @param value
+	 *            child object id.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public <T> void deleteChildId(Class<?> parentClass, String parentId, T object, 
+                Integer value) throws RedmineException {
+            final EntityConfig<T> config = getConfig(object.getClass());
+            URI uri = getURIConfigurator().getChildIdURI(parentClass, 
+                    parentId, object.getClass(), value);
+            HttpDelete httpDelete = new HttpDelete(uri);
+            String response = getCommunicator().sendRequest(httpDelete);
+            logger.debug(response);
 	}
 
 	/**
@@ -467,6 +495,24 @@ public final class Transport {
 		final JSONWriter jsonWriter = new JSONWriter(writer);
 		try {
 			jsonWriter.object().key("user_id").value(userId).endObject();
+		} catch (JSONException e) {
+			throw new RedmineInternalError("Unexpected exception", e);
+		}
+		String body = writer.toString();
+		setEntity(httpPost, body);
+		String response = getCommunicator().sendRequest(httpPost);
+		logger.debug(response);
+		return;
+	}
+
+	public void addWatcherToIssue(int watcherId, int issueId) throws RedmineException {
+		logger.debug("adding watcher " + watcherId + " to issue " + issueId + "...");
+		URI uri = getURIConfigurator().getChildObjectsURI(Issue.class, Integer.toString(issueId), Watcher.class);
+		HttpPost httpPost = new HttpPost(uri);
+		final StringWriter writer = new StringWriter();
+		final JSONWriter jsonWriter = new JSONWriter(writer);
+		try {
+			jsonWriter.object().key("user_id").value(watcherId).endObject();
 		} catch (JSONException e) {
 			throw new RedmineInternalError("Unexpected exception", e);
 		}

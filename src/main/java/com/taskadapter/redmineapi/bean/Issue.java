@@ -42,6 +42,7 @@ public class Issue implements Identifiable {
     private List<IssueRelation> relations = new ArrayList<IssueRelation>();
     private List<Attachment> attachments = new ArrayList<Attachment>();
     private List<Changeset> changesets = new ArrayList<Changeset>();
+    private List<Watcher> watchers = new ArrayList<Watcher>();
 
     public Project getProject() {
         return project;
@@ -242,6 +243,14 @@ public class Issue implements Identifiable {
 
     public void setChangesets(List<Changeset> changesets) {
         this.changesets = changesets;
+    }
+
+    public List<Watcher> getWatchers() {
+        return watchers;
+    }
+
+    public void setWatchers(List<Watcher> watchers) {
+        this.watchers = watchers;
     }
 
     @Override
@@ -477,6 +486,13 @@ public class Issue implements Identifiable {
                 return false;
             }
         } else if (!changesets.equals(other.changesets)) {
+            return false;
+        }
+        if (watchers == null) {
+            if (other.watchers != null) {
+                return false;
+            }
+        } else if (!watchers.equals(other.watchers)) {
             return false;
         }
         return true;

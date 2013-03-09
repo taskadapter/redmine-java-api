@@ -32,6 +32,7 @@ import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 
@@ -194,6 +195,13 @@ public class RedmineJSONParser {
 		@Override
 		public Changeset parse(JSONObject input) throws JSONException {
 			return parseChangeset(input);
+		}
+	};
+
+	public static final JsonObjectParser<Watcher> WATCHER_PARSER = new JsonObjectParser<Watcher>() {
+		@Override
+		public Watcher parse(JSONObject input) throws JSONException {
+			return parseWatcher(input);
 		}
 	};
 
@@ -415,6 +423,8 @@ public class RedmineJSONParser {
 				CATEGORY_PARSER));
 		result.setChangesets(JsonInput.getListOrEmpty(content, "changesets",
 				CHANGESET_PARSER));
+		result.setWatchers(JsonInput.getListOrEmpty(content, "watchers",
+				WATCHER_PARSER));
 		return result;
 	}
 
@@ -589,6 +599,13 @@ public class RedmineJSONParser {
         result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
         return result;
     }
+
+	public static Watcher parseWatcher(JSONObject content) throws JSONException {
+		final Watcher result = new Watcher();
+		result.setId(JsonInput.getIntOrNull(content, "id"));
+		result.setName(JsonInput.getStringOrNull(content, "name"));
+		return result;
+	}
     
 	/**
 	 * @param responseBody
