@@ -41,6 +41,7 @@ public class URIConfigurator {
 		urls.put(Membership.class, "memberships");
 		urls.put(IssuePriority.class, "enumerations/issue_priorities");
         urls.put(TimeEntryActivity.class, "enumerations/time_entry_activities");
+		urls.put(Watcher.class, "watchers");
 	}
 
 	private final URL baseURL;
@@ -101,6 +102,14 @@ public class URIConfigurator {
 		final String detal = getConfig(child);
 		return createURI(base + "/" + parentId + "/" + detal + URL_POSTFIX,
 				args);
+	}
+
+	public URI getChildIdURI(Class<?> parent, String parentId,
+                Class<?> child, int value) {
+            final String base = getConfig(parent);
+            final String detal = getConfig(child);
+            return createURI(base + "/" + parentId + "/" + detal +
+                    "/" + value + URL_POSTFIX );
 	}
 
 	public URI getObjectsURI(Class<?> child, NameValuePair... args) {

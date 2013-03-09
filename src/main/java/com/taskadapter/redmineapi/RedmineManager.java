@@ -52,6 +52,7 @@ import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
 import com.taskadapter.redmineapi.internal.io.MarkedIOException;
@@ -69,7 +70,7 @@ public class RedmineManager {
         // these values MUST BE exactly as they are written here,
         // can't use capital letters or rename.
         // they are provided in "?include=..." HTTP request
-        journals, relations, attachments, changesets
+        journals, relations, attachments, changesets, watchers
     }
 
 	private final Transport transport;
@@ -871,5 +872,11 @@ public class RedmineManager {
 				.getIdentifier();
 	}
 
+    public void addWatcherToIssue(Watcher watcher, Issue issue) throws RedmineException {
+        transport.addWatcherToIssue(watcher.getId(), issue.getId());
+    }
 
+    public void deleteWatcherToIssue(Watcher watcher, Issue issue) throws RedmineException {
+        transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId() );
+    }
 }

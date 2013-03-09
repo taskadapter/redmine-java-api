@@ -39,6 +39,7 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2078,4 +2079,72 @@ public class RedmineManagerTest {
         nonAdminManager.setPassword(nonAdminPassword);
         return nonAdminManager;
     }
+
+    @Test
+    public void testAddIssueWatcher() throws RedmineException {
+        final Issue issue = createIssues(1).get(0);
+        final Issue retrievedIssue = mgr.getIssueById(issue.getId());
+        Assert.assertEquals(issue, retrievedIssue);
+
+        final User newUser = mgr.createUser(generateRandomUser());
+        try
+        {
+            Watcher watcher = new Watcher(newUser.getId(), null);
+            mgr.addWatcherToIssue( watcher, issue);
+        }
+        finally
+        {
+            mgr.deleteUser(newUser.getId());
+        }
+
+        mgr.getIssueById(issue.getId());
+    }
+
+    @Test
+    public void testDeleteIssueWatcher() throws RedmineException {
+        final Issue issue = createIssues(1).get(0);
+        final Issue retrievedIssue = mgr.getIssueById(issue.getId());
+        Assert.assertEquals(issue, retrievedIssue);
+
+        final User newUser = mgr.createUser(generateRandomUser());
+        try
+        {
+            Watcher watcher = new Watcher(newUser.getId(), null);
+            mgr.addWatcherToIssue(watcher, issue);
+            mgr.deleteWatcherToIssue(watcher, issue);
+        }
+        finally
+        {
+            mgr.deleteUser(newUser.getId());
+        }
+
+        mgr.deleteIssue(issue.getId());
+    }
+
+    @Test
+    public void testGetIssueWatcher() throws RedmineException {
+        final Issue issue = createIssues(1).get(0);
+        final Issue retrievedIssue = mgr.getIssueById(issue.getId());
+        Assert.assertEquals(issue, retrievedIssue);
+
+        final User newUser = mgr.createUser(generateRandomUser());
+        try
+        {
+            Watcher watcher = new Watcher(newUser.getId(), null);
+            mgr.addWatcherToIssue( watcher, issue);
+            final Issue includeWatcherIssue = mgr.getIssueById( issue.getId(), INCLUDE.watchers );
+            if ( 0 < includeWatcherIssue.getWatchers().size() )
+            {
+                Assert.assertEquals( newUser.getId(),
+                        includeWatcherIssue.getWatchers().get(0).getId() );
+            }
+        }
+        finally
+        {
+            mgr.deleteUser(newUser.getId());
+        }
+
+        mgr.getIssueById(issue.getId());
+    }
+
 }
