@@ -2113,7 +2113,7 @@ public class RedmineManagerTest {
         {
             Watcher watcher = new Watcher(newUser.getId(), null);
             mgr.addWatcherToIssue(watcher, issue);
-            mgr.deleteWatcherToIssue(watcher, issue);
+            mgr.deleteWatcherFromIssue(watcher, issue);
         }
         finally
         {

@@ -876,7 +876,7 @@ public class RedmineManager {
         transport.addWatcherToIssue(watcher.getId(), issue.getId());
     }
 
-    public void deleteWatcherToIssue(Watcher watcher, Issue issue) throws RedmineException {
+    public void deleteWatcherFromIssue(Watcher watcher, Issue issue) throws RedmineException {
         transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId() );
     }
 }
