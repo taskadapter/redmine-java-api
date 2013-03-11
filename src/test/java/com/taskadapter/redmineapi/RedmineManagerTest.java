@@ -2080,6 +2080,7 @@ public class RedmineManagerTest {
         return nonAdminManager;
     }
 
+    @Ignore("Not supported yet on our test platform. Requires redmine 2.3")
     @Test
     public void testAddIssueWatcher() throws RedmineException {
         final Issue issue = createIssues(1).get(0);
@@ -2100,6 +2101,7 @@ public class RedmineManagerTest {
         mgr.getIssueById(issue.getId());
     }
 
+    @Ignore("Not supported yet on our test platform. Requires redmine 2.3")
     @Test
     public void testDeleteIssueWatcher() throws RedmineException {
         final Issue issue = createIssues(1).get(0);
@@ -2121,6 +2123,7 @@ public class RedmineManagerTest {
         mgr.deleteIssue(issue.getId());
     }
 
+    @Ignore("Not supported yet on our test platform. Requires redmine 2.3")
     @Test
     public void testGetIssueWatcher() throws RedmineException {
         final Issue issue = createIssues(1).get(0);
