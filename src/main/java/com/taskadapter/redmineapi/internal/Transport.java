@@ -35,16 +35,15 @@ import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineOptions;
-import com.taskadapter.redmineapi.RedmineProcessingException;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.SavedQuery;
@@ -147,12 +146,12 @@ public final class Transport {
         OBJECT_CONFIGS.put(
                 TimeEntryActivity.class,
                 config("time_entry_activity", "time_entry_activities", null,
-                        RedmineJSONParser.ISSUE_PRIORITY_PARSER));
+                        RedmineJSONParser.TIME_ENTRY_ACTIVITY_PARSER));
 
-            OBJECT_CONFIGS.put(
-                    Watcher.class,
-                    config("watcher", "watchers", null,
-                            RedmineJSONParser.WATCHER_PARSER));
+        OBJECT_CONFIGS.put(
+                Watcher.class,
+                config("watcher", "watchers", null,
+                        RedmineJSONParser.WATCHER_PARSER));
 	}
 
 	private final URIConfigurator configurator;
