@@ -22,6 +22,7 @@ import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
@@ -43,7 +44,7 @@ public class RedmineJSONParserTest {
 		final String projectString = "{\"project\":{\"created_on\":\"2012/05/11 06:53:21 -0700\",\"updated_on\":\"2012/05/11 06:53:20 -0700\",\"homepage\":\"\",\"trackers\":[{\"name\":\"Bug\",\"id\":1},{\"name\":\"Feature\",\"id\":2},{\"name\":\"Support\",\"id\":3}],\"identifier\":\"test1336744548920\",\"name\":\"test project\",\"id\":6143}}";
 		final Project project = RedmineJSONParser.PROJECT_PARSER
 				.parse(RedmineJSONParser.getResponseSingleObject(projectString,
-                "project"));
+						"project"));
 
 		final Project template = new Project();
 		template.setId(6143);
@@ -90,8 +91,7 @@ public class RedmineJSONParserTest {
 
 	}
 
-	private List<Issue> loadRedmine11Issues() throws IOException,
- JSONException {
+	private List<Issue> loadRedmine11Issues() throws IOException, JSONException {
 		String json = MyIOUtils.getResourceAsString(REDMINE_ISSUES);
 		return JsonInput.getListOrEmpty(RedmineJSONParser.getResponse(json),
 				"issues", RedmineJSONParser.ISSUE_PARSER);
@@ -113,8 +113,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testParseProjectRedmine() throws IOException,
- JSONException {
+	public void testParseProjectRedmine() throws IOException, JSONException {
 		String json = MyIOUtils.getResourceAsString("redmine_project.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
 				.getResponseSingleObject(json, "project"));
@@ -137,8 +136,7 @@ public class RedmineJSONParserTest {
 	}
 
 	@Test
-	public void testParseProjectNoTracker() throws IOException,
- JSONException {
+	public void testParseProjectNoTracker() throws IOException, JSONException {
 		String json = MyIOUtils
 				.getResourceAsString("redmine_project_no_trackers.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
@@ -380,6 +378,25 @@ public class RedmineJSONParserTest {
 
 			News anyItem = news.get(0);
 			assertEquals("rest last", anyItem.getUser().getFullName());
+		} catch (Exception e) {
+			Assert.fail("Error:" + e);
+		}
+	}
+
+	@Test
+	public void parsesTimeEntryActivities() {
+		try {
+			String str = MyIOUtils
+					.getResourceAsString("redmine_time_entry_activities.json");
+			List<TimeEntryActivity> activities = JsonInput.getListOrEmpty(
+					RedmineJSONParser.getResponse(str),
+					"time_entry_activities",
+					RedmineJSONParser.TIME_ENTRY_ACTIVITY_PARSER);
+			assertEquals(2, activities.size());
+
+			assertEquals(8, (long) activities.get(0).getId());
+			assertEquals("Design", activities.get(0).getName());
+
 		} catch (Exception e) {
 			Assert.fail("Error:" + e);
 		}

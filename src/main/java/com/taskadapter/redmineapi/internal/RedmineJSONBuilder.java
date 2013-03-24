@@ -336,6 +336,7 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "filename", attachment.getFileName());
 		JsonOutput.addIfNotNull(writer, "content_type",
 				attachment.getContentType());
+		JsonOutput.addIfNotNull(writer, "description", attachment.getDescription());
 	}
 
 	public static void writeMembership(JSONWriter writer, Membership membership)
