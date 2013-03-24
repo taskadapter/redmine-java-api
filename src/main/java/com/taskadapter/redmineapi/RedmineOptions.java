@@ -36,7 +36,7 @@ public final class RedmineOptions {
 		return new RedmineOptions(maxOpen, 30, 30);
 	}
 
-	public int getMaxOpenConnecitons() {
+	public int getMaxOpenConnections() {
 		return maxOpen;
 	}
 

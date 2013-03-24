@@ -28,7 +28,7 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 		ClientConnectionManager connManager;
 		try {
 			connManager = HttpUtil.createConnectionManager(options
-					.getMaxOpenConnecitons());
+					.getMaxOpenConnections());
 			clientImpl = HttpUtil.getNewHttpClient(connManager);
 		} catch (Exception e) {
 			connManager = null;
