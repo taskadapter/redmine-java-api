@@ -269,8 +269,7 @@ public final class Transport {
 	 */
 	public <T> void deleteChildId(Class<?> parentClass, String parentId, T object, 
                 Integer value) throws RedmineException {
-            final EntityConfig<T> config = getConfig(object.getClass());
-            URI uri = getURIConfigurator().getChildIdURI(parentClass, 
+            URI uri = getURIConfigurator().getChildIdURI(parentClass,
                     parentId, object.getClass(), value);
             HttpDelete httpDelete = new HttpDelete(uri);
             String response = getCommunicator().sendRequest(httpDelete);

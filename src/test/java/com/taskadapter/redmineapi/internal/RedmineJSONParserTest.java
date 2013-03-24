@@ -46,7 +46,7 @@ public class RedmineJSONParserTest {
                 "project"));
 
 		final Project template = new Project();
-		template.setId(Integer.valueOf(6143));
+		template.setId(6143);
 		template.setIdentifier("test1336744548920");
 		template.setName("test project");
 		template.setHomepage("");
