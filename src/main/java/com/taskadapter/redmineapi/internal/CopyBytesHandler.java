@@ -1,19 +1,19 @@
-package com.taskadapter.redmineapi;
+package com.taskadapter.redmineapi.internal;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.taskadapter.redmineapi.RedmineCommunicationException;
+import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.ContentHandler;
 
 /**
  * "Copy bytes" handler.
  * 
- * @author maxkar
- * 
  */
-final class CopyBytesHandler implements ContentHandler<BasicHttpResponse, Void> {
+public final class CopyBytesHandler implements ContentHandler<BasicHttpResponse, Void> {
 
 	private final OutputStream outStream;
 
