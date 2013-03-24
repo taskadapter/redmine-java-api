@@ -65,7 +65,7 @@ public class TimeEntryActivity {
 
     @Override
     public String toString() {
-        return "Priority [id=" + id + ", name=" + name + ", isDefault="
+        return "TimeEntryActivity [id=" + id + ", name=" + name + ", isDefault="
                 + isDefault + "]";
     }
 

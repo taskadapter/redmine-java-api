@@ -1,0 +1,10 @@
+{
+  "time_entry_activities": [{
+    "id": 8,
+    "name": "Design"
+  }, {
+    "id": 9,
+    "name": "Development",
+    "is_default": true
+  }]
+}
