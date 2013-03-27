@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import com.taskadapter.redmineapi.internal.CopyBytesHandler;
 import com.taskadapter.redmineapi.internal.Joiner;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
