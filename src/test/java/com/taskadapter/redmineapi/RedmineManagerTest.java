@@ -731,7 +731,7 @@ public class RedmineManagerTest {
         long randomNumber = new Date().getTime();
         user.setLogin("login" + randomNumber);
         user.setMail("somemail" + randomNumber + "@somedomain.com");
-        user.setPassword("zzzz");
+        user.setPassword("zzzz1234");
 
         return user;
     }
@@ -745,7 +745,7 @@ public class RedmineManagerTest {
         long randomNumber = new Date().getTime();
         userToCreate.setLogin("login33" + randomNumber);
         userToCreate.setMail("email" + randomNumber + "@somedomain.com");
-        userToCreate.setPassword("1234");
+        userToCreate.setPassword("1234asdf");
         try {
             User createdUser = mgr.createUser(userToCreate);
             Integer userId = createdUser.getId();
@@ -2080,7 +2080,9 @@ public class RedmineManagerTest {
         return nonAdminManager;
     }
 
-    @Ignore("Not supported yet on our test platform. Requires redmine 2.3")
+    /**
+     * Requires Redmine 2.3
+     */
     @Test
     public void testAddIssueWatcher() throws RedmineException {
         final Issue issue = createIssues(1).get(0);
@@ -2101,7 +2103,9 @@ public class RedmineManagerTest {
         mgr.getIssueById(issue.getId());
     }
 
-    @Ignore("Not supported yet on our test platform. Requires redmine 2.3")
+    /**
+     * Requires Redmine 2.3
+     */
     @Test
     public void testDeleteIssueWatcher() throws RedmineException {
         final Issue issue = createIssues(1).get(0);
@@ -2123,7 +2127,9 @@ public class RedmineManagerTest {
         mgr.deleteIssue(issue.getId());
     }
 
-    @Ignore("Not supported yet on our test platform. Requires redmine 2.3")
+    /**
+     * Requires Redmine 2.3
+     */
     @Test
     public void testGetIssueWatcher() throws RedmineException {
         final Issue issue = createIssues(1).get(0);
