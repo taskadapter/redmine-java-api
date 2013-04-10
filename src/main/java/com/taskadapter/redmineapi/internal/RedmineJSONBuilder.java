@@ -151,7 +151,7 @@ public class RedmineJSONBuilder {
 				timeEntry.getActivityId());
 		JsonOutput.addIfNotNull(writer, "hours", timeEntry.getHours());
 		JsonOutput.addIfNotNull(writer, "comments", timeEntry.getComment());
-		addIfNotNullShort(writer, "spent_on", timeEntry.getSpentOn());
+		addIfNotNullShort2(writer, "spent_on", timeEntry.getSpentOn());
 		addIfNotNullFull(writer, "created_on", timeEntry.getSpentOn());
 		addIfNotNullFull(writer, "updated_on", timeEntry.getSpentOn());
 	}
@@ -295,8 +295,8 @@ public class RedmineJSONBuilder {
 		if (issue.getAuthor() != null)
 			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
 					.getId());
-		addFull(writer, "start_date", issue.getStartDate());
-		addIfNotNullFull(writer, "due_date", issue.getDueDate());
+		addShort2(writer, "start_date", issue.getStartDate());
+		addIfNotNullShort2(writer, "due_date", issue.getDueDate());
 		if (issue.getTracker() != null)
 			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker()
 					.getId());
@@ -426,4 +426,41 @@ public class RedmineJSONBuilder {
 				.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
 	}
+	
+	/**
+     * Adds a value to a writer if value is not <code>null</code>.
+     * 
+     * @param writer
+     *            writer to add object to.
+     * @param field
+     *            field name to set.
+     * @param value
+     *            field value.
+     * @throws JSONException
+     *             if io error occurs.
+     */
+    public static void addIfNotNullShort2(JSONWriter writer, String field,
+            Date value) throws JSONException {
+        final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT_V2
+                .get();
+        JsonOutput.addIfNotNull(writer, field, value, format);
+    }
+
+    /**
+     * Adds a value to a writer.
+     * 
+     * @param writer
+     *            writer to add object to.
+     * @param field
+     *            field name to set.
+     * @param value
+     *            field value.
+     * @throws JSONException
+     *             if io error occurs.
+     */
+    public static void addShort2(JSONWriter writer, String field, Date value)
+            throws JSONException {
+        final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT_V2.get();
+        JsonOutput.add(writer, field, value, format);
+    }
 }
