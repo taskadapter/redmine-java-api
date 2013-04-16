@@ -415,6 +415,40 @@ public class RedmineManager {
 		return transport.getObjectsList(Group.class);
     }
 
+    /**
+     * Returns the group based on its id.
+     * <p>
+     * <b>This operation requires "Redmine Administrators" permission.</b>
+     * 
+     * @param id
+     *            the id of the group
+     * @return the group
+     * @throws RedmineException
+     */
+    public Group getGroupById(int id) throws RedmineException {
+        return transport.getObject(Group.class, id);
+    }
+    
+    /**
+     * Creates a new group.
+     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     * @return created group.
+     * @throws RedmineException
+     */
+    public Group createGroup(Group base) throws RedmineException {
+        return transport.addObject(base);
+    }
+
+    /**
+     * Deletes a group.
+     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     * @return created group.
+     * @throws RedmineException
+     */
+    public void deleteGroup(Group base) throws RedmineException {
+        transport.deleteObject(Group.class, base.getId().toString());
+    }
+    
     public List<TimeEntry> getTimeEntries() throws RedmineException {
 		return transport.getObjectsList(TimeEntry.class);
     }

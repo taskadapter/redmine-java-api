@@ -273,7 +273,7 @@ public class RedmineJSONBuilder {
 	public static void writeGroup(Group group, final JSONWriter writer)
 			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", group.getId());
-		JsonOutput.addIfNotNull(writer, "login", group.getName());
+		JsonOutput.addIfNotNull(writer, "name", group.getName());
 	}
 
 	public static void writeIssue(Issue issue, final JSONWriter writer)
