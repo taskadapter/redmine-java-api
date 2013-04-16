@@ -2134,6 +2134,28 @@ public class RedmineManagerTest {
             // OK!
         }
     }
+    
+    @Test
+    public void testGetRoleById() throws RedmineException {
+        final Collection<Role> roles = mgr.getRoles();
+        for (Role r : roles) {
+            final Role loaded = mgr.getRoleById(r.getId());
+            Assert.assertEquals(r.getName(), loaded.getName());
+            Assert.assertEquals(r.getInherited(), loaded.getInherited());
+        }
+    }
+    
+    @Test
+    public void testRolesHasPermissions() throws RedmineException {
+        final Collection<Role> roles = mgr.getRoles();
+        for (Role r : roles) {
+            final Role loaded = mgr.getRoleById(r.getId());
+            if (loaded.getPermissions() != null && !loaded.getPermissions().isEmpty())
+                return;
+            
+        }
+        Assert.fail("Failed to find a role with a permissions");
+    }
 
     /**
      * Test for issue 64 (time entry format)

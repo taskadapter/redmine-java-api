@@ -4,7 +4,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -568,6 +570,13 @@ public class RedmineJSONParser {
 		role.setName(JsonInput.getStringOrNull(content, "name"));
 		role.setInherited(content.has("inherited")
 				&& content.getBoolean("inherited"));
+		if (content.has("permissions")) {
+		    final JSONArray perms = content.getJSONArray("permissions");
+		    final Set<String> permSet = new HashSet<String>();
+		    for (int i = 0; i < perms.length(); i++)
+		        permSet.add(perms.getString(i));
+		    role.setPermissions(permSet);
+		}
 		return role;
 	}
 

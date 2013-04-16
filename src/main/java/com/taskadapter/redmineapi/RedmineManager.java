@@ -841,6 +841,10 @@ public class RedmineManager {
 		return transport.getObjectsList(Role.class);
 	}
 	
+	public Role getRoleById(int id) throws RedmineException {
+	    return transport.getObject(Role.class, id);
+	}
+	
 	public List<IssuePriority> getIssuePriorities() throws RedmineException {
 	    return transport.getObjectsList(IssuePriority.class);
 	}

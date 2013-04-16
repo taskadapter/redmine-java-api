@@ -1,5 +1,7 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.util.Set;
+
 /**
  * User role.
  * 
@@ -11,6 +13,7 @@ public class Role {
 	private Integer id;
 	private String name;
 	private Boolean inherited;
+	private Set<String> permissions;
 
 	public Integer getId() {
 		return id;
@@ -35,8 +38,16 @@ public class Role {
 	public void setInherited(Boolean inherited) {
 		this.inherited = inherited;
 	}
+	
+	public Set<String> getPermissions() {
+        return permissions;
+    }
 
-	@Override
+    public void setPermissions(Set<String> permissions) {
+        this.permissions = permissions;
+    }
+
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
