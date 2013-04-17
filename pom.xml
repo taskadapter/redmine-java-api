@@ -9,7 +9,7 @@
 
     <groupId>com.taskadapter</groupId>
     <artifactId>redmine-java-api</artifactId>
-    <version>1.20-SNAPSHOT</version>
+    <version>1.20</version>
 
     <description>Free open-source Java API for Redmine and Chiliproject bug/task management systems.
         This project was originally a part of Task Adapter application (http://www.taskadapter.com)
