@@ -459,7 +459,8 @@ public final class Transport {
 			Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
-				parentId, classs);
+				parentId, classs, new BasicNameValuePair("limit", String
+						.valueOf(objectsPerPage)));
 
 		HttpGet http = new HttpGet(uri);
 		String response = getCommunicator().sendRequest(http);
