@@ -1,10 +1,10 @@
-target
 *.iml
+.gradle
 .idea
+build
+target
 
 /.settings/**
 /.classpath
 /.project
 /.settings
-/META-INF
-/build.properties
