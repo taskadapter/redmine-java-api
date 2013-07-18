@@ -18,7 +18,7 @@ public class User implements Identifiable {
     private String mail;
     private Date createdOn;
     private Date lastLoginOn;
-    // TODO add tests after http://code.google.com/p/redmine-java-api/issues/detail?id=100 is implemented
+    // TODO add tests
     private List<CustomField> customFields = new ArrayList<CustomField>();
 	private List<Membership> memberships = new ArrayList<Membership>();
 
