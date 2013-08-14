@@ -502,9 +502,20 @@ public class Issue implements Identifiable {
      * @return the value or NULL if the field is not found
      */
     public String getCustomField(String fieldName) {
+        if(customFields == null) return null;
         for (CustomField f : customFields) {
             if (f.getName().equals(fieldName)) {
                 return f.getValue();
+            }
+        }
+        return null;
+    }
+
+    public CustomField getCustomFieldById(int customFieldId) {
+        if(customFields == null) return null;
+        for (CustomField customField : customFields) {
+            if (customFieldId == customField.getId()) {
+                return customField;
             }
         }
         return null;

@@ -124,6 +124,11 @@ public class RedmineJSONParserTest {
 		Assert.assertEquals(expectedName, project.getName());
 		Assert.assertEquals(expectedKey, project.getIdentifier());
 
+        Assert.assertNotNull(project.getCustomFieldById(1));
+        String expectedCustomeFieldValue1 = "Should have a value";
+        Assert.assertEquals(expectedCustomeFieldValue1, project.getCustomFieldById(1).getValue());
+        Assert.assertEquals("", project.getCustomFieldById(6).getValue());
+
 		List<Tracker> trackers = project.getTrackers();
 		Assert.assertNotNull("Trackers list must not be NULL", trackers);
 		Assert.assertEquals(3, trackers.size());

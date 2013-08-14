@@ -43,6 +43,8 @@ public class Project implements Identifiable, Serializable {
      */
     private Integer parentId;
 
+    private List<CustomField> customFields;
+
     public String getHomepage() {
         return homepage;
     }
@@ -155,6 +157,24 @@ public class Project implements Identifiable, Serializable {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public List<CustomField> getCustomFields() {
+        return customFields;
+    }
+
+    public void setCustomFields(List<CustomField> customFields) {
+        this.customFields = customFields;
+    }
+
+    public CustomField getCustomFieldById(int customFieldId) {
+        if(customFields == null) return null;
+        for (CustomField customField : customFields) {
+            if (customFieldId == customField.getId()) {
+                return customField;
+            }
+        }
+        return null;
     }
 
     @Override
