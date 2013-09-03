@@ -91,7 +91,7 @@ public class CustomField {
             return false;
         if (value != null ? !value.equals(that.value) : that.value != null)
             return false;
-		if (values != null ? !values.equals(that.value) : that.values != null)
+		if (values != null ? !values.equals(that.values) : that.values != null)
 			return false;
 
         return true;
