@@ -699,9 +699,7 @@ public class RedmineJSONParser {
 	public static JSONObject getResponseSingleObject(String body, String key)
 			throws JSONException {
 		final JSONObject bodyJson = new JSONObject(body);
-		final JSONObject contentJSon = JsonInput
-				.getObjectNotNull(bodyJson, key);
-		return contentJSon;
+    return JsonInput.getObjectNotNull(bodyJson, key);
 	}
 
 	public static JSONObject getResponse(String body) throws JSONException {

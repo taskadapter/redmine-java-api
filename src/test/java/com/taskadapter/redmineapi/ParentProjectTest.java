@@ -12,11 +12,10 @@ import com.taskadapter.redmineapi.bean.Project;
 public class ParentProjectTest {
 
     private static RedmineManager mgr;
-    private static TestConfig testConfig;
 
-    @BeforeClass
+  @BeforeClass
     public static void oneTimeSetUp() {
-        testConfig = new TestConfig();
+    TestConfig testConfig = new TestConfig();
         mgr = new RedmineManager(testConfig.getURI());
         mgr.setLogin(testConfig.getLogin());
         mgr.setPassword(testConfig.getPassword());

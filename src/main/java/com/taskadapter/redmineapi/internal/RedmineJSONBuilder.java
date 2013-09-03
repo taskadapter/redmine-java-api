@@ -31,7 +31,7 @@ import org.json.JSONException;
  */
 public class RedmineJSONBuilder {
 
-	private static JsonObjectWriter<Tracker> TRACKER_WRITER = new JsonObjectWriter<Tracker>() {
+	private static final JsonObjectWriter<Tracker> TRACKER_WRITER = new JsonObjectWriter<Tracker>() {
 		@Override
 		public void write(JSONWriter writer, Tracker object)
 				throws JSONException {
@@ -39,7 +39,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<Project> PROJECT_WRITER = new JsonObjectWriter<Project>() {
+	public static final JsonObjectWriter<Project> PROJECT_WRITER = new JsonObjectWriter<Project>() {
 		@Override
 		public void write(JSONWriter writer, Project object)
 				throws JSONException {
@@ -47,28 +47,28 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<Issue> ISSUE_WRITER = new JsonObjectWriter<Issue>() {
+	public static final JsonObjectWriter<Issue> ISSUE_WRITER = new JsonObjectWriter<Issue>() {
 		@Override
 		public void write(JSONWriter writer, Issue object) throws JSONException {
 			writeIssue(object, writer);
 		}
 	};
 
-	public static JsonObjectWriter<User> USER_WRITER = new JsonObjectWriter<User>() {
+	public static final JsonObjectWriter<User> USER_WRITER = new JsonObjectWriter<User>() {
 		@Override
 		public void write(JSONWriter writer, User object) throws JSONException {
 			writeUser(object, writer);
 		}
 	};
 	
-	public static JsonObjectWriter<Group> GROUP_WRITER = new JsonObjectWriter<Group>() {
+	public static final JsonObjectWriter<Group> GROUP_WRITER = new JsonObjectWriter<Group>() {
 		@Override
 		public void write(JSONWriter writer, Group object) throws JSONException {
 			writeGroup(object, writer);
 		}
 	};
 
-	public static JsonObjectWriter<IssueRelation> RELATION_WRITER = new JsonObjectWriter<IssueRelation>() {
+	public static final JsonObjectWriter<IssueRelation> RELATION_WRITER = new JsonObjectWriter<IssueRelation>() {
 		@Override
 		public void write(JSONWriter writer, IssueRelation object)
 				throws JSONException {
@@ -76,7 +76,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<IssueCategory> CATEGORY_WRITER = new JsonObjectWriter<IssueCategory>() {
+	public static final JsonObjectWriter<IssueCategory> CATEGORY_WRITER = new JsonObjectWriter<IssueCategory>() {
 		@Override
 		public void write(JSONWriter writer, IssueCategory object)
 				throws JSONException {
@@ -84,7 +84,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<Version> VERSION_WRITER = new JsonObjectWriter<Version>() {
+	public static final JsonObjectWriter<Version> VERSION_WRITER = new JsonObjectWriter<Version>() {
 		@Override
 		public void write(JSONWriter writer, Version object)
 				throws JSONException {
@@ -92,7 +92,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<TimeEntry> TIME_ENTRY_WRITER = new JsonObjectWriter<TimeEntry>() {
+	public static final JsonObjectWriter<TimeEntry> TIME_ENTRY_WRITER = new JsonObjectWriter<TimeEntry>() {
 		@Override
 		public void write(JSONWriter writer, TimeEntry object)
 				throws JSONException {
@@ -100,7 +100,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<Attachment> UPLOAD_WRITER = new JsonObjectWriter<Attachment>() {
+	public static final JsonObjectWriter<Attachment> UPLOAD_WRITER = new JsonObjectWriter<Attachment>() {
 		@Override
 		public void write(JSONWriter writer, Attachment object)
 				throws JSONException {
@@ -108,7 +108,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	public static JsonObjectWriter<Membership> MEMBERSHIP_WRITER = new JsonObjectWriter<Membership>() {
+	public static final JsonObjectWriter<Membership> MEMBERSHIP_WRITER = new JsonObjectWriter<Membership>() {
 		@Override
 		public void write(JSONWriter writer, Membership object)
 				throws JSONException {

@@ -48,7 +48,7 @@ class HttpUtil {
 
 	static PoolingClientConnectionManager createConnectionManager(
 			int maxConnections) throws KeyStoreException,
-			NoSuchAlgorithmException, CertificateException, IOException,
+			NoSuchAlgorithmException, CertificateException,
 			KeyManagementException, UnrecoverableKeyException {
         SSLSocketFactory factory = NaiveSSLFactory.createNaiveSSLSocketFactory();
 

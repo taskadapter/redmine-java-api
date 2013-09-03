@@ -65,22 +65,18 @@ import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 
-/**
- * Redmine transport utilities.
- */
 public final class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<Class<?>, EntityConfig<?>>();
 	private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
-	private SimpleCommunicator<String> communicator;
+	private final SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final BaseCommunicator baseCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
-	private final Communicator<String> coreCommunicator;
 
-	static {
+  static {
 		OBJECT_CONFIGS.put(
 				Project.class,
 				config("project", "projects",
@@ -170,8 +166,8 @@ public final class Transport {
 				authenticator,
 				Communicators.compose(errorProcessor,
 						Communicators.transportDecoder()));
-		coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
-				Communicators.contentReader());
+    Communicator<String> coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
+            Communicators.contentReader());
 		this.communicator = Communicators.simplify(coreCommunicator,
                 Communicators.<String>identityHandler());
 	}
@@ -501,7 +497,6 @@ public final class Transport {
 		setEntity(httpPost, body);
 		String response = getCommunicator().sendRequest(httpPost);
 		logger.debug(response);
-		return;
 	}
 
 	public void addWatcherToIssue(int watcherId, int issueId) throws RedmineException {
@@ -519,7 +514,6 @@ public final class Transport {
 		setEntity(httpPost, body);
 		String response = getCommunicator().sendRequest(httpPost);
 		logger.debug(response);
-		return;
 	}
 
 	private SimpleCommunicator<String> getCommunicator()
