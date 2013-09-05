@@ -21,7 +21,7 @@ import com.taskadapter.redmineapi.internal.comm.Communicators;
 public final class RedmineErrorHandler implements
         ContentHandler<BasicHttpResponse, BasicHttpResponse> {
 
-	private static Map<String, String> ERROR_REMAP = new HashMap<String, String>();
+	private static final Map<String, String> ERROR_REMAP = new HashMap<String, String>();
 
 	static {
 		ERROR_REMAP
