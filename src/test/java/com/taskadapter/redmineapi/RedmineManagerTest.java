@@ -40,6 +40,10 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.enums.AccountStatuses;
+import com.taskadapter.redmineapi.filter.NameUserFilter;
+import com.taskadapter.redmineapi.filter.StatusUserFilter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -676,6 +680,35 @@ public class RedmineManagerTest {
     public void userCanBeLoadedByIdByNonAdmin() throws RedmineException {
         User userById = getNonAdminManager().getUserById(nonAdminUserId);
         assertEquals(nonAdminUserId, userById.getId());
+    }
+    
+    @Test
+    public void testGetUserFilterByName() throws RedmineException {
+    	User user = mgr.createUser(generateRandomUser());
+    	
+    	try {
+	    	List<User> foundUsers = mgr.getUsers(new NameUserFilter(user.getLogin()));
+	    	assertEquals(1, foundUsers.size());
+	    	assertEquals(foundUsers.get(0).getId(), user.getId());
+    	}
+    	finally {
+    		mgr.deleteUser(user.getId());
+    	}
+    }
+    
+    @Test
+    public void testGetUserFilterByStatus() throws RedmineException {
+    	List<User> foundUsers = mgr.getUsers(new StatusUserFilter(AccountStatuses.ACTIVE));
+    	int count1 = foundUsers.size();
+    	
+    	User user = mgr.createUser(generateRandomUser());
+    	
+    	foundUsers = mgr.getUsers(new StatusUserFilter(AccountStatuses.ACTIVE));
+    	int count2 = foundUsers.size();
+    	
+    	assertEquals(1, count2 - count1);
+    	
+    	mgr.deleteUser(user.getId());
     }
 
     @Test
@@ -2132,6 +2165,29 @@ public class RedmineManagerTest {
             Assert.fail("Group should be deleted but was found");
         } catch (NotFoundException e) {
             // OK!
+        }
+    }
+    
+    @Test
+    public void testGetGroupUsers() throws RedmineException {
+        final Group template = new Group();
+        template.setName("testGetMembersByGroupId " + System.currentTimeMillis());
+        final Group group = mgr.createGroup(template);
+        final User newUser = mgr.createUser(generateRandomUser());
+        
+        try {
+        	List<User> users = mgr.getGroupUsers(group.getId());
+        	assertEquals(users.size(), 0);
+        	
+        	mgr.addUserToGroup(newUser, group);
+        	
+        	users = mgr.getGroupUsers(group.getId());
+        	assertEquals(1, users.size());
+        	assertEquals(newUser.getId(), users.get(0).getId());
+        }
+        finally {
+        	mgr.deleteGroup(group);
+        	mgr.deleteUser(newUser.getId());
         }
     }
     
