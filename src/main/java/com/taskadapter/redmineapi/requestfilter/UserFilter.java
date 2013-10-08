@@ -1,4 +1,4 @@
-package com.taskadapter.redmineapi.filter;
+package com.taskadapter.redmineapi.requestfilter;
 
 public interface UserFilter extends Filter {
 

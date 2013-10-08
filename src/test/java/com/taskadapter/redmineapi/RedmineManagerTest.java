@@ -40,9 +40,9 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.enums.AccountStatuses;
-import com.taskadapter.redmineapi.filter.NameUserFilter;
-import com.taskadapter.redmineapi.filter.StatusUserFilter;
+import com.taskadapter.redmineapi.enums.AccountStatus;
+import com.taskadapter.redmineapi.requestfilter.AccountStatusUserFilter;
+import com.taskadapter.redmineapi.requestfilter.NameUserFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -698,12 +698,12 @@ public class RedmineManagerTest {
     
     @Test
     public void testGetUserFilterByStatus() throws RedmineException {
-    	List<User> foundUsers = mgr.getUsers(new StatusUserFilter(AccountStatuses.ACTIVE));
+    	List<User> foundUsers = mgr.getUsers(new AccountStatusUserFilter(AccountStatus.ACTIVE));
     	int count1 = foundUsers.size();
     	
     	User user = mgr.createUser(generateRandomUser());
     	
-    	foundUsers = mgr.getUsers(new StatusUserFilter(AccountStatuses.ACTIVE));
+    	foundUsers = mgr.getUsers(new AccountStatusUserFilter(AccountStatus.ACTIVE));
     	int count2 = foundUsers.size();
     	
     	assertEquals(1, count2 - count1);

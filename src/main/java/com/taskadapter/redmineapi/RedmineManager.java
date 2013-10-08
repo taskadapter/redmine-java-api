@@ -30,8 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import com.taskadapter.redmineapi.filter.GroupUserFilter;
-import com.taskadapter.redmineapi.filter.UserFilter;
 import com.taskadapter.redmineapi.internal.CopyBytesHandler;
 import com.taskadapter.redmineapi.internal.Joiner;
 
@@ -61,6 +59,8 @@ import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
 import com.taskadapter.redmineapi.internal.io.MarkedIOException;
 import com.taskadapter.redmineapi.internal.io.MarkedInputStream;
+import com.taskadapter.redmineapi.requestfilter.GroupUserFilter;
+import com.taskadapter.redmineapi.requestfilter.UserFilter;
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -374,6 +374,17 @@ public class RedmineManager {
 				"include", "memberships"));
     }
     
+    /**
+     * Load filtered list (http://www.redmine.org/projects/redmine/wiki/Rest_Users#GET) of users on the server.
+     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     *
+     * @param UserFilter filter - one of GroupUserFilter, NameUserFilter, AccountStatusUserFilter
+     * @return list of User objects
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException
+     * @throws RedmineException
+     */
     public List<User> getUsers(UserFilter filter) throws RedmineException {
 		return transport.getObjectsList(User.class, filter.getNameValuePair());
     }

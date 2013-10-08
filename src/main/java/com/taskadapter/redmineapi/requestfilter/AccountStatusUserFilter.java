@@ -1,9 +1,9 @@
-package com.taskadapter.redmineapi.filter;
+package com.taskadapter.redmineapi.requestfilter;
 
-import com.taskadapter.redmineapi.enums.AccountStatuses;
+import com.taskadapter.redmineapi.enums.AccountStatus;
 
-public class StatusUserFilter extends GenericFilter<Integer> implements UserFilter {
-	public StatusUserFilter(AccountStatuses value) {
-		super("status", value.getId());
+public class AccountStatusUserFilter extends GenericFilter<AccountStatus> implements UserFilter {
+	public AccountStatusUserFilter(AccountStatus value) {
+		super("status", value);
 	}
 }
