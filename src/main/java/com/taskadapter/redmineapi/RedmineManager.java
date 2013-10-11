@@ -378,7 +378,7 @@ public class RedmineManager {
      * Load filtered list (http://www.redmine.org/projects/redmine/wiki/Rest_Users#GET) of users on the server.
      * <p><b>This operation requires "Redmine Administrator" permission.</b>
      *
-     * @param UserFilter filter - one of GroupUserFilter, NameUserFilter, AccountStatusUserFilter
+     * @param filter - one of GroupUserFilter, NameUserFilter, AccountStatusUserFilter
      * @return list of User objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.

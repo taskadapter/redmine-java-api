@@ -703,12 +703,15 @@ public class RedmineManagerTest {
     	
     	User user = mgr.createUser(generateRandomUser());
     	
-    	foundUsers = mgr.getUsers(new AccountStatusUserFilter(AccountStatus.ACTIVE));
-    	int count2 = foundUsers.size();
-    	
-    	assertEquals(1, count2 - count1);
-    	
-    	mgr.deleteUser(user.getId());
+    	try {
+	    	foundUsers = mgr.getUsers(new AccountStatusUserFilter(AccountStatus.ACTIVE));
+	    	int count2 = foundUsers.size();
+	    	
+	    	assertEquals(1, count2 - count1);
+    	}
+    	finally {
+    		mgr.deleteUser(user.getId());
+    	}
     }
 
     @Test
@@ -2061,7 +2064,7 @@ public class RedmineManagerTest {
         Assert.assertEquals(1, updatedEmptyMembership.getRoles().size());
         mgr.delete(updatedEmptyMembership);
     }
-
+    
     @Test
     public void testUserMemberships() throws RedmineException {
         final List<Role> roles = mgr.getRoles();
