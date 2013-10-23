@@ -368,7 +368,7 @@ public class RedmineManager {
      */
     public List<User> getUsers() throws RedmineException {
 		return transport.getObjectsList(User.class, new BasicNameValuePair(
-				"include", "memberships"));
+				"include", "memberships,groups"));
     }
 
     /**
@@ -376,7 +376,7 @@ public class RedmineManager {
      */
     public User getUserById(Integer userId) throws RedmineException {
 		return transport.getObject(User.class, userId, new BasicNameValuePair(
-				"include", "memberships"));
+				"include", "memberships,groups"));
     }
 
     /**
@@ -429,6 +429,20 @@ public class RedmineManager {
         return transport.getObject(Group.class, id);
     }
     
+    /**
+     * Returns the group based on its name.
+     * <p>
+     * <b>This operation requires "Redmine Administrators" permission.</b>
+     *
+     * @param name
+     *            the name of the group
+     * @return the group
+     * @throws RedmineException
+     */
+    public Group getGroupByName(String name) throws RedmineException {
+        return transport.getObject(Group.class, name);
+    }
+
     /**
      * Creates a new group.
      * <p><b>This operation requires "Redmine Administrator" permission.</b>

@@ -2096,6 +2096,8 @@ public class RedmineManagerTest {
             try {
                 mgr.addUserToGroup(newUser, group);
                 mgr.addUserToGroup(newUser, group);
+                final List<Group> userGroups = mgr.getUserById(newUser.getId()).getGroups();
+                assertTrue(userGroups.size() > 0);
             } finally {
                 mgr.deleteUser(newUser.getId());
             }

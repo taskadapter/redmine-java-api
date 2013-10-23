@@ -21,6 +21,7 @@ public class User implements Identifiable {
     // TODO add tests
     private List<CustomField> customFields = new ArrayList<CustomField>();
 	private List<Membership> memberships = new ArrayList<Membership>();
+	 private List<Group> groups = new ArrayList<Group>();
 
     public Integer getId() {
         return id;
@@ -222,5 +223,13 @@ public class User implements Identifiable {
 
 	public void setMemberships(List<Membership> memberships) {
 		this.memberships = memberships;
+	}
+
+	public List<Group> getGroups() {
+	   return groups;
+	   }
+
+	public void setGroups(List<Group> groups) {
+	   this.groups = groups;
 	}
 }
