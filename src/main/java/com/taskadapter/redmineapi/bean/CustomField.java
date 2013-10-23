@@ -2,11 +2,6 @@ package com.taskadapter.redmineapi.bean;
 
 import java.util.List;
 
-/**
- * Redmine custom field
- *
- * @author Yuri Lupol
- */
 public class CustomField {
 
     private int id;
@@ -15,9 +10,6 @@ public class CustomField {
     private boolean multiple = false;
 	private List<String> values;
 
-    /**
-     * This default empty constructor is required for Castor XML library.
-     */
     public CustomField() {
     }
 
