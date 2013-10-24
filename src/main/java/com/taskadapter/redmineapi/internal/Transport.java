@@ -53,6 +53,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.Wiki;
 import com.taskadapter.redmineapi.internal.comm.BaseCommunicator;
 import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.Communicator;
@@ -148,6 +149,12 @@ public final class Transport {
                 Watcher.class,
                 config("watcher", "watchers", null,
                         RedmineJSONParser.WATCHER_PARSER));
+        
+        OBJECT_CONFIGS.put(
+                Wiki.class,
+                config("wiki_page", "wiki", 
+                        RedmineJSONBuilder.WIKI_WRITER,
+                        RedmineJSONParser.WIKI_PARSER));
 	}
 
 	private final URIConfigurator configurator;
@@ -514,6 +521,20 @@ public final class Transport {
 		setEntity(httpPost, body);
 		String response = getCommunicator().sendRequest(httpPost);
 		logger.debug(response);
+	}
+	
+	public Wiki addWikiToProject( Wiki wiki ) throws RedmineException{
+	    logger.debug( "adding wiki page " + wiki.getTitle() +" in project " + wiki.getProject().getIdentifier() );
+	    final EntityConfig<Wiki> config = getConfig(wiki.getClass());
+	    URI uri = getURIConfigurator().getChildObjectURI (Project.class, wiki.getProject().getIdentifier(), Wiki.class, wiki.getIdentifier());
+        final HttpPut http = new HttpPut(uri);
+
+        final String body = RedmineJSONBuilder.toSimpleJSON(
+                config.singleObjectName, wiki, config.writer);
+        setEntity(http, body);
+
+        getCommunicator().sendRequest(http);
+        return wiki;
 	}
 
 	private SimpleCommunicator<String> getCommunicator()

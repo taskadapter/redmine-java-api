@@ -35,6 +35,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.Wiki;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 
@@ -206,6 +207,13 @@ public class RedmineJSONParser {
 			return parseWatcher(input);
 		}
 	};
+	
+	public static final JsonObjectParser<Wiki> WIKI_PARSER = new JsonObjectParser<Wiki>() {
+        @Override
+        public Wiki parse(JSONObject input) throws JSONException {
+            return parseWiki(input);
+        }
+    };
 
     public static final JsonObjectParser<IssuePriority> ISSUE_PRIORITY_PARSER = new JsonObjectParser<IssuePriority>() {
         @Override
@@ -615,6 +623,16 @@ public class RedmineJSONParser {
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}
+	
+	public static Wiki parseWiki(JSONObject content) throws JSONException {
+        final Wiki result = new Wiki();
+        result.setId(JsonInput.getIntOrNull(content, "id"));
+        result.setTitle(JsonInput.getStringOrNull(content, "title"));
+        result.setText(JsonInput.getStringOrNull(content, "text"));
+        result.setCreatedOn(getDateOrNull(content, "created_on"));
+        result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+        return result;
+    }
     
 	/**
 	 * @param responseBody
