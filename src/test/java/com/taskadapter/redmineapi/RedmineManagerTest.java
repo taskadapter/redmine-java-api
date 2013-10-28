@@ -1498,10 +1498,12 @@ public class RedmineManagerTest {
      */
     @Test
     public void testGetVersions() throws RedmineException {
-        Project project = mgr.getProjectByKey(projectKey);
-        Version testVersion1 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
-        Version testVersion2 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
+        Project project = createProject();
+        Version testVersion1 = null;
+        Version testVersion2 = null;
         try {
+            testVersion1 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
+            testVersion2 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
             List<Version> versions = mgr.getVersions(project.getId());
             assertEquals("Wrong number of versions for project "
                     + project.getName() + " delivered by Redmine Java API", 2,
@@ -1519,6 +1521,7 @@ public class RedmineManagerTest {
             if (testVersion2 != null) {
                 mgr.deleteVersion(testVersion2);
             }
+            mgr.deleteProject(project.getIdentifier());
         }
     }
 
