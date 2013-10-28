@@ -442,8 +442,6 @@ public class RedmineManager {
     /**
      * Deletes a group.
      * <p><b>This operation requires "Redmine Administrator" permission.</b>
-     * @return created group.
-     * @throws RedmineException
      */
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());
