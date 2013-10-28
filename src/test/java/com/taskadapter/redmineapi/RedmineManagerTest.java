@@ -1553,6 +1553,19 @@ public class RedmineManagerTest {
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(description, versionById.getDescription());
     }
+    
+    @Test
+    public void versionIsUpdatedIncludingDueDate() throws RedmineException {
+        Project project = mgr.getProjectByKey(projectKey);
+        Version createdVersion = mgr.createVersion(new Version(project,
+                "Version_1_" + UUID.randomUUID()));
+        String description = "new description";
+        createdVersion.setDescription(description);
+        createdVersion.setDueDate(new Date());
+        mgr.update(createdVersion);
+        Version versionById = mgr.getVersionById(createdVersion.getId());
+        assertEquals(description, versionById.getDescription());
+    }
 
     /**
      * tests the creation and deletion of a {@link IssueCategory}.
