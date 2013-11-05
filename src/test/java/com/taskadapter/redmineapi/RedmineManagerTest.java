@@ -312,6 +312,7 @@ public class RedmineManagerTest {
         user.setLogin(login);
         user.setFirstName(fName);
         user.setLastName(lName);
+        user.setApiKey(testConfig.getParam("apikey"));
         return user;
     }
 
@@ -685,6 +686,7 @@ public class RedmineManagerTest {
         User loadedUser = mgr.getUserById(getOurUser().getId());
         assertEquals(getOurUser().getId(), loadedUser.getId());
         assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
+        assertEquals(getOurUser().getApiKey(), loadedUser.getApiKey());
     }
 
     @Test(expected = NotFoundException.class)

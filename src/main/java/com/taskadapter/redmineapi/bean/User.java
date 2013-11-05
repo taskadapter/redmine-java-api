@@ -92,10 +92,10 @@ public class User implements Identifiable {
     }
 
     /**
-     * The property is read-only for new users.
-     * 
-     * @param apiKey the API access key
+     * APIKey property is read-only. This setter is only for serialization JSon.
+     * The value you set using this method will be ignored by the server.
      */
+    @Deprecated
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
