@@ -1109,7 +1109,7 @@ public class RedmineManagerTest {
                 assertEquals("Must be 1 error", 1, e.getErrors().size());
                 assertEquals("Checking error text",
                         "% Done is not included in the list", e.getErrors()
-                                .get(0));
+                        .get(0));
             }
 
             Issue reloadedFromRedmineIssueUnchanged = mgr.getIssueById(issueId);
@@ -2112,9 +2112,9 @@ public class RedmineManagerTest {
     * Requires Redmine 2.1
     */
     @Test
-    public void testAddUserToGroupTwice() throws RedmineException {
+    public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
         final Group template = new Group();
-        template.setName("testAddUserToGroupTwice " + System.currentTimeMillis());
+        template.setName("some test " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
             final User newUser = mgr.createUser(generateRandomUser());
