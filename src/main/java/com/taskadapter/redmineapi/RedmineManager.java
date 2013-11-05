@@ -915,6 +915,7 @@ public class RedmineManager {
 	 * @param group
 	 *            - The new group of the user.
 	 * @throws RedmineException
+    * @since Redmine 2.1
 	 */
 	public void addUserToGroup(User user, Group group) throws RedmineException {
 		transport.addUserToGroup(user.getId(), group.getId());

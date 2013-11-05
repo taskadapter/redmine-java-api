@@ -2086,6 +2086,9 @@ public class RedmineManagerTest {
         assertTrue(queries.size() > 0);
     }
 
+   /**
+    * Requires Redmine 2.1
+    */
     @Test
     public void testAddUserToGroup() throws RedmineException {
         final Group template = new Group();
@@ -2095,9 +2098,31 @@ public class RedmineManagerTest {
             final User newUser = mgr.createUser(generateRandomUser());
             try {
                 mgr.addUserToGroup(newUser, group);
-                mgr.addUserToGroup(newUser, group);
                 final List<Group> userGroups = mgr.getUserById(newUser.getId()).getGroups();
-                assertTrue(userGroups.size() > 0);
+                assertTrue(userGroups.size() == 1);
+                assertTrue(group.getName().equals(userGroups.get(0).getName()));
+            } finally {
+                mgr.deleteUser(newUser.getId());
+            }
+        } finally {
+            mgr.deleteGroup(group);
+        }
+    }
+    
+   /**
+    * Requires Redmine 2.1
+    */
+    @Test
+    public void testAddUserToGroupTwice() throws RedmineException {
+        final Group template = new Group();
+        template.setName("testAddUserToGroupTwice " + System.currentTimeMillis());
+        final Group group = mgr.createGroup(template);
+        try {
+            final User newUser = mgr.createUser(generateRandomUser());
+            try {
+                mgr.addUserToGroup(newUser, group);
+                mgr.addUserToGroup(newUser, group);
+                assertTrue(mgr.getUserById(newUser.getId()).getGroups().size() == 1);
             } finally {
                 mgr.deleteUser(newUser.getId());
             }
