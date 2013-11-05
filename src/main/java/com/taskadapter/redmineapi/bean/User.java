@@ -18,6 +18,7 @@ public class User implements Identifiable {
     private String mail;
     private Date createdOn;
     private Date lastLoginOn;
+    private String apiKey;
     // TODO add tests
     private List<CustomField> customFields = new ArrayList<CustomField>();
 	private List<Membership> memberships = new ArrayList<Membership>();
@@ -86,6 +87,19 @@ public class User implements Identifiable {
         this.lastLoginOn = lastLoginOn;
     }
 
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    /**
+     * The property is read-only for new users.
+     * 
+     * @param apiKey the API access key
+     */
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -103,6 +117,7 @@ public class User implements Identifiable {
         result = prime * result + ((mail == null) ? 0 : mail.hashCode());
         result = prime * result
                 + ((password == null) ? 0 : password.hashCode());
+        result = prime * result + ((apiKey == null) ? 0 : apiKey.hashCode());
         return result;
     }
 
@@ -155,6 +170,13 @@ public class User implements Identifiable {
                 return false;
         } else if (!password.equals(other.password))
             return false;
+        if(apiKey == null) {
+            if(other.apiKey != null) {
+                return false;
+            }
+        } else if (!apiKey.equals(other.apiKey)) {
+            return false;
+        }
         return true;
     }
 
