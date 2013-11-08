@@ -66,66 +66,20 @@ public class IssueRelation implements Identifiable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((delay == null) ? 0 : delay.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((issueId == null) ? 0 : issueId.hashCode());
-        result = prime * result
-                + ((issueToId == null) ? 0 : issueToId.hashCode());
-        result = prime * result + ((type == null) ? 0 : type.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        IssueRelation that = (IssueRelation) o;
+
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        IssueRelation other = (IssueRelation) obj;
-        if (delay == null) {
-            if (other.delay != null) {
-                return false;
-            }
-        } else if (!delay.equals(other.delay)) {
-            return false;
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
-            return false;
-        }
-        if (issueId == null) {
-            if (other.issueId != null) {
-                return false;
-            }
-        } else if (!issueId.equals(other.issueId)) {
-            return false;
-        }
-        if (issueToId == null) {
-            if (other.issueToId != null) {
-                return false;
-            }
-        } else if (!issueToId.equals(other.issueToId)) {
-            return false;
-        }
-        if (type == null) {
-            if (other.type != null) {
-                return false;
-            }
-        } else if (!type.equals(other.type)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override

@@ -48,49 +48,20 @@ public class JournalDetail implements Serializable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result
-                + ((newValue == null) ? 0 : newValue.hashCode());
-        result = prime * result
-                + ((oldValue == null) ? 0 : oldValue.hashCode());
-        result = prime * result
-                + ((property == null) ? 0 : property.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JournalDetail that = (JournalDetail) o;
+
+        if (newValue != null ? !newValue.equals(that.newValue) : that.newValue != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        JournalDetail other = (JournalDetail) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        if (newValue == null) {
-            if (other.newValue != null)
-                return false;
-        } else if (!newValue.equals(other.newValue))
-            return false;
-        if (oldValue == null) {
-            if (other.oldValue != null)
-                return false;
-        } else if (!oldValue.equals(other.oldValue))
-            return false;
-        if (property == null) {
-            if (other.property != null)
-                return false;
-        } else if (!property.equals(other.property))
-            return false;
-        return true;
+    public int hashCode() {
+        return newValue != null ? newValue.hashCode() : 0;
     }
 
     @Override

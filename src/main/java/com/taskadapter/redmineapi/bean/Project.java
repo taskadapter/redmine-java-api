@@ -178,105 +178,19 @@ public class Project implements Identifiable, Serializable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((createdOn == null) ? 0 : createdOn.hashCode());
-        result = prime * result
-                + ((description == null) ? 0 : description.hashCode());
-        result = prime * result
-                + ((homepage == null) ? 0 : homepage.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result
-                + ((identifier == null) ? 0 : identifier.hashCode());
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        result = prime * result
-                + ((parentId == null) ? 0 : parentId.hashCode());
-        result = prime * result
-                + ((trackers == null) ? 0 : trackers.hashCode());
-        result = prime * result
-                + ((updatedOn == null) ? 0 : updatedOn.hashCode());
-        return result;
-    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        Project other = (Project) obj;
-        if (createdOn == null) {
-            if (other.createdOn != null) {
-                return false;
-            }
-        } else if (!createdOn.equals(other.createdOn)) {
-            return false;
-        }
-        if (description == null) {
-            if (other.description != null) {
-                return false;
-            }
-        } else if (!description.equals(other.description)) {
-            return false;
-        }
-        if (homepage == null) {
-            if (other.homepage != null) {
-                return false;
-            }
-        } else if (!homepage.equals(other.homepage)) {
-            return false;
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else if (!id.equals(other.id)) {
-            return false;
-        }
-        if (identifier == null) {
-            if (other.identifier != null) {
-                return false;
-            }
-        } else if (!identifier.equals(other.identifier)) {
-            return false;
-        }
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        if (parentId == null) {
-            if (other.parentId != null) {
-                return false;
-            }
-        } else if (!parentId.equals(other.parentId)) {
-            return false;
-        }
-        if (trackers == null) {
-            if (other.trackers != null) {
-                return false;
-            }
-        } else if (!trackers.equals(other.trackers)) {
-            return false;
-        }
-        if (updatedOn == null) {
-            if (other.updatedOn != null) {
-                return false;
-            }
-        } else if (!updatedOn.equals(other.updatedOn)) {
-            return false;
-        }
+        Project project = (Project) o;
+
+        if (id != null ? !id.equals(project.id) : project.id != null) return false;
+
         return true;
     }
 
-
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

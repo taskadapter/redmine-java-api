@@ -368,7 +368,7 @@ public class RedmineManager {
      */
     public List<User> getUsers() throws RedmineException {
 		return transport.getObjectsList(User.class, new BasicNameValuePair(
-				"include", "memberships"));
+				"include", "memberships,groups"));
     }
 
     /**
@@ -376,7 +376,7 @@ public class RedmineManager {
      */
     public User getUserById(Integer userId) throws RedmineException {
 		return transport.getObject(User.class, userId, new BasicNameValuePair(
-				"include", "memberships"));
+				"include", "memberships,groups"));
     }
 
     /**
@@ -430,6 +430,20 @@ public class RedmineManager {
     }
     
     /**
+     * Returns the group based on its name.
+     * <p>
+     * <b>This operation requires "Redmine Administrators" permission.</b>
+     *
+     * @param name
+     *            the name of the group
+     * @return the group
+     * @throws RedmineException
+     */
+    public Group getGroupByName(String name) throws RedmineException {
+        return transport.getObject(Group.class, name);
+    }
+
+    /**
      * Creates a new group.
      * <p><b>This operation requires "Redmine Administrator" permission.</b>
      * @return created group.
@@ -442,8 +456,6 @@ public class RedmineManager {
     /**
      * Deletes a group.
      * <p><b>This operation requires "Redmine Administrator" permission.</b>
-     * @return created group.
-     * @throws RedmineException
      */
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());
@@ -896,11 +908,10 @@ public class RedmineManager {
 	/**
 	 * Adds the given user to the given group.
 	 * 
-	 * @param user
-	 *            - The user being added.
-	 * @param group
-	 *            - The new group of the user.
+	 * @param user  - The user being added.
+	 * @param group - The new group of the user.
 	 * @throws RedmineException
+   * @since Redmine 2.1
 	 */
 	public void addUserToGroup(User user, Group group) throws RedmineException {
 		transport.addUserToGroup(user.getId(), group.getId());

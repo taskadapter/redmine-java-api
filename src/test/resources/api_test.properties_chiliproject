@@ -1,7 +1,0 @@
-# MUSHROOM server : Chiliproject 1.2.0 test installation
-host=http://ta-dev.dyndns.biz:3010
-apikey=808f615b7276c0dc1d087e878d25843ff517a9a1
-user=admin
-
-createissue.userid=1
-createissue.userFirstAndLastName=Admin ChiliProject

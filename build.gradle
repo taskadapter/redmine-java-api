@@ -3,11 +3,30 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+
 group = 'com.taskadapter'
-version = '1.22'
+version = '1.23'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0' // coveralls plugin depends on cobertura plugin
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.1.6'
+    }
+}
+
+apply plugin: 'cobertura'
+apply plugin: 'coveralls'
+cobertura.coverageFormats = ['html', 'xml']
 
 tasks.withType(Compile) {
     options.encoding = 'UTF-8'
@@ -18,12 +37,15 @@ repositories {
 }
 
 dependencies {
-    compile 'org.apache.httpcomponents:httpclient:4.2'
-    compile 'org.apache.httpcomponents:httpcore:4.2'
-    compile 'org.json:json:20090211'
-    compile 'org.slf4j:slf4j-api:1.7.1'
-    testCompile 'junit:junit:4.10'
-    testCompile 'org.slf4j:slf4j-jdk14:1.7.1'
+    compile ('org.apache.httpcomponents:httpclient:4.2',
+            'org.apache.httpcomponents:httpcore:4.2',
+            'org.json:json:20090211',
+            'org.slf4j:slf4j-api:1.7.1')
+
+    testCompile(
+            'junit:junit:4.10',
+            'org.slf4j:slf4j-jdk14:1.7.1'
+    )
 }
 
 // A PGP key is required to sign the artifacts before uploading to OSS Sonatype Maven repository.
@@ -31,23 +53,29 @@ dependencies {
 // signing.keyId=...
 // signing.password=...
 // signing.secretKeyRingFile=c:/Users/ask/.gnupg/secring.gpg
-signing {
-    sign configurations.archives
+if (signing.signatory) {
+    signing {
+        sign configurations.archives
+    }
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
-            // set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
-            // standard properties file format: "ossUser=myOssUser", etc.
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: ossUser, password: ossPassword)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: ossUser, password: ossPassword)
-            }
 
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            if (signing.signatory) {
+                beforeDeployment {
+                    signing.signPom(it)
+                }
+                // set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
+                // standard properties file format: "ossUser=myOssUser", etc.
+                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                    authentication(userName: ossUser, password: ossPassword)
+                }
+                snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+                    authentication(userName: ossUser, password: ossPassword)
+                }
+            }
 
             pom.project {
                 name 'Redmine Java API'

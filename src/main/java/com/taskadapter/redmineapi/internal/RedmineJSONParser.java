@@ -544,6 +544,7 @@ public class RedmineJSONParser {
 		result.setMail(JsonInput.getStringOrNull(content, "mail"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
+                result.setApiKey(JsonInput.getStringOrNull(content, "api_key"));
 		result.setCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		final String name = JsonInput.getStringOrNull(content, "name");
@@ -551,7 +552,8 @@ public class RedmineJSONParser {
 			result.setFullName(name);
 		result.setMemberships(JsonInput.getListOrEmpty(content, "memberships",
 				MEMBERSHIP_PARSER));
-
+		result.setGroups(JsonInput.getListOrEmpty(content, "groups",
+				GROUP_PARSER));
 		/* Fix user for membership */
 		for (Membership m : result.getMemberships())
 			m.setUser(result);
@@ -701,9 +703,7 @@ public class RedmineJSONParser {
 	public static JSONObject getResponseSingleObject(String body, String key)
 			throws JSONException {
 		final JSONObject bodyJson = new JSONObject(body);
-		final JSONObject contentJSon = JsonInput
-				.getObjectNotNull(bodyJson, key);
-		return contentJSon;
+    return JsonInput.getObjectNotNull(bodyJson, key);
 	}
 
 	public static JSONObject getResponse(String body) throws JSONException {

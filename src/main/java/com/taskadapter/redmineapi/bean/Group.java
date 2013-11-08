@@ -1,27 +1,13 @@
 package com.taskadapter.redmineapi.bean;
 
 
-/**
- * Redmine's Group.
- *
- * @author Bruno Medeiros
- */
 public class Group implements Identifiable {
-	
-	public Group() {
-		super();
-	}
 	
     private Integer id;
     private String name;
     
     public Integer getId() {
         return id;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
     }
 
     public void setId(Integer id) {
@@ -36,4 +22,25 @@ public class Group implements Identifiable {
         this.name = name;
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        if (id != null ? !id.equals(group.id) : group.id != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

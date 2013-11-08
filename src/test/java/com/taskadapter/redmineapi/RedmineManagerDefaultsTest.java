@@ -30,11 +30,10 @@ public class RedmineManagerDefaultsTest {
 	private static RedmineManager mgr;
 
 	private static String projectKey;
-	private static TestConfig testConfig;
 
-	@BeforeClass
+  @BeforeClass
 	public static void oneTimeSetUp() {
-		testConfig = new TestConfig();
+    TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
 		mgr = new RedmineManager(testConfig.getURI());
 		mgr.setLogin(testConfig.getLogin());

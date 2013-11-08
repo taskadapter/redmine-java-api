@@ -8,15 +8,18 @@ import org.junit.Test;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.Project;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ParentProjectTest {
 
-    private static RedmineManager mgr;
-    private static TestConfig testConfig;
+    private final Logger logger = LoggerFactory.getLogger(ParentProjectTest.class);
 
-    @BeforeClass
+    private static RedmineManager mgr;
+
+  @BeforeClass
     public static void oneTimeSetUp() {
-        testConfig = new TestConfig();
+    TestConfig testConfig = new TestConfig();
         mgr = new RedmineManager(testConfig.getURI());
         mgr.setLogin(testConfig.getLogin());
         mgr.setPassword(testConfig.getPassword());
@@ -27,15 +30,19 @@ public class ParentProjectTest {
         String parentKey = "parent";
         String childKey = "child";
 
-        Project parentProject = createProject(parentKey, "Parent Project", null);
-        Project childProject = 
-                createProject(childKey, "Child Project", parentProject.getId());
-
         try {
+            Project parentProject = createProject(parentKey, "Parent Project", null);
+            Project childProject =
+                    createProject(childKey, "Child Project", parentProject.getId());
+
             Assert.assertEquals(childProject.getParentId(), parentProject.getId());
         } finally {
-            mgr.deleteProject(childKey);
-            mgr.deleteProject(parentKey);
+            try {
+                mgr.deleteProject(parentKey);
+                mgr.deleteProject(childKey);
+            } catch (RedmineException e) {
+                logger.debug("Unable to delete a project.", e);
+            }
         }
     }
 
