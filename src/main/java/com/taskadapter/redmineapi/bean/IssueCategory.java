@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 /**
  * Redmine issue category.
- *
- * @author Matthias Paul Scholz
  */
 public class IssueCategory implements Identifiable, Serializable {
 	private static final long serialVersionUID = -109010410391968475L;
@@ -71,21 +69,14 @@ public class IssueCategory implements Identifiable, Serializable {
 
         IssueCategory that = (IssueCategory) o;
 
-        if (assignee != null ? !assignee.equals(that.assignee) : that.assignee != null) return false;
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
-        if (name != null ? !name.equals(that.name) : that.name != null) return false;
-        if (project != null ? !project.equals(that.project) : that.project != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (project != null ? project.hashCode() : 0);
-        result = 31 * result + (assignee != null ? assignee.hashCode() : 0);
-        return result;
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override

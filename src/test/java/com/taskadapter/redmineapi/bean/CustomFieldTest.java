@@ -11,20 +11,21 @@ import static org.junit.Assert.assertThat;
 
 public class CustomFieldTest {
     @Test
-    public void valuesAreEqual() {
-        assertThat(getField("A"), equalTo(getField("A")));
-        assertThat(getField("A", "B"), equalTo(getField("A", "B")));
+    public void fieldsAreEqualIfIDIsEqual() {
+        assertThat(getField(1, "A"), equalTo(getField(1, "ANOTHER")));
+        assertThat(getField(1, "A", "B"), equalTo(getField(1, "SOMETHING", "ANOTHER")));
     }
 
     @Test
-    public void valuesNotEqual() {
-        assertThat(getField(), not(equalTo(getField("something"))));
-        assertThat(getField("A"), not(equalTo(getField("B"))));
-        assertThat(getField("A", "B"), not(equalTo(getField("B", "A"))));
+    public void fieldsAreNotEqualIfIDsAreNotEqual() {
+        assertThat(getField(1), not(equalTo(getField(2))));
+        assertThat(getField(1, "A"), not(equalTo(getField(2, "A"))));
+        assertThat(getField(1, "A", "B"), not(equalTo(getField(2, "A", "B"))));
     }
 
-    private CustomField getField(String... values) {
+    private CustomField getField(int id, String... values) {
         CustomField field = new CustomField();
+        field.setId(id);
         field.setValues(Arrays.asList(values));
         return field;
     }

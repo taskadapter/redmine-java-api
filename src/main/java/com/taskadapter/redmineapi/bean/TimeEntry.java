@@ -140,107 +140,20 @@ public class TimeEntry implements Identifiable {
     }
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result
-                + ((activityId == null) ? 0 : activityId.hashCode());
-        result = prime * result
-                + ((activityName == null) ? 0 : activityName.hashCode());
-        result = prime * result + ((comment == null) ? 0 : comment.hashCode());
-        result = prime * result
-                + ((createdOn == null) ? 0 : createdOn.hashCode());
-        result = prime * result + ((hours == null) ? 0 : hours.hashCode());
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((issueId == null) ? 0 : issueId.hashCode());
-        result = prime * result
-                + ((projectId == null) ? 0 : projectId.hashCode());
-        result = prime * result
-                + ((projectName == null) ? 0 : projectName.hashCode());
-        result = prime * result + ((spentOn == null) ? 0 : spentOn.hashCode());
-        result = prime * result
-                + ((updatedOn == null) ? 0 : updatedOn.hashCode());
-        result = prime * result + ((userId == null) ? 0 : userId.hashCode());
-        result = prime * result
-                + ((userName == null) ? 0 : userName.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TimeEntry timeEntry = (TimeEntry) o;
+
+        if (id != null ? !id.equals(timeEntry.id) : timeEntry.id != null) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        TimeEntry other = (TimeEntry) obj;
-        if (activityId == null) {
-            if (other.activityId != null)
-                return false;
-        } else if (!activityId.equals(other.activityId))
-            return false;
-        if (activityName == null) {
-            if (other.activityName != null)
-                return false;
-        } else if (!activityName.equals(other.activityName))
-            return false;
-        if (comment == null) {
-            if (other.comment != null)
-                return false;
-        } else if (!comment.equals(other.comment))
-            return false;
-        if (createdOn == null) {
-            if (other.createdOn != null)
-                return false;
-        } else if (!createdOn.equals(other.createdOn))
-            return false;
-        if (hours == null) {
-            if (other.hours != null)
-                return false;
-        } else if (!hours.equals(other.hours))
-            return false;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        if (issueId == null) {
-            if (other.issueId != null)
-                return false;
-        } else if (!issueId.equals(other.issueId))
-            return false;
-        if (projectId == null) {
-            if (other.projectId != null)
-                return false;
-        } else if (!projectId.equals(other.projectId))
-            return false;
-        if (projectName == null) {
-            if (other.projectName != null)
-                return false;
-        } else if (!projectName.equals(other.projectName))
-            return false;
-        if (spentOn == null) {
-            if (other.spentOn != null)
-                return false;
-        } else if (!spentOn.equals(other.spentOn))
-            return false;
-        if (updatedOn == null) {
-            if (other.updatedOn != null)
-                return false;
-        } else if (!updatedOn.equals(other.updatedOn))
-            return false;
-        if (userId == null) {
-            if (other.userId != null)
-                return false;
-        } else if (!userId.equals(other.userId))
-            return false;
-        if (userName == null) {
-            if (other.userName != null)
-                return false;
-        } else if (!userName.equals(other.userName))
-            return false;
-        return true;
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 
     public boolean isValid() {

@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * Redmine issue journal field
- *
- * @author Vladimir Polyakov
  */
 public class Journal {
 
@@ -17,9 +15,6 @@ public class Journal {
     private Date createdOn;
     private List<JournalDetail> details = new ArrayList<JournalDetail>();
 
-    /**
-     * This default empty constructor is required for Castor XML library.
-     */
     public Journal() {
     }
 
@@ -80,40 +75,19 @@ public class Journal {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        Journal that = (Journal) o;
+        Journal journal = (Journal) o;
 
-        if (id != that.id) {
-            return false;
-        }
-        if (user != null ? !user.equals(that.user) : that.user != null) {
-            return false;
-        }
-        if (notes != null ? !notes.equals(that.notes) : that.notes != null) {
-            return false;
-        }
-        if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) {
-            return false;
-        }
-        if (details != null ? !details.equals(that.details) : that.details != null) {
-            return false;
-        }
+        if (id != journal.id) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + (user != null ? user.hashCode() : 0);
-        result = 31 * result + (details != null ? details.hashCode() : 0);
-        return result;
+        return id;
     }
 
     @Override

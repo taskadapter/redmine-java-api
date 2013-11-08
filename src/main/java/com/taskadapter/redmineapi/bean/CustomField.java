@@ -70,32 +70,19 @@ public class CustomField {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         CustomField that = (CustomField) o;
 
-        if (id != that.id)
-            return false;
-        if (name != null ? !name.equals(that.name) : that.name != null)
-            return false;
-        if (value != null ? !value.equals(that.value) : that.value != null)
-            return false;
-		if (values != null ? !values.equals(that.values) : that.values != null)
-			return false;
+        if (id != that.id) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (value != null ? value.hashCode() : 0);
-		result = 31 * result + (values != null ? values.hashCode() : 0);
-        return result;
+        return id;
     }
 
     @Override
