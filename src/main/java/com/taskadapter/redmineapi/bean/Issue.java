@@ -280,6 +280,16 @@ public class Issue implements Identifiable {
         return null;
     }
 
+    public CustomField getCustomFieldById(int customFieldId) {
+        if(customFields == null) return null;
+        for (CustomField customField : customFields) {
+            if (customFieldId == customField.getId()) {
+                return customField;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "Issue [id=" + id + ", subject=" + subject + "]";

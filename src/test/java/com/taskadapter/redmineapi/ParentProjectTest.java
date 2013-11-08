@@ -30,8 +30,8 @@ public class ParentProjectTest {
         try {
             assertEquals(childProject.getParentId(), parentProject.getId());
         } finally {
-            mgr.deleteProject(childKey);
             mgr.deleteProject(parentKey);
+            mgr.deleteProject(childKey);
         }
     }
 

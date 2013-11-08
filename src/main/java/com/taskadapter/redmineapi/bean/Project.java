@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,8 @@ public class Project implements Identifiable, Serializable {
      * This is the *database ID*, not a String-based key.
      */
     private Integer parentId;
+
+    private List<CustomField> customFields = new ArrayList<CustomField>();
 
     public String getHomepage() {
         return homepage;
@@ -155,6 +158,23 @@ public class Project implements Identifiable, Serializable {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public List<CustomField> getCustomFields() {
+        return customFields;
+    }
+
+    public void setCustomFields(List<CustomField> customFields) {
+        this.customFields = customFields;
+    }
+
+    public CustomField getCustomFieldById(int customFieldId) {
+        for (CustomField customField : customFields) {
+            if (customFieldId == customField.getId()) {
+                return customField;
+            }
+        }
+        return null;
     }
 
     @Override
