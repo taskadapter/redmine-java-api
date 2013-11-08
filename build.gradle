@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
 group = 'com.taskadapter'
-version = '1.22'
+version = '1.23'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
