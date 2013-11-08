@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 
 import com.taskadapter.redmineapi.internal.CopyBytesHandler;
 import com.taskadapter.redmineapi.internal.Joiner;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -58,6 +59,8 @@ import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
 import com.taskadapter.redmineapi.internal.io.MarkedIOException;
 import com.taskadapter.redmineapi.internal.io.MarkedInputStream;
+import com.taskadapter.redmineapi.requestfilter.GroupUserFilter;
+import com.taskadapter.redmineapi.requestfilter.UserFilter;
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -370,6 +373,21 @@ public class RedmineManager {
 		return transport.getObjectsList(User.class, new BasicNameValuePair(
 				"include", "memberships,groups"));
     }
+    
+    /**
+     * Load filtered list (http://www.redmine.org/projects/redmine/wiki/Rest_Users#GET) of users on the server.
+     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     *
+     * @param filter - one of GroupUserFilter, NameUserFilter, AccountStatusUserFilter
+     * @return list of User objects
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException
+     * @throws RedmineException
+     */
+    public List<User> getUsers(UserFilter filter) throws RedmineException {
+		return transport.getObjectsList(User.class, filter.getNameValuePair());
+    }
 
     /**
      * This does NOT require Admin privileges by default Redmine installation (tested with Redmine 2.0.3).
@@ -459,6 +477,23 @@ public class RedmineManager {
      */
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());
+    }
+    
+    /**
+     * Returns members of the group.
+     * Emulates missing /groups/:id/users.:format GET endpoint using
+     * /users.:format GET endpoint with group_id filter
+     * (http://www.redmine.org/projects/redmine/wiki/Rest_Users#GET)
+     * <p>
+     * <b>This operation requires "Redmine Administrators" permission.</b>
+     * 
+     * @param groupId
+     *            the id of the group
+     * @return list of User objects
+     * @throws RedmineException
+     */
+    public List<User> getGroupUsers(Integer groupId) throws RedmineException {
+		return getUsers(new GroupUserFilter(groupId));
     }
     
     public List<TimeEntry> getTimeEntries() throws RedmineException {
