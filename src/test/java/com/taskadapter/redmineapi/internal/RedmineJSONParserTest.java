@@ -124,11 +124,6 @@ public class RedmineJSONParserTest {
 		Assert.assertEquals(expectedName, project.getName());
 		Assert.assertEquals(expectedKey, project.getIdentifier());
 
-        Assert.assertNotNull(project.getCustomFieldById(1));
-        String expectedCustomeFieldValue1 = "Should have a value";
-        Assert.assertEquals(expectedCustomeFieldValue1, project.getCustomFieldById(1).getValue());
-        Assert.assertEquals("", project.getCustomFieldById(6).getValue());
-
 		List<Tracker> trackers = project.getTrackers();
 		Assert.assertNotNull("Trackers list must not be NULL", trackers);
 		Assert.assertEquals(3, trackers.size());
@@ -139,6 +134,19 @@ public class RedmineJSONParserTest {
 		Assert.assertEquals("checking id of 'support' tracker",
 				expectedTrackerId, tracker.getId());
 	}
+
+    @Test
+    public void testProjectWithCustomField() throws IOException, JSONException {
+        String json = MyIOUtils.getResourceAsString("redmine_projectWithCustomField.json");
+        Project project = RedmineJSONParser.parseProject(RedmineJSONParser
+                .getResponseSingleObject(json, "project"));
+
+        Assert.assertEquals(project.getCustomFields().size(), 2);
+        Assert.assertNotNull(project.getCustomFieldById(1));
+        String expectedCustomeFieldValue = "Should have a value";
+        Assert.assertEquals(expectedCustomeFieldValue, project.getCustomFieldById(1).getValue());
+        Assert.assertEquals("", project.getCustomFieldById(6).getValue());
+    }
 
 	@Test
 	public void testParseProjectNoTracker() throws IOException, JSONException {
