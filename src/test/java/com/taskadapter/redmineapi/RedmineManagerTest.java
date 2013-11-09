@@ -1,27 +1,6 @@
 package com.taskadapter.redmineapi;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
-import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Group;
@@ -40,10 +19,33 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.*;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Integration tests for Redmine Java API.
@@ -71,22 +73,14 @@ public class RedmineManagerTest {
     @BeforeClass
     public static void oneTimeSetup() {
         testConfig = new TestConfig();
-        logger.info("Running Redmine integration tests using: " + testConfig.getURI());
-        mgr = new RedmineManager(testConfig.getURI());
-        mgr.setLogin(testConfig.getLogin());
-        mgr.setPassword(testConfig.getPassword());
-        Project junitTestProject = new Project();
-        junitTestProject.setName("test project");
-        junitTestProject.setIdentifier("test"
-                + Calendar.getInstance().getTimeInMillis());
+        mgr = IntegrationTestHelper.createRedmineManager();
 
         try {
-            Project createdProject = mgr.createProject(junitTestProject);
-            projectKey = createdProject.getIdentifier();
+            projectKey = IntegrationTestHelper.createProject(mgr);
             createNonAdminUser();
         } catch (Exception e) {
             logger.error("Exception while configuring tests", e);
-            Assert.fail("Error: " + e.getMessage());
+            fail("Error: " + e.getMessage());
         }
     }
 
@@ -100,18 +94,7 @@ public class RedmineManagerTest {
 
     @AfterClass
     public static void oneTimeTearDown() {
-        try {
-            if (mgr != null && projectKey != null) {
-                mgr.deleteProject(projectKey);
-            }
-            if (nonAdminUserId != null) {
-                mgr.deleteUser(nonAdminUserId);
-            }
-        } catch (Exception e) {
-            logger.error("Exception while deleting test project", e);
-            Assert.fail("can't delete the test project '" + projectKey
-                    + ". reason: " + e.getMessage());
-        }
+        IntegrationTestHelper.deleteProject(mgr, projectKey);
     }
 
     @Test
@@ -1721,109 +1704,6 @@ public class RedmineManagerTest {
     }
 
     /**
-     * Tests the retrieval of an {@link Issue}, inlcuding the
-     * {@link com.taskadapter.redmineapi.bean.Attachment}s.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
-     */
-    @Test
-    public void testGetIssueWithAttachments() throws RedmineException {
-        Issue newIssue = null;
-        try {
-            // create at least 1 issue
-            Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("testGetIssueAttachment_"
-                    + UUID.randomUUID());
-            newIssue = mgr.createIssue(projectKey, issueToCreate);
-            // TODO create test attachments for the issue once the Redmine REST
-            // API allows for it
-            // retrieve issue attachments
-            Issue retrievedIssue = mgr.getIssueById(newIssue.getId(),
-                    INCLUDE.attachments);
-            assertNotNull("List of attachments retrieved for issue "
-                    + newIssue.getId()
-                    + " delivered by Redmine Java API should not be null",
-                    retrievedIssue.getAttachments());
-            // TODO assert attachments once we actually receive ones for our
-            // test issue
-        } finally {
-            // scrub test issue
-            if (newIssue != null) {
-                mgr.deleteIssue(newIssue.getId());
-            }
-        }
-    }
-
-    /**
-     * Tests the retrieval of an
-     * {@link com.taskadapter.redmineapi.bean.Attachment} by its ID. TODO
-     * reactivate once the Redmine REST API allows for creating attachments
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
-     */
-    // @Test
-    public void testGetAttachmentById() throws RedmineException {
-        // TODO where do we get a valid attachment number from? We can't create
-        // an attachment by our own for the test as the Redmine REST API does
-        // not support that.
-        int attachmentID = 1;
-        Attachment attachment = mgr.getAttachmentById(attachmentID);
-        assertNotNull("Attachment retrieved by ID " + attachmentID
-                + " should not be null", attachment);
-        assertNotNull("Content URL of attachment retrieved by ID "
-                + attachmentID + " should not be null",
-                attachment.getContentURL());
-        // TODO more asserts on the attachment once this delivers an attachment
-    }
-
-    /**
-     * Tests the download of the content of an
-     * {@link com.taskadapter.redmineapi.bean.Attachment}. TODO reactivate once
-     * the Redmine REST API allows for creating attachments
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
-     */
-    // @Test
-    public void testDownloadAttachmentContent() throws RedmineException {
-        // TODO where do we get a valid attachment number from? We can't create
-        // an attachment by our own for the test as the Redmine REST API does
-        // not support that.
-        int attachmentID = 1;
-        // retrieve issue attachment
-        Attachment attachment = mgr.getAttachmentById(attachmentID);
-        // download attachment content
-        byte[] attachmentContent = mgr.downloadAttachmentContent(attachment);
-        assertNotNull(
-                "Download of content of attachment with content URL "
-                        + attachment.getContentURL() + " should not be null",
-                attachmentContent);
-    }
-
-    /**
      * Tests the creation and retrieval of an
      * {@link com.taskadapter.redmineapi.bean.Issue} with a
      * {@link IssueCategory}.
@@ -1958,28 +1838,6 @@ public class RedmineManagerTest {
     }
 
     @Test
-    public void testAttachmentUploads() throws RedmineException, IOException {
-        final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        final Attachment attach1 = mgr.uploadAttachment("test.bin",
-                "application/ternary", content);
-        final Issue testIssue = new Issue();
-        testIssue.setSubject("This is upload ticket!");
-        testIssue.getAttachments().add(attach1);
-        final Issue createdIssue = mgr.createIssue(projectKey, testIssue);
-        try {
-            final List<Attachment> attachments = createdIssue.getAttachments();
-            assertEquals(1, attachments.size());
-            final Attachment added = attachments.get(0);
-            assertEquals("test.bin", added.getFileName());
-            assertEquals("application/ternary", added.getContentType());
-            final byte[] receivedContent = mgr.downloadAttachmentContent(added);
-            assertArrayEquals(content, receivedContent);
-        } finally {
-            mgr.deleteIssue(createdIssue.getId());
-        }
-    }
-
-    @Test
     public void testGetRoles() throws RedmineException {
         assertTrue(mgr.getRoles().size() > 0);
     }
@@ -2043,17 +1901,6 @@ public class RedmineManagerTest {
 
         final User userWithMembership = mgr.getUserById(currentUser.getId());
         assertTrue(userWithMembership.getMemberships().size() > 0);
-    }
-
-    @Test(expected = IOException.class)
-    public void testUploadException() throws RedmineException, IOException {
-        final InputStream content = new InputStream() {
-            @Override
-            public int read() throws IOException {
-                throw new IOException("Unsupported read!");
-            }
-        };
-        mgr.uploadAttachment("test.bin", "application/ternary", content);
     }
 
     @Test
