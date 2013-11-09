@@ -20,7 +20,6 @@ import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -49,7 +48,7 @@ import static org.junit.Assert.fail;
 
 /**
  * Integration tests for Redmine Java API.
- * 
+ * <p/>
  * This class and its dependencies are located in com.taskadapter.redmineapi
  * project.
  */
@@ -63,9 +62,6 @@ public class RedmineManagerTest {
             .getLogger(RedmineManagerTest.class);
 
     private static RedmineManager mgr;
-    private static Integer nonAdminUserId;
-    private static String nonAdminUserLogin;
-    private static String nonAdminPassword;
 
     private static String projectKey;
     private static TestConfig testConfig;
@@ -74,22 +70,7 @@ public class RedmineManagerTest {
     public static void oneTimeSetup() {
         testConfig = new TestConfig();
         mgr = IntegrationTestHelper.createRedmineManager();
-
-        try {
-            projectKey = IntegrationTestHelper.createProject(mgr);
-            createNonAdminUser();
-        } catch (Exception e) {
-            logger.error("Exception while configuring tests", e);
-            fail("Error: " + e.getMessage());
-        }
-    }
-
-    private static void createNonAdminUser() throws RedmineException {
-        User user = generateRandomUser();
-        User nonAdminUser = mgr.createUser(user);
-        nonAdminUserId = nonAdminUser.getId();
-        nonAdminUserLogin = user.getLogin();
-        nonAdminPassword = user.getPassword();
+        projectKey = IntegrationTestHelper.createProject(mgr);
     }
 
     @AfterClass
@@ -117,7 +98,7 @@ public class RedmineManagerTest {
             Calendar due = Calendar.getInstance();
             due.add(Calendar.MONTH, 1);
             issueToCreate.setDueDate(due.getTime());
-            User assignee = getOurUser();
+            User assignee = IntegrationTestHelper.getOurUser();
             issueToCreate.setAssignee(assignee);
 
             String description = "This is the description for the new task."
@@ -161,7 +142,7 @@ public class RedmineManagerTest {
                     actualAssignee.getId());
 
             // check AUTHOR
-            Integer EXPECTED_AUTHOR_ID = getOurUser().getId();
+            Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser().getId();
             assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor()
                     .getId());
 
@@ -182,7 +163,7 @@ public class RedmineManagerTest {
             assertTrue(newIssue.getPriorityId() > 0);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
@@ -213,7 +194,7 @@ public class RedmineManagerTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
@@ -230,7 +211,7 @@ public class RedmineManagerTest {
             assertNull(loadedIssue.getStartDate());
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
@@ -240,7 +221,7 @@ public class RedmineManagerTest {
         try {
             Issue issue = new Issue();
             issue.setSubject(summary);
-            User assignee = getOurUser();
+            User assignee = IntegrationTestHelper.getOurUser();
             issue.setAssignee(assignee);
 
             Issue newIssue = mgr.createIssue(projectKey, issue);
@@ -264,7 +245,7 @@ public class RedmineManagerTest {
             assertEquals(summary, loadedIssue1.getSubject());
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
@@ -280,23 +261,8 @@ public class RedmineManagerTest {
                     foundIssues.isEmpty());
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
-    }
-
-    private static User getOurUser() {
-        Integer userId = Integer.parseInt(testConfig
-                .getParam("createissue.userid"));
-        String login = testConfig.getLogin();
-        String fName = testConfig.getParam("userFName");
-        String lName = testConfig.getParam("userLName");
-        User user = new User();
-        user.setId(userId);
-        user.setLogin(login);
-        user.setFirstName(fName);
-        user.setLastName(lName);
-        user.setApiKey(testConfig.getParam("apikey"));
-        return user;
     }
 
     @SuppressWarnings("unused")
@@ -348,22 +314,20 @@ public class RedmineManagerTest {
                     changedSubject, reloadedFromRedmineIssue.getSubject());
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
     /**
      * Tests the retrieval of an {@link Issue} by its ID.
-     * 
+     *
      * @throws com.taskadapter.redmineapi.RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
+     *                                        thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
      * @throws com.taskadapter.redmineapi.NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *                                        thrown in case the objects requested for could not be found
      */
     @Test
     public void testGetIssueById() throws RedmineException {
@@ -384,38 +348,6 @@ public class RedmineManagerTest {
                 tracker.getId());
         assertNotNull("Name of tracker of issue should not be null",
                 tracker.getName());
-    }
-
-    /**
-     * Tests the retrieval of {@link Project}s.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws com.taskadapter.redmineapi.NotFoundException
-     *             thrown in case the objects requested for could not be found
-     */
-    @Test
-    public void testGetProjects() throws RedmineException {
-        // retrieve projects
-        List<Project> projects = mgr.getProjects();
-        // asserts
-        assertTrue(projects.size() > 0);
-        boolean found = false;
-        for (Project project : projects) {
-            if (project.getIdentifier().equals(projectKey)) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            Assert.fail("Our project with key '" + projectKey
-                    + "' is not found on the server");
-        }
     }
 
     @Test
@@ -441,12 +373,12 @@ public class RedmineManagerTest {
                 }
             }
             if (!found) {
-                Assert.fail("getIssues() didn't return the issue we just created. The query "
+                fail("getIssues() didn't return the issue we just created. The query "
                         + " must have returned all issues created during the last 2 days");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -454,118 +386,6 @@ public class RedmineManagerTest {
     public void testGetIssuesInvalidQueryId() throws RedmineException {
         Integer invalidQueryId = 9999999;
         mgr.getIssues(projectKey, invalidQueryId);
-    }
-
-    @Test
-    public void testCreateProject() throws RedmineException {
-        Project projectToCreate = generateRandomProject();
-        String key = null;
-        try {
-            Project createdProject = mgr.createProject(projectToCreate);
-            key = createdProject.getIdentifier();
-
-            assertNotNull(
-                    "checking that a non-null project is returned",
-                    createdProject);
-
-            assertEquals(projectToCreate.getIdentifier(),
-                    createdProject.getIdentifier());
-            assertEquals(projectToCreate.getName(),
-                    createdProject.getName());
-            assertEquals(projectToCreate.getDescription(),
-                    createdProject.getDescription());
-            assertEquals(projectToCreate.getHomepage(),
-                    createdProject.getHomepage());
-
-            List<Tracker> trackers = createdProject.getTrackers();
-            assertNotNull("checking that project has some trackers",
-                    trackers);
-            assertTrue("checking that project has some trackers",
-                    !(trackers.isEmpty()));
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        } finally {
-            if (key != null) {
-                mgr.deleteProject(key);
-            }
-        }
-    }
-
-    @Test
-    public void testCreateGetUpdateDeleteProject() throws RedmineException {
-        Project projectToCreate = generateRandomProject();
-        String key = null;
-        try {
-            projectToCreate.setIdentifier("id" + new Date().getTime());
-            logger.debug("trying to create a project with id "
-                    + projectToCreate.getIdentifier());
-            Project createdProject = mgr.createProject(projectToCreate);
-            key = createdProject.getIdentifier();
-            String newDescr = "NEW123";
-            String newName = "new name here";
-
-            createdProject.setName(newName);
-            createdProject.setDescription(newDescr);
-            mgr.update(createdProject);
-
-            Project updatedProject = mgr.getProjectByKey(key);
-            assertNotNull(updatedProject);
-
-            assertEquals(createdProject.getIdentifier(),
-                    updatedProject.getIdentifier());
-            assertEquals(newName, updatedProject.getName());
-            assertEquals(newDescr, updatedProject.getDescription());
-            List<Tracker> trackers = updatedProject.getTrackers();
-            assertNotNull("checking that project has some trackers",
-                    trackers);
-            assertTrue("checking that project has some trackers",
-                    !(trackers.isEmpty()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        } finally {
-            if (key != null) {
-                mgr.deleteProject(key);
-            }
-        }
-    }
-
-    @Test
-    public void createProjectFailsWithReservedIdentifier() throws Exception {
-        Project projectToCreate = new Project();
-        projectToCreate.setName("new");
-        projectToCreate.setIdentifier("new");
-        String createdProjectKey = null;
-        try {
-            Project createdProject = mgr.createProject(projectToCreate);
-            // in case if the creation haven't failed (although it should have
-            // had!),
-            // need to cleanup - delete this project
-            createdProjectKey = createdProject.getIdentifier();
-
-        } catch (RedmineProcessingException e) {
-            assertNotNull(e.getErrors());
-            assertEquals(1, e.getErrors().size());
-            assertEquals("Identifier is reserved", e.getErrors().get(0));
-        } finally {
-            if (createdProjectKey != null) {
-                mgr.deleteProject(createdProjectKey);
-            }
-        }
-    }
-
-    private static Project generateRandomProject() {
-        Project project = new Project();
-        Long timeStamp = Calendar.getInstance().getTimeInMillis();
-        String key = "projkey" + timeStamp;
-        String name = "project number " + timeStamp;
-        String description = "some description for the project";
-        project.setIdentifier(key);
-        project.setName(name);
-        project.setDescription(description);
-        project.setHomepage("www.randompage" + timeStamp + ".com");
-        return project;
     }
 
     @Test
@@ -577,7 +397,7 @@ public class RedmineManagerTest {
             Issue created = mgr.createIssue(projectKey, toCreate);
             assertEquals(nonLatinSymbols, created.getSubject());
         } catch (Exception e) {
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -593,13 +413,13 @@ public class RedmineManagerTest {
                     newIssue.getId());
 
             // check AUTHOR
-            Integer EXPECTED_AUTHOR_ID = getOurUser().getId();
+            Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser().getId();
             assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor()
                     .getId());
 
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail();
+            fail();
         }
     }
 
@@ -608,16 +428,6 @@ public class RedmineManagerTest {
         Issue issueToCreate = new Issue();
         issueToCreate.setSubject("Summary line 100");
         mgr.createIssue("someNotExistingProjectKey", issueToCreate);
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testGetProjectNonExistingId() throws RedmineException {
-        mgr.getProjectByKey("some-non-existing-key");
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testDeleteNonExistingProject() throws RedmineException {
-        mgr.deleteProject("some-non-existing-key");
     }
 
     @Test(expected = NotFoundException.class)
@@ -632,158 +442,6 @@ public class RedmineManagerTest {
         Issue issue = new Issue();
         issue.setId(nonExistingId);
         mgr.update(issue);
-    }
-
-    @Test
-    public void usersAreLoadedByAdmin() {
-        try {
-            List<User> users = mgr.getUsers();
-            assertTrue(users.size() > 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-    }
-
-    @Test(expected = NotAuthorizedException.class)
-    public void usersCannotBeLoadedByNotAdmin() throws RedmineException {
-        getNonAdminManager().getUsers();
-        fail("Must have failed with NotAuthorizedException.");
-    }
-
-    @Test
-    public void userCanBeLoadedByIdByNonAdmin() throws RedmineException {
-        User userById = getNonAdminManager().getUserById(nonAdminUserId);
-        assertEquals(nonAdminUserId, userById.getId());
-    }
-
-    @Test
-    public void testGetCurrentUser() throws RedmineException {
-        User currentUser = mgr.getCurrentUser();
-        assertEquals(getOurUser().getId(), currentUser.getId());
-        assertEquals(getOurUser().getLogin(), currentUser.getLogin());
-    }
-
-    @Test
-    public void testGetUserById() throws RedmineException {
-        User loadedUser = mgr.getUserById(getOurUser().getId());
-        assertEquals(getOurUser().getId(), loadedUser.getId());
-        assertEquals(getOurUser().getLogin(), loadedUser.getLogin());
-        assertEquals(getOurUser().getApiKey(), loadedUser.getApiKey());
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testGetUserNonExistingId() throws RedmineException {
-        mgr.getUserById(999999);
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testInvalidGetCurrentUser() throws RedmineException {
-        RedmineManager invalidManager = new RedmineManager(testConfig.getURI()
-                + "/INVALID");
-        invalidManager.setLogin("Invalid");
-        invalidManager.setPassword("Invalid");
-        invalidManager.getCurrentUser();
-    }
-
-    @Test
-    public void testCreateUser() throws RedmineException {
-        User createdUser = null;
-        try {
-            User userToCreate = generateRandomUser();
-            createdUser = mgr.createUser(userToCreate);
-
-            assertNotNull(
-                    "checking that a non-null project is returned", createdUser);
-
-            assertEquals(userToCreate.getLogin(), createdUser.getLogin());
-            assertEquals(userToCreate.getFirstName(),
-                    createdUser.getFirstName());
-            assertEquals(userToCreate.getLastName(),
-                    createdUser.getLastName());
-            Integer id = createdUser.getId();
-            assertNotNull(id);
-
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        } finally {
-            if (createdUser != null) {
-                mgr.deleteUser(createdUser.getId());
-            }
-        }
-    }
-
-    private static User generateRandomUser() {
-        User user = new User();
-        user.setFirstName("fname");
-        user.setLastName("lname");
-        long randomNumber = new Date().getTime();
-        user.setLogin("login" + randomNumber);
-        user.setMail("somemail" + randomNumber + "@somedomain.com");
-        user.setPassword("zzzz1234");
-
-        return user;
-    }
-
-    @Test
-    public void testUpdateUser() throws RedmineAuthenticationException,
-            NotFoundException {
-        User userToCreate = new User();
-        userToCreate.setFirstName("fname2");
-        userToCreate.setLastName("lname2");
-        long randomNumber = new Date().getTime();
-        userToCreate.setLogin("login33" + randomNumber);
-        userToCreate.setMail("email" + randomNumber + "@somedomain.com");
-        userToCreate.setPassword("1234asdf");
-        try {
-            User createdUser = mgr.createUser(userToCreate);
-            Integer userId = createdUser.getId();
-            assertNotNull(
-                    "checking that a non-null project is returned", createdUser);
-
-            String newFirstName = "fnameNEW";
-            String newLastName = "lnameNEW";
-            String newMail = "newmail" + randomNumber + "@asd.com";
-            createdUser.setFirstName(newFirstName);
-            createdUser.setLastName(newLastName);
-            createdUser.setMail(newMail);
-
-            mgr.update(createdUser);
-
-            User updatedUser = mgr.getUserById(userId);
-
-            assertEquals(newFirstName, updatedUser.getFirstName());
-            assertEquals(newLastName, updatedUser.getLastName());
-            assertEquals(newMail, updatedUser.getMail());
-            assertEquals(userId, updatedUser.getId());
-
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void userCanBeDeleted() throws RedmineException {
-        User user = generateRandomUser();
-        User createdUser = mgr.createUser(user);
-        Integer newUserId = createdUser.getId();
-
-        try {
-            mgr.deleteUser(newUserId);
-        } catch (Exception e) {
-            Assert.fail(e.getMessage());
-        }
-        try {
-            mgr.getUserById(newUserId);
-            fail("Must have failed with NotFoundException because we tried to delete the user");
-        } catch (NotFoundException e) {
-            // ignore: the user should not be found
-        }
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void deletingNonExistingUserThrowsNFE() throws RedmineException {
-        mgr.deleteUser(999999);
     }
 
     @Test
@@ -802,7 +460,7 @@ public class RedmineManagerTest {
             assertEquals(issues.size(), issueSet.size());
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -822,37 +480,6 @@ public class RedmineManagerTest {
         Issue issue = new Issue();
         issue.setSubject("some issue " + r.nextInt() + " " + new Date());
         return issue;
-    }
-
-    @Test
-    public void testProjectsAllPagesLoaded() throws RedmineException {
-        int NUM = 27; // must be larger than 25, which is a default page size in
-        // Redmine
-        List<Project> projects = createProjects(NUM);
-
-        List<Project> loadedProjects = mgr.getProjects();
-        assertTrue(
-                "Number of projects loaded from the server must be bigger than "
-                        + NUM + ", but it's " + loadedProjects.size(),
-                loadedProjects.size() > NUM);
-
-        deleteProjects(projects);
-    }
-
-    private List<Project> createProjects(int num) throws RedmineException {
-        List<Project> projects = new ArrayList<Project>(num);
-        for (int i = 0; i < num; i++) {
-            Project projectToCreate = generateRandomProject();
-            Project p = mgr.createProject(projectToCreate);
-            projects.add(p);
-        }
-        return projects;
-    }
-
-    private void deleteProjects(List<Project> projects) throws RedmineException {
-        for (Project p : projects) {
-            mgr.deleteProject(p.getIdentifier());
-        }
     }
 
     @Test
@@ -1014,22 +641,18 @@ public class RedmineManagerTest {
             assertEquals("Estimated hours must be NULL", null,
                     reloadedFromRedmineIssue.getEstimatedHours());
         } catch (Exception e) {
-            Assert.fail();
+            fail();
         }
     }
 
     /**
      * Tests the correct retrieval of the parent id of sub {@link Project}.
-     * 
-     * @throws RedmineProcessingException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineProcessingException     thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testSubProjectIsCreatedWithCorrectParentId()
@@ -1132,7 +755,7 @@ public class RedmineManagerTest {
             assertEquals("Description must be erased", "",
                     reloadedFromRedmineIssueUnchanged.getDescription());
         } catch (Exception e) {
-            Assert.fail();
+            fail();
         }
     }
 
@@ -1161,7 +784,7 @@ public class RedmineManagerTest {
             Journal journalItem = loadedIssueWithJournals2.getJournals().get(0);
             assertEquals(commentDescribingTheUpdate,
                     journalItem.getNotes());
-            User ourUser = getOurUser();
+            User ourUser = IntegrationTestHelper.getOurUser();
             // can't compare User objects because either of them is not
             // completely filled
             assertEquals(ourUser.getId(), journalItem.getUser().getId());
@@ -1181,7 +804,7 @@ public class RedmineManagerTest {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -1199,7 +822,7 @@ public class RedmineManagerTest {
             assertEquals(target.getId(), r.getIssueToId());
             assertEquals(relationText, r.getType());
         } catch (Exception e) {
-            Assert.fail(e.toString());
+            fail(e.toString());
         }
     }
 
@@ -1234,7 +857,7 @@ public class RedmineManagerTest {
             // both forward and reverse relations are the same!
             assertEquals(relation1, reverseRelation);
         } catch (Exception e) {
-            Assert.fail(e.toString());
+            fail(e.toString());
         }
     }
 
@@ -1294,27 +917,6 @@ public class RedmineManagerTest {
                 versionName);
     }
 
-    // Redmine ignores this parameter for "get projects" request. see bug
-    // http://www.redmine.org/issues/8545
-    @Ignore
-    @Test
-    public void testGetProjectsIncludesTrackers() {
-        try {
-            List<Project> projects = mgr.getProjects();
-            assertTrue(projects.size() > 0);
-            Project p1 = projects.get(0);
-            assertNotNull(p1.getTrackers());
-            for (Project p : projects)
-                if (!p.getTrackers().isEmpty())
-                    return;
-            Assert.fail("No projects with trackers found");
-            logger.debug("Created trackers " + p1.getTrackers());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
-        }
-    }
-
     /**
      * Not supported by Redmine REST API.
      */
@@ -1332,7 +934,7 @@ public class RedmineManagerTest {
             Issue newIssue = mgr.getIssueById(createdIssue.getId());
             assertEquals((Float) spentHours, newIssue.getSpentHours());
         } catch (Exception e) {
-            Assert.fail();
+            fail();
         }
     }
 
@@ -1374,16 +976,12 @@ public class RedmineManagerTest {
 
     /**
      * tests the retrieval of statuses.
-     * 
-     * @throws RedmineProcessingException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineProcessingException     thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testGetStatuses() throws RedmineException {
@@ -1402,13 +1000,10 @@ public class RedmineManagerTest {
 
     /**
      * tests the creation of an invalid {@link Version}.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidVersion() throws RedmineException {
@@ -1420,13 +1015,10 @@ public class RedmineManagerTest {
     /**
      * tests the deletion of an invalid {@link Version}. Expects a
      * {@link NotFoundException} to be thrown.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidVersion() throws RedmineException {
@@ -1443,13 +1035,10 @@ public class RedmineManagerTest {
 
     /**
      * tests the deletion of a {@link Version}.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testDeleteVersion() throws RedmineException {
@@ -1473,13 +1062,10 @@ public class RedmineManagerTest {
 
     /**
      * tests the retrieval of {@link Version}s.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testGetVersions() throws RedmineException {
@@ -1530,7 +1116,7 @@ public class RedmineManagerTest {
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(description, versionById.getDescription());
     }
-    
+
     @Test
     public void versionIsUpdatedIncludingDueDate() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
@@ -1546,22 +1132,18 @@ public class RedmineManagerTest {
 
     /**
      * tests the creation and deletion of a {@link IssueCategory}.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
         IssueCategory category = new IssueCategory(project, "Category" + new Date().getTime());
-        category.setAssignee(getOurUser());
+        category.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory = mgr.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
         assertNotNull("Expected project of new category not to be null", newIssueCategory.getProject());
@@ -1578,16 +1160,12 @@ public class RedmineManagerTest {
 
     /**
      * tests the retrieval of {@link IssueCategory}s.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testGetIssueCategories() throws RedmineException {
@@ -1595,12 +1173,12 @@ public class RedmineManagerTest {
         // create some categories
         IssueCategory testIssueCategory1 = new IssueCategory(project,
                 "Category" + new Date().getTime());
-        testIssueCategory1.setAssignee(getOurUser());
+        testIssueCategory1.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory1 = mgr
                 .createCategory(testIssueCategory1);
         IssueCategory testIssueCategory2 = new IssueCategory(project,
                 "Category" + new Date().getTime());
-        testIssueCategory2.setAssignee(getOurUser());
+        testIssueCategory2.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory2 = mgr
                 .createCategory(testIssueCategory2);
         try {
@@ -1632,16 +1210,12 @@ public class RedmineManagerTest {
 
     /**
      * tests the creation of an invalid {@link IssueCategory}.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidIssueCategory() throws RedmineException {
@@ -1653,16 +1227,12 @@ public class RedmineManagerTest {
     /**
      * tests the deletion of an invalid {@link IssueCategory}. Expects a
      * {@link NotFoundException} to be thrown.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidIssueCategory() throws RedmineException {
@@ -1677,16 +1247,12 @@ public class RedmineManagerTest {
 
     /**
      * Tests the retrieval of {@link Tracker}s.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testGetTrackers() throws RedmineException {
@@ -1707,16 +1273,12 @@ public class RedmineManagerTest {
      * Tests the creation and retrieval of an
      * {@link com.taskadapter.redmineapi.bean.Issue} with a
      * {@link IssueCategory}.
-     * 
-     * @throws RedmineException
-     *             thrown in case something went wrong in Redmine
-     * @throws IOException
-     *             thrown in case something went wrong while performing I/O
-     *             operations
-     * @throws RedmineAuthenticationException
-     *             thrown in case something went wrong while trying to login
-     * @throws NotFoundException
-     *             thrown in case the objects requested for could not be found
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testCreateAndGetIssueWithCategory() throws RedmineException {
@@ -1727,11 +1289,11 @@ public class RedmineManagerTest {
             // create an issue category
             IssueCategory category = new IssueCategory(project, "Category_"
                     + new Date().getTime());
-            category.setAssignee(getOurUser());
+            category.setAssignee(IntegrationTestHelper.getOurUser());
             newIssueCategory = mgr.createCategory(category);
             // create an issue
             Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("getIssueWithCategory_"+ UUID.randomUUID());
+            issueToCreate.setSubject("getIssueWithCategory_" + UUID.randomUUID());
             issueToCreate.setCategory(newIssueCategory);
             newIssue = mgr.createIssue(projectKey, issueToCreate);
             // retrieve issue
@@ -1739,7 +1301,7 @@ public class RedmineManagerTest {
             // assert retrieved category of issue
             IssueCategory retrievedCategory = retrievedIssue.getCategory();
             assertNotNull("Category retrieved for issue " + newIssue.getId()
-                            + " should not be null", retrievedCategory);
+                    + " should not be null", retrievedCategory);
             assertEquals("ID of category retrieved for issue "
                     + newIssue.getId() + " is wrong", newIssueCategory.getId(),
                     retrievedCategory.getId());
@@ -1816,25 +1378,6 @@ public class RedmineManagerTest {
         final Issue iss3 = mgr.getIssueById(iss2.getId());
         assertEquals("New subject", iss3.getSubject());
         assertEquals("Original description", iss3.getDescription());
-    }
-
-    @Test
-    public void tryUpdateProjectWithLongHomepage() throws RedmineException {
-        final Project project = generateRandomProject();
-        project.setName("issue 7 test project");
-        project.setDescription("test");
-        final String longHomepageName = "http://www.localhost.com/asdf?a=\"&b=\"&c=\"&d=\"&e=\"&f=\"&g=\"&h=\"&i=\"&j=\"&k=\"&l=\"&m=\"&n=\"&o=\"&p=\"&q=\"&r=\"&s=\"&t=\"&u=\"&v=\"&w=\"&x=\"&y=\"&zо=авфбвоафжывлдаофжывладоджлфоывадлфоываждфлоываждфлоываждлфоываждлфова&&\\&&&&&&&&&&&&&&&&&&\\&&&&&&&&&&&&&&&&&&&&&&&&&&&&<>>";
-        project.setHomepage(longHomepageName);
-        final Project created = mgr.createProject(project);
-        created.setDescription("updated description");
-        try {
-            mgr.update(created);
-            final Project updated = mgr
-                    .getProjectByKey(project.getIdentifier());
-            assertEquals(longHomepageName, updated.getHomepage());
-        } finally {
-            mgr.deleteProject(created.getIdentifier());
-        }
     }
 
     @Test
@@ -1932,16 +1475,16 @@ public class RedmineManagerTest {
         assertTrue(queries.size() > 0);
     }
 
-   /**
-    * Requires Redmine 2.1
-    */
+    /**
+     * Requires Redmine 2.1
+     */
     @Test
     public void testAddUserToGroup() throws RedmineException {
         final Group template = new Group();
         template.setName("testAddUserToGroup " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
-            final User newUser = mgr.createUser(generateRandomUser());
+            final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
             try {
                 mgr.addUserToGroup(newUser, group);
                 final List<Group> userGroups = mgr.getUserById(newUser.getId()).getGroups();
@@ -1954,17 +1497,17 @@ public class RedmineManagerTest {
             mgr.deleteGroup(group);
         }
     }
-    
-   /**
-    * Requires Redmine 2.1
-    */
+
+    /**
+     * Requires Redmine 2.1
+     */
     @Test
     public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
         final Group template = new Group();
         template.setName("some test " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
-            final User newUser = mgr.createUser(generateRandomUser());
+            final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
             try {
                 mgr.addUserToGroup(newUser, group);
                 mgr.addUserToGroup(newUser, group);
@@ -1982,32 +1525,32 @@ public class RedmineManagerTest {
         final Group template = new Group();
         template.setName("Template group " + System.currentTimeMillis());
         final Group created = mgr.createGroup(template);
-        
+
         try {
             assertEquals(template.getName(), created.getName());
             final Group loaded = mgr.getGroupById(created.getId());
             assertEquals(template.getName(), loaded.getName());
-            
+
             final Group update = new Group();
             update.setId(loaded.getId());
             update.setName("Group update " + System.currentTimeMillis());
-            
+
             mgr.update(update);
-            
+
             final Group loaded2 = mgr.getGroupById(created.getId());
             assertEquals(update.getName(), loaded2.getName());
         } finally {
             mgr.deleteGroup(created);
         }
-        
+
         try {
             mgr.getGroupById(created.getId());
-            Assert.fail("Group should be deleted but was found");
+            fail("Group should be deleted but was found");
         } catch (NotFoundException e) {
             // OK!
         }
     }
-    
+
     @Test
     public void testGetRoleById() throws RedmineException {
         final Collection<Role> roles = mgr.getRoles();
@@ -2017,7 +1560,7 @@ public class RedmineManagerTest {
             assertEquals(r.getInherited(), loaded.getInherited());
         }
     }
-    
+
     @Test
     public void testRolesHasPermissions() throws RedmineException {
         final Collection<Role> roles = mgr.getRoles();
@@ -2025,9 +1568,9 @@ public class RedmineManagerTest {
             final Role loaded = mgr.getRoleById(r.getId());
             if (loaded.getPermissions() != null && !loaded.getPermissions().isEmpty())
                 return;
-            
+
         }
-        Assert.fail("Failed to find a role with a permissions");
+        fail("Failed to find a role with a permissions");
     }
 
     /**
@@ -2068,13 +1611,6 @@ public class RedmineManagerTest {
         assertTrue(mgr.getTimeEntryActivities().size() > 0);
     }
 
-    private RedmineManager getNonAdminManager() {
-        RedmineManager nonAdminManager = new RedmineManager(testConfig.getURI());
-        nonAdminManager.setLogin(nonAdminUserLogin);
-        nonAdminManager.setPassword(nonAdminPassword);
-        return nonAdminManager;
-    }
-
     /**
      * Requires Redmine 2.3
      */
@@ -2084,7 +1620,7 @@ public class RedmineManagerTest {
         final Issue retrievedIssue = mgr.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
-        final User newUser = mgr.createUser(generateRandomUser());
+        final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
         try {
             Watcher watcher = new Watcher(newUser.getId(), null);
             mgr.addWatcherToIssue(watcher, issue);
@@ -2104,7 +1640,7 @@ public class RedmineManagerTest {
         final Issue retrievedIssue = mgr.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
-        final User newUser = mgr.createUser(generateRandomUser());
+        final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
         try {
             Watcher watcher = new Watcher(newUser.getId(), null);
             mgr.addWatcherToIssue(watcher, issue);
@@ -2125,7 +1661,7 @@ public class RedmineManagerTest {
         final Issue retrievedIssue = mgr.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
-        final User newUser = mgr.createUser(generateRandomUser());
+        final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
         try {
             Watcher watcher = new Watcher(newUser.getId(), null);
             mgr.addWatcherToIssue(watcher, issue);
@@ -2141,5 +1677,4 @@ public class RedmineManagerTest {
 
         mgr.getIssueById(issue.getId());
     }
-
 }

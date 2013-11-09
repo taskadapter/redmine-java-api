@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +10,28 @@ import java.util.Calendar;
 public class IntegrationTestHelper {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTestHelper.class);
 
+    // to make sure we all use the same config
+    public static TestConfig getTestConfig() {
+        return new TestConfig();
+    }
+
+    public static User getOurUser() {
+        TestConfig testConfig = getTestConfig();
+        Integer userId = Integer.parseInt(testConfig.getParam("createissue.userid"));
+        String login = testConfig.getLogin();
+        String fName = testConfig.getParam("userFName");
+        String lName = testConfig.getParam("userLName");
+        User user = new User();
+        user.setId(userId);
+        user.setLogin(login);
+        user.setFirstName(fName);
+        user.setLastName(lName);
+        user.setApiKey(testConfig.getParam("apikey"));
+        return user;
+    }
+
     public static RedmineManager createRedmineManager() {
-        TestConfig testConfig = new TestConfig();
+        TestConfig testConfig = getTestConfig();
         logger.info("Running Redmine integration tests using: " + testConfig.getURI());
         RedmineManager manager = new RedmineManager(testConfig.getURI());
         manager.setLogin(testConfig.getLogin());
@@ -26,7 +47,7 @@ public class IntegrationTestHelper {
         testProject.setName("test project");
         testProject.setIdentifier("test" + Calendar.getInstance().getTimeInMillis());
 
-        String projectKey = null;
+        String projectKey;
         try {
             Project createdProject = mgr.createProject(testProject);
             projectKey = createdProject.getIdentifier();
