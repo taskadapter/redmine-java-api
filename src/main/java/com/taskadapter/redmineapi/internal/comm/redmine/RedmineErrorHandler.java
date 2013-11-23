@@ -41,19 +41,21 @@ public final class RedmineErrorHandler implements
 			throw new NotAuthorizedException(
 					"Forbidden. Please check the user has proper permissions.");
 		}
-		if (responseCode == HttpStatus.SC_NOT_FOUND) {
+        String responseBody = getContent(httpResponse);
+        if (responseCode == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException(
 					"Server returned '404 not found'. response body:"
-							+ getContent(httpResponse));
+							+ responseBody);
 		}
 
 		if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
 			List<String> errors;
 			try {
-				errors = RedmineJSONParser.parseErrors(getContent(httpResponse));
+				errors = RedmineJSONParser.parseErrors(responseBody);
 				errors = remap(errors);
 			} catch (JSONException e) {
-				throw new RedmineFormatException("Bad redmine error response", e);
+				throw new RedmineFormatException("Bad redmine error response. Content: \""
+                        + responseBody + "\"", e);
 			}
 			throw new RedmineProcessingException(errors);
 		}
