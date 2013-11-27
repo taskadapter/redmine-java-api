@@ -1,14 +1,5 @@
 package com.taskadapter.redmineapi.internal.comm.redmine;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
-import com.taskadapter.redmineapi.internal.comm.ContentHandler;
-import org.apache.http.HttpStatus;
-import org.json.JSONException;
 import com.taskadapter.redmineapi.NotAuthorizedException;
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
@@ -16,7 +7,16 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineProcessingException;
 import com.taskadapter.redmineapi.internal.RedmineJSONParser;
+import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.Communicators;
+import com.taskadapter.redmineapi.internal.comm.ContentHandler;
+import org.apache.http.HttpStatus;
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class RedmineErrorHandler implements
         ContentHandler<BasicHttpResponse, BasicHttpResponse> {
@@ -41,21 +41,19 @@ public final class RedmineErrorHandler implements
 			throw new NotAuthorizedException(
 					"Forbidden. Please check the user has proper permissions.");
 		}
-        String responseBody = getContent(httpResponse);
-        if (responseCode == HttpStatus.SC_NOT_FOUND) {
+		if (responseCode == HttpStatus.SC_NOT_FOUND) {
 			throw new NotFoundException(
 					"Server returned '404 not found'. response body:"
-							+ responseBody);
+							+ getContent(httpResponse));
 		}
 
 		if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
 			List<String> errors;
 			try {
-				errors = RedmineJSONParser.parseErrors(responseBody);
+				errors = RedmineJSONParser.parseErrors(getContent(httpResponse));
 				errors = remap(errors);
 			} catch (JSONException e) {
-				throw new RedmineFormatException("Bad redmine error response. Content: \""
-                        + responseBody + "\"", e);
+				throw new RedmineFormatException("Bad redmine error response", e);
 			}
 			throw new RedmineProcessingException(errors);
 		}
