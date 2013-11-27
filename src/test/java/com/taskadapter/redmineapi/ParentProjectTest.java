@@ -1,37 +1,34 @@
 package com.taskadapter.redmineapi;
 
-import junit.framework.Assert;
-
+import com.taskadapter.redmineapi.bean.Project;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.RedmineManager;
-import com.taskadapter.redmineapi.bean.Project;
+import static org.junit.Assert.assertEquals;
 
 public class ParentProjectTest {
 
     private static RedmineManager mgr;
 
-  @BeforeClass
+    @BeforeClass
     public static void oneTimeSetUp() {
-    TestConfig testConfig = new TestConfig();
+        TestConfig testConfig = new TestConfig();
         mgr = new RedmineManager(testConfig.getURI());
         mgr.setLogin(testConfig.getLogin());
         mgr.setPassword(testConfig.getPassword());
     }
 
     @Test
-    public void testProjectParentId() throws RedmineException {
-        String parentKey = "parent";
-        String childKey = "child";
+    public void childProjectGetsCorrectParentId() throws RedmineException {
+        String parentKey = "parent" + System.currentTimeMillis();
+        String childKey = "child" + System.currentTimeMillis();
 
         Project parentProject = createProject(parentKey, "Parent Project", null);
-        Project childProject = 
+        Project childProject =
                 createProject(childKey, "Child Project", parentProject.getId());
 
         try {
-            Assert.assertEquals(childProject.getParentId(), parentProject.getId());
+            assertEquals(childProject.getParentId(), parentProject.getId());
         } finally {
             mgr.deleteProject(childKey);
             mgr.deleteProject(parentKey);
