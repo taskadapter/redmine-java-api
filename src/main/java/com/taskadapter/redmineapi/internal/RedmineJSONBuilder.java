@@ -20,6 +20,7 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Wiki;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 import com.taskadapter.redmineapi.internal.json.JsonOutput;
 
@@ -115,6 +116,22 @@ public class RedmineJSONBuilder {
 			writeMembership(writer, object);
 		}
 	};
+	
+	public static JsonObjectWriter<Wiki> WIKI_WRITER = new JsonObjectWriter<Wiki>() {
+        @Override
+        public void write(JSONWriter writer, Wiki object)
+                throws JSONException {
+            writeWiki(writer, object);
+        }
+    };
+    
+    public static JsonObjectWriter<Wiki> WIKIPARENT_WRITER = new JsonObjectWriter<Wiki>() {
+        @Override
+        public void write(JSONWriter writer, Wiki object)
+                throws JSONException {
+            writeWikiParent(writer, object);
+        }
+    };
 
 	/**
 	 * Writes a "create project" request.
@@ -371,6 +388,33 @@ public class RedmineJSONBuilder {
 		}
 		writer.endObject();
 	}
+	
+    private static void writeWiki( JSONWriter writer, Wiki wikiPage )
+        throws JSONException
+    {
+        if ( wikiPage == null )
+            return;
+        JsonOutput.addIfNotNull(writer, "title", wikiPage.getTitle());
+        JsonOutput.addIfNotNull(writer, "text", wikiPage.getText());
+        addIfNotNullFull(writer, "created_on", wikiPage.getCreatedOn());
+        if (wikiPage.getAttachments() != null && wikiPage.getAttachments().size() > 0) {
+            final List<Attachment> uploads = new ArrayList<Attachment>();
+            for (Attachment attach : wikiPage.getAttachments())
+                if (attach.getToken() != null)
+                    uploads.add(attach);
+            JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
+                    UPLOAD_WRITER);
+        }
+        JsonOutput.addIfNotNull( writer, "parent", wikiPage.getParent(), WIKIPARENT_WRITER );
+    }
+    
+    private static void writeWikiParent( JSONWriter writer, Wiki wikiPage )
+        throws JSONException
+    {
+        if ( wikiPage == null )
+            return;
+        JsonOutput.addIfNotNull(writer, "title", wikiPage.getTitle().replace( ' ', '_' ));
+    }
 
 	/**
 	 * Adds a value to a writer if value is not <code>null</code>.
