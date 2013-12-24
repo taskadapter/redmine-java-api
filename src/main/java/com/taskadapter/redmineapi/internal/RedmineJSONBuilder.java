@@ -239,12 +239,7 @@ public class RedmineJSONBuilder {
 		addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
 		JsonOutput.addIfNotNull(writer, "parent_id", project.getParentId());
 		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(),
-				TRACKER_WRITER);
-	}
-
-	public static void writeCategory(IssueCategory category,
-			final JSONWriter writer) throws JSONException {
-		writer.key("id");
+				TRACKER_WRITER)w
 		writer.value(category.getId());
 		JsonOutput.addIfNotNull(writer, "name", category.getName());
 		if (category.getProject() != null)
@@ -313,6 +308,15 @@ public class RedmineJSONBuilder {
 					.getId());
 		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
+
+		if (issue.getWatchers() != null && issue.getWatchers().size() > 0) {
+			writer.key("watcher_user_ids");
+			writer.array();
+			for (Watcher watcher: issue.getWatchers())
+				if (watcher.getId() != null)
+					writer.value(watcher.getId());
+			writer.endArray();
+		}
 
 		if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
 			final List<Attachment> uploads = new ArrayList<Attachment>();
