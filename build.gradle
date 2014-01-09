@@ -29,6 +29,19 @@ dependencies {
     )
 }
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0' // coveralls plugin depends on cobertura plugin
+    }
+}
+
+apply plugin: 'cobertura'
+cobertura.coverageFormats = ['html', 'xml']
+
 // A PGP key is required to sign the artifacts before uploading to OSS Sonatype Maven repository.
 // Put the PGP key info in your <home>/.gradle/gradle.properties file:
 // signing.keyId=...
@@ -43,11 +56,13 @@ uploadArchives {
         mavenDeployer {
             // set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
             // standard properties file format: "ossUser=myOssUser", etc.
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: ossUser, password: ossPassword)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: ossUser, password: ossPassword)
+            if(project.hasProperty('ossUser') && project.hasProperty('ossPassword')) {
+                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                    authentication(userName: ossUser, password: ossPassword)
+                }
+                snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+                    authentication(userName: ossUser, password: ossPassword)
+                }
             }
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
