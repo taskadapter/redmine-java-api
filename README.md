@@ -3,6 +3,7 @@
 
 # Redmine/Chiliproject Java API.
 
+* Requires Java 6.
 * Uses Redmine REST API
 * Does not require any plugins installed on Redmine/Chiliproject server.
 * Runs on any standard Java platform

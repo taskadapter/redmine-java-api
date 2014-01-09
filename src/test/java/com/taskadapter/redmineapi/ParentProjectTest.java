@@ -1,48 +1,37 @@
 package com.taskadapter.redmineapi;
 
-import junit.framework.Assert;
-
+import com.taskadapter.redmineapi.bean.Project;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.RedmineManager;
-import com.taskadapter.redmineapi.bean.Project;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
 
 public class ParentProjectTest {
 
-    private final Logger logger = LoggerFactory.getLogger(ParentProjectTest.class);
-
     private static RedmineManager mgr;
 
-  @BeforeClass
+    @BeforeClass
     public static void oneTimeSetUp() {
-    TestConfig testConfig = new TestConfig();
+        TestConfig testConfig = new TestConfig();
         mgr = new RedmineManager(testConfig.getURI());
         mgr.setLogin(testConfig.getLogin());
         mgr.setPassword(testConfig.getPassword());
     }
 
     @Test
-    public void testProjectParentId() throws RedmineException {
-        String parentKey = "parent";
-        String childKey = "child";
+    public void childProjectGetsCorrectParentId() throws RedmineException {
+        String parentKey = "parent" + System.currentTimeMillis();
+        String childKey = "child" + System.currentTimeMillis();
+
+        Project parentProject = createProject(parentKey, "Parent Project", null);
+        Project childProject = 
+                createProject(childKey, "Child Project", parentProject.getId());
 
         try {
-            Project parentProject = createProject(parentKey, "Parent Project", null);
-            Project childProject =
-                    createProject(childKey, "Child Project", parentProject.getId());
-
-            Assert.assertEquals(childProject.getParentId(), parentProject.getId());
+            assertEquals(childProject.getParentId(), parentProject.getId());
         } finally {
-            try {
-                mgr.deleteProject(parentKey);
-                mgr.deleteProject(childKey);
-            } catch (RedmineException e) {
-                logger.debug("Unable to delete a project.", e);
-            }
+            mgr.deleteProject(childKey);
+            mgr.deleteProject(parentKey);
         }
     }
 
