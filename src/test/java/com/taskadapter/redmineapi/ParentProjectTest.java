@@ -24,7 +24,7 @@ public class ParentProjectTest {
         String childKey = "child" + System.currentTimeMillis();
 
         Project parentProject = createProject(parentKey, "Parent Project", null);
-        Project childProject = 
+        Project childProject =
                 createProject(childKey, "Child Project", parentProject.getId());
 
         try {

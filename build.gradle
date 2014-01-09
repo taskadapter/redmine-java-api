@@ -3,28 +3,11 @@ apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-apply plugin: 'eclipse'
-apply plugin: 'idea'
-
-
 group = 'com.taskadapter'
 version = '1.23'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0' // coveralls plugin depends on cobertura plugin
-    }
-}
-
-apply plugin: 'cobertura'
-cobertura.coverageFormats = ['html', 'xml']
 
 tasks.withType(Compile) {
     options.encoding = 'UTF-8'
@@ -51,20 +34,16 @@ dependencies {
 // signing.keyId=...
 // signing.password=...
 // signing.secretKeyRingFile=c:/Users/ask/.gnupg/secring.gpg
-if (signing.signatory) {
-    signing {
-        sign configurations.archives
-    }
+signing {
+    sign configurations.archives
 }
 
 uploadArchives {
     repositories {
         mavenDeployer {
 
-            if (signing.signatory) {
-                beforeDeployment {
-                    signing.signPom(it)
-                }
+            beforeDeployment {
+                signing.signPom(it)
                 // set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
                 // standard properties file format: "ossUser=myOssUser", etc.
                 repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {

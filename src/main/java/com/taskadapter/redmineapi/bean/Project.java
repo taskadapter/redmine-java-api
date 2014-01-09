@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class Project implements Identifiable, Serializable {
      */
     private Integer parentId;
 
-    private List<CustomField> customFields;
+    private List<CustomField> customFields = new ArrayList<CustomField>();
 
     public String getHomepage() {
         return homepage;

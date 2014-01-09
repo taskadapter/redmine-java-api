@@ -1,6 +1,3 @@
-[![Coverage Status](https://coveralls.io/repos/alecharp/redmine-java-api/badge.png)](https://coveralls.io/r/alecharp/redmine-java-api)
-[![Build Status](https://travis-ci.org/alecharp/redmine-java-api.png?branch=master)](https://travis-ci.org/alecharp/redmine-java-api)
-
 # Redmine/Chiliproject Java API.
 
 * Requires Java 6.
