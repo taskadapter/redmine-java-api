@@ -169,7 +169,6 @@ public class Project implements Identifiable, Serializable {
     }
 
     public CustomField getCustomFieldById(int customFieldId) {
-        if(customFields == null) return null;
         for (CustomField customField : customFields) {
             if (customFieldId == customField.getId()) {
                 return customField;
