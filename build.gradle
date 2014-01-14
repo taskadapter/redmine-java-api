@@ -41,6 +41,14 @@ signing {
 uploadArchives {
     repositories {
         mavenDeployer {
+            // set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
+            // standard properties file format: "ossUser=myOssUser", etc.
+            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                authentication(userName: ossUser, password: ossPassword)
+            }
+            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+                authentication(userName: ossUser, password: ossPassword)
+            }
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 

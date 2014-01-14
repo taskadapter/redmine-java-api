@@ -142,7 +142,6 @@ public class RedmineJSONParserTest {
                 .getResponseSingleObject(json, "project"));
 
         Assert.assertEquals(project.getCustomFields().size(), 2);
-        Assert.assertNotNull(project.getCustomFieldById(1));
         String expectedCustomeFieldValue = "Should have a value";
         Assert.assertEquals(expectedCustomeFieldValue, project.getCustomFieldById(1).getValue());
         Assert.assertEquals("", project.getCustomFieldById(6).getValue());
