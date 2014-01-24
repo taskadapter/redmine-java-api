@@ -30,8 +30,10 @@ public class ParentProjectTest {
         try {
             assertEquals(childProject.getParentId(), parentProject.getId());
         } finally {
+            // Alexey: I verified that deleting the parent project deletes the child one as well
+            // (at least on Redmine 2.3.3)
+            // Thus, there's no need in deleting the child one separately
             mgr.deleteProject(parentKey);
-            mgr.deleteProject(childKey);
         }
     }
 
