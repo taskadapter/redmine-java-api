@@ -194,6 +194,7 @@ public class RedmineJSONBuilder {
 		addIfNotNullShort2(writer, "due_date", version.getDueDate());
 		addIfNotNullFull(writer, "created_on", version.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", version.getUpdatedOn());
+        writeCustomFields(writer, version.getCustomFields());
 	}
 
 	/**

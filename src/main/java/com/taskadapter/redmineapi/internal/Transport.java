@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.taskadapter.redmineapi.bean.*;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -35,24 +36,6 @@ import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineOptions;
-import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.Identifiable;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssuePriority;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueStatus;
-import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.SavedQuery;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryActivity;
-import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.comm.BaseCommunicator;
 import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.Communicator;
@@ -148,6 +131,11 @@ public final class Transport {
                 Watcher.class,
                 config("watcher", "watchers", null,
                         RedmineJSONParser.WATCHER_PARSER));
+
+        OBJECT_CONFIGS.put(
+                CustomFieldDefinition.class,
+                config("custom_field", "custom_fields", null,
+                        RedmineJSONParser.CUSTOM_FIELD_DEFINITION_PARSER));
 	}
 
 	private final URIConfigurator configurator;

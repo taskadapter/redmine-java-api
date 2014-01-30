@@ -42,6 +42,7 @@ public class URIConfigurator {
 		urls.put(IssuePriority.class, "enumerations/issue_priorities");
         urls.put(TimeEntryActivity.class, "enumerations/time_entry_activities");
 		urls.put(Watcher.class, "watchers");
+        urls.put(CustomFieldDefinition.class, "custom_fields");
 	}
 
 	private final URL baseURL;
