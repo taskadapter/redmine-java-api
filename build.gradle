@@ -38,16 +38,20 @@ signing {
     sign configurations.archives
 }
 
+// password can be set in gradle.properties or environment variable (check "build environment" on Jenkins)
+// typically you set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
+// standard properties file format: "ossUser=myOssUser", etc.
+def ossUserVar = hasProperty("ossUser") ? ossUser : ""
+def ossPasswordVar = hasProperty("ossPassword") ? ossPassword : ""
+
 uploadArchives {
     repositories {
         mavenDeployer {
-            // set "ossUser" and "ossPassword" properties in your <home>/.gradle/gradle.properties file,
-            // standard properties file format: "ossUser=myOssUser", etc.
             repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: ossUser, password: ossPassword)
+                authentication(userName: ossUserVar, password: ossPasswordVar)
             }
             snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                authentication(userName: ossUser, password: ossPassword)
+                authentication(userName: ossUserVar, password: ossPasswordVar)
             }
 
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
