@@ -455,6 +455,8 @@ public class RedmineJSONParser {
 		result.setDueDate(getShortDateOrNull(content, "due_date"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
+		result.setCustomFields(JsonInput.getListOrEmpty(content,
+				"custom_fields", RedmineJSONParser.CUSTOM_FIELD_PARSER));
 		return result;
 	}
 
