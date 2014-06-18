@@ -1,6 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Redmine's project version
@@ -22,6 +24,7 @@ public class Version implements Identifiable {
     private Date dueDate;
     private Date createdOn;
     private Date updatedOn;
+    private List<CustomField> customFields = new ArrayList<CustomField>();
 
     /**
      * Required for reflective construction.
@@ -38,6 +41,9 @@ public class Version implements Identifiable {
         this.name = name;
     }
 
+    /**
+     * Version objects are considered to be equal if their IDs are not null and equal.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,6 +124,26 @@ public class Version implements Identifiable {
 
     public void setUpdatedOn(Date updatedOn) {
         this.updatedOn = updatedOn;
+    }
+
+    public List<CustomField> getCustomFields() {
+        return customFields;
+    }
+
+    public void setCustomFields(List<CustomField> customFields) {
+        this.customFields = customFields;
+    }
+
+    /**
+     * @return the field with the given ID or NULL if the field is not found.
+     */
+    public CustomField getCustomFieldById(int customFieldId) {
+        for (CustomField customField : customFields) {
+            if (customFieldId == customField.getId()) {
+                return customField;
+            }
+        }
+        return null;
     }
 
     @Override
