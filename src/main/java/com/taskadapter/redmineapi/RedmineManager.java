@@ -30,30 +30,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.CopyBytesHandler;
 import com.taskadapter.redmineapi.internal.Joiner;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.taskadapter.redmineapi.bean.Attachment;
-import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.Identifiable;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssuePriority;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueStatus;
-import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.SavedQuery;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryActivity;
-import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
 import com.taskadapter.redmineapi.internal.io.MarkedIOException;
@@ -927,5 +909,9 @@ public class RedmineManager {
 
     public void deleteWatcherFromIssue(Watcher watcher, Issue issue) throws RedmineException {
         transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId() );
+    }
+
+    public List<CustomFieldDefinition> getCustomFieldDefinitions() throws RedmineException {
+        return transport.getObjectsList(CustomFieldDefinition.class);
     }
 }

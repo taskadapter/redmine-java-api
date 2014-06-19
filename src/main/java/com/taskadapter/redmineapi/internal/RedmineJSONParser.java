@@ -16,6 +16,7 @@ import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -98,6 +99,14 @@ public class RedmineJSONParser {
 			return parseCustomField(input);
 		}
 	};
+
+    public static final JsonObjectParser<CustomFieldDefinition> CUSTOM_FIELD_DEFINITION_PARSER =
+            new JsonObjectParser<CustomFieldDefinition>() {
+        @Override
+        public CustomFieldDefinition parse(JSONObject input) throws JSONException {
+            return parseCustomFieldDefinition(input);
+        }
+    };
 
 	public static final JsonObjectParser<Journal> JOURNAL_PARSER = new JsonObjectParser<Journal>() {
 		@Override
@@ -455,6 +464,8 @@ public class RedmineJSONParser {
 		result.setDueDate(getShortDateOrNull(content, "due_date"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
+        result.setCustomFields(JsonInput.getListOrNull(content,
+                "custom_fields", CUSTOM_FIELD_PARSER));
 		return result;
 	}
 
@@ -504,6 +515,30 @@ public class RedmineJSONParser {
 
 		return result;
 	}
+
+    public static CustomFieldDefinition parseCustomFieldDefinition(JSONObject content)
+            throws JSONException {
+        final CustomFieldDefinition result = new CustomFieldDefinition();
+        result.setId(JsonInput.getInt(content, "id"));
+        result.setName(JsonInput.getStringOrNull(content, "name"));
+        result.setCustomizedType(JsonInput.getStringOrNull(content, "customized_type"));
+        result.setFieldFormat(JsonInput.getStringOrNull(content, "field_format"));
+        result.setRegExp(JsonInput.getStringOrNull(content, "regexp"));
+        result.setDefaultValue(JsonInput.getStringOrNull(content, "default_value"));
+        result.setMinLength(JsonInput.getIntOrNull(content, "min_length"));
+        result.setMaxLength(JsonInput.getIntOrNull(content, "max_length"));
+        List<String> values = JsonInput.getListOrEmpty(content, "possible_values", new JsonObjectParser<String>() {
+            @Override
+            public String parse(JSONObject input) throws JSONException {
+                if (input.has("value"))
+                    return input.getString("value");
+                else
+                    return "";
+            }
+        });
+        result.setPossibleValues(values);
+        return result;
+    }
 
 	public static Journal parseJournal(JSONObject content) throws JSONException {
 		final Journal result = new Journal();
