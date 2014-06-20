@@ -414,4 +414,18 @@ public class RedmineJSONParserTest {
 		}
 	}
 
+    @Test
+    public void testVersionWithCustomField() throws IOException, JSONException {
+		String json = MyIOUtils
+			.getResourceAsString("redmine_versionWithCustomField.json");
+		Project version = RedmineJSONParser
+			.parseProject(RedmineJSONParser.getResponseSingleObject(json,
+				"version"));
+	
+		Assert.assertEquals(version.getCustomFields().size(), 2);
+		String expectedCustomeFieldValue = "Should have a value";
+		Assert.assertEquals(expectedCustomeFieldValue, version
+			.getCustomFieldById(1).getValue());
+		Assert.assertEquals("", version.getCustomFieldById(6).getValue());
+    }
 }
