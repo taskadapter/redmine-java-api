@@ -1,7 +1,11 @@
 package com.taskadapter.redmineapi.internal.comm;
 
-import com.taskadapter.redmineapi.RedmineConfigurationException;
-import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -21,14 +25,26 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
+import com.taskadapter.redmineapi.RedmineConfigurationException;
+import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
 
 class HttpUtil {
+  
+  private static SSLSocketFactory sslSocketFactory = null;
+  
+  /**
+   * Sets the SSLSocketFactory to use.
+   * If no factory has been set, a dummy implementation will be used,
+   * that accepts all certificates and does not do any hostname checks.
+   * This methos has to be executed before creating a {@link RedmineManager} instance.
+   * @param factory
+   */
+  public static void setSSLSocketFactory(SSLSocketFactory factory)
+  {
+    sslSocketFactory = factory;
+  }
+  
 	public static DefaultHttpClient getNewHttpClient(
 			ClientConnectionManager connectionManager) {
 		try {
@@ -50,7 +66,7 @@ class HttpUtil {
 			int maxConnections) throws KeyStoreException,
 			NoSuchAlgorithmException, CertificateException,
 			KeyManagementException, UnrecoverableKeyException {
-        SSLSocketFactory factory = NaiveSSLFactory.createNaiveSSLSocketFactory();
+        SSLSocketFactory factory = sslSocketFactory != null ? sslSocketFactory : NaiveSSLFactory.createNaiveSSLSocketFactory();
 
         SchemeRegistry registry = new SchemeRegistry();
 		registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
