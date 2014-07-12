@@ -3,9 +3,11 @@ package com.taskadapter.redmineapi;
 /**
  * Connection pooling options.
  * 
- * @author maxkar
+ * @deprecated Create {@link TransportConfiguration} instread. This options
+ * are actually HttpClient options leaked into redmine manager.
  * 
  */
+@Deprecated
 public final class RedmineOptions {
 	private final int maxOpen;
 	private final int idleTimeout;
