@@ -268,7 +268,7 @@ public class RedmineManagerTest {
     @SuppressWarnings("unused")
     @Test(expected = IllegalArgumentException.class)
     public void testNULLHostParameter() {
-        new RedmineManager(null);
+        new RedmineManager((String) null);
     }
 
     @Test(expected = IllegalArgumentException.class)

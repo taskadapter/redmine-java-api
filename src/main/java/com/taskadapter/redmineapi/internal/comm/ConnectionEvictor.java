@@ -10,7 +10,7 @@ import org.apache.http.conn.ClientConnectionManager;
  * @author maxkar
  * 
  */
-final class ConnectionEvictor implements Runnable {
+public final class ConnectionEvictor implements Runnable {
 
 	/**
 	 * "Terminate" flag.
@@ -73,7 +73,7 @@ final class ConnectionEvictor implements Runnable {
 	/**
 	 * Shutdowns an evictor.
 	 */
-	synchronized void shutdown() {
+	public synchronized void shutdown() {
 		terminate = true;
 		notifyAll();
 	}
