@@ -43,7 +43,7 @@ public class Project implements Identifiable, Serializable {
      * This is the *database ID*, not a String-based key.
      */
     private Integer parentId;
-    private Boolean isPublic;
+    private Boolean projectPublic;
     private List<CustomField> customFields = new ArrayList<CustomField>();
 
     public String getHomepage() {
@@ -168,12 +168,12 @@ public class Project implements Identifiable, Serializable {
      * The value is not returned by server.
      */
     @Deprecated
-    public Boolean getPublic() {
-        return isPublic;
+    public Boolean getProjectPublic() {
+        return projectPublic;
     }
     
-    public void setIsPublic(Boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setProjectPublic(Boolean projectPublic) {
+        this.projectPublic = projectPublic;
     }
     
     public List<CustomField> getCustomFields() {
