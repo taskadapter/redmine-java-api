@@ -18,7 +18,7 @@ public class Version implements Identifiable {
       * <updated_on>2009-11-15T12:22:12+01:00</updated_on>
       */
 
-    public static final String STATUS_OPEN = "opened";
+    public static final String STATUS_OPEN = "open";
     public static final String STATUS_LOCKED = "locked";
     public static final String STATUS_CLOSED = "closed";
 
