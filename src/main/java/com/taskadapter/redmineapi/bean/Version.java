@@ -13,15 +13,28 @@ public class Version implements Identifiable {
     /*
       * <id>1</id> <project name="Redmine" id="1"/> <name>0.7</name>
       * <description/> <status>closed</status> <due_date>2008-04-28</due_date>
+      * <sharing>descendants</sharing>
       * <created_on>2008-03-09T12:52:06+01:00</created_on>
       * <updated_on>2009-11-15T12:22:12+01:00</updated_on>
       */
+
+    public static final String STATUS_OPEN = "opened";
+    public static final String STATUS_LOCKED = "locked";
+    public static final String STATUS_CLOSED = "closed";
+
+    public static final String SHARING_NONE = "none";
+    public static final String SHARING_DESCENDANTS = "descendants";
+    public static final String SHARING_HIERARCHY = "hierarchy";
+    public static final String SHARING_TREE = "tree";
+    public static final String SHARING_SYSTEM = "system";
+
     private Integer id;
     private Project project;
     private String name;
     private String description;
     private String status;
     private Date dueDate;
+    private String sharing;
     private Date createdOn;
     private Date updatedOn;
     private List<CustomField> customFields = new ArrayList<CustomField>();
@@ -86,6 +99,10 @@ public class Version implements Identifiable {
         return project;
     }
 
+    public String getSharing() {
+        return sharing;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -116,6 +133,10 @@ public class Version implements Identifiable {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public void setSharing(String sharing) {
+        this.sharing = sharing;
     }
 
     public void setStatus(String status) {

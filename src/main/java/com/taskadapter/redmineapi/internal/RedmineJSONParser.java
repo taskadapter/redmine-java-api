@@ -451,6 +451,7 @@ public class RedmineJSONParser {
 				MINIMAL_PROJECT_PARSER));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setDescription(JsonInput.getStringOrNull(content, "description"));
+		result.setStatus(JsonInput.getStringOrNull(content, "sharing"));
 		result.setStatus(JsonInput.getStringOrNull(content, "status"));
 		result.setDueDate(getShortDateOrNull(content, "due_date"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
