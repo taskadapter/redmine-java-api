@@ -1130,6 +1130,21 @@ public class RedmineManagerTest {
         assertEquals(description, versionById.getDescription());
     }
 
+    @Test
+    public void versionSharingParameterIsSaved() throws RedmineException {
+        Project project = mgr.getProjectByKey(projectKey);
+        Version version = new Version(project, "Version_1_" + UUID.randomUUID());
+        version.setSharing(Version.SHARING_NONE);
+        Version createdVersion = mgr.createVersion(version);
+        Version versionById = mgr.getVersionById(createdVersion.getId());
+        assertEquals(Version.SHARING_NONE, versionById.getSharing());
+
+        Version versionShared = new Version(project, "Version_2_" + UUID.randomUUID());
+        versionShared.setSharing(Version.SHARING_HIERARCHY);
+        Version createdVersion2 = mgr.createVersion(versionShared);
+        Version version2ById = mgr.getVersionById(createdVersion2.getId());
+        assertEquals(Version.SHARING_HIERARCHY, version2ById.getSharing());
+    }
     /**
      * tests the creation and deletion of a {@link IssueCategory}.
      *
