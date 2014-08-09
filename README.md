@@ -17,3 +17,10 @@ Gradle dependency:
     }
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
+
+# How to contribute to the project.
+* Install Gradle 2.0+.
+* To build in command line: run "gradle build".
+* To open the project code in IDEA or Eclipse: open "build.gradle" file. Your IDE will create a project basing on the gradle's script.
+* Please make sure you add unit and/or integration tests when submitting your changes. 
+Don't forget to document the required Redmine version and other limitations. 
