@@ -164,8 +164,10 @@ public class Project implements Identifiable, Serializable {
      *
      * @return true if the project is public, false if the project is private. 
      * Returns <code>null</code> if the project visibility was not specified or if the project was just retrieved from server.
+     *
      * @deprecated is_public property is only for writing. This getter is only for JSON serialization.
-     * The value is not returned by server.
+     * The value is not returned by server (checked with Redmine 2.3.3).
+     * Here's the bug report submitted against Redmine REST API: http://www.redmine.org/issues/17628
      */
     @Deprecated
     public Boolean getProjectPublic() {
