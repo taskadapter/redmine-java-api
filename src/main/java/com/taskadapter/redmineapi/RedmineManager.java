@@ -75,19 +75,20 @@ public class RedmineManager {
     }
 
 	private final Transport transport;
+    private final Runnable shutdownListener;
 
-	public RedmineManager(String uri) {
-		this(uri, RedmineOptions.simpleOptions());
-	}
-
-	public RedmineManager(String uri, String login, String password) {
-		this(uri, login, password, RedmineOptions.simpleOptions());
-	}
+    /**
+     * @deprecated use {@link RedmineManagerFactory#createUnauthenticated(String)} instead.
+     */
+    @Deprecated
+    public RedmineManager(String uri) {
+        this(uri, RedmineOptions.simpleOptions());
+    }
 
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
 	 * not checked at this moment.
-	 * 
+	 *
 	 * @param host
 	 *            complete Redmine server web URI, including protocol and port
 	 *            number. Example: http://demo.redmine.org:8080
@@ -97,7 +98,10 @@ public class RedmineManager {
 	 *            <i>http://redmine_server_url/my/account<i> URL). This
 	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
 	 *            projects, which are "public".
+     *
+     * @deprecated use {@link RedmineManagerFactory#createWithApiKey(String, String, RedmineOptions)} instead.
 	 */
+    @Deprecated
 	public RedmineManager(String host, String apiAccessKey) {
 		this(host, apiAccessKey, RedmineOptions.simpleOptions());
 	}
@@ -105,7 +109,7 @@ public class RedmineManager {
 	/**
 	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
 	 * not checked at this moment.
-	 * 
+	 *
 	 * @param host
 	 *            complete Redmine server web URI, including protocol and port
 	 *            number. Example: http://demo.redmine.org:8080
@@ -115,22 +119,38 @@ public class RedmineManager {
 	 *            <i>http://redmine_server_url/my/account<i> URL). This
 	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
 	 *            projects, which are "public".
+	 * @deprecated use {@link RedmineManagerFactory#createWithApiKey(String, String, RedmineOptions)} instead.
 	 */
+    @Deprecated
 	public RedmineManager(String host, String apiAccessKey,
 			RedmineOptions options) {
-		this.transport = new Transport(new URIConfigurator(host, apiAccessKey),
-				options);
+        this(host, null, null, apiAccessKey, options);
 	}
 
+    /**
+     * @deprecated use {@link RedmineManagerFactory#createUnauthenticated(String, RedmineOptions)}.
+     */
+    @Deprecated
 	public RedmineManager(String uri, RedmineOptions options) {
 		this(uri, null, null, options);
 	}
 
-	public RedmineManager(String uri, String login, String password,
-			RedmineOptions options) {
-		this.transport = new Transport(new URIConfigurator(uri, null), options);
-		transport.setCredentials(login, password);
-	}
+    /**
+     * @deprecated Use {@link RedmineManagerFactory#createWithUserAuth(String, String, String)} instead.
+     */
+    @Deprecated
+    public RedmineManager(String uri, String login, String password) {
+        this(uri, login, password, RedmineOptions.simpleOptions());
+    }
+
+    /**
+     * @deprecated Use {@link RedmineManagerFactory#createWithUserAuth(String, String, String, RedmineOptions)} instead.
+     */
+    @Deprecated
+    public RedmineManager(String uri, String login, String password,
+                          RedmineOptions options) {
+        this(uri, login, password, null, options);
+    }
 
     /**
      * Sample usage:
@@ -164,6 +184,25 @@ public class RedmineManager {
 		}
     }
 
+    @Deprecated
+    private RedmineManager(String uri, String login, String password,
+                           String apikey, RedmineOptions options) {
+        final TransportConfiguration tc = RedmineManagerFactory.parseOptions(options);
+        this.transport = new Transport(new URIConfigurator(uri, apikey), tc.client);
+        transport.setCredentials(login, password);
+        this.shutdownListener = tc.shutdownListener;
+    }
+
+    /**
+     * Internal catch-all constructor.
+     *
+     * @param transport        target transport.
+     * @param shutdownListener shutdown listener.
+     */
+    RedmineManager(Transport transport, Runnable shutdownListener) {
+        this.transport = transport;
+        this.shutdownListener = shutdownListener;
+    }
 
     /**
      * Load the list of projects available to the user, which is represented by the API access key.
@@ -400,7 +439,7 @@ public class RedmineManager {
     public void deleteUser(Integer userId) throws RedmineException {
 		transport.deleteObject(User.class, Integer.toString(userId));
     }
-    
+
     /**
      * Load the list of groups on the server.
      * <p><b>This operation requires "Redmine Administrator" permission.</b>
@@ -419,7 +458,7 @@ public class RedmineManager {
      * Returns the group based on its id.
      * <p>
      * <b>This operation requires "Redmine Administrators" permission.</b>
-     * 
+     *
      * @param id
      *            the id of the group
      * @return the group
@@ -428,7 +467,7 @@ public class RedmineManager {
     public Group getGroupById(int id) throws RedmineException {
         return transport.getObject(Group.class, id);
     }
-    
+
     /**
      * Returns the group based on its name.
      * <p>
@@ -460,7 +499,7 @@ public class RedmineManager {
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());
     }
-    
+
     public List<TimeEntry> getTimeEntries() throws RedmineException {
 		return transport.getObjectsList(TimeEntry.class);
     }
@@ -736,12 +775,23 @@ public class RedmineManager {
 		return transport.getObjectsList(News.class, params);
     }
 
-	/**
-	 * Shutdowns a communicator.
-	 */
-	public void shutdown() {
-		transport.shutdown();
-	}
+    /**
+     * Shutdown the communicator.
+     */
+    public void shutdown() {
+        if (shutdownListener != null) {
+            shutdownListener.run();
+        }
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        try {
+            super.finalize();
+        } finally {
+            shutdown();
+        }
+    }
 
 	/**
 	 * @param exception
@@ -763,7 +813,7 @@ public class RedmineManager {
 
 	/**
 	 * Uploads an attachment.
-	 * 
+	 *
 	 * @param fileName
 	 *            file name of the attachment.
 	 * @param contentType
@@ -792,7 +842,7 @@ public class RedmineManager {
 
 	/**
 	 * Uploads an attachment.
-	 * 
+	 *
 	 * @param contentType
 	 *            content type of the attachment.
 	 * @param content
@@ -851,11 +901,11 @@ public class RedmineManager {
     public List<Role> getRoles() throws RedmineException {
 		return transport.getObjectsList(Role.class);
 	}
-	
+
 	public Role getRoleById(int id) throws RedmineException {
 	    return transport.getObject(Role.class, id);
 	}
-	
+
 	public List<IssuePriority> getIssuePriorities() throws RedmineException {
 	    return transport.getObjectsList(IssuePriority.class);
 	}
@@ -863,7 +913,7 @@ public class RedmineManager {
     public List<TimeEntryActivity> getTimeEntryActivities() throws RedmineException {
         return transport.getObjectsList(TimeEntryActivity.class);
     }
-    
+
 	public List<Membership> getMemberships(String project)
 			throws RedmineException {
 		return transport.getChildEntries(Project.class, project,
@@ -877,7 +927,7 @@ public class RedmineManager {
 
 	/**
 	 * Add a membership.
-	 * 
+	 *
 	 * @param membership
 	 *            membership.
 	 * @throws RedmineException
@@ -906,7 +956,7 @@ public class RedmineManager {
 
 	/**
 	 * Adds the given user to the given group.
-	 * 
+	 *
 	 * @param user  - The user being added.
 	 * @param group - The new group of the user.
 	 * @throws RedmineException

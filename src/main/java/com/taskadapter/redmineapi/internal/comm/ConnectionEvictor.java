@@ -1,16 +1,10 @@
 package com.taskadapter.redmineapi.internal.comm;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.http.conn.ClientConnectionManager;
 
-/**
- * Connection evictor.
- * 
- * @author maxkar
- * 
- */
-final class ConnectionEvictor implements Runnable {
+import java.util.concurrent.TimeUnit;
+
+public final class ConnectionEvictor implements Runnable {
 
 	/**
 	 * "Terminate" flag.
@@ -73,7 +67,7 @@ final class ConnectionEvictor implements Runnable {
 	/**
 	 * Shutdowns an evictor.
 	 */
-	synchronized void shutdown() {
+	public synchronized void shutdown() {
 		terminate = true;
 		notifyAll();
 	}

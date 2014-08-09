@@ -10,16 +10,17 @@ import org.slf4j.LoggerFactory;
 
 public class Simple {
 	private static final Logger logger = LoggerFactory.getLogger(Simple.class);
-	private static final String projectKey = "test1336839552181";
+	private static final String projectKey = "test1385579926235";
 
 	private static final Integer queryId = null; // any
 
 	public static void main(String[] args) {
-		String redmineHost = "http://ta-dev.dyndns.biz/redmine";
-		String apiAccessKey = "acbd877fa75d53402fc19c0fff8bea48836a1c7f";
-		RedmineManager mgr = new RedmineManager(redmineHost, apiAccessKey);
+		String uri = "http://76.126.10.142:9080/redmine";
+		String apiAccessKey = "0f4e6c32e540b41de8d594f894388e4f299ddd8a";
+//		RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
 		try {
-            getUsersAsNotAdmin(new RedmineManager(redmineHost, "notadmin", "notadmin"));
+            getUsersAsNotAdmin(mgr);
 			// getIssueWithRelations(mgr);
 			// tryCreateIssue(mgr);
 			// tryGetIssues(mgr);

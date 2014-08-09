@@ -21,42 +21,9 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 
 	private final HttpClient client;
 
-	private final ConnectionEvictor evictor;
-
-	public BaseCommunicator(RedmineOptions options) {
-		DefaultHttpClient clientImpl;
-		ClientConnectionManager connManager;
-		try {
-			connManager = HttpUtil.createConnectionManager(options
-					.getMaxOpenConnections());
-			clientImpl = HttpUtil.getNewHttpClient(connManager);
-		} catch (Exception e) {
-			connManager = null;
-			clientImpl = new DefaultHttpClient();
-		}
-
-		if (connManager != null) {
-			evictor = new ConnectionEvictor(connManager,
-					options.getEvictionCheckInterval(),
-					options.getIdleTimeout());
-			runEvictor(evictor);
-		} else {
-			evictor = null;
-		}
-
-		this.client = clientImpl;
-	}
-
-	/**
-	 * Runs an evictor thread.
-	 */
-	private void runEvictor(ConnectionEvictor evictor2) {
-		final Thread evictorThread = new Thread(evictor2);
-		evictorThread.setDaemon(true);
-		evictorThread
-				.setName("Redmine communicator connection eviction thread");
-		evictorThread.start();
-	}
+    public BaseCommunicator(HttpClient client) {
+        this.client = client;
+    }
 
 	// TODO lots of usages process 404 code themselves, but some don't.
 	// check if we can process 404 code in this method instead of forcing
@@ -100,31 +67,5 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 		if (paramsIndex >= 0)
 			return uri.substring(0, paramsIndex);
 		return uri;
-	}
-
-	/**
-	 * Shutdowns a communicator.
-	 */
-	public void shutdown() {
-		client.getConnectionManager().shutdown();
-		if (evictor != null)
-			evictor.shutdown();
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		/*
-		 * We MUST terminate evictor on finalization. Threads (even daemon
-		 * threads) will not be garbage-collected automatically. Thus we should
-		 * release such threads even if client forget to call
-		 * "manager.shutdown".
-		 */
-		try {
-			if (evictor != null)
-				evictor.shutdown();
-		} catch (Exception e) {
-			// ignore;
-		}
-		super.finalize();
 	}
 }

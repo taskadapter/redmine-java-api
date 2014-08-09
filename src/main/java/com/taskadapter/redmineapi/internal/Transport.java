@@ -14,6 +14,7 @@ import java.util.Map;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -73,7 +74,6 @@ public final class Transport {
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 	private final SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
-	private final BaseCommunicator baseCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
 
   static {
@@ -156,9 +156,9 @@ public final class Transport {
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 	private static final String CHARSET = "UTF-8";
 
-	public Transport(URIConfigurator configurator, RedmineOptions options) {
+	public Transport(URIConfigurator configurator, HttpClient client) {
 		this.configurator = configurator;
-		this.baseCommunicator = new BaseCommunicator(options);
+        final Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(client);
 		this.authenticator = new RedmineAuthenticator<HttpResponse>(
 				baseCommunicator, CHARSET);
 		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
@@ -568,10 +568,6 @@ public final class Transport {
 		this.login = login;
 		this.password = password;
 		authenticator.setCredentials(login, password);
-	}
-
-	public void shutdown() {
-		baseCommunicator.shutdown();
 	}
 
 	public void setPassword(String password) {
