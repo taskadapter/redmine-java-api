@@ -43,7 +43,7 @@ public class Project implements Identifiable, Serializable {
      * This is the *database ID*, not a String-based key.
      */
     private Integer parentId;
-
+    private Boolean projectPublic;
     private List<CustomField> customFields = new ArrayList<CustomField>();
 
     public String getHomepage() {
@@ -160,6 +160,22 @@ public class Project implements Identifiable, Serializable {
         this.parentId = parentId;
     }
 
+    /**
+     *
+     * @return true if the project is public, false if the project is private. 
+     * Returns <code>null</code> if the project visibility was not specified or if the project was just retrieved from server.
+     * @deprecated is_public property is only for writing. This getter is only for JSON serialization.
+     * The value is not returned by server.
+     */
+    @Deprecated
+    public Boolean getProjectPublic() {
+        return projectPublic;
+    }
+    
+    public void setProjectPublic(Boolean projectPublic) {
+        this.projectPublic = projectPublic;
+    }
+    
     public List<CustomField> getCustomFields() {
         return customFields;
     }

@@ -91,6 +91,26 @@ public class JsonOutput {
 		writer.value(format.format(value));
 	}
 
+        /**
+	 * Adds a value to a writer if value is not <code>null</code>.
+	 * 
+	 * @param writer
+	 *            writer to add object to.
+	 * @param field
+	 *            field name to set.
+	 * @param value
+	 *            field value.
+	 * @throws JSONException
+	 *             if io error occurs.
+	 */
+	public static void addIfNotNull(JSONWriter writer, String field,
+			Boolean value) throws JSONException {
+		if (value == null)
+			return;
+		writer.key(field);
+		writer.value(value);
+	}
+        
 	/**
 	 * Adds a value to a writer.
 	 * 
