@@ -18,6 +18,21 @@ Gradle dependency:
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
 
+# Sample code.
+
+Sample code to retrieve list of Redmine issues:
+
+    private static String uri = "https://www.hostedredmine.com";
+    private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
+    private static String projectKey = "taskconnector-test";
+    private static Integer queryId = null; // any
+
+    RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
+    List<Issue> issues = mgr.getIssues(projectKey, queryId);
+    for (Issue issue : issues) {
+        System.out.println(issue.toString());
+    }
+
 # How to contribute to the project.
 * Install Gradle 2.0+.
 * To build in command line: run "gradle build".
