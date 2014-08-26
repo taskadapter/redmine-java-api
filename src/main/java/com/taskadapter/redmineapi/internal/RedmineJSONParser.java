@@ -545,6 +545,7 @@ public class RedmineJSONParser {
 		result.setFirstName(JsonInput.getStringOrNull(content, "firstname"));
 		result.setLastName(JsonInput.getStringOrNull(content, "lastname"));
 		result.setMail(JsonInput.getStringOrNull(content, "mail"));
+		result.setAuthSourceId(JsonInput.getIntOrNull(content, "auth_source_id"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
                 result.setApiKey(JsonInput.getStringOrNull(content, "api_key"));

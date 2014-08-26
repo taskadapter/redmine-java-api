@@ -19,6 +19,7 @@ public class User implements Identifiable {
     private Date createdOn;
     private Date lastLoginOn;
     private String apiKey;
+    private Integer authSourceId;
     // TODO add tests
     private List<CustomField> customFields = new ArrayList<CustomField>();
 	private List<Membership> memberships = new ArrayList<Membership>();
@@ -101,7 +102,21 @@ public class User implements Identifiable {
         this.apiKey = apiKey;
     }
 
-    @Override
+	/**
+	 * This value is not returned by redmine on existing users.
+	 * 
+	 * @return - The Authentication Source ID, if you set it on your own.
+	 */
+    @Deprecated
+    public Integer getAuthSourceId() {
+		return authSourceId;
+	}
+
+	public void setAuthSourceId(Integer authSource) {
+		this.authSourceId = authSource;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
