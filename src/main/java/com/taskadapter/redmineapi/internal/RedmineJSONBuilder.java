@@ -317,6 +317,15 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
 
+		if (issue.getWatchers() != null && issue.getWatchers().size() > 0) {
+			writer.key("watcher_user_ids");
+			writer.array();
+			for (Watcher watcher: issue.getWatchers())
+				if (watcher.getId() != null)
+					writer.value(watcher.getId());
+			writer.endArray();
+		}
+
 		if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
 			final List<Attachment> uploads = new ArrayList<Attachment>();
 			for (Attachment attach : issue.getAttachments())
