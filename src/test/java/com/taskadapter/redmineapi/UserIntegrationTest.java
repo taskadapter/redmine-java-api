@@ -1,17 +1,18 @@
 package com.taskadapter.redmineapi;
 
-import com.taskadapter.redmineapi.bean.User;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.util.Date;
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import java.util.Date;
+import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import com.taskadapter.redmineapi.bean.User;
 
 public class UserIntegrationTest {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
@@ -97,7 +98,7 @@ public class UserIntegrationTest {
             createdUser = mgr.createUser(userToCreate);
 
             assertNotNull(
-                    "checking that a non-null project is returned", createdUser);
+                    "checking that a non-null user is returned", createdUser);
 
             assertEquals(userToCreate.getLogin(), createdUser.getLogin());
             assertEquals(userToCreate.getFirstName(),
@@ -106,6 +107,29 @@ public class UserIntegrationTest {
                     createdUser.getLastName());
             Integer id = createdUser.getId();
             assertNotNull(id);
+
+        } catch (Exception e) {
+            fail(e.getMessage());
+        } finally {
+            if (createdUser != null) {
+                mgr.deleteUser(createdUser.getId());
+            }
+        }
+    }
+    
+    @Test
+    public void testCreateUserWithAuthSource() throws RedmineException {
+        User createdUser = null;
+        try {
+            User userToCreate = UserGenerator.generateRandomUser();
+            userToCreate.setAuthSourceId(1);
+            createdUser = mgr.createUser(userToCreate);
+
+            assertNotNull("checking that a non-null user is returned", createdUser);
+            
+//            Redmine doesn't return it, so let's consider a non-exceptional return as success for now. 
+//            assertNotNull("checking that a non-null auth_source_id is returned", createdUser.getAuthSourceId());
+//            assertEquals(1, createdUser.getAuthSourceId().intValue());
 
         } catch (Exception e) {
             fail(e.getMessage());

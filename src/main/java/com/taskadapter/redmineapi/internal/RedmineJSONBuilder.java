@@ -266,6 +266,7 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "lastname", user.getLastName());
 		JsonOutput.addIfNotNull(writer, "name", user.getFullName());
 		JsonOutput.addIfNotNull(writer, "mail", user.getMail());
+		JsonOutput.addIfNotNull(writer, "auth_source_id", user.getAuthSourceId());
 		addIfNotNullFull(writer, "created_on", user.getCreatedOn());
 		addIfNotNullFull(writer, "last_login_on", user.getLastLoginOn());
 		writeCustomFields(writer, user.getCustomFields());
