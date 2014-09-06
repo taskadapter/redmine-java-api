@@ -410,7 +410,7 @@ public class RedmineJSONParser {
 			result.setStatusId(JsonInput.getIntOrNull(statusObject, "id"));
 		}
 
-		result.setCustomFields(JsonInput.getListOrNull(content,
+		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setJournals(JsonInput.getListOrEmpty(content, "journals",
@@ -549,7 +549,7 @@ public class RedmineJSONParser {
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
                 result.setApiKey(JsonInput.getStringOrNull(content, "api_key"));
-		result.setCustomFields(JsonInput.getListOrEmpty(content,
+		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)

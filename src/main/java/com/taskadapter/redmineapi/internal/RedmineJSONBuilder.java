@@ -4,7 +4,9 @@ import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.bean.Attachment;
@@ -358,11 +360,13 @@ public class RedmineJSONBuilder {
 	}
 
 	private static void writeCustomFields(JSONWriter writer,
-			List<CustomField> customFields) throws JSONException {
-		if (customFields == null || customFields.isEmpty())
-			return;
+			Iterator<CustomField> customFields) throws JSONException {
+		if (customFields == null || !customFields.hasNext()) {
+            return;
+        }
 		writer.key("custom_field_values").object();
-		for (CustomField field : customFields) {
+		while (customFields.hasNext()) {
+            CustomField field = customFields.next();
             // see https://github.com/taskadapter/redmine-java-api/issues/54
             Object valueToWrite;
             if (field.isMultiple()) {

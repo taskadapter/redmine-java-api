@@ -1,8 +1,12 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Redmine's Issue
@@ -35,7 +39,12 @@ public class Issue implements Identifiable {
      * Some comment describing the issue update
      */
     private String notes;
-    private List<CustomField> customFields = new ArrayList<CustomField>();
+
+    /**
+     * can't have two custom fields with the same ID in the collection, that's why it is declared
+     * as a Set, not a List.
+     */
+    private Set<CustomField> customFields = new HashSet<CustomField>();
     private List<Journal> journals = new ArrayList<Journal>();
     private List<IssueRelation> relations = new ArrayList<IssueRelation>();
     private List<Attachment> attachments = new ArrayList<Attachment>();
@@ -203,17 +212,35 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * list of Custom Field objects, NEVER NULL.
+     * @return Custom Field objects, NEVER NULL.
      */
-    public List<CustomField> getCustomFields() {
-        return customFields;
+    public Iterator<CustomField> getCustomFields() {
+        return customFields.iterator();
+    }
+
+    public void clearCustomFields() {
+        customFields.clear();
     }
 
     /**
      * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
      */
-    public void setCustomFields(List<CustomField> customFields) {
-        this.customFields = customFields;
+    public void addCustomFields(Collection<CustomField> customFields) {
+        this.customFields.addAll(customFields);
+    }
+
+    /**
+     * If there is a custom field with the same ID already present in the Issue,
+     * the new field replaces the old one.
+     *
+     * @param customField the field to add to the issue.
+     */
+    public void addCustomField(CustomField customField) {
+        customFields.add(customField);
+    }
+
+    public int getNumberOfCustomFields() {
+        return customFields.size();
     }
 
     public String getNotes() {

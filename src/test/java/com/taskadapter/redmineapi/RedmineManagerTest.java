@@ -219,8 +219,7 @@ public class RedmineManagerTest {
     public void testGetIssuesBySummary() {
         String summary = "issue with subject ABC";
         try {
-            Issue issue = new Issue();
-            issue.setSubject(summary);
+            Issue issue = IssueBuilder.build(summary);
             User assignee = IntegrationTestHelper.getOurUser();
             issue.setAssignee(assignee);
 
@@ -280,8 +279,7 @@ public class RedmineManagerTest {
     @Test(expected = RedmineAuthenticationException.class)
     public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
         RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI());
-        Issue issue = new Issue();
-        issue.setSubject("test zzx");
+        Issue issue = IssueBuilder.build("test zzx");
         redmineMgrEmpty.createIssue(projectKey, issue);
     }
 
@@ -289,17 +287,15 @@ public class RedmineManagerTest {
     public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
         RedmineManager redmineMgrInvalidKey = new RedmineManager(
                 testConfig.getURI(), "wrong_key");
-        Issue issue = new Issue();
-        issue.setSubject("test zzx");
+        Issue issue = IssueBuilder.build("test zzx");
         redmineMgrInvalidKey.createIssue(projectKey, issue);
     }
 
     @Test
     public void testUpdateIssue() {
         try {
-            Issue issue = new Issue();
             String originalSubject = "Issue " + new Date();
-            issue.setSubject(originalSubject);
+            Issue issue = IssueBuilder.build(originalSubject);
 
             Issue newIssue = mgr.createIssue(projectKey, issue);
             String changedSubject = "changed subject";
@@ -331,9 +327,8 @@ public class RedmineManagerTest {
      */
     @Test
     public void testGetIssueById() throws RedmineException {
-        Issue issue = new Issue();
         String originalSubject = "Issue " + new Date();
-        issue.setSubject(originalSubject);
+        Issue issue = IssueBuilder.build(originalSubject);
 
         Issue newIssue = mgr.createIssue(projectKey, issue);
 
@@ -354,8 +349,7 @@ public class RedmineManagerTest {
     public void testGetIssues() {
         try {
             // create at least 1 issue
-            Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("testGetIssues: " + new Date());
+            Issue issueToCreate = IssueBuilder.build("testGetIssues: " + new Date());
             Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 
             List<Issue> issues = mgr.getIssues(projectKey, null);
@@ -425,8 +419,7 @@ public class RedmineManagerTest {
 
     @Test(expected = NotFoundException.class)
     public void testCreateIssueInvalidProjectKey() throws RedmineException {
-        Issue issueToCreate = new Issue();
-        issueToCreate.setSubject("Summary line 100");
+        Issue issueToCreate = IssueBuilder.build("Summary line 100");
         mgr.createIssue("someNotExistingProjectKey", issueToCreate);
     }
 
@@ -596,7 +589,7 @@ public class RedmineManagerTest {
     public void testCustomFields() throws Exception {
         Issue issue = createIssues(1).get(0);
         // default empty values
-        assertEquals(2, issue.getCustomFields().size());
+        assertEquals(2, issue.getNumberOfCustomFields());
 
         // TODO update this!
         int id1 = 1; // TODO this is pretty much a hack, we don't generally know
@@ -608,16 +601,14 @@ public class RedmineManagerTest {
         String custom2FieldName = "custom_boolean_1";
         String custom2Value = "true";
 
-        issue.setCustomFields(new ArrayList<CustomField>());
+        issue.clearCustomFields();
 
-        issue.getCustomFields().add(
-                new CustomField(id1, custom1FieldName, custom1Value));
-        issue.getCustomFields().add(
-                new CustomField(id2, custom2FieldName, custom2Value));
+        issue.addCustomField(new CustomField(id1, custom1FieldName, custom1Value));
+        issue.addCustomField(new CustomField(id2, custom2FieldName, custom2Value));
         mgr.update(issue);
 
         Issue updatedIssue = mgr.getIssueById(issue.getId());
-        assertEquals(2, updatedIssue.getCustomFields().size());
+        assertEquals(2, updatedIssue.getNumberOfCustomFields());
         assertEquals(custom1Value,
                 updatedIssue.getCustomField(custom1FieldName));
         assertEquals(custom2Value,
