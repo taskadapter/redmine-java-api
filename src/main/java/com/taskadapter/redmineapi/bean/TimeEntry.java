@@ -6,7 +6,7 @@ public class TimeEntry implements Identifiable {
     /**
      * database Id
      */
-    private Integer id;
+    private final Integer id;
 
     /**
      * database Id of the Issue
@@ -28,12 +28,15 @@ public class TimeEntry implements Identifiable {
     private Date createdOn;
     private Date updatedOn;
 
-    public Integer getId() {
-        return id;
+    /**
+     * @param id database Id
+     */
+    TimeEntry(Integer id) {
+        this.id = id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Integer getId() {
+        return id;
     }
 
     public Integer getUserId() {

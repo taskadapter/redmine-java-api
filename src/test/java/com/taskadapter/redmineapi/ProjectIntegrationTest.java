@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -146,9 +147,7 @@ public class ProjectIntegrationTest {
 
     @Test
     public void createProjectFailsWithReservedIdentifier() throws Exception {
-        Project projectToCreate = new Project();
-        projectToCreate.setName("new");
-        projectToCreate.setIdentifier("new");
+        Project projectToCreate = ProjectFactory.create("new", "new");
         String createdProjectKey = null;
         try {
             Project createdProject = mgr.createProject(projectToCreate);
@@ -244,13 +243,12 @@ public class ProjectIntegrationTest {
     }
 
     private static Project generateRandomProject() {
-        Project project = new Project();
         Long timeStamp = Calendar.getInstance().getTimeInMillis();
         String key = "projkey" + timeStamp;
         String name = "project number " + timeStamp;
         String description = "some description for the project";
-        project.setIdentifier(key);
-        project.setName(name);
+
+        Project project = ProjectFactory.create(name, key);
         project.setDescription(description);
         project.setHomepage("www.randompage" + timeStamp + ".com");
         return project;

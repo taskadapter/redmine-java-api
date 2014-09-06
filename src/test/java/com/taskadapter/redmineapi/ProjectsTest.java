@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi;
 
 import java.util.List;
 
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import org.json.JSONObject;
 import org.junit.Assert;
 import com.taskadapter.redmineapi.bean.Project;
@@ -31,8 +32,7 @@ public class ProjectsTest {
 
     @Test
     public void testProjects1Info() {
-        Project aceProject = new Project();
-        aceProject.setId(15);
+        Project aceProject = ProjectFactory.create(15);
         aceProject.setIdentifier("test1295577237142");
         aceProject.setName("test project 15");
 

@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -10,6 +11,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -37,8 +39,7 @@ public class AttachmentIntegrationTest {
         final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         final Attachment attach1 = mgr.uploadAttachment("test.bin",
                 "application/ternary", content);
-        final Issue testIssue = new Issue();
-        testIssue.setSubject("This is upload ticket!");
+        final Issue testIssue = IssueFactory.createWithSubject("This is upload ticket!");
         testIssue.addAttachment(attach1);
         final Issue createdIssue = mgr.createIssue(projectKey, testIssue);
         try {
@@ -135,8 +136,7 @@ public class AttachmentIntegrationTest {
         Issue newIssue = null;
         try {
             // create at least 1 issue
-            Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("testGetIssueAttachment_"
+            Issue issueToCreate = IssueFactory.createWithSubject("testGetIssueAttachment_"
                     + UUID.randomUUID());
             newIssue = mgr.createIssue(projectKey, issueToCreate);
             // TODO create test attachments for the issue once the Redmine REST
