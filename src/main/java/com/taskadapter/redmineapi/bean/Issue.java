@@ -1,8 +1,13 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Redmine's Issue
@@ -35,12 +40,17 @@ public class Issue implements Identifiable {
      * Some comment describing the issue update
      */
     private String notes;
-    private List<CustomField> customFields = new ArrayList<CustomField>();
-    private List<Journal> journals = new ArrayList<Journal>();
-    private List<IssueRelation> relations = new ArrayList<IssueRelation>();
-    private List<Attachment> attachments = new ArrayList<Attachment>();
-    private List<Changeset> changesets = new ArrayList<Changeset>();
-    private List<Watcher> watchers = new ArrayList<Watcher>();
+
+    /**
+     * can't have two custom fields with the same ID in the collection, that's why it is declared
+     * as a Set, not a List.
+     */
+    private Set<CustomField> customFields = new HashSet<CustomField>();
+    private Set<Journal> journals = new HashSet<Journal>();
+    private Set<IssueRelation> relations = new HashSet<IssueRelation>();
+    private Set<Attachment> attachments = new HashSet<Attachment>();
+    private Set<Changeset> changesets = new HashSet<Changeset>();
+    private Set<Watcher> watchers = new HashSet<Watcher>();
 
     public Project getProject() {
         return project;
@@ -203,17 +213,31 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * list of Custom Field objects, NEVER NULL.
+     * @return Custom Field objects. the collection may be empty, but it is never NULL.
      */
-    public List<CustomField> getCustomFields() {
-        return customFields;
+    public Collection<CustomField> getCustomFields() {
+        return Collections.unmodifiableCollection(customFields);
+    }
+
+    public void clearCustomFields() {
+        customFields.clear();
     }
 
     /**
      * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
      */
-    public void setCustomFields(List<CustomField> customFields) {
-        this.customFields = customFields;
+    public void addCustomFields(Collection<CustomField> customFields) {
+        this.customFields.addAll(customFields);
+    }
+
+    /**
+     * If there is a custom field with the same ID already present in the Issue,
+     * the new field replaces the old one.
+     *
+     * @param customField the field to add to the issue.
+     */
+    public void addCustomField(CustomField customField) {
+        customFields.add(customField);
     }
 
     public String getNotes() {
@@ -227,28 +251,28 @@ public class Issue implements Identifiable {
         this.notes = notes;
     }
 
-    public List<Journal> getJournals() {
-        return journals;
+    public Collection<Journal> getJournals() {
+        return Collections.unmodifiableCollection(journals);
     }
 
-    public void setJournals(List<Journal> journals) {
-        this.journals = journals;
+    public void addJournals(Collection<Journal> journals) {
+        this.journals.addAll(journals);
     }
 
-    public List<Changeset> getChangesets() {
-        return changesets;
+    public Collection<Changeset> getChangesets() {
+        return Collections.unmodifiableCollection(changesets);
     }
 
-    public void setChangesets(List<Changeset> changesets) {
-        this.changesets = changesets;
+    public void addChangesets(Collection<Changeset> changesets) {
+        this.changesets.addAll(changesets);
     }
 
-    public List<Watcher> getWatchers() {
-        return watchers;
+    public Collection<Watcher> getWatchers() {
+        return Collections.unmodifiableCollection(watchers);
     }
 
-    public void setWatchers(List<Watcher> watchers) {
-        this.watchers = watchers;
+    public void addWatchers(Collection<Watcher> watchers) {
+        this.watchers.addAll(watchers);
     }
 
     @Override
@@ -298,12 +322,16 @@ public class Issue implements Identifiable {
     /**
      * Relations are only loaded if you include INCLUDE.relations when loading the Issue.
      *
-     * @return list of relations or EMPTY list if no relations, never returns NULL
+     * @return relations or EMPTY collection if no relations, never returns NULL
      *
      * @see com.taskadapter.redmineapi.RedmineManager#getIssueById(Integer id, INCLUDE... include)
      */
-    public List<IssueRelation> getRelations() {
-        return relations;
+    public Collection<IssueRelation> getRelations() {
+        return Collections.unmodifiableCollection(relations);
+    }
+
+    public void addRelations(Collection<IssueRelation> collection) {
+        relations.addAll(collection);
     }
 
     public Integer getPriorityId() {
@@ -318,13 +346,23 @@ public class Issue implements Identifiable {
         return targetVersion;
     }
 
-    public List<Attachment> getAttachments() {
-        return attachments;
+    /**
+     * @return attachments. the collection can be empty, but never null.
+     */
+    public Collection<Attachment> getAttachments() {
+        return Collections.unmodifiableCollection(attachments);
+    }
+
+    public void addAttachments(Collection<Attachment> collection) {
+        attachments.addAll(collection);
+    }
+
+    public void addAttachment(Attachment attachment) {
+        attachments.add(attachment);
     }
 
     public void setTargetVersion(Version version) {
         this.targetVersion = version;
-
     }
 
     public IssueCategory getCategory() {
