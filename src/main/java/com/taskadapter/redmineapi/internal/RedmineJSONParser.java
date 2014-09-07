@@ -10,6 +10,7 @@ import java.util.Set;
 
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.bean.WatcherFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -611,8 +612,7 @@ public class RedmineJSONParser {
     }
 
 	public static Watcher parseWatcher(JSONObject content) throws JSONException {
-		final Watcher result = new Watcher();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Watcher result = WatcherFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}
