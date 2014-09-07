@@ -1692,4 +1692,30 @@ public class RedmineManagerTest {
 
         mgr.getIssueById(issue.getId());
     }
+    
+    @Test
+    public void testAddIssueWithWatchers() throws RedmineException {
+        final Issue issue = generateRandomIssue();
+        
+        final User newUserWatcher = mgr.createUser(UserGenerator.generateRandomUser());
+        
+        try {
+            List<Watcher> watchers = new ArrayList<Watcher>();
+            Watcher watcher = new Watcher();
+            watcher.setId(newUserWatcher.getId());
+            watchers.add(watcher);
+
+            issue.setWatchers(watchers);
+
+            final Issue retrievedIssue = mgr.createIssue(projectKey, issue);
+            final Issue retrievedIssueWithWatchers =  mgr.getIssueById(retrievedIssue.getId(), INCLUDE.watchers);
+        
+            assertNotNull(retrievedIssueWithWatchers);
+            assertNotNull(retrievedIssueWithWatchers.getWatchers());
+            assertEquals(watchers.size(), retrievedIssueWithWatchers.getWatchers().size());
+            assertEquals(watcher.getId(), retrievedIssueWithWatchers.getWatchers().get(0).getId());
+        } finally {
+            mgr.deleteUser(newUserWatcher.getId());
+        }
+    }
 }
