@@ -46,8 +46,7 @@ public class RedmineJSONParserTest {
 				.parse(RedmineJSONParser.getResponseSingleObject(projectString,
 						"project"));
 
-		final Project template = new Project();
-		template.setId(6143);
+		final Project template = new Project(6143);
 		template.setIdentifier("test1336744548920");
 		template.setName("test project");
 		template.setHomepage("");

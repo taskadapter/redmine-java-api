@@ -4,16 +4,21 @@ import java.util.List;
 
 public class CustomField {
 
-    private int id;
+    private final Integer id;
     private String name;
     private String value;
     private boolean multiple = false;
 	private List<String> values;
 
-    public CustomField() {
+    CustomField() {
+        this.id = null;
     }
 
-    public CustomField(int id, String name, String value) {
+    CustomField(Integer id) {
+        this.id = id;
+    }
+
+    CustomField(Integer id, String name, String value) {
         this.id = id;
         this.name = name;
         this.value = value;
@@ -21,10 +26,6 @@ public class CustomField {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {

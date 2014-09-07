@@ -3,8 +3,10 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueBuilder;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
@@ -18,6 +20,7 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -433,8 +436,7 @@ public class RedmineManagerTest {
     @Test(expected = NotFoundException.class)
     public void testUpdateIssueNonExistingId() throws RedmineException {
         int nonExistingId = 999999;
-        Issue issue = new Issue();
-        issue.setId(nonExistingId);
+        Issue issue = new Issue(nonExistingId);
         mgr.update(issue);
     }
 
@@ -604,8 +606,8 @@ public class RedmineManagerTest {
 
         issue.clearCustomFields();
 
-        issue.addCustomField(new CustomField(id1, custom1FieldName, custom1Value));
-        issue.addCustomField(new CustomField(id2, custom2FieldName, custom2Value));
+        issue.addCustomField(CustomFieldFactory.build(id1, custom1FieldName, custom1Value));
+        issue.addCustomField(CustomFieldFactory.build(id2, custom2FieldName, custom2Value));
         mgr.update(issue);
 
         Issue updatedIssue = mgr.getIssueById(issue.getId());
@@ -892,10 +894,9 @@ public class RedmineManagerTest {
 
         String existingProjectKey = "test";
         Issue toCreate = generateRandomIssue();
-        Version v = new Version();
+        Version v = VersionFactory.create(1);
         String versionName = "1.0";
         v.setName("1.0");
-        v.setId(1);
         v.setProject(mgr.getProjectByKey(projectKey));
         v = mgr.createVersion(v);
         toCreate.setTargetVersion(v);
@@ -996,8 +997,7 @@ public class RedmineManagerTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidVersion() throws RedmineException {
-        Version version = new Version(null, "Invalid test version "
-                + UUID.randomUUID().toString());
+        Version version = VersionFactory.create(null, "Invalid version " + UUID.randomUUID().toString());
         mgr.createVersion(version);
     }
 
@@ -1011,13 +1011,10 @@ public class RedmineManagerTest {
      */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidVersion() throws RedmineException {
-        // create new test version
-        Version version = new Version(null, "Invalid test version "
-                + UUID.randomUUID().toString());
-        version.setDescription("An invalid test version created by "
-                + this.getClass());
-        // set invalid id
-        version.setId(-1);
+        // create new test version with invalid id: -1.
+        Version version = VersionFactory.create(-1);
+        version.setName("name invalid version " + UUID.randomUUID().toString());
+        version.setDescription("An invalid test version created by " + this.getClass());
         // now try to delete version
         mgr.deleteVersion(version);
     }
@@ -1034,7 +1031,7 @@ public class RedmineManagerTest {
         Project project = createProject();
         try {
             String name = "Test version " + UUID.randomUUID().toString();
-            Version version = new Version(project, name);
+            Version version = VersionFactory.create(project, name);
             version.setDescription("A test version created by " + this.getClass());
             version.setStatus("open");
             Version newVersion = mgr.createVersion(version);
@@ -1062,8 +1059,8 @@ public class RedmineManagerTest {
         Version testVersion1 = null;
         Version testVersion2 = null;
         try {
-            testVersion1 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
-            testVersion2 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
+            testVersion1 = mgr.createVersion(VersionFactory.create(project, "Version" + UUID.randomUUID()));
+            testVersion2 = mgr.createVersion(VersionFactory.create(project, "Version" + UUID.randomUUID()));
             List<Version> versions = mgr.getVersions(project.getId());
             assertEquals("Wrong number of versions for project "
                     + project.getName() + " delivered by Redmine Java API", 2,
@@ -1088,7 +1085,7 @@ public class RedmineManagerTest {
     @Test
     public void versionIsRetrievedById() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version createdVersion = mgr.createVersion(new Version(project,
+        Version createdVersion = mgr.createVersion(VersionFactory.create(project,
                 "Version_1_" + UUID.randomUUID()));
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(createdVersion, versionById);
@@ -1097,7 +1094,7 @@ public class RedmineManagerTest {
     @Test
     public void versionIsUpdated() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version createdVersion = mgr.createVersion(new Version(project,
+        Version createdVersion = mgr.createVersion(VersionFactory.create(project,
                 "Version_1_" + UUID.randomUUID()));
         String description = "new description";
         createdVersion.setDescription(description);
@@ -1109,7 +1106,7 @@ public class RedmineManagerTest {
     @Test
     public void versionIsUpdatedIncludingDueDate() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version createdVersion = mgr.createVersion(new Version(project,
+        Version createdVersion = mgr.createVersion(VersionFactory.create(project,
                 "Version_1_" + UUID.randomUUID()));
         String description = "new description";
         createdVersion.setDescription(description);
@@ -1122,13 +1119,13 @@ public class RedmineManagerTest {
     @Test
     public void versionSharingParameterIsSaved() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version version = new Version(project, "Version_1_" + UUID.randomUUID());
+        Version version = VersionFactory.create(project, "Version_1_" + UUID.randomUUID());
         version.setSharing(Version.SHARING_NONE);
         Version createdVersion = mgr.createVersion(version);
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(Version.SHARING_NONE, versionById.getSharing());
 
-        Version versionShared = new Version(project, "Version_2_" + UUID.randomUUID());
+        Version versionShared = VersionFactory.create(project, "Version_2_" + UUID.randomUUID());
         versionShared.setSharing(Version.SHARING_HIERARCHY);
         Version createdVersion2 = mgr.createVersion(versionShared);
         Version version2ById = mgr.getVersionById(createdVersion2.getId());
@@ -1360,8 +1357,7 @@ public class RedmineManagerTest {
         Issue issue = new Issue();
         issue.setSubject("test123");
         final Issue iss1 = mgr.createIssue(projectKey, issue);
-        final Issue iss2 = new Issue();
-        iss2.setId(iss1.getId());
+        final Issue iss2 = new Issue(iss1.getId());
         iss2.setDescription("This is a test");
         mgr.update(iss2);
         final Issue iss3 = mgr.getIssueById(iss2.getId());
@@ -1375,8 +1371,7 @@ public class RedmineManagerTest {
         issue.setSubject("test123");
         issue.setDescription("Original description");
         final Issue iss1 = mgr.createIssue(projectKey, issue);
-        final Issue iss2 = new Issue();
-        iss2.setId(iss1.getId());
+        final Issue iss2 = new Issue(iss1.getId());
         iss2.setSubject("New subject");
         mgr.update(iss2);
         final Issue iss3 = mgr.getIssueById(iss2.getId());

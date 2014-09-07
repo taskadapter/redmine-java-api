@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.taskadapter.redmineapi.bean.CustomFieldFactory;
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -331,8 +333,7 @@ public class RedmineJSONParser {
 	 */
 	public static Project parseMinimalProject(JSONObject content)
 			throws JSONException {
-		final Project result = new Project();
-		result.setId(JsonInput.getInt(content, "id"));
+		final Project result = new Project(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		return result;
@@ -346,8 +347,7 @@ public class RedmineJSONParser {
 	 * @return parsed project.
 	 */
 	public static Project parseProject(JSONObject content) throws JSONException {
-		final Project result = new Project();
-		result.setId(JsonInput.getInt(content, "id"));
+		final Project result = new Project(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		result.setDescription(JsonInput
@@ -368,8 +368,7 @@ public class RedmineJSONParser {
 
 	@SuppressWarnings("deprecation")
 	public static Issue parseIssue(JSONObject content) throws JSONException {
-		final Issue result = new Issue();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Issue result = new Issue(JsonInput.getIntOrNull(content, "id"));
 		result.setSubject(JsonInput.getStringOrNull(content, "subject"));
 		final JSONObject parentIssueObject = JsonInput.getObjectOrNull(content,
 				"parent");
@@ -442,8 +441,7 @@ public class RedmineJSONParser {
 	}
 
 	public static Version parseVersion(JSONObject content) throws JSONException {
-		final Version result = new Version();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Version result = VersionFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
@@ -487,8 +485,7 @@ public class RedmineJSONParser {
 
 	public static CustomField parseCustomField(JSONObject content)
 			throws JSONException {
-		final CustomField result = new CustomField();
-		result.setId(JsonInput.getInt(content, "id"));
+		final CustomField result = CustomFieldFactory.build(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 
 		if (!content.has("multiple"))
@@ -535,8 +532,7 @@ public class RedmineJSONParser {
 	}
 
 	public static User parseUser(JSONObject content) throws JSONException {
-		final User result = new User();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final User result = new User(JsonInput.getIntOrNull(content, "id"));
 		result.setLogin(JsonInput.getStringOrNull(content, "login"));
 		result.setPassword(JsonInput.getStringOrNull(content, "password"));
 		result.setFirstName(JsonInput.getStringOrNull(content, "firstname"));

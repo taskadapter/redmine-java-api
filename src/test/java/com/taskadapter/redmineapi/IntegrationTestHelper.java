@@ -21,8 +21,7 @@ public class IntegrationTestHelper {
         String login = testConfig.getLogin();
         String fName = testConfig.getParam("userFName");
         String lName = testConfig.getParam("userLName");
-        User user = new User();
-        user.setId(userId);
+        User user = new User(userId);
         user.setLogin(login);
         user.setFirstName(fName);
         user.setLastName(lName);

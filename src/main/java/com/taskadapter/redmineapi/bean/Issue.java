@@ -1,11 +1,9 @@
 package com.taskadapter.redmineapi.bean;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,7 +11,8 @@ import java.util.Set;
  */
 public class Issue implements Identifiable {
 
-    private Integer id;
+    private final Integer id;
+
     private String subject;
     private Integer parentId;
     private Float estimatedHours;
@@ -50,6 +49,14 @@ public class Issue implements Identifiable {
     private Set<Attachment> attachments = new HashSet<Attachment>();
     private Set<Changeset> changesets = new HashSet<Changeset>();
     private Set<Watcher> watchers = new HashSet<Watcher>();
+
+    public Issue(Integer id) {
+        this.id = id;
+    }
+
+    public Issue() {
+        this.id = null;
+    }
 
     public Project getProject() {
         return project;
@@ -122,10 +129,6 @@ public class Issue implements Identifiable {
      */
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getSubject() {

@@ -1,4 +1,4 @@
-package com.taskadapter.redmineapi;
+package com.taskadapter.redmineapi.bean;
 
 import com.taskadapter.redmineapi.bean.Issue;
 

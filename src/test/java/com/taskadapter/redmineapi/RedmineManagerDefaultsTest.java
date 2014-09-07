@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi;
 
 import java.util.Calendar;
 
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -209,7 +210,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testVersionDefaults() throws RedmineException {
-		final Version template = new Version();
+		final Version template = VersionFactory.create();
 		template.setProject(mgr.getProjectByKey(projectKey));
 		template.setName("2.3.4.5");
 		final Version version = mgr.createVersion(template);

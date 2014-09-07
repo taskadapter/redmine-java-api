@@ -31,8 +31,7 @@ public class ProjectsTest {
 
     @Test
     public void testProjects1Info() {
-        Project aceProject = new Project();
-        aceProject.setId(15);
+        Project aceProject = new Project(15);
         aceProject.setIdentifier("test1295577237142");
         aceProject.setName("test project 15");
 
