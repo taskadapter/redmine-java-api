@@ -9,6 +9,9 @@ import java.util.List;
  */
 public class Journal {
 
+    /**
+     * database ID.
+     */
     private final Integer id;
 
     private String notes;
@@ -16,7 +19,12 @@ public class Journal {
     private Date createdOn;
     private List<JournalDetail> details = new ArrayList<JournalDetail>();
 
-    public Journal(Integer id) {
+    /**
+     * Use JournalFactory to create instances of this class.
+     *
+     * @param id database ID.
+     */
+    Journal(Integer id) {
         this.id = id;
     }
 

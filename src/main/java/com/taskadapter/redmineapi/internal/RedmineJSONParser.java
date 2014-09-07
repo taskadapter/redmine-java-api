@@ -17,12 +17,14 @@ import com.taskadapter.redmineapi.bean.IssueRelationFactory;
 import com.taskadapter.redmineapi.bean.IssueStatusFactory;
 import com.taskadapter.redmineapi.bean.JournalFactory;
 import com.taskadapter.redmineapi.bean.MembershipFactory;
+import com.taskadapter.redmineapi.bean.NewsFactory;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.RoleFactory;
 import com.taskadapter.redmineapi.bean.SavedQueryFactory;
 import com.taskadapter.redmineapi.bean.TimeEntryActivityFactory;
 import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.TrackerFactory;
+import com.taskadapter.redmineapi.bean.UserFactory;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.WatcherFactory;
 import org.json.JSONArray;
@@ -285,8 +287,7 @@ public class RedmineJSONParser {
 	}
 
 	public static News parseNews(JSONObject object) throws JSONException {
-		final News result = new News();
-		result.setId(JsonInput.getIntOrNull(object, "id"));
+		final News result = NewsFactory.create(JsonInput.getIntOrNull(object, "id"));
 		result.setProject(JsonInput.getObjectOrNull(object, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setUser(JsonInput.getObjectOrNull(object, "author", USER_PARSER));
@@ -541,7 +542,7 @@ public class RedmineJSONParser {
 	}
 
 	public static User parseUser(JSONObject content) throws JSONException {
-		final User result = new User(JsonInput.getIntOrNull(content, "id"));
+		final User result = UserFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setLogin(JsonInput.getStringOrNull(content, "login"));
 		result.setPassword(JsonInput.getStringOrNull(content, "password"));
 		result.setFirstName(JsonInput.getStringOrNull(content, "firstname"));

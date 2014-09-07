@@ -118,7 +118,7 @@ public class Attachment implements Identifiable {
 
     @Override
     public String toString() {
-        return "IssueAttachment{" +
+        return "Attachment{" +
                 "id=" + id +
                 ", fileName='" + fileName + '\'' +
                 ", fileSize=" + fileSize +

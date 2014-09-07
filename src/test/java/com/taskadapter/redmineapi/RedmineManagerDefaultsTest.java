@@ -5,6 +5,7 @@ import java.util.Calendar;
 import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.TimeEntryFactory;
+import com.taskadapter.redmineapi.bean.UserFactory;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -126,7 +127,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testUserDefaults() throws RedmineException {
-		final User template = new User();
+		final User template = UserFactory.create();
 		template.setFirstName("first name");
 		template.setLastName("last name");
 		template.setMail("root@globalhost.ru");
