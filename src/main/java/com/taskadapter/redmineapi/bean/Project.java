@@ -14,7 +14,7 @@ public class Project implements Identifiable, Serializable {
 	/**
 	 * database ID
 	 */
-    private Integer id;
+    private final Integer id;
 
     /**
      * String "identifier" (human-readable name without spaces and other extra stuff)
@@ -46,6 +46,10 @@ public class Project implements Identifiable, Serializable {
     private Boolean projectPublic;
     private List<CustomField> customFields = new ArrayList<CustomField>();
 
+    Project(Integer id) {
+        this.id = id;
+    }
+
     public String getHomepage() {
         return homepage;
     }
@@ -71,13 +75,6 @@ public class Project implements Identifiable, Serializable {
      */
     public Integer getId() {
         return id;
-    }
-
-    /**
-     * @param id numeric database ID
-     */
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     /**

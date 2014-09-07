@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class Attachment implements Identifiable {
 
-    private Integer id;
+    private final Integer id;
     private String fileName;
     private long fileSize;
     private String contentType;
@@ -15,18 +15,24 @@ public class Attachment implements Identifiable {
     private String description;
     private Date createdOn;
     private User author;
-	private String token;
+    private String token;
+
+    /**
+     * Use AttachmentFactory to create instances of this class.
+     *
+     * @param id database ID.
+     * @see com.taskadapter.redmineapi.bean.AttachmentFactory
+     */
+    Attachment(Integer id) {
+        this.id = id;
+    }
 
     @Override
     /**
-     * @return id. can be NULL for attachments not added to Redmine yet
+     * @return id. NULL for attachments not added to Redmine yet.
      */
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getContentType() {
@@ -85,13 +91,13 @@ public class Attachment implements Identifiable {
         this.fileSize = fileSize;
     }
 
-	public String getToken() {
-		return token;
-	}
+    public String getToken() {
+        return token;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -112,7 +118,7 @@ public class Attachment implements Identifiable {
 
     @Override
     public String toString() {
-        return "IssueAttachment{" +
+        return "Attachment{" +
                 "id=" + id +
                 ", fileName='" + fileName + '\'' +
                 ", fileSize=" + fileSize +

@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.TrackerFactory;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -46,8 +48,7 @@ public class RedmineJSONParserTest {
 				.parse(RedmineJSONParser.getResponseSingleObject(projectString,
 						"project"));
 
-		final Project template = new Project();
-		template.setId(6143);
+		final Project template = ProjectFactory.create(6143);
 		template.setIdentifier("test1336744548920");
 		template.setName("test project");
 		template.setHomepage("");
@@ -55,8 +56,8 @@ public class RedmineJSONParserTest {
 				.parse("11.05.2012 06:53:21 -0700"));
 		template.setUpdatedOn(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss Z")
 				.parse("11.05.2012 06:53:20 -0700"));
-		template.setTrackers(Arrays.asList(new Tracker(1, "Bug"), new Tracker(
-				2, "Feature"), new Tracker(3, "Support")));
+		template.setTrackers(Arrays.asList(TrackerFactory.create(1, "Bug"), TrackerFactory.create(
+				2, "Feature"), TrackerFactory.create(3, "Support")));
 		template.setDescription("");
 		Assert.assertEquals(template, project);
 	}

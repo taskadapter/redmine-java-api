@@ -1,16 +1,22 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Redmine's User.
- *
- * @author Alexey Skorokhodov
  */
 public class User implements Identifiable {
-    private Integer id;
+    /**
+     * database ID.
+     */
+    private final Integer id;
+
     private String login;
     private String password;
     private String firstName;
@@ -21,9 +27,20 @@ public class User implements Identifiable {
     private String apiKey;
     private Integer authSourceId;
     // TODO add tests
-    private List<CustomField> customFields = new ArrayList<CustomField>();
+    private Set<CustomField> customFields = new HashSet<CustomField>();
 	private List<Membership> memberships = new ArrayList<Membership>();
 	 private List<Group> groups = new ArrayList<Group>();
+
+    /**
+     * Use UserFactory to create instances of this class.
+     *
+     * @param id database ID.
+     *
+     * @see UserFactory
+     */
+    User(Integer id) {
+        this.id = id;
+    }
 
     public Integer getId() {
         return id;
@@ -32,10 +49,6 @@ public class User implements Identifiable {
     @Override
     public String toString() {
         return getFullName();
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getLogin() {
@@ -177,18 +190,36 @@ public class User implements Identifiable {
     }
 
     /**
-     *  list of Custom Field objects, NEVER NULL.
+     * @return Custom Fields, NEVER NULL.
      */
-    public List<CustomField> getCustomFields() {
-        return customFields;
+    public Iterator<CustomField> getCustomFields() {
+        return customFields.iterator();
+    }
+
+    public void clearCustomFields() {
+        customFields.clear();
     }
 
     /**
      * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
      * ID can be seen in database or in Redmine administration when editing the custom field (number is part of the URL!).
      */
-    public void setCustomFields(List<CustomField> customFields) {
-        this.customFields = customFields;
+    public void addCustomFields(Collection<CustomField> customFields) {
+        this.customFields.addAll(customFields);
+    }
+
+    /**
+     * If there is a custom field with the same ID already present,
+     * the new field replaces the old one.
+     *
+     * @param customField the field to add.
+     */
+    public void addCustomField(CustomField customField) {
+        customFields.add(customField);
+    }
+
+    public int getNumberOfCustomFields() {
+        return customFields.size();
     }
 
 	public List<Membership> getMemberships() {

@@ -1,11 +1,5 @@
 package com.taskadapter.redmineapi.internal;
 
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.CustomField;
@@ -22,9 +16,15 @@ import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 import com.taskadapter.redmineapi.internal.json.JsonOutput;
-
-import org.json.JSONWriter;
 import org.json.JSONException;
+import org.json.JSONWriter;
+
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Builder for requests to Redmine in JSON format.
@@ -317,15 +317,16 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
 
-		if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
-			final List<Attachment> uploads = new ArrayList<Attachment>();
-			for (Attachment attach : issue.getAttachments())
-				if (attach.getToken() != null)
-					uploads.add(attach);
-			JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
-					UPLOAD_WRITER);
-		}
-		
+        Iterator<Attachment> attachments = issue.getAttachments();
+        final List<Attachment> uploads = new ArrayList<Attachment>();
+        while (attachments.hasNext()) {
+            Attachment next = attachments.next();
+            if (next.getToken() != null) {
+                uploads.add(next);
+            }
+        }
+        JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
+                UPLOAD_WRITER);
 
 		/*
 		 * Journals and Relations cannot be set for an issue during creation or
@@ -358,11 +359,13 @@ public class RedmineJSONBuilder {
 	}
 
 	private static void writeCustomFields(JSONWriter writer,
-			List<CustomField> customFields) throws JSONException {
-		if (customFields == null || customFields.isEmpty())
-			return;
+			Iterator<CustomField> customFields) throws JSONException {
+		if (customFields == null || !customFields.hasNext()) {
+            return;
+        }
 		writer.key("custom_field_values").object();
-		for (CustomField field : customFields) {
+		while (customFields.hasNext()) {
+            CustomField field = customFields.next();
             // see https://github.com/taskadapter/redmine-java-api/issues/54
             Object valueToWrite;
             if (field.isMultiple()) {

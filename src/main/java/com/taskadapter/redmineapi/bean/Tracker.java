@@ -7,24 +7,26 @@ import java.io.Serializable;
  */
 public class Tracker implements Identifiable, Serializable {
 
-    private Integer id;
+    /**
+     * database ID.
+     */
+    private final Integer id;
+
     private String name;
 
-    public Tracker() {
-    }
-
-    public Tracker(Integer id, String name) {
-        super();
+    /**
+     * Use TrackerFactory to create instances of this class.
+     *
+     * @param id database ID.
+     *
+     * @see com.taskadapter.redmineapi.bean.TrackerFactory
+     */
+    Tracker(Integer id) {
         this.id = id;
-        this.name = name;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -8,6 +8,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.taskadapter.redmineapi.bean.AttachmentFactory;
+import com.taskadapter.redmineapi.bean.CustomFieldFactory;
+import com.taskadapter.redmineapi.bean.GroupFactory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
+import com.taskadapter.redmineapi.bean.IssuePriorityFactory;
+import com.taskadapter.redmineapi.bean.IssueRelationFactory;
+import com.taskadapter.redmineapi.bean.IssueStatusFactory;
+import com.taskadapter.redmineapi.bean.JournalFactory;
+import com.taskadapter.redmineapi.bean.MembershipFactory;
+import com.taskadapter.redmineapi.bean.NewsFactory;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.RoleFactory;
+import com.taskadapter.redmineapi.bean.SavedQueryFactory;
+import com.taskadapter.redmineapi.bean.TimeEntryActivityFactory;
+import com.taskadapter.redmineapi.bean.TimeEntryFactory;
+import com.taskadapter.redmineapi.bean.TrackerFactory;
+import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.bean.WatcherFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -233,7 +252,7 @@ public class RedmineJSONParser {
 	public static Tracker parseTracker(JSONObject object) throws JSONException {
 		final int id = JsonInput.getInt(object, "id");
 		final String name = JsonInput.getStringNotNull(object, "name");
-		return new Tracker(id, name);
+		return TrackerFactory.create(id, name);
 	}
 
 	/**
@@ -249,7 +268,7 @@ public class RedmineJSONParser {
 			throws JSONException {
 		final int id = JsonInput.getInt(object, "id");
 		final String name = JsonInput.getStringNotNull(object, "name");
-		final IssueStatus result = new IssueStatus(id, name);
+		final IssueStatus result = IssueStatusFactory.create(id, name);
 		if (object.has("is_default"))
 			result.setDefaultStatus(JsonInput.getOptionalBool(object,
 					"is_default"));
@@ -260,8 +279,7 @@ public class RedmineJSONParser {
 
 	public static SavedQuery parseSavedQuery(JSONObject object)
 			throws JSONException {
-		final SavedQuery result = new SavedQuery();
-		result.setId(JsonInput.getIntOrNull(object, "id"));
+		final SavedQuery result = SavedQueryFactory.create(JsonInput.getIntOrNull(object, "id"));
 		result.setName(JsonInput.getStringOrNull(object, "name"));
 		result.setPublicQuery(JsonInput.getOptionalBool(object, "is_public"));
 		result.setProjectId(JsonInput.getIntOrNull(object, "project_id"));
@@ -269,8 +287,7 @@ public class RedmineJSONParser {
 	}
 
 	public static News parseNews(JSONObject object) throws JSONException {
-		final News result = new News();
-		result.setId(JsonInput.getIntOrNull(object, "id"));
+		final News result = NewsFactory.create(JsonInput.getIntOrNull(object, "id"));
 		result.setProject(JsonInput.getObjectOrNull(object, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setUser(JsonInput.getObjectOrNull(object, "author", USER_PARSER));
@@ -290,8 +307,7 @@ public class RedmineJSONParser {
 		 * addIfNotNullFull(writer, "created_on", timeEntry.getSpentOn());
 		 * addIfNotNullFull(writer, "updated_on", timeEntry.getSpentOn());
 		 */
-		final TimeEntry result = new TimeEntry();
-		result.setId(JsonInput.getIntOrNull(object, "id"));
+		final TimeEntry result = TimeEntryFactory.create(JsonInput.getIntOrNull(object, "id"));
 		final JSONObject issueObject = JsonInput.getObjectOrNull(object,
 				"issue");
 		if (issueObject != null)
@@ -331,8 +347,7 @@ public class RedmineJSONParser {
 	 */
 	public static Project parseMinimalProject(JSONObject content)
 			throws JSONException {
-		final Project result = new Project();
-		result.setId(JsonInput.getInt(content, "id"));
+		final Project result = ProjectFactory.create(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		return result;
@@ -346,8 +361,7 @@ public class RedmineJSONParser {
 	 * @return parsed project.
 	 */
 	public static Project parseProject(JSONObject content) throws JSONException {
-		final Project result = new Project();
-		result.setId(JsonInput.getInt(content, "id"));
+		final Project result = ProjectFactory.create(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		result.setDescription(JsonInput
@@ -368,8 +382,7 @@ public class RedmineJSONParser {
 
 	@SuppressWarnings("deprecation")
 	public static Issue parseIssue(JSONObject content) throws JSONException {
-		final Issue result = new Issue();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Issue result = new Issue(JsonInput.getIntOrNull(content, "id"));
 		result.setSubject(JsonInput.getStringOrNull(content, "subject"));
 		final JSONObject parentIssueObject = JsonInput.getObjectOrNull(content,
 				"parent");
@@ -410,32 +423,28 @@ public class RedmineJSONParser {
 			result.setStatusId(JsonInput.getIntOrNull(statusObject, "id"));
 		}
 
-		result.setCustomFields(JsonInput.getListOrNull(content,
+		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
-		result.setJournals(JsonInput.getListOrEmpty(content, "journals",
+		result.addJournals(JsonInput.getListOrEmpty(content, "journals",
 				JOURNAL_PARSER));
-		result.getAttachments().addAll(
+		result.addAttachments(
 				JsonInput.getListOrEmpty(content, "attachments",
 						ATTACHMENT_PARSER));
-		result.getRelations()
-				.addAll(JsonInput.getListOrEmpty(content, "relations",
-						RELATION_PARSER));
-		result.setTargetVersion(JsonInput.getObjectOrNull(content,
-				"fixed_version", VERSION_PARSER));
+		result.addRelations(JsonInput.getListOrEmpty(content, "relations", RELATION_PARSER));
+		result.setTargetVersion(JsonInput.getObjectOrNull(content, "fixed_version", VERSION_PARSER));
 		result.setCategory(JsonInput.getObjectOrNull(content, "category",
 				CATEGORY_PARSER));
-		result.setChangesets(JsonInput.getListOrEmpty(content, "changesets",
+		result.addChangesets(JsonInput.getListOrEmpty(content, "changesets",
 				CHANGESET_PARSER));
-		result.setWatchers(JsonInput.getListOrEmpty(content, "watchers",
+		result.addWatchers(JsonInput.getListOrEmpty(content, "watchers",
 				WATCHER_PARSER));
 		return result;
 	}
 
 	public static IssueCategory parseCategory(JSONObject content)
 			throws JSONException {
-		final IssueCategory result = new IssueCategory();
-		result.setId(JsonInput.getInt(content, "id"));
+		final IssueCategory result = IssueCategoryFactory.create(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));
@@ -445,8 +454,7 @@ public class RedmineJSONParser {
 	}
 
 	public static Version parseVersion(JSONObject content) throws JSONException {
-		final Version result = new Version();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Version result = VersionFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
@@ -463,8 +471,7 @@ public class RedmineJSONParser {
 
 	public static IssueRelation parseRelation(JSONObject content)
 			throws JSONException {
-		final IssueRelation result = new IssueRelation();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final IssueRelation result = IssueRelationFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setIssueId(JsonInput.getIntOrNull(content, "issue_id"));
 		result.setIssueToId(JsonInput.getIntOrNull(content, "issue_to_id"));
 		result.setType(JsonInput.getStringOrNull(content, "relation_type"));
@@ -474,8 +481,7 @@ public class RedmineJSONParser {
 
 	public static Attachment parseAttachments(JSONObject content)
 			throws JSONException {
-		final Attachment result = new Attachment();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Attachment result = AttachmentFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setFileName(JsonInput.getStringOrNull(content, "filename"));
 		result.setFileSize(JsonInput.getLong(content, "filesize"));
 		result.setContentType(JsonInput
@@ -490,8 +496,7 @@ public class RedmineJSONParser {
 
 	public static CustomField parseCustomField(JSONObject content)
 			throws JSONException {
-		final CustomField result = new CustomField();
-		result.setId(JsonInput.getInt(content, "id"));
+		final CustomField result = CustomFieldFactory.create(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 
 		if (!content.has("multiple"))
@@ -509,8 +514,7 @@ public class RedmineJSONParser {
 	}
 
 	public static Journal parseJournal(JSONObject content) throws JSONException {
-		final Journal result = new Journal();
-		result.setId(JsonInput.getInt(content, "id"));
+		final Journal result = JournalFactory.create(JsonInput.getInt(content, "id"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
@@ -538,8 +542,7 @@ public class RedmineJSONParser {
 	}
 
 	public static User parseUser(JSONObject content) throws JSONException {
-		final User result = new User();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final User result = UserFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setLogin(JsonInput.getStringOrNull(content, "login"));
 		result.setPassword(JsonInput.getStringOrNull(content, "password"));
 		result.setFirstName(JsonInput.getStringOrNull(content, "firstname"));
@@ -549,7 +552,7 @@ public class RedmineJSONParser {
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
                 result.setApiKey(JsonInput.getStringOrNull(content, "api_key"));
-		result.setCustomFields(JsonInput.getListOrEmpty(content,
+		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
@@ -566,15 +569,13 @@ public class RedmineJSONParser {
 	}
 	
 	public static Group parseGroup(JSONObject content) throws JSONException {
-		final Group result = new Group();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Group result = GroupFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}
 
 	public static Role parseRole(JSONObject content) throws JSONException {
-		final Role role = new Role();
-		role.setId(JsonInput.getIntOrNull(content, "id"));
+		final Role role = RoleFactory.create(JsonInput.getIntOrNull(content, "id"));
 		role.setName(JsonInput.getStringOrNull(content, "name"));
 		role.setInherited(content.has("inherited")
 				&& content.getBoolean("inherited"));
@@ -590,8 +591,7 @@ public class RedmineJSONParser {
 
 	public static Membership parseMembership(JSONObject content)
 			throws JSONException {
-		final Membership result = new Membership();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Membership result = MembershipFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
@@ -601,8 +601,7 @@ public class RedmineJSONParser {
 	
     public static IssuePriority parseIssuePriority(JSONObject content)
             throws JSONException {
-        final IssuePriority result = new IssuePriority();
-        result.setId(JsonInput.getInt(content, "id"));
+        final IssuePriority result = IssuePriorityFactory.create(JsonInput.getInt(content, "id"));
         result.setName(JsonInput.getStringNotNull(content, "name"));
         result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
         return result;
@@ -610,16 +609,14 @@ public class RedmineJSONParser {
 
     public static TimeEntryActivity parseTimeEntryActivity(JSONObject content)
             throws JSONException {
-        final TimeEntryActivity result = new TimeEntryActivity();
-        result.setId(JsonInput.getInt(content, "id"));
+        final TimeEntryActivity result = TimeEntryActivityFactory.create(JsonInput.getInt(content, "id"));
         result.setName(JsonInput.getStringNotNull(content, "name"));
         result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
         return result;
     }
 
 	public static Watcher parseWatcher(JSONObject content) throws JSONException {
-		final Watcher result = new Watcher();
-		result.setId(JsonInput.getIntOrNull(content, "id"));
+		final Watcher result = WatcherFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}

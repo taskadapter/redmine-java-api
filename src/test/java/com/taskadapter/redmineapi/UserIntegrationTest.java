@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import java.util.Date;
 import java.util.List;
 
+import com.taskadapter.redmineapi.bean.UserFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -143,7 +144,7 @@ public class UserIntegrationTest {
     @Test
     public void testUpdateUser() throws RedmineAuthenticationException,
             NotFoundException {
-        User userToCreate = new User();
+        User userToCreate = UserFactory.create();
         userToCreate.setFirstName("fname2");
         userToCreate.setLastName("lname2");
         long randomNumber = new Date().getTime();

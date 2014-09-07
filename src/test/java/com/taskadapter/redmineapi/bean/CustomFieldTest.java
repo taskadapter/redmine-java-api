@@ -24,8 +24,7 @@ public class CustomFieldTest {
     }
 
     private CustomField getField(int id, String... values) {
-        CustomField field = new CustomField();
-        field.setId(id);
+        CustomField field = new CustomField(id);
         field.setValues(Arrays.asList(values));
         return field;
     }

@@ -1,6 +1,5 @@
 package com.taskadapter.redmineapi.bean;
 
-import com.taskadapter.redmineapi.bean.TimeEntry;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -10,12 +9,12 @@ public class TimeEntryTest {
 
     @Test
     public void emptyObjectIsInvalid() {
-        assertFalse(new TimeEntry().isValid());
+        assertFalse(TimeEntryFactory.create().isValid());
     }
 
     @Test
     public void validWithNonEmptyIssueId() {
-        TimeEntry timeEntry = new TimeEntry();
+        TimeEntry timeEntry = TimeEntryFactory.create();
         timeEntry.setHours(5f);
         timeEntry.setIssueId(1);
         assertTrue(timeEntry.isValid());
@@ -23,14 +22,14 @@ public class TimeEntryTest {
 
     @Test
     public void invalidWithoutTime() {
-        TimeEntry timeEntry = new TimeEntry();
+        TimeEntry timeEntry = TimeEntryFactory.create();
         timeEntry.setIssueId(1);
         assertFalse(timeEntry.isValid());
     }
 
     @Test
     public void validWithNonEmptyProjectId() {
-        TimeEntry timeEntry = new TimeEntry();
+        TimeEntry timeEntry = TimeEntryFactory.create();
         timeEntry.setHours(5f);
         timeEntry.setProjectId(123);
         assertTrue(timeEntry.isValid());
@@ -38,7 +37,7 @@ public class TimeEntryTest {
 
     @Test
     public void validWithBothProjectIdAndIssueIdSet() {
-        TimeEntry timeEntry = new TimeEntry();
+        TimeEntry timeEntry = TimeEntryFactory.create();
         timeEntry.setHours(5f);
         timeEntry.setIssueId(11);
         timeEntry.setProjectId(22);

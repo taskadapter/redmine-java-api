@@ -8,34 +8,24 @@ import java.io.Serializable;
 public class IssueCategory implements Identifiable, Serializable {
 	private static final long serialVersionUID = -109010410391968475L;
 
-	private Integer id;
+    /**
+     * database ID.
+     */
+	private final Integer id;
+
     private String name;
     private Project project;
     private User assignee;
 
     /**
-     * No-params constructor is required for reflective construction.
+     * @param id database ID.
      */
-    public IssueCategory() {
-    }
-
-    /**
-     * Constructor with some mandatory fields.
-     *
-     * @param project the {@link Project}
-     * @param name    the name
-     */
-    public IssueCategory(Project project, String name) {
-        this.name = name;
-        this.project = project;
+    IssueCategory(Integer id) {
+        this.id = id;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

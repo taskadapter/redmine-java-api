@@ -5,24 +5,20 @@ package com.taskadapter.redmineapi.bean;
  */
 public class Watcher {
 
-    private Integer id;
+    private final Integer id;
     private String name;
 
-    public Watcher() {
-    }
-
-    public Watcher(Integer id, String name) {
-        super();
+    /**
+     * Use WatcherFactory to create instances of this class.
+     *
+     * @param id database Id
+     */
+    Watcher(Integer id) {
         this.id = id;
-        this.name = name;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

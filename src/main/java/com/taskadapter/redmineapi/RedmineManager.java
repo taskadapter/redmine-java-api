@@ -25,11 +25,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import com.taskadapter.redmineapi.bean.AttachmentFactory;
+import com.taskadapter.redmineapi.bean.IssueRelationFactory;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.internal.CopyBytesHandler;
 import com.taskadapter.redmineapi.internal.Joiner;
 import org.apache.http.NameValuePair;
@@ -173,7 +177,7 @@ public class RedmineManager {
      */
     public Issue createIssue(String projectKey, Issue issue) throws RedmineException {
 		final Project oldProject = issue.getProject();
-		final Project newProject = new Project();
+		final Project newProject = ProjectFactory.create();
 		newProject.setIdentifier(projectKey);
 		issue.setProject(newProject);
 		try {
@@ -555,7 +559,7 @@ public class RedmineManager {
     }
 
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
-        IssueRelation toCreate = new IssueRelation();
+        IssueRelation toCreate = IssueRelationFactory.create();
         toCreate.setIssueId(issueId);
         toCreate.setIssueToId(issueToId);
         toCreate.setType(type);
@@ -574,8 +578,9 @@ public class RedmineManager {
      * Delete all issue's relations
      */
     public void deleteIssueRelations(Issue redmineIssue) throws RedmineException {
-        for (IssueRelation relation : redmineIssue.getRelations()) {
-            deleteRelation(relation.getId());
+        Iterator<IssueRelation> relations = redmineIssue.getRelations();
+        while (relations.hasNext()) {
+            deleteRelation(relations.next().getId());
         }
     }
 
@@ -887,7 +892,7 @@ public class RedmineManager {
         final String token;
         try {
             token = transport.upload(wrapper);
-            final Attachment result = new Attachment();
+            final Attachment result = AttachmentFactory.create();
             result.setToken(token);
             result.setContentType(contentType);
             result.setFileName(fileName);

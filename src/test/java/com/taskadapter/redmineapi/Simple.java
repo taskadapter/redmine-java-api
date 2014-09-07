@@ -1,12 +1,24 @@
 package com.taskadapter.redmineapi;
 
-import java.io.IOException;
-import java.util.List;
-
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
-import com.taskadapter.redmineapi.bean.*;
+import com.taskadapter.redmineapi.bean.Attachment;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
+import com.taskadapter.redmineapi.bean.IssueRelation;
+import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.SavedQuery;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.List;
 
 public class Simple {
 	private static final Logger logger = LoggerFactory.getLogger(Simple.class);
@@ -56,10 +68,8 @@ public class Simple {
 				"application/ternary", content);
 		final Issue testIssue = new Issue();
 		testIssue.setSubject("This is upload ticket!");
-		testIssue.getAttachments().add(attach1);
-		final Project tmpProject = new Project();
-		tmpProject.setIdentifier("uploadtmpproject");
-		tmpProject.setName("Upload project");
+		testIssue.addAttachment(attach1);
+		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
 		final Project project = mgr.createProject(tmpProject);
 		try {
 			final Issue createdIssue = mgr.createIssue(project.getIdentifier(),
@@ -136,9 +146,8 @@ public class Simple {
 	private static void getIssueWithRelations(RedmineManager mgr)
 			throws RedmineException {
 		Issue issue = mgr.getIssueById(22751, INCLUDE.relations);
-		List<IssueRelation> r = issue.getRelations();
+		Iterator<IssueRelation> r = issue.getRelations();
 		logger.debug("Retrieved relations " + r);
-
 	}
 
 	@SuppressWarnings("unused")
@@ -146,11 +155,9 @@ public class Simple {
 			throws RedmineException {
 		Issue issue = new Issue();
 		issue.setSubject("test123");
-		final Version ver = new Version();
-		ver.setId(512);
+		final Version ver = VersionFactory.create(512);
 		issue.setTargetVersion(ver);
-		final IssueCategory cat = new IssueCategory();
-		cat.setId(673);
+		final IssueCategory cat = IssueCategoryFactory.create(673);
 		issue.setCategory(cat);
 		mgr.createIssue(projectKey, issue);
 	}

@@ -9,10 +9,12 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Iterator;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class AttachmentIntegrationTest {
 
@@ -37,19 +39,19 @@ public class AttachmentIntegrationTest {
                 "application/ternary", content);
         final Issue testIssue = new Issue();
         testIssue.setSubject("This is upload ticket!");
-        testIssue.getAttachments().add(attach1);
+        testIssue.addAttachment(attach1);
         final Issue createdIssue = mgr.createIssue(projectKey, testIssue);
         try {
-            final List<Attachment> attachments = createdIssue.getAttachments();
-            assertEquals(1, attachments.size());
-            final Attachment added = attachments.get(0);
-            assertEquals("test.bin", added.getFileName());
-            assertEquals("application/ternary", added.getContentType());
+            assertThat(createdIssue.getNumberOfAttachments()).isEqualTo(1);
+            final Iterator<Attachment> attachments = createdIssue.getAttachments();
+            final Attachment added = attachments.next();
+            assertThat(added.getFileName()).isEqualTo("test.bin");
+            assertThat(added.getContentType()).isEqualTo("application/ternary");
             final byte[] receivedContent = mgr.downloadAttachmentContent(added);
             assertArrayEquals(content, receivedContent);
 
             Issue issueById = mgr.getIssueById(createdIssue.getId(), RedmineManager.INCLUDE.attachments);
-            assertEquals(1, issueById.getAttachments().size());
+            assertThat(issueById.getNumberOfAttachments()).isEqualTo(1);
         } finally {
             mgr.deleteIssue(createdIssue.getId());
         }

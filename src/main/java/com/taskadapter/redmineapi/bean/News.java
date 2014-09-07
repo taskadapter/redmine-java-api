@@ -6,7 +6,8 @@ import java.util.Date;
 public class News implements Identifiable, Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
+    private final Integer id;
+
     private Project project;
     private User user;
     private String title;
@@ -14,16 +15,12 @@ public class News implements Identifiable, Serializable {
     private Date createdOn;
     private String link;
 
-    public News() {
-        super();
+    News(Integer id) {
+        this.id = id;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer aId) {
-        this.id = aId;
     }
 
     public Project getProject() {
