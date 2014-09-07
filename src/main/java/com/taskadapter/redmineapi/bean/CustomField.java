@@ -10,18 +10,8 @@ public class CustomField {
     private boolean multiple = false;
 	private List<String> values;
 
-    CustomField() {
-        this.id = null;
-    }
-
     CustomField(Integer id) {
         this.id = id;
-    }
-
-    CustomField(Integer id, String name, String value) {
-        this.id = id;
-        this.name = name;
-        this.value = value;
     }
 
     public int getId() {

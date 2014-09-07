@@ -11,6 +11,9 @@ import java.util.Set;
  */
 public class Issue implements Identifiable {
 
+    /**
+     * @param id database ID.
+     */
     private final Integer id;
 
     private String subject;
@@ -50,6 +53,9 @@ public class Issue implements Identifiable {
     private Set<Changeset> changesets = new HashSet<Changeset>();
     private Set<Watcher> watchers = new HashSet<Watcher>();
 
+    /**
+     * @param id database ID.
+     */
     public Issue(Integer id) {
         this.id = id;
     }

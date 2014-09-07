@@ -1,16 +1,24 @@
 package com.taskadapter.redmineapi.bean;
 
 public class TimeEntryActivity {
-    private Integer id;
+
+    /**
+     * @param id database Id
+     */
+    private final Integer id;
+
     private String name;
     private boolean isDefault;
 
-    public Integer getId() {
-        return id;
+    /**
+     * @param id database Id
+     */
+    TimeEntryActivity(Integer id) {
+        this.id = id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {

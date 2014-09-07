@@ -13,6 +13,7 @@ import java.util.Set;
  */
 public class User implements Identifiable {
     private final Integer id;
+
     private String login;
     private String password;
     private String firstName;
@@ -27,6 +28,9 @@ public class User implements Identifiable {
 	private List<Membership> memberships = new ArrayList<Membership>();
 	 private List<Group> groups = new ArrayList<Group>();
 
+    /**
+     * @param id database Id
+     */
     public User(Integer id) {
         this.id = id;
     }

@@ -3,15 +3,15 @@ package com.taskadapter.redmineapi.bean;
 
 public class Group implements Identifiable {
 	
-    private Integer id;
+    private final Integer id;
     private String name;
-    
-    public Integer getId() {
-        return id;
+
+    Group(Integer id) {
+        this.id = id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {

@@ -1,16 +1,16 @@
 package com.taskadapter.redmineapi.bean;
 
 public class IssuePriority {
-    private Integer id;
+    private final Integer id;
     private String name;
     private boolean isDefault;
 
-    public Integer getId() {
-        return id;
+    IssuePriority(Integer id) {
+        this.id = id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {

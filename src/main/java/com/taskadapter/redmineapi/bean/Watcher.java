@@ -10,6 +10,8 @@ public class Watcher {
 
     /**
      * Use WatcherFactory to create instances of this class.
+     *
+     * @param id database Id
      */
     Watcher(Integer id) {
         this.id = id;

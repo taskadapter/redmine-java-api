@@ -9,30 +9,17 @@ import java.util.List;
  */
 public class Journal {
 
-    private int id;
+    private final Integer id;
+
     private String notes;
     private User user;
     private Date createdOn;
     private List<JournalDetail> details = new ArrayList<JournalDetail>();
 
-    public Journal() {
+    public Journal(Integer id) {
+        this.id = id;
     }
 
-    public Journal(int id, String notes, User user, Date createdOn) {
-        this.id = id;
-        this.notes = notes;
-        this.user = user;
-        this.createdOn = createdOn;
-    }
-
-    public Journal(int id, String notes, User user, Date createdOn, List<JournalDetail> details) {
-        this.id = id;
-        this.notes = notes;
-        this.user = user;
-        this.createdOn = createdOn;
-        this.details = details;
-    }
-    
     public Date getCreatedOn() {
         return createdOn;
     }
@@ -43,10 +30,6 @@ public class Journal {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getNotes() {

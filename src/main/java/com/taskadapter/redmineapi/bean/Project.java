@@ -46,11 +46,7 @@ public class Project implements Identifiable, Serializable {
     private Boolean projectPublic;
     private List<CustomField> customFields = new ArrayList<CustomField>();
 
-    public Project() {
-        this.id = null;
-    }
-
-    public Project(Integer id) {
+    Project(Integer id) {
         this.id = id;
     }
 

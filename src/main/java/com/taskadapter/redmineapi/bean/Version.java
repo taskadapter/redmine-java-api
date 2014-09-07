@@ -48,16 +48,6 @@ public class Version implements Identifiable {
     }
 
     /**
-     * @param project the {@link Project} of the {@link Version}
-     * @param name    the name of the the {@link Version}
-     */
-    Version(Project project, String name) {
-        this.id = null;
-        this.project = project;
-        this.name = name;
-    }
-
-    /**
      * Version objects are considered to be equal if their IDs are not null and equal.
      */
     @Override

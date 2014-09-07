@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -12,10 +13,13 @@ import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -489,7 +493,7 @@ public class RedmineManagerTest {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 11f;
         entry.setHours(hours);
         entry.setIssueId(issueId);
@@ -516,7 +520,7 @@ public class RedmineManagerTest {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 4f;
         entry.setHours(hours);
         entry.setIssueId(issueId);
@@ -551,7 +555,7 @@ public class RedmineManagerTest {
 
     private TimeEntry createTimeEntry(Integer issueId, float hours)
             throws RedmineException {
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         entry.setHours(hours);
         entry.setIssueId(issueId);
         entry.setActivityId(ACTIVITY_ID);
@@ -606,8 +610,8 @@ public class RedmineManagerTest {
 
         issue.clearCustomFields();
 
-        issue.addCustomField(CustomFieldFactory.build(id1, custom1FieldName, custom1Value));
-        issue.addCustomField(CustomFieldFactory.build(id2, custom2FieldName, custom2Value));
+        issue.addCustomField(CustomFieldFactory.create(id1, custom1FieldName, custom1Value));
+        issue.addCustomField(CustomFieldFactory.create(id2, custom2FieldName, custom2Value));
         mgr.update(issue);
 
         Issue updatedIssue = mgr.getIssueById(issue.getId());
@@ -665,18 +669,14 @@ public class RedmineManagerTest {
     }
 
     private Project createProject() throws RedmineException {
-        Project mainProject = new Project();
         long id = new Date().getTime();
-        mainProject.setName("project" + id);
-        mainProject.setIdentifier("project" + id);
+        Project mainProject = ProjectFactory.create("project" + id, "project" + id);
         return mgr.createProject(mainProject);
     }
 
     private Project createSubProject(Project parent) throws RedmineException {
-        Project project = new Project();
         long id = new Date().getTime();
-        project.setName("sub_pr" + id);
-        project.setIdentifier("subpr" + id);
+        Project project = ProjectFactory.create("sub_pr" + id, "subpr" + id);
         project.setParentId(parent.getId());
         return mgr.createProject(project);
     }
@@ -939,7 +939,7 @@ public class RedmineManagerTest {
     }
 
     private TimeEntry createIncompleteTimeEntry() {
-        TimeEntry timeEntry = new TimeEntry();
+        TimeEntry timeEntry = TimeEntryFactory.create();
         timeEntry.setActivityId(ACTIVITY_ID);
         timeEntry.setSpentOn(new Date());
         timeEntry.setHours(1.5f);
@@ -1394,8 +1394,8 @@ public class RedmineManagerTest {
     public void testMemberships() throws RedmineException {
         final List<Role> roles = mgr.getRoles();
 
-        final Membership newMembership = new Membership();
-        final Project project = new Project();
+        final Membership newMembership = MembershipFactory.create();
+        final Project project = ProjectFactory.create();
         project.setIdentifier(projectKey);
         newMembership.setProject(project);
         final User currentUser = mgr.getCurrentUser();
@@ -1414,8 +1414,7 @@ public class RedmineManagerTest {
                 .getId());
         assertEquals(createdMembership, membershipById);
 
-        final Membership emptyMembership = new Membership();
-        emptyMembership.setId(createdMembership.getId());
+        final Membership emptyMembership = MembershipFactory.create(createdMembership.getId());
         emptyMembership.setProject(createdMembership.getProject());
         emptyMembership.setUser(createdMembership.getUser());
         emptyMembership.setRoles(Collections.singletonList(roles.get(0)));
@@ -1431,8 +1430,8 @@ public class RedmineManagerTest {
     @Test
     public void testUserMemberships() throws RedmineException {
         final List<Role> roles = mgr.getRoles();
-        final Membership newMembership = new Membership();
-        final Project project = new Project();
+        final Membership newMembership = MembershipFactory.create();
+        final Project project = ProjectFactory.create();
         project.setIdentifier(projectKey);
         newMembership.setProject(project);
         final User currentUser = mgr.getCurrentUser();
@@ -1479,7 +1478,7 @@ public class RedmineManagerTest {
      */
     @Test
     public void testAddUserToGroup() throws RedmineException {
-        final Group template = new Group();
+        final Group template = GroupFactory.create();
         template.setName("testAddUserToGroup " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
@@ -1502,7 +1501,7 @@ public class RedmineManagerTest {
      */
     @Test
     public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
-        final Group template = new Group();
+        final Group template = GroupFactory.create();
         template.setName("some test " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
@@ -1521,7 +1520,7 @@ public class RedmineManagerTest {
 
     @Test
     public void testGroupCRUD() throws RedmineException {
-        final Group template = new Group();
+        final Group template = GroupFactory.create();
         template.setName("Template group " + System.currentTimeMillis());
         final Group created = mgr.createGroup(template);
 
@@ -1530,8 +1529,7 @@ public class RedmineManagerTest {
             final Group loaded = mgr.getGroupById(created.getId());
             assertEquals(template.getName(), loaded.getName());
 
-            final Group update = new Group();
-            update.setId(loaded.getId());
+            final Group update = GroupFactory.create(loaded.getId());
             update.setName("Group update " + System.currentTimeMillis());
 
             mgr.update(update);
@@ -1580,7 +1578,7 @@ public class RedmineManagerTest {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 11f;
         entry.setHours(hours);
         entry.setIssueId(issueId);

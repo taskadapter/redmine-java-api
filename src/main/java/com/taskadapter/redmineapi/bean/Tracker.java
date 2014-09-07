@@ -7,24 +7,18 @@ import java.io.Serializable;
  */
 public class Tracker implements Identifiable, Serializable {
 
-    private Integer id;
+    private final Integer id;
     private String name;
 
-    public Tracker() {
-    }
-
-    public Tracker(Integer id, String name) {
-        super();
+    /**
+     * @param id database Id
+     */
+    Tracker(Integer id) {
         this.id = id;
-        this.name = name;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

@@ -2,6 +2,8 @@ package com.taskadapter.redmineapi;
 
 import java.util.Calendar;
 
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -39,10 +41,7 @@ public class RedmineManagerDefaultsTest {
 		mgr = new RedmineManager(testConfig.getURI());
 		mgr.setLogin(testConfig.getLogin());
 		mgr.setPassword(testConfig.getPassword());
-		Project junitTestProject = new Project();
-		junitTestProject.setName("test project");
-		junitTestProject.setIdentifier("test"
-				+ Calendar.getInstance().getTimeInMillis());
+		Project junitTestProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
 
 		try {
 			Project createdProject = mgr.createProject(junitTestProject);
@@ -68,10 +67,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testProjectDefaults() throws RedmineException {
-		final Project template = new Project();
-		template.setName("Test name");
-		template.setIdentifier("test"
-				+ Calendar.getInstance().getTimeInMillis());
+		final Project template = ProjectFactory.create("Test name", "key" + Calendar.getInstance().getTimeInMillis());
 		final Project result = mgr.createProject(template);
 		try {
 			Assert.assertNotNull(result.getId());
@@ -153,7 +149,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testTimeEntryDefaults() throws RedmineException {
-		final TimeEntry template = new TimeEntry();
+		final TimeEntry template = TimeEntryFactory.create();
 
 		final Issue tmp = new Issue();
 		tmp.setSubject("aaabbbccc");

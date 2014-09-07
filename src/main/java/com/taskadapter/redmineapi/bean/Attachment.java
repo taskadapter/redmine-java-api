@@ -7,7 +7,7 @@ import java.util.Date;
  */
 public class Attachment implements Identifiable {
 
-    private Integer id;
+    private final Integer id;
     private String fileName;
     private long fileSize;
     private String contentType;
@@ -17,16 +17,16 @@ public class Attachment implements Identifiable {
     private User author;
 	private String token;
 
+    Attachment(Integer id) {
+        this.id = id;
+    }
+
     @Override
     /**
-     * @return id. can be NULL for attachments not added to Redmine yet
+     * @return id. NULL for attachments not added to Redmine yet.
      */
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getContentType() {

@@ -8,8 +8,8 @@ public class UserTest {
     @Test
     public void customFieldWithDuplicateIDReplacesTheOldOne() {
         User user = new User();
-        CustomField field = new CustomField(5, "name1", "value1");
-        CustomField duplicateField = new CustomField(5, "name1", "value1");
+        CustomField field = CustomFieldFactory.create(5, "name1", "value1");
+        CustomField duplicateField = CustomFieldFactory.create(5, "name1", "value1");
         assertThat(user.getNumberOfCustomFields()).isEqualTo(0);
         user.addCustomField(field);
         user.addCustomField(duplicateField);

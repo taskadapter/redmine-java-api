@@ -7,6 +7,7 @@ import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -67,9 +68,7 @@ public class Simple {
 		final Issue testIssue = new Issue();
 		testIssue.setSubject("This is upload ticket!");
 		testIssue.addAttachment(attach1);
-		final Project tmpProject = new Project();
-		tmpProject.setIdentifier("uploadtmpproject");
-		tmpProject.setName("Upload project");
+		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
 		final Project project = mgr.createProject(tmpProject);
 		try {
 			final Issue createdIssue = mgr.createIssue(project.getIdentifier(),

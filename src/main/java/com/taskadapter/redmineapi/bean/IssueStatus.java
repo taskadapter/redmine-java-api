@@ -3,29 +3,23 @@ package com.taskadapter.redmineapi.bean;
 import java.io.Serializable;
 
 /**
- * Redmine Issue Status ("new", "in progress" etc)
+ * Redmine Issue Status ("new", "in progress", etc)
  */
 public class IssueStatus implements Identifiable, Serializable {
 	private static final long serialVersionUID = -2221390098554222099L;
-	private Integer id;
+
+	private final Integer id;
+
     private String name;
     private boolean defaultStatus = false;
     private boolean closed = false;
 
-    public IssueStatus() {
-    }
-
-    public IssueStatus(Integer id, String name) {
+    IssueStatus(Integer id) {
         this.id = id;
-        this.name = name;
     }
 
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {

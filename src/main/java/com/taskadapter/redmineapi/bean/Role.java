@@ -7,17 +7,18 @@ import java.util.Set;
  */
 public class Role {
 
-	private Integer id;
+	private final Integer id;
+
 	private String name;
 	private Boolean inherited;
 	private Set<String> permissions;
 
-	public Integer getId() {
-		return id;
-	}
+    Role(Integer id) {
+        this.id = id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
+    public Integer getId() {
+		return id;
 	}
 
 	public String getName() {
