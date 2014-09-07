@@ -11,6 +11,7 @@ import java.util.Set;
 import com.taskadapter.redmineapi.bean.AttachmentFactory;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.GroupFactory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssuePriorityFactory;
 import com.taskadapter.redmineapi.bean.IssueRelationFactory;
 import com.taskadapter.redmineapi.bean.IssueStatusFactory;
@@ -442,8 +443,7 @@ public class RedmineJSONParser {
 
 	public static IssueCategory parseCategory(JSONObject content)
 			throws JSONException {
-		final IssueCategory result = new IssueCategory();
-		result.setId(JsonInput.getInt(content, "id"));
+		final IssueCategory result = IssueCategoryFactory.create(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));

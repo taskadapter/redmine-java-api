@@ -15,8 +15,14 @@ public class Attachment implements Identifiable {
     private String description;
     private Date createdOn;
     private User author;
-	private String token;
+    private String token;
 
+    /**
+     * Use AttachmentFactory to create instances of this class.
+     *
+     * @param id database ID.
+     * @see com.taskadapter.redmineapi.bean.AttachmentFactory
+     */
     Attachment(Integer id) {
         this.id = id;
     }
@@ -85,13 +91,13 @@ public class Attachment implements Identifiable {
         this.fileSize = fileSize;
     }
 
-	public String getToken() {
-		return token;
-	}
+    public String getToken() {
+        return token;
+    }
 
-	public void setToken(String token) {
-		this.token = token;
-	}
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     @Override
     public boolean equals(Object o) {

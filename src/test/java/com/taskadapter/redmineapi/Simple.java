@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
@@ -156,8 +157,7 @@ public class Simple {
 		issue.setSubject("test123");
 		final Version ver = VersionFactory.create(512);
 		issue.setTargetVersion(ver);
-		final IssueCategory cat = new IssueCategory();
-		cat.setId(673);
+		final IssueCategory cat = IssueCategoryFactory.create(673);
 		issue.setCategory(cat);
 		mgr.createIssue(projectKey, issue);
 	}

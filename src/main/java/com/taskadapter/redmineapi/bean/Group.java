@@ -6,6 +6,11 @@ public class Group implements Identifiable {
     private final Integer id;
     private String name;
 
+    /**
+     * Use GroupFactory to create instances of this class.
+     *
+     * @param id database ID.
+     */
     Group(Integer id) {
         this.id = id;
     }

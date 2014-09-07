@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi;
 
 import java.util.Calendar;
 
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.VersionFactory;
@@ -226,9 +227,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testCategoryDefaults() throws RedmineException {
-		final IssueCategory template = new IssueCategory();
-		template.setProject(mgr.getProjectByKey(projectKey));
-		template.setName("test name");
+		final IssueCategory template = IssueCategoryFactory.create(mgr.getProjectByKey(projectKey), "test name");
 		final IssueCategory category = mgr.createCategory(template);
 		try {
 			Assert.assertNotNull(category.getId());

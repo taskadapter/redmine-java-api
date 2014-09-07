@@ -6,6 +6,7 @@ import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -1143,7 +1144,7 @@ public class RedmineManagerTest {
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        IssueCategory category = new IssueCategory(project, "Category" + new Date().getTime());
+        IssueCategory category = IssueCategoryFactory.create(project, "Category" + new Date().getTime());
         category.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory = mgr.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
@@ -1172,12 +1173,12 @@ public class RedmineManagerTest {
     public void testGetIssueCategories() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
         // create some categories
-        IssueCategory testIssueCategory1 = new IssueCategory(project,
+        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project,
                 "Category" + new Date().getTime());
         testIssueCategory1.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory1 = mgr
                 .createCategory(testIssueCategory1);
-        IssueCategory testIssueCategory2 = new IssueCategory(project,
+        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project,
                 "Category" + new Date().getTime());
         testIssueCategory2.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory2 = mgr
@@ -1220,7 +1221,7 @@ public class RedmineManagerTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidIssueCategory() throws RedmineException {
-        IssueCategory category = new IssueCategory(null, "InvalidCategory"
+        IssueCategory category = IssueCategoryFactory.create(null, "InvalidCategory"
                 + new Date().getTime());
         mgr.createCategory(category);
     }
@@ -1238,11 +1239,9 @@ public class RedmineManagerTest {
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidIssueCategory() throws RedmineException {
         // create new test category
-        IssueCategory category = new IssueCategory(null, "InvalidCategory"
-                + new Date().getTime());
-        // set invalid id
-        category.setId(-1);
-        // now try to delete category
+        IssueCategory category = IssueCategoryFactory.create(-1);
+        category.setName("InvalidCategory" + new Date().getTime());
+        // now try deleting the category
         mgr.deleteCategory(category);
     }
 
@@ -1288,7 +1287,7 @@ public class RedmineManagerTest {
         try {
             Project project = mgr.getProjectByKey(projectKey);
             // create an issue category
-            IssueCategory category = new IssueCategory(project, "Category_"
+            IssueCategory category = IssueCategoryFactory.create(project, "Category_"
                     + new Date().getTime());
             category.setAssignee(IntegrationTestHelper.getOurUser());
             newIssueCategory = mgr.createCategory(category);

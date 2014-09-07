@@ -10,6 +10,11 @@ public class CustomField {
     private boolean multiple = false;
 	private List<String> values;
 
+    /**
+     * Use CustomFieldFactory to create instances of this class.
+     *
+     * @param id database ID.
+     */
     CustomField(Integer id) {
         this.id = id;
     }
