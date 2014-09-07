@@ -39,6 +39,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -760,7 +761,7 @@ public class RedmineManagerTest {
 
             Issue loadedIssueWithJournals = mgr.getIssueById(newIssue.getId(),
                     INCLUDE.journals);
-            assertTrue(loadedIssueWithJournals.getJournals().isEmpty());
+            assertFalse(loadedIssueWithJournals.getJournals().hasNext());
 
             String commentDescribingTheUpdate = "some comment describing the issue update";
             loadedIssueWithJournals.setSubject("new subject");
@@ -769,12 +770,10 @@ public class RedmineManagerTest {
 
             Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(),
                     INCLUDE.journals);
-            assertEquals(1, loadedIssueWithJournals2.getJournals()
-                    .size());
+            assertThat(loadedIssueWithJournals2.getNumberOfJournals()).isEqualTo(1);
 
-            Journal journalItem = loadedIssueWithJournals2.getJournals().get(0);
-            assertEquals(commentDescribingTheUpdate,
-                    journalItem.getNotes());
+            Journal journalItem = loadedIssueWithJournals2.getJournals().next();
+            assertEquals(commentDescribingTheUpdate, journalItem.getNotes());
             User ourUser = IntegrationTestHelper.getOurUser();
             // can't compare User objects because either of them is not
             // completely filled
@@ -789,9 +788,8 @@ public class RedmineManagerTest {
             assertEquals("subject", journalDetail.getName());
             assertEquals("attr", journalDetail.getProperty());
 
-            Issue loadedIssueWithoutJournals = mgr.getIssueById(newIssue
-                    .getId());
-            assertTrue(loadedIssueWithoutJournals.getJournals().isEmpty());
+            Issue loadedIssueWithoutJournals = mgr.getIssueById(newIssue.getId());
+            assertFalse(loadedIssueWithoutJournals.getJournals().hasNext());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -835,16 +833,16 @@ public class RedmineManagerTest {
             Issue issueTarget = mgr.getIssueById(relation.getIssueToId(),
                     INCLUDE.relations);
 
-            assertEquals(1, issue.getRelations().size());
-            assertEquals(1, issueTarget.getRelations().size());
+            assertThat(issue.getNumberOfRelations()).isEqualTo(1);
+            assertThat(issueTarget.getNumberOfRelations()).isEqualTo(1);
 
-            IssueRelation relation1 = issue.getRelations().get(0);
+            IssueRelation relation1 = issue.getRelations().next();
             assertEquals(issue.getId(), relation1.getIssueId());
             assertEquals(issueTarget.getId(), relation1.getIssueToId());
             assertEquals("precedes", relation1.getType());
             assertEquals((Integer) 0, relation1.getDelay());
 
-            IssueRelation reverseRelation = issueTarget.getRelations().get(0);
+            IssueRelation reverseRelation = issueTarget.getRelations().next();
             // both forward and reverse relations are the same!
             assertEquals(relation1, reverseRelation);
         } catch (Exception e) {
@@ -859,7 +857,7 @@ public class RedmineManagerTest {
         mgr.deleteRelation(relation.getId());
         Issue issue = mgr
                 .getIssueById(relation.getIssueId(), INCLUDE.relations);
-        assertEquals(0, issue.getRelations().size());
+        assertFalse(issue.getRelations().hasNext());
     }
 
     @Test
@@ -878,7 +876,7 @@ public class RedmineManagerTest {
         mgr.deleteIssueRelations(src);
 
         Issue issue = mgr.getIssueById(src.getId(), INCLUDE.relations);
-        assertEquals(0, issue.getRelations().size());
+        assertFalse(issue.getRelations().hasNext());
     }
 
     /**
@@ -1469,8 +1467,8 @@ public class RedmineManagerTest {
     @Test
     public void testChangesets() throws RedmineException {
         final Issue issue = mgr.getIssueById(89, INCLUDE.changesets);
-        assertEquals(2, issue.getChangesets().size());
-        final Changeset firstChange = issue.getChangesets().get(0);
+        assertThat(issue.getNumberOfChangesets()).isEqualTo(2);
+        final Changeset firstChange = issue.getChangesets().next();
         assertNotNull(firstChange.getComments());
     }
 
@@ -1673,9 +1671,8 @@ public class RedmineManagerTest {
             mgr.addWatcherToIssue(watcher, issue);
             final Issue includeWatcherIssue = mgr.getIssueById(issue.getId(),
                     INCLUDE.watchers);
-            if (0 < includeWatcherIssue.getWatchers().size()) {
-                assertEquals(newUser.getId(), includeWatcherIssue
-                        .getWatchers().get(0).getId());
+            if (includeWatcherIssue.getWatchers().hasNext()) {
+                assertEquals(newUser.getId(), includeWatcherIssue.getWatchers().next().getId());
             }
         } finally {
             mgr.deleteUser(newUser.getId());

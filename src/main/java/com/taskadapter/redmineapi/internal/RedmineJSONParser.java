@@ -413,21 +413,18 @@ public class RedmineJSONParser {
 		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
-		result.setJournals(JsonInput.getListOrEmpty(content, "journals",
+		result.addJournals(JsonInput.getListOrEmpty(content, "journals",
 				JOURNAL_PARSER));
-		result.getAttachments().addAll(
+		result.addAttachments(
 				JsonInput.getListOrEmpty(content, "attachments",
 						ATTACHMENT_PARSER));
-		result.getRelations()
-				.addAll(JsonInput.getListOrEmpty(content, "relations",
-						RELATION_PARSER));
-		result.setTargetVersion(JsonInput.getObjectOrNull(content,
-				"fixed_version", VERSION_PARSER));
+		result.addRelations(JsonInput.getListOrEmpty(content, "relations", RELATION_PARSER));
+		result.setTargetVersion(JsonInput.getObjectOrNull(content, "fixed_version", VERSION_PARSER));
 		result.setCategory(JsonInput.getObjectOrNull(content, "category",
 				CATEGORY_PARSER));
-		result.setChangesets(JsonInput.getListOrEmpty(content, "changesets",
+		result.addChangesets(JsonInput.getListOrEmpty(content, "changesets",
 				CHANGESET_PARSER));
-		result.setWatchers(JsonInput.getListOrEmpty(content, "watchers",
+		result.addWatchers(JsonInput.getListOrEmpty(content, "watchers",
 				WATCHER_PARSER));
 		return result;
 	}

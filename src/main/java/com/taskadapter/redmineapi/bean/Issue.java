@@ -45,11 +45,11 @@ public class Issue implements Identifiable {
      * as a Set, not a List.
      */
     private Set<CustomField> customFields = new HashSet<CustomField>();
-    private List<Journal> journals = new ArrayList<Journal>();
-    private List<IssueRelation> relations = new ArrayList<IssueRelation>();
-    private List<Attachment> attachments = new ArrayList<Attachment>();
-    private List<Changeset> changesets = new ArrayList<Changeset>();
-    private List<Watcher> watchers = new ArrayList<Watcher>();
+    private Set<Journal> journals = new HashSet<Journal>();
+    private Set<IssueRelation> relations = new HashSet<IssueRelation>();
+    private Set<Attachment> attachments = new HashSet<Attachment>();
+    private Set<Changeset> changesets = new HashSet<Changeset>();
+    private Set<Watcher> watchers = new HashSet<Watcher>();
 
     public Project getProject() {
         return project;
@@ -212,7 +212,7 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * @return Custom Field objects, NEVER NULL.
+     * @return Custom Field objects. the iterator may be empty, but it is never NULL.
      */
     public Iterator<CustomField> getCustomFields() {
         return customFields.iterator();
@@ -254,28 +254,36 @@ public class Issue implements Identifiable {
         this.notes = notes;
     }
 
-    public List<Journal> getJournals() {
-        return journals;
+    public Iterator<Journal> getJournals() {
+        return journals.iterator();
     }
 
-    public void setJournals(List<Journal> journals) {
-        this.journals = journals;
+    public int getNumberOfJournals() {
+        return journals.size();
     }
 
-    public List<Changeset> getChangesets() {
-        return changesets;
+    public void addJournals(Collection<Journal> journals) {
+        this.journals.addAll(journals);
     }
 
-    public void setChangesets(List<Changeset> changesets) {
-        this.changesets = changesets;
+    public Iterator<Changeset> getChangesets() {
+        return changesets.iterator();
     }
 
-    public List<Watcher> getWatchers() {
-        return watchers;
+    public void addChangesets(Collection<Changeset> changesets) {
+        this.changesets.addAll(changesets);
     }
 
-    public void setWatchers(List<Watcher> watchers) {
-        this.watchers = watchers;
+    public int getNumberOfChangesets() {
+        return changesets.size();
+    }
+
+    public Iterator<Watcher> getWatchers() {
+        return watchers.iterator();
+    }
+
+    public void addWatchers(Collection<Watcher> watchers) {
+        this.watchers.addAll(watchers);
     }
 
     @Override
@@ -325,12 +333,20 @@ public class Issue implements Identifiable {
     /**
      * Relations are only loaded if you include INCLUDE.relations when loading the Issue.
      *
-     * @return list of relations or EMPTY list if no relations, never returns NULL
+     * @return relations or EMPTY iterator if no relations, never returns NULL
      *
      * @see com.taskadapter.redmineapi.RedmineManager#getIssueById(Integer id, INCLUDE... include)
      */
-    public List<IssueRelation> getRelations() {
-        return relations;
+    public Iterator<IssueRelation> getRelations() {
+        return relations.iterator();
+    }
+
+    public void addRelations(Collection<IssueRelation> collection) {
+        relations.addAll(collection);
+    }
+
+    public int getNumberOfRelations() {
+        return relations.size();
     }
 
     public Integer getPriorityId() {
@@ -345,8 +361,23 @@ public class Issue implements Identifiable {
         return targetVersion;
     }
 
-    public List<Attachment> getAttachments() {
-        return attachments;
+    /**
+     * @return attachments. the iterator can be empty, but never null.
+     */
+    public Iterator<Attachment> getAttachments() {
+        return attachments.iterator();
+    }
+
+    public void addAttachments(Collection<Attachment> collection) {
+        attachments.addAll(collection);
+    }
+
+    public void addAttachment(Attachment attachment) {
+        attachments.add(attachment);
+    }
+
+    public int getNumberOfAttachments() {
+        return attachments.size();
     }
 
     public void setTargetVersion(Version version) {

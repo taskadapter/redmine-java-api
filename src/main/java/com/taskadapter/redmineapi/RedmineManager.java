@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -574,8 +575,9 @@ public class RedmineManager {
      * Delete all issue's relations
      */
     public void deleteIssueRelations(Issue redmineIssue) throws RedmineException {
-        for (IssueRelation relation : redmineIssue.getRelations()) {
-            deleteRelation(relation.getId());
+        Iterator<IssueRelation> relations = redmineIssue.getRelations();
+        while (relations.hasNext()) {
+            deleteRelation(relations.next().getId());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
@@ -56,7 +57,7 @@ public class Simple {
 				"application/ternary", content);
 		final Issue testIssue = new Issue();
 		testIssue.setSubject("This is upload ticket!");
-		testIssue.getAttachments().add(attach1);
+		testIssue.addAttachment(attach1);
 		final Project tmpProject = new Project();
 		tmpProject.setIdentifier("uploadtmpproject");
 		tmpProject.setName("Upload project");
@@ -136,9 +137,8 @@ public class Simple {
 	private static void getIssueWithRelations(RedmineManager mgr)
 			throws RedmineException {
 		Issue issue = mgr.getIssueById(22751, INCLUDE.relations);
-		List<IssueRelation> r = issue.getRelations();
+		Iterator<IssueRelation> r = issue.getRelations();
 		logger.debug("Retrieved relations " + r);
-
 	}
 
 	@SuppressWarnings("unused")
