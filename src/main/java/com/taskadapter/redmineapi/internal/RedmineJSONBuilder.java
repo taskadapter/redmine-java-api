@@ -20,6 +20,7 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 import com.taskadapter.redmineapi.internal.json.JsonOutput;
 
@@ -115,7 +116,7 @@ public class RedmineJSONBuilder {
 			writeMembership(writer, object);
 		}
 	};
-
+        
 	/**
 	 * Writes a "create project" request.
 	 * 
@@ -317,6 +318,11 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
 
+                List<Watcher> issueWatchers = issue.getWatchers();
+                if (issueWatchers != null && !issueWatchers.isEmpty()) {
+                    writeWatchers(writer, issueWatchers);
+                }
+                
 		if (issue.getAttachments() != null && issue.getAttachments().size() > 0) {
 			final List<Attachment> uploads = new ArrayList<Attachment>();
 			for (Attachment attach : issue.getAttachments())
@@ -373,6 +379,22 @@ public class RedmineJSONBuilder {
             writer.key(Integer.toString(field.getId())).value(valueToWrite);
 		}
 		writer.endObject();
+	}
+        
+        public static void writeWatchers(JSONWriter writer, List<Watcher> watchers)
+			throws JSONException {
+            if (watchers == null || watchers.isEmpty()) {
+                return;
+            }
+            
+            writer.key("watcher_user_ids");
+            writer.array();
+            for (Watcher watcher : watchers) {
+                if (watcher.getId() != null) {
+                    writer.value(watcher.getId().longValue());
+                }
+            }
+            writer.endArray();
 	}
 
 	/**
