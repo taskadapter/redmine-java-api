@@ -206,6 +206,12 @@ public class RedmineManager {
 
     /**
      * Load the list of projects available to the user, which is represented by the API access key.
+     * <p>
+     * Redmine ignores "get trackers info" parameter for "get projects" request. see bug
+     * http://www.redmine.org/issues/8545
+     * The field is already accessible for a specific project for a long time (GET /projects/:id)
+     * but in the projects list (GET /projects) it's only on the svn trunk for now (Sep 8, 2014).
+     * It will be included in Redmine 2.6.0 which isn't out yet.
      *
      * @return list of Project objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which

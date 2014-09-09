@@ -189,6 +189,9 @@ public class ProjectIntegrationTest {
 
     // Redmine ignores this parameter for "get projects" request. see bug
     // http://www.redmine.org/issues/8545
+    // The field is already accessible for a specific project for a long time (GET /projects/:id)
+    // but in the projects list (GET /projects) it's only on the svn trunk for now (Sep 8, 2014).
+    // It will be included in Redmine 2.6.0 which isn't out yet.
     @Ignore
     @Test
     public void testGetProjectsIncludesTrackers() {
