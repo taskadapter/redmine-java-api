@@ -202,9 +202,8 @@ public class UserIntegrationTest {
     }
 
     private RedmineManager getNonAdminManager() {
-        RedmineManager nonAdminManager = new RedmineManager(IntegrationTestHelper.getTestConfig().getURI());
-        nonAdminManager.setLogin(nonAdminUserLogin);
-        nonAdminManager.setPassword(nonAdminPassword);
+        RedmineManager nonAdminManager = RedmineManagerFactory.createWithUserAuth(IntegrationTestHelper.getTestConfig().getURI(),
+                    nonAdminUserLogin, nonAdminPassword);
         return nonAdminManager;
     }
 

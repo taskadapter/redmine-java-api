@@ -35,9 +35,7 @@ public class RedmineManagerDefaultsTest {
 	public static void oneTimeSetUp() {
     TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
-		mgr = new RedmineManager(testConfig.getURI());
-		mgr.setLogin(testConfig.getLogin());
-		mgr.setPassword(testConfig.getPassword());
+		mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
 		Project junitTestProject = new Project();
 		junitTestProject.setName("test project");
 		junitTestProject.setIdentifier("test"
