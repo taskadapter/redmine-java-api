@@ -29,6 +29,8 @@ import com.taskadapter.redmineapi.internal.comm.ConnectionEvictor;
 import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
 
 /**
+ * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
+ * <p>
  * Collection of creation methods for the redmine. Method number may grow as
  * grows number of requirements. However, having all creation methods in one
  * place allows us to refactor RemineManager internals without changing this

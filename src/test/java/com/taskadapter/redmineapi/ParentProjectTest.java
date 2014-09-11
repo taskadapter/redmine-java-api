@@ -9,12 +9,13 @@ import static org.junit.Assert.assertEquals;
 
 public class ParentProjectTest {
 
-    private static RedmineManager mgr;
+    private static ProjectManager projectManager;
 
     @BeforeClass
     public static void oneTimeSetUp() {
         TestConfig testConfig = new TestConfig();
-        mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        projectManager = redmineManager.getProjectManager();
     }
 
     @Test
@@ -32,7 +33,7 @@ public class ParentProjectTest {
             // Alexey: I verified that deleting the parent project deletes the child one as well
             // (at least on Redmine 2.3.3)
             // Thus, there's no need in deleting the child one separately
-            mgr.deleteProject(parentKey);
+            projectManager.deleteProject(parentKey);
         }
     }
 
@@ -44,8 +45,8 @@ public class ParentProjectTest {
         if (parentId != null) {
             newProject.setParentId(parentId);
         }
-        mgr.createProject(newProject);
-        return mgr.getProjectByKey(key);
+        projectManager.createProject(newProject);
+        return projectManager.getProjectByKey(key);
     }
 
 }

@@ -3,15 +3,17 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueFactory;
+import org.apache.http.entity.ContentType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import static org.fest.assertions.Assertions.assertThat;
@@ -22,10 +24,15 @@ public class AttachmentIntegrationTest {
 
     private static RedmineManager mgr;
     private static String projectKey;
+    private static IssueManager issueManager;
+    private static AttachmentManager attachmentManager;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
+
+        issueManager = mgr.getIssueManager();
+        attachmentManager = mgr.getAttachmentManager();
         projectKey = IntegrationTestHelper.createProject(mgr);
     }
 
@@ -37,24 +44,48 @@ public class AttachmentIntegrationTest {
     @Test
     public void uploadAttachment() throws RedmineException, IOException {
         final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        final Attachment attach1 = mgr.uploadAttachment("test.bin",
+        final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
                 "application/ternary", content);
         final Issue testIssue = IssueFactory.createWithSubject("This is upload ticket!");
         testIssue.addAttachment(attach1);
-        final Issue createdIssue = mgr.createIssue(projectKey, testIssue);
+        final Issue createdIssue = issueManager.createIssue(projectKey, testIssue);
         try {
             final Collection<Attachment> attachments = createdIssue.getAttachments();
             assertThat(attachments.size()).isEqualTo(1);
             final Attachment added = attachments.iterator().next();
             assertThat(added.getFileName()).isEqualTo("test.bin");
             assertThat(added.getContentType()).isEqualTo("application/ternary");
-            final byte[] receivedContent = mgr.downloadAttachmentContent(added);
+            final byte[] receivedContent = attachmentManager.downloadAttachmentContent(added);
             assertArrayEquals(content, receivedContent);
 
-            Issue issueById = mgr.getIssueById(createdIssue.getId(), RedmineManager.INCLUDE.attachments);
+            Issue issueById = issueManager.getIssueById(createdIssue.getId(), Include.attachments);
             assertThat(issueById.getAttachments().size()).isEqualTo(1);
         } finally {
-            mgr.deleteIssue(createdIssue.getId());
+            issueManager.deleteIssue(createdIssue.getId());
+        }
+    }
+
+    @Test
+    public void addAttachment() throws RedmineException, IOException {
+        File tempFile = File.createTempFile("redmine_test_", ".tmp");
+        FileWriter fileWriter = new FileWriter(tempFile.getAbsolutePath());
+        String attachmentContent = "some text";
+        fileWriter.write(attachmentContent);
+        fileWriter.close();
+
+        final Issue issue = IssueFactory.createWithSubject("task with attachment");
+        final Issue createdIssue = issueManager.createIssue(projectKey, issue);
+        attachmentManager.addAttachmentToIssue(createdIssue.getId(), tempFile, ContentType.TEXT_PLAIN.getMimeType());
+        try {
+            Issue loadedIssue = issueManager.getIssueById(createdIssue.getId(), Include.attachments);
+            final Collection<Attachment> attachments = loadedIssue.getAttachments();
+            Attachment next = attachments.iterator().next();
+            assertThat(next.getFileName()).isEqualTo(tempFile.getName());
+            final byte[] receivedContent = attachmentManager.downloadAttachmentContent(next);
+            String contentAsString = new String(receivedContent);
+            assertThat(contentAsString).isEqualTo(attachmentContent);
+        } finally {
+            issueManager.deleteIssue(createdIssue.getId());
         }
     }
 
@@ -66,7 +97,7 @@ public class AttachmentIntegrationTest {
                 throw new IOException("Unsupported read!");
             }
         };
-        mgr.uploadAttachment("test.bin", "application/ternary", content);
+        attachmentManager.uploadAttachment("test.bin", "application/ternary", content);
     }
 
     /**
@@ -86,7 +117,7 @@ public class AttachmentIntegrationTest {
         // an attachment by our own for the test as the Redmine REST API does
         // not support that.
         int attachmentID = 1;
-        Attachment attachment = mgr.getAttachmentById(attachmentID);
+        Attachment attachment = attachmentManager.getAttachmentById(attachmentID);
         assertNotNull("Attachment retrieved by ID " + attachmentID
                 + " should not be null", attachment);
         assertNotNull("Content URL of attachment retrieved by ID "
@@ -114,9 +145,9 @@ public class AttachmentIntegrationTest {
         // not support that.
         int attachmentID = 1;
         // retrieve issue attachment
-        Attachment attachment = mgr.getAttachmentById(attachmentID);
+        Attachment attachment = attachmentManager.getAttachmentById(attachmentID);
         // download attachment content
-        byte[] attachmentContent = mgr.downloadAttachmentContent(attachment);
+        byte[] attachmentContent = attachmentManager.downloadAttachmentContent(attachment);
         assertNotNull("Download of content of attachment with content URL " + attachment.getContentURL()
                 + " should not be null", attachmentContent);
     }
@@ -138,12 +169,12 @@ public class AttachmentIntegrationTest {
             // create at least 1 issue
             Issue issueToCreate = IssueFactory.createWithSubject("testGetIssueAttachment_"
                     + UUID.randomUUID());
-            newIssue = mgr.createIssue(projectKey, issueToCreate);
+            newIssue = issueManager.createIssue(projectKey, issueToCreate);
             // TODO create test attachments for the issue once the Redmine REST
             // API allows for it
             // retrieve issue attachments
-            Issue retrievedIssue = mgr.getIssueById(newIssue.getId(),
-                    RedmineManager.INCLUDE.attachments);
+            Issue retrievedIssue = issueManager.getIssueById(newIssue.getId(),
+                    Include.attachments);
             assertNotNull("List of attachments retrieved for issue "
                     + newIssue.getId()
                     + " delivered by Redmine Java API should not be null",
@@ -153,7 +184,7 @@ public class AttachmentIntegrationTest {
         } finally {
             // scrub test issue
             if (newIssue != null) {
-                mgr.deleteIssue(newIssue.getId());
+                issueManager.deleteIssue(newIssue.getId());
             }
         }
     }
