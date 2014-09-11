@@ -13,9 +13,7 @@ public class ParentProjectTest {
     @BeforeClass
     public static void oneTimeSetUp() {
         TestConfig testConfig = new TestConfig();
-        mgr = new RedmineManager(testConfig.getURI());
-        mgr.setLogin(testConfig.getLogin());
-        mgr.setPassword(testConfig.getPassword());
+        mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
     }
 
     @Test

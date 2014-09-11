@@ -29,10 +29,8 @@ public final class HttpBasicAuthTest {
     @BeforeClass
     public static void setup() {
         TestConfig testConfig = new TestConfig();
-        mgrKey = new RedmineManager(testConfig.getURI(), testConfig.getApiKey());
-        mgrHttpBasicAuth = new RedmineManager(testConfig.getURI());
-        mgrHttpBasicAuth.setLogin(testConfig.getLogin());
-        mgrHttpBasicAuth.setPassword(testConfig.getPassword());
+        mgrKey = RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey());
+        mgrHttpBasicAuth = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
     }
 
     @Test

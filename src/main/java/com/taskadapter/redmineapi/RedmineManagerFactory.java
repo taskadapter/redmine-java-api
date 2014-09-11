@@ -49,21 +49,8 @@ public final class RedmineManagerFactory {
      *
      * @param uri redmine manager URI.
      */
-    public RedmineManager createUnauthenticated(String uri) {
+    public static RedmineManager createUnauthenticated(String uri) {
         return createUnauthenticated(uri, createDefaultTransportConfig());
-    }
-
-    /**
-     * Creates a non-authenticating redmine manager.
-     *
-     * @param uri     redmine manager URI.
-     * @param options additional redmine manager options.
-     * @deprecated use {@link #createUnauthenticated(String, TransportConfiguration)} instead.
-     */
-    @Deprecated
-    public RedmineManager createUnauthenticated(String uri,
-                                                RedmineOptions options) {
-        return createWithUserAuth(uri, null, null, options);
     }
 
     /**
@@ -72,7 +59,7 @@ public final class RedmineManagerFactory {
      * @param uri    redmine manager URI.
      * @param config transport configuration.
      */
-    public RedmineManager createUnauthenticated(String uri,
+    public static RedmineManager createUnauthenticated(String uri,
                                                 TransportConfiguration config) {
         return createWithUserAuth(uri, null, null, config);
     }
@@ -93,28 +80,6 @@ public final class RedmineManagerFactory {
                                                   String apiAccessKey) {
         return createWithApiKey(uri, apiAccessKey,
                 createDefaultTransportConfig());
-    }
-
-    /**
-     * Creates an instance of RedmineManager class. Host and apiAccessKey are
-     * not checked at this moment.
-     *
-     * @param uri          complete Redmine server web URI, including protocol and port
-     *                     number. Example: http://demo.redmine.org:8080
-     * @param apiAccessKey Redmine API access key. It is shown on "My Account" /
-     *                     "API access key" webpage (check
-     *                     <i>http://redmine_server_url/my/account<i> URL). This
-     *                     parameter is <b>optional</b> (can be set to NULL) for Redmine
-     *                     projects, which are "public".
-     * @param options      additional redmine options.
-     * @deprecated use
-     * {@link #createWithApiKey(String, String, TransportConfiguration)}
-     * instead.
-     */
-    @Deprecated
-    public static RedmineManager createWithApiKey(String uri,
-                                                  String apiAccessKey, RedmineOptions options) {
-        return createWithApiKey(uri, apiAccessKey, parseOptions(options));
     }
 
     /**
@@ -155,23 +120,6 @@ public final class RedmineManagerFactory {
      * @param uri      redmine manager URI.
      * @param login    user's name.
      * @param password user's password.
-     * @param options  additional redmine options.
-     * @deprecated use
-     * {@link #createWithUserAuth(String, String, String, TransportConfiguration)}
-     * instead.
-     */
-    @Deprecated
-    public static RedmineManager createWithUserAuth(String uri, String login,
-                                                    String password, RedmineOptions options) {
-        return createWithUserAuth(uri, login, password, parseOptions(options));
-    }
-
-    /**
-     * Creates a new redmine managen with user-based authentication.
-     *
-     * @param uri      redmine manager URI.
-     * @param login    user's name.
-     * @param password user's password.
      * @param config   transport configuration.
      */
     public static RedmineManager createWithUserAuth(String uri, String login,
@@ -180,20 +128,6 @@ public final class RedmineManagerFactory {
                 new URIConfigurator(uri, null), config.client);
         transport.setCredentials(login, password);
         return new RedmineManager(transport, config.shutdownListener);
-    }
-
-    /**
-     * Read the obsolete (deprecated) RedmineOptions instance.
-     *
-     * @param options options to configure.
-     * @return transport from options.
-     */
-    @Deprecated
-    static TransportConfiguration parseOptions(RedmineOptions options) {
-        final ClientConnectionManager connManager = createConnectionManager(
-                options.getMaxOpenConnections(),
-                SSLSocketFactory.getSystemSocketFactory());
-        return createLongTermConfiguration(connManager, options.getIdleTimeout(), options.getEvictionCheckInterval());
     }
 
     /**

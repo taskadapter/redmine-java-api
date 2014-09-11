@@ -266,28 +266,16 @@ public class RedmineManagerTest {
         }
     }
 
-    @SuppressWarnings("unused")
-    @Test(expected = IllegalArgumentException.class)
-    public void testNULLHostParameter() {
-        new RedmineManager(null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    @SuppressWarnings("unused")
-    public void testEmptyHostParameter() throws RuntimeException {
-        new RedmineManager("");
-    }
-
     @Test(expected = RedmineAuthenticationException.class)
     public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
-        RedmineManager redmineMgrEmpty = new RedmineManager(testConfig.getURI());
+        RedmineManager redmineMgrEmpty = RedmineManagerFactory.createUnauthenticated(testConfig.getURI());
         Issue issue = IssueFactory.create("test zzx");
         redmineMgrEmpty.createIssue(projectKey, issue);
     }
 
     @Test(expected = RedmineAuthenticationException.class)
     public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
-        RedmineManager redmineMgrInvalidKey = new RedmineManager(
+        RedmineManager redmineMgrInvalidKey = RedmineManagerFactory.createWithApiKey(
                 testConfig.getURI(), "wrong_key");
         Issue issue = IssueFactory.create("test zzx");
         redmineMgrInvalidKey.createIssue(projectKey, issue);
@@ -1453,8 +1441,7 @@ public class RedmineManagerTest {
 
     @Test
     public void testUnknownHostException() throws RedmineException, IOException {
-        final RedmineManager mgr1 = new RedmineManager(
-                "http://The.unknown.host");
+        final RedmineManager mgr1 = RedmineManagerFactory.createUnauthenticated("http://The.unknown.host");
         try {
             mgr1.getProjects();
         } catch (RedmineTransportException e1) {

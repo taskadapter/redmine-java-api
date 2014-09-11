@@ -78,81 +78,6 @@ public class RedmineManager {
     private final Runnable shutdownListener;
 
     /**
-     * @deprecated use {@link RedmineManagerFactory#createUnauthenticated(String)} instead.
-     */
-    @Deprecated
-    public RedmineManager(String uri) {
-        this(uri, RedmineOptions.simpleOptions());
-    }
-
-	/**
-	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
-	 * not checked at this moment.
-	 *
-	 * @param host
-	 *            complete Redmine server web URI, including protocol and port
-	 *            number. Example: http://demo.redmine.org:8080
-	 * @param apiAccessKey
-	 *            Redmine API access key. It is shown on "My Account" /
-	 *            "API access key" webpage (check
-	 *            <i>http://redmine_server_url/my/account<i> URL). This
-	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
-	 *            projects, which are "public".
-     *
-     * @deprecated use {@link RedmineManagerFactory#createWithApiKey(String, String, RedmineOptions)} instead.
-	 */
-    @Deprecated
-	public RedmineManager(String host, String apiAccessKey) {
-		this(host, apiAccessKey, RedmineOptions.simpleOptions());
-	}
-
-	/**
-	 * Creates an instance of RedmineManager class. Host and apiAccessKey are
-	 * not checked at this moment.
-	 *
-	 * @param host
-	 *            complete Redmine server web URI, including protocol and port
-	 *            number. Example: http://demo.redmine.org:8080
-	 * @param apiAccessKey
-	 *            Redmine API access key. It is shown on "My Account" /
-	 *            "API access key" webpage (check
-	 *            <i>http://redmine_server_url/my/account<i> URL). This
-	 *            parameter is <b>optional</b> (can be set to NULL) for Redmine
-	 *            projects, which are "public".
-	 * @deprecated use {@link RedmineManagerFactory#createWithApiKey(String, String, RedmineOptions)} instead.
-	 */
-    @Deprecated
-	public RedmineManager(String host, String apiAccessKey,
-			RedmineOptions options) {
-        this(host, null, null, apiAccessKey, options);
-	}
-
-    /**
-     * @deprecated use {@link RedmineManagerFactory#createUnauthenticated(String, RedmineOptions)}.
-     */
-    @Deprecated
-	public RedmineManager(String uri, RedmineOptions options) {
-		this(uri, null, null, options);
-	}
-
-    /**
-     * @deprecated Use {@link RedmineManagerFactory#createWithUserAuth(String, String, String)} instead.
-     */
-    @Deprecated
-    public RedmineManager(String uri, String login, String password) {
-        this(uri, login, password, RedmineOptions.simpleOptions());
-    }
-
-    /**
-     * @deprecated Use {@link RedmineManagerFactory#createWithUserAuth(String, String, String, RedmineOptions)} instead.
-     */
-    @Deprecated
-    public RedmineManager(String uri, String login, String password,
-                          RedmineOptions options) {
-        this(uri, login, password, null, options);
-    }
-
-    /**
      * Sample usage:
      * <p/>
      * <p/>
@@ -182,15 +107,6 @@ public class RedmineManager {
 		} finally {
 			issue.setProject(oldProject);
 		}
-    }
-
-    @Deprecated
-    private RedmineManager(String uri, String login, String password,
-                           String apikey, RedmineOptions options) {
-        final TransportConfiguration tc = RedmineManagerFactory.parseOptions(options);
-        this.transport = new Transport(new URIConfigurator(uri, apikey), tc.client);
-        transport.setCredentials(login, password);
-        this.shutdownListener = tc.shutdownListener;
     }
 
     /**
