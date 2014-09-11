@@ -2,24 +2,31 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Changeset;
-import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueFactory;
+import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.WatcherFactory;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -83,8 +90,7 @@ public class RedmineManagerTest {
     @Test
     public void issueCreated() {
         try {
-            Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("test zzx");
+            Issue issueToCreate = IssueFactory.createWithSubject("test zzx");
 
             Calendar startCal = Calendar.getInstance();
             // have to clear them because they are ignored by Redmine and
@@ -172,8 +178,7 @@ public class RedmineManagerTest {
     @Test
     public void issueWithParentCreated() {
         try {
-            Issue parentIssue = new Issue();
-            parentIssue.setSubject("parent 1");
+            Issue parentIssue = IssueFactory.createWithSubject("parent 1");
             Issue newParentIssue = mgr.createIssue(projectKey, parentIssue);
             logger.debug("created parent: " + newParentIssue);
 
@@ -184,8 +189,7 @@ public class RedmineManagerTest {
             // Integer parentId = 46;
             Integer parentId = newParentIssue.getId();
 
-            Issue childIssue = new Issue();
-            childIssue.setSubject("child 1");
+            Issue childIssue = IssueFactory.createWithSubject("child 1");
             childIssue.setParentId(parentId);
 
             Issue newChildIssue = mgr.createIssue(projectKey, childIssue);
@@ -203,8 +207,7 @@ public class RedmineManagerTest {
     @Test
     public void nullStartDateIsPreserved() {
         try {
-            Issue issue = new Issue();
-            issue.setSubject("test start date");
+            Issue issue = IssueFactory.createWithSubject("test start date");
             issue.setStartDate(null);
 
             Issue newIssue = mgr.createIssue(projectKey, issue);
@@ -221,7 +224,7 @@ public class RedmineManagerTest {
     public void testGetIssuesBySummary() {
         String summary = "issue with subject ABC";
         try {
-            Issue issue = IssueFactory.create(summary);
+            Issue issue = IssueFactory.createWithSubject(summary);
             User assignee = IntegrationTestHelper.getOurUser();
             issue.setAssignee(assignee);
 
@@ -269,7 +272,7 @@ public class RedmineManagerTest {
     @Test(expected = RedmineAuthenticationException.class)
     public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
         RedmineManager redmineMgrEmpty = RedmineManagerFactory.createUnauthenticated(testConfig.getURI());
-        Issue issue = IssueFactory.create("test zzx");
+        Issue issue = IssueFactory.createWithSubject("test zzx");
         redmineMgrEmpty.createIssue(projectKey, issue);
     }
 
@@ -277,7 +280,7 @@ public class RedmineManagerTest {
     public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
         RedmineManager redmineMgrInvalidKey = RedmineManagerFactory.createWithApiKey(
                 testConfig.getURI(), "wrong_key");
-        Issue issue = IssueFactory.create("test zzx");
+        Issue issue = IssueFactory.createWithSubject("test zzx");
         redmineMgrInvalidKey.createIssue(projectKey, issue);
     }
 
@@ -285,7 +288,7 @@ public class RedmineManagerTest {
     public void testUpdateIssue() {
         try {
             String originalSubject = "Issue " + new Date();
-            Issue issue = IssueFactory.create(originalSubject);
+            Issue issue = IssueFactory.createWithSubject(originalSubject);
 
             Issue newIssue = mgr.createIssue(projectKey, issue);
             String changedSubject = "changed subject";
@@ -318,7 +321,7 @@ public class RedmineManagerTest {
     @Test
     public void testGetIssueById() throws RedmineException {
         String originalSubject = "Issue " + new Date();
-        Issue issue = IssueFactory.create(originalSubject);
+        Issue issue = IssueFactory.createWithSubject(originalSubject);
 
         Issue newIssue = mgr.createIssue(projectKey, issue);
 
@@ -339,7 +342,7 @@ public class RedmineManagerTest {
     public void testGetIssues() {
         try {
             // create at least 1 issue
-            Issue issueToCreate = IssueFactory.create("testGetIssues: " + new Date());
+            Issue issueToCreate = IssueFactory.createWithSubject("testGetIssues: " + new Date());
             Issue newIssue = mgr.createIssue(projectKey, issueToCreate);
 
             List<Issue> issues = mgr.getIssues(projectKey, null);
@@ -376,8 +379,7 @@ public class RedmineManagerTest {
     public void testCreateIssueNonUnicodeSymbols() {
         try {
             String nonLatinSymbols = "Example with accents A��o";
-            Issue toCreate = new Issue();
-            toCreate.setSubject(nonLatinSymbols);
+            Issue toCreate = IssueFactory.createWithSubject(nonLatinSymbols);
             Issue created = mgr.createIssue(projectKey, toCreate);
             assertEquals(nonLatinSymbols, created.getSubject());
         } catch (Exception e) {
@@ -409,7 +411,7 @@ public class RedmineManagerTest {
 
     @Test(expected = NotFoundException.class)
     public void testCreateIssueInvalidProjectKey() throws RedmineException {
-        Issue issueToCreate = IssueFactory.create("Summary line 100");
+        Issue issueToCreate = IssueFactory.createWithSubject("Summary line 100");
         mgr.createIssue("someNotExistingProjectKey", issueToCreate);
     }
 
@@ -422,8 +424,7 @@ public class RedmineManagerTest {
     @Test(expected = NotFoundException.class)
     public void testUpdateIssueNonExistingId() throws RedmineException {
         int nonExistingId = 999999;
-        Issue issue = new Issue();
-        issue.setId(nonExistingId);
+        Issue issue = IssueFactory.create(nonExistingId);
         mgr.update(issue);
     }
 
@@ -450,8 +451,7 @@ public class RedmineManagerTest {
     private List<Issue> createIssues(int issuesNumber) throws RedmineException {
         List<Issue> issues = new ArrayList<Issue>(issuesNumber);
         for (int i = 0; i < issuesNumber; i++) {
-            Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("some issue " + i + " " + new Date());
+            Issue issueToCreate = IssueFactory.createWithSubject("some issue " + i + " " + new Date());
             Issue issue = mgr.createIssue(projectKey, issueToCreate);
             issues.add(issue);
         }
@@ -460,8 +460,7 @@ public class RedmineManagerTest {
 
     private Issue generateRandomIssue() {
         Random r = new Random();
-        Issue issue = new Issue();
-        issue.setSubject("some issue " + r.nextInt() + " " + new Date());
+        Issue issue = IssueFactory.createWithSubject("some issue " + r.nextInt() + " " + new Date());
         return issue;
     }
 
@@ -476,7 +475,7 @@ public class RedmineManagerTest {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 11f;
         entry.setHours(hours);
         entry.setIssueId(issueId);
@@ -503,7 +502,7 @@ public class RedmineManagerTest {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 4f;
         entry.setHours(hours);
         entry.setIssueId(issueId);
@@ -538,7 +537,7 @@ public class RedmineManagerTest {
 
     private TimeEntry createTimeEntry(Integer issueId, float hours)
             throws RedmineException {
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         entry.setHours(hours);
         entry.setIssueId(issueId);
         entry.setActivityId(ACTIVITY_ID);
@@ -593,8 +592,8 @@ public class RedmineManagerTest {
 
         issue.clearCustomFields();
 
-        issue.addCustomField(new CustomField(id1, custom1FieldName, custom1Value));
-        issue.addCustomField(new CustomField(id2, custom2FieldName, custom2Value));
+        issue.addCustomField(CustomFieldFactory.create(id1, custom1FieldName, custom1Value));
+        issue.addCustomField(CustomFieldFactory.create(id2, custom2FieldName, custom2Value));
         mgr.update(issue);
 
         Issue updatedIssue = mgr.getIssueById(issue.getId());
@@ -652,18 +651,14 @@ public class RedmineManagerTest {
     }
 
     private Project createProject() throws RedmineException {
-        Project mainProject = new Project();
         long id = new Date().getTime();
-        mainProject.setName("project" + id);
-        mainProject.setIdentifier("project" + id);
+        Project mainProject = ProjectFactory.create("project" + id, "project" + id);
         return mgr.createProject(mainProject);
     }
 
     private Project createSubProject(Project parent) throws RedmineException {
-        Project project = new Project();
         long id = new Date().getTime();
-        project.setName("sub_pr" + id);
-        project.setIdentifier("subpr" + id);
+        Project project = ProjectFactory.create("sub_pr" + id, "subpr" + id);
         project.setParentId(parent.getId());
         return mgr.createProject(project);
     }
@@ -759,7 +754,8 @@ public class RedmineManagerTest {
 
             Issue loadedIssueWithJournals2 = mgr.getIssueById(newIssue.getId(),
                     INCLUDE.journals);
-            assertThat(loadedIssueWithJournals2.getJournals().size()).isEqualTo(1);
+            assertEquals(1, loadedIssueWithJournals2.getJournals()
+                    .size());
 
             Journal journalItem = loadedIssueWithJournals2.getJournals().iterator().next();
             assertEquals(commentDescribingTheUpdate, journalItem.getNotes());
@@ -881,10 +877,9 @@ public class RedmineManagerTest {
 
         String existingProjectKey = "test";
         Issue toCreate = generateRandomIssue();
-        Version v = new Version();
+        Version v = VersionFactory.create(1);
         String versionName = "1.0";
         v.setName("1.0");
-        v.setId(1);
         v.setProject(mgr.getProjectByKey(projectKey));
         v = mgr.createVersion(v);
         toCreate.setTargetVersion(v);
@@ -927,7 +922,7 @@ public class RedmineManagerTest {
     }
 
     private TimeEntry createIncompleteTimeEntry() {
-        TimeEntry timeEntry = new TimeEntry();
+        TimeEntry timeEntry = TimeEntryFactory.create();
         timeEntry.setActivityId(ACTIVITY_ID);
         timeEntry.setSpentOn(new Date());
         timeEntry.setHours(1.5f);
@@ -985,8 +980,7 @@ public class RedmineManagerTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidVersion() throws RedmineException {
-        Version version = new Version(null, "Invalid test version "
-                + UUID.randomUUID().toString());
+        Version version = VersionFactory.create(null, "Invalid version " + UUID.randomUUID().toString());
         mgr.createVersion(version);
     }
 
@@ -1000,13 +994,10 @@ public class RedmineManagerTest {
      */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidVersion() throws RedmineException {
-        // create new test version
-        Version version = new Version(null, "Invalid test version "
-                + UUID.randomUUID().toString());
-        version.setDescription("An invalid test version created by "
-                + this.getClass());
-        // set invalid id
-        version.setId(-1);
+        // create new test version with invalid id: -1.
+        Version version = VersionFactory.create(-1);
+        version.setName("name invalid version " + UUID.randomUUID().toString());
+        version.setDescription("An invalid test version created by " + this.getClass());
         // now try to delete version
         mgr.deleteVersion(version);
     }
@@ -1023,7 +1014,7 @@ public class RedmineManagerTest {
         Project project = createProject();
         try {
             String name = "Test version " + UUID.randomUUID().toString();
-            Version version = new Version(project, name);
+            Version version = VersionFactory.create(project, name);
             version.setDescription("A test version created by " + this.getClass());
             version.setStatus("open");
             Version newVersion = mgr.createVersion(version);
@@ -1051,8 +1042,8 @@ public class RedmineManagerTest {
         Version testVersion1 = null;
         Version testVersion2 = null;
         try {
-            testVersion1 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
-            testVersion2 = mgr.createVersion(new Version(project, "Version" + UUID.randomUUID()));
+            testVersion1 = mgr.createVersion(VersionFactory.create(project, "Version" + UUID.randomUUID()));
+            testVersion2 = mgr.createVersion(VersionFactory.create(project, "Version" + UUID.randomUUID()));
             List<Version> versions = mgr.getVersions(project.getId());
             assertEquals("Wrong number of versions for project "
                     + project.getName() + " delivered by Redmine Java API", 2,
@@ -1077,7 +1068,7 @@ public class RedmineManagerTest {
     @Test
     public void versionIsRetrievedById() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version createdVersion = mgr.createVersion(new Version(project,
+        Version createdVersion = mgr.createVersion(VersionFactory.create(project,
                 "Version_1_" + UUID.randomUUID()));
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(createdVersion, versionById);
@@ -1086,7 +1077,7 @@ public class RedmineManagerTest {
     @Test
     public void versionIsUpdated() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version createdVersion = mgr.createVersion(new Version(project,
+        Version createdVersion = mgr.createVersion(VersionFactory.create(project,
                 "Version_1_" + UUID.randomUUID()));
         String description = "new description";
         createdVersion.setDescription(description);
@@ -1098,7 +1089,7 @@ public class RedmineManagerTest {
     @Test
     public void versionIsUpdatedIncludingDueDate() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version createdVersion = mgr.createVersion(new Version(project,
+        Version createdVersion = mgr.createVersion(VersionFactory.create(project,
                 "Version_1_" + UUID.randomUUID()));
         String description = "new description";
         createdVersion.setDescription(description);
@@ -1111,13 +1102,13 @@ public class RedmineManagerTest {
     @Test
     public void versionSharingParameterIsSaved() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        Version version = new Version(project, "Version_1_" + UUID.randomUUID());
+        Version version = VersionFactory.create(project, "Version_1_" + UUID.randomUUID());
         version.setSharing(Version.SHARING_NONE);
         Version createdVersion = mgr.createVersion(version);
         Version versionById = mgr.getVersionById(createdVersion.getId());
         assertEquals(Version.SHARING_NONE, versionById.getSharing());
 
-        Version versionShared = new Version(project, "Version_2_" + UUID.randomUUID());
+        Version versionShared = VersionFactory.create(project, "Version_2_" + UUID.randomUUID());
         versionShared.setSharing(Version.SHARING_HIERARCHY);
         Version createdVersion2 = mgr.createVersion(versionShared);
         Version version2ById = mgr.getVersionById(createdVersion2.getId());
@@ -1135,7 +1126,7 @@ public class RedmineManagerTest {
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
-        IssueCategory category = new IssueCategory(project, "Category" + new Date().getTime());
+        IssueCategory category = IssueCategoryFactory.create(project, "Category" + new Date().getTime());
         category.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory = mgr.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
@@ -1164,12 +1155,12 @@ public class RedmineManagerTest {
     public void testGetIssueCategories() throws RedmineException {
         Project project = mgr.getProjectByKey(projectKey);
         // create some categories
-        IssueCategory testIssueCategory1 = new IssueCategory(project,
+        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project,
                 "Category" + new Date().getTime());
         testIssueCategory1.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory1 = mgr
                 .createCategory(testIssueCategory1);
-        IssueCategory testIssueCategory2 = new IssueCategory(project,
+        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project,
                 "Category" + new Date().getTime());
         testIssueCategory2.setAssignee(IntegrationTestHelper.getOurUser());
         IssueCategory newIssueCategory2 = mgr
@@ -1212,7 +1203,7 @@ public class RedmineManagerTest {
      */
     @Test(expected = IllegalArgumentException.class)
     public void testCreateInvalidIssueCategory() throws RedmineException {
-        IssueCategory category = new IssueCategory(null, "InvalidCategory"
+        IssueCategory category = IssueCategoryFactory.create(null, "InvalidCategory"
                 + new Date().getTime());
         mgr.createCategory(category);
     }
@@ -1230,11 +1221,9 @@ public class RedmineManagerTest {
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidIssueCategory() throws RedmineException {
         // create new test category
-        IssueCategory category = new IssueCategory(null, "InvalidCategory"
-                + new Date().getTime());
-        // set invalid id
-        category.setId(-1);
-        // now try to delete category
+        IssueCategory category = IssueCategoryFactory.create(-1);
+        category.setName("InvalidCategory" + new Date().getTime());
+        // now try deleting the category
         mgr.deleteCategory(category);
     }
 
@@ -1280,13 +1269,12 @@ public class RedmineManagerTest {
         try {
             Project project = mgr.getProjectByKey(projectKey);
             // create an issue category
-            IssueCategory category = new IssueCategory(project, "Category_"
+            IssueCategory category = IssueCategoryFactory.create(project, "Category_"
                     + new Date().getTime());
             category.setAssignee(IntegrationTestHelper.getOurUser());
             newIssueCategory = mgr.createCategory(category);
             // create an issue
-            Issue issueToCreate = new Issue();
-            issueToCreate.setSubject("getIssueWithCategory_" + UUID.randomUUID());
+            Issue issueToCreate = IssueFactory.createWithSubject("getIssueWithCategory_" + UUID.randomUUID());
             issueToCreate.setCategory(newIssueCategory);
             newIssue = mgr.createIssue(projectKey, issueToCreate);
             // retrieve issue
@@ -1335,10 +1323,7 @@ public class RedmineManagerTest {
 
     @Test
     public void emptyDescriptionReturnedAsEmptyString() throws RedmineException {
-        Issue issue = new Issue();
-        String subject = "Issue " + new Date();
-        issue.setSubject(subject);
-
+        Issue issue = IssueFactory.createWithSubject("Issue " + new Date());
         Issue createdIssue = mgr.createIssue(projectKey, issue);
         assertEquals("Description must be an empty string, not NULL", "",
                 createdIssue.getDescription());
@@ -1349,8 +1334,7 @@ public class RedmineManagerTest {
         Issue issue = new Issue();
         issue.setSubject("test123");
         final Issue iss1 = mgr.createIssue(projectKey, issue);
-        final Issue iss2 = new Issue();
-        iss2.setId(iss1.getId());
+        final Issue iss2 = IssueFactory.create(iss1.getId());
         iss2.setDescription("This is a test");
         mgr.update(iss2);
         final Issue iss3 = mgr.getIssueById(iss2.getId());
@@ -1364,8 +1348,7 @@ public class RedmineManagerTest {
         issue.setSubject("test123");
         issue.setDescription("Original description");
         final Issue iss1 = mgr.createIssue(projectKey, issue);
-        final Issue iss2 = new Issue();
-        iss2.setId(iss1.getId());
+        final Issue iss2 = IssueFactory.create(iss1.getId());
         iss2.setSubject("New subject");
         mgr.update(iss2);
         final Issue iss3 = mgr.getIssueById(iss2.getId());
@@ -1388,8 +1371,8 @@ public class RedmineManagerTest {
     public void testMemberships() throws RedmineException {
         final List<Role> roles = mgr.getRoles();
 
-        final Membership newMembership = new Membership();
-        final Project project = new Project();
+        final Membership newMembership = MembershipFactory.create();
+        final Project project = ProjectFactory.create();
         project.setIdentifier(projectKey);
         newMembership.setProject(project);
         final User currentUser = mgr.getCurrentUser();
@@ -1408,8 +1391,7 @@ public class RedmineManagerTest {
                 .getId());
         assertEquals(createdMembership, membershipById);
 
-        final Membership emptyMembership = new Membership();
-        emptyMembership.setId(createdMembership.getId());
+        final Membership emptyMembership = MembershipFactory.create(createdMembership.getId());
         emptyMembership.setProject(createdMembership.getProject());
         emptyMembership.setUser(createdMembership.getUser());
         emptyMembership.setRoles(Collections.singletonList(roles.get(0)));
@@ -1425,8 +1407,8 @@ public class RedmineManagerTest {
     @Test
     public void testUserMemberships() throws RedmineException {
         final List<Role> roles = mgr.getRoles();
-        final Membership newMembership = new Membership();
-        final Project project = new Project();
+        final Membership newMembership = MembershipFactory.create();
+        final Project project = ProjectFactory.create();
         project.setIdentifier(projectKey);
         newMembership.setProject(project);
         final User currentUser = mgr.getCurrentUser();
@@ -1472,7 +1454,7 @@ public class RedmineManagerTest {
      */
     @Test
     public void testAddUserToGroup() throws RedmineException {
-        final Group template = new Group();
+        final Group template = GroupFactory.create();
         template.setName("testAddUserToGroup " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
@@ -1495,7 +1477,7 @@ public class RedmineManagerTest {
      */
     @Test
     public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
-        final Group template = new Group();
+        final Group template = GroupFactory.create();
         template.setName("some test " + System.currentTimeMillis());
         final Group group = mgr.createGroup(template);
         try {
@@ -1514,7 +1496,7 @@ public class RedmineManagerTest {
 
     @Test
     public void testGroupCRUD() throws RedmineException {
-        final Group template = new Group();
+        final Group template = GroupFactory.create();
         template.setName("Template group " + System.currentTimeMillis());
         final Group created = mgr.createGroup(template);
 
@@ -1523,8 +1505,7 @@ public class RedmineManagerTest {
             final Group loaded = mgr.getGroupById(created.getId());
             assertEquals(template.getName(), loaded.getName());
 
-            final Group update = new Group();
-            update.setId(loaded.getId());
+            final Group update = GroupFactory.create(loaded.getId());
             update.setName("Group update " + System.currentTimeMillis());
 
             mgr.update(update);
@@ -1573,7 +1554,7 @@ public class RedmineManagerTest {
         Issue issue = createIssues(1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = new TimeEntry();
+        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 11f;
         entry.setHours(hours);
         entry.setIssueId(issueId);
@@ -1614,7 +1595,7 @@ public class RedmineManagerTest {
 
         final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
         try {
-            Watcher watcher = new Watcher(newUser.getId(), null);
+            Watcher watcher = WatcherFactory.create(newUser.getId());
             mgr.addWatcherToIssue(watcher, issue);
         } finally {
             mgr.deleteUser(newUser.getId());
@@ -1634,7 +1615,7 @@ public class RedmineManagerTest {
 
         final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
         try {
-            Watcher watcher = new Watcher(newUser.getId(), null);
+            Watcher watcher = WatcherFactory.create(newUser.getId());
             mgr.addWatcherToIssue(watcher, issue);
             mgr.deleteWatcherFromIssue(watcher, issue);
         } finally {
@@ -1655,7 +1636,7 @@ public class RedmineManagerTest {
 
         final User newUser = mgr.createUser(UserGenerator.generateRandomUser());
         try {
-            Watcher watcher = new Watcher(newUser.getId(), null);
+            Watcher watcher = WatcherFactory.create(newUser.getId());
             mgr.addWatcherToIssue(watcher, issue);
             final Issue includeWatcherIssue = mgr.getIssueById(issue.getId(),
                     INCLUDE.watchers);
@@ -1678,8 +1659,7 @@ public class RedmineManagerTest {
         
         try {
             List<Watcher> watchers = new ArrayList<Watcher>();
-            Watcher watcher = new Watcher();
-            watcher.setId(newUserWatcher.getId());
+            Watcher watcher = WatcherFactory.create(newUserWatcher.getId());
             watchers.add(watcher);
 
             issue.addWatchers(watchers);

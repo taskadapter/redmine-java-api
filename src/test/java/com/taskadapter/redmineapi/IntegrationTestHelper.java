@@ -1,7 +1,9 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.UserFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +23,7 @@ public class IntegrationTestHelper {
         String login = testConfig.getLogin();
         String fName = testConfig.getParam("userFName");
         String lName = testConfig.getParam("userLName");
-        User user = new User();
-        user.setId(userId);
+        User user = UserFactory.create(userId);
         user.setLogin(login);
         user.setFirstName(fName);
         user.setLastName(lName);
@@ -41,9 +42,7 @@ public class IntegrationTestHelper {
      * @return project key
      */
     public static String createProject(RedmineManager mgr) {
-        Project testProject = new Project();
-        testProject.setName("test project");
-        testProject.setIdentifier("test" + Calendar.getInstance().getTimeInMillis());
+        Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
 
         String projectKey;
         try {

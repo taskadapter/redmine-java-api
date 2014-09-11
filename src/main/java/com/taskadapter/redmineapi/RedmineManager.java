@@ -16,6 +16,37 @@
 
 package com.taskadapter.redmineapi;
 
+import com.taskadapter.redmineapi.bean.Attachment;
+import com.taskadapter.redmineapi.bean.AttachmentFactory;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Identifiable;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssuePriority;
+import com.taskadapter.redmineapi.bean.IssueRelation;
+import com.taskadapter.redmineapi.bean.IssueRelationFactory;
+import com.taskadapter.redmineapi.bean.IssueStatus;
+import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.SavedQuery;
+import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
+import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.internal.CopyBytesHandler;
+import com.taskadapter.redmineapi.internal.Joiner;
+import com.taskadapter.redmineapi.internal.Transport;
+import com.taskadapter.redmineapi.internal.URIConfigurator;
+import com.taskadapter.redmineapi.internal.io.MarkedIOException;
+import com.taskadapter.redmineapi.internal.io.MarkedInputStream;
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -27,37 +58,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import com.taskadapter.redmineapi.internal.CopyBytesHandler;
-import com.taskadapter.redmineapi.internal.Joiner;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
-
-import com.taskadapter.redmineapi.bean.Attachment;
-import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.Identifiable;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssuePriority;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueStatus;
-import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.SavedQuery;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryActivity;
-import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.internal.Transport;
-import com.taskadapter.redmineapi.internal.URIConfigurator;
-import com.taskadapter.redmineapi.internal.io.MarkedIOException;
-import com.taskadapter.redmineapi.internal.io.MarkedInputStream;
+import java.util.Set;
 
 /**
  * <b>Entry point</b> for the API: use this class to communicate with Redmine servers.
@@ -98,7 +100,7 @@ public class RedmineManager {
      */
     public Issue createIssue(String projectKey, Issue issue) throws RedmineException {
 		final Project oldProject = issue.getProject();
-		final Project newProject = new Project();
+		final Project newProject = ProjectFactory.create();
 		newProject.setIdentifier(projectKey);
 		issue.setProject(newProject);
 		try {
@@ -477,7 +479,7 @@ public class RedmineManager {
     }
 
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
-        IssueRelation toCreate = new IssueRelation();
+        IssueRelation toCreate = IssueRelationFactory.create();
         toCreate.setIssueId(issueId);
         toCreate.setIssueToId(issueToId);
         toCreate.setType(type);
@@ -809,7 +811,7 @@ public class RedmineManager {
         final String token;
         try {
             token = transport.upload(wrapper);
-            final Attachment result = new Attachment();
+            final Attachment result = AttachmentFactory.create();
             result.setToken(token);
             result.setContentType(contentType);
             result.setFileName(fileName);

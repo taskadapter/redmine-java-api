@@ -28,7 +28,7 @@ public class Version implements Identifiable {
     public static final String SHARING_TREE = "tree";
     public static final String SHARING_SYSTEM = "system";
 
-    private Integer id;
+    private final Integer id;
     private Project project;
     private String name;
     private String description;
@@ -40,18 +40,11 @@ public class Version implements Identifiable {
     private List<CustomField> customFields = new ArrayList<CustomField>();
 
     /**
-     * Required for reflective construction.
+     * Use VersionFactory to create an instance of this class.
+     * @see com.taskadapter.redmineapi.bean.VersionFactory
      */
-    public Version() {
-    }
-
-    /**
-     * @param project the {@link Project} of the {@link Version}
-     * @param name    the name of the the {@link Version}
-     */
-    public Version(Project project, String name) {
-        this.project = project;
-        this.name = name;
+    Version(Integer id) {
+        this.id = id;
     }
 
     /**
@@ -121,10 +114,6 @@ public class Version implements Identifiable {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public void setName(String name) {

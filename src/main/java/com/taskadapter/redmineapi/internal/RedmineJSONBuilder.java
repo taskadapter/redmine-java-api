@@ -116,7 +116,7 @@ public class RedmineJSONBuilder {
 			writeMembership(writer, object);
 		}
 	};
-        
+
 	/**
 	 * Writes a "create project" request.
 	 * 
@@ -322,7 +322,7 @@ public class RedmineJSONBuilder {
         if (issueWatchers != null && !issueWatchers.isEmpty()) {
             writeWatchers(writer, issueWatchers);
         }
-        
+
         final List<Attachment> uploads = new ArrayList<Attachment>();
         for (Attachment attachment : issue.getAttachments()) {
             if (attachment.getToken() != null) {
@@ -380,13 +380,13 @@ public class RedmineJSONBuilder {
 		}
 		writer.endObject();
 	}
-        
+
         public static void writeWatchers(JSONWriter writer, Collection<Watcher> watchers)
 			throws JSONException {
             if (watchers == null || watchers.isEmpty()) {
                 return;
             }
-            
+
             writer.key("watcher_user_ids");
             writer.array();
             for (Watcher watcher : watchers) {

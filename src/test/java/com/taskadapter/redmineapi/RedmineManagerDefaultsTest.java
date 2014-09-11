@@ -2,6 +2,12 @@ package com.taskadapter.redmineapi;
 
 import java.util.Calendar;
 
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
+import com.taskadapter.redmineapi.bean.IssueFactory;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.TimeEntryFactory;
+import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -36,12 +42,10 @@ public class RedmineManagerDefaultsTest {
     TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
 		mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
-		Project junitTestProject = new Project();
-		junitTestProject.setName("test project");
-		junitTestProject.setIdentifier("test"
-				+ Calendar.getInstance().getTimeInMillis());
+        Project junitTestProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
 
-		try {
+
+        try {
 			Project createdProject = mgr.createProject(junitTestProject);
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
@@ -65,10 +69,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testProjectDefaults() throws RedmineException {
-		final Project template = new Project();
-		template.setName("Test name");
-		template.setIdentifier("test"
-				+ Calendar.getInstance().getTimeInMillis());
+		final Project template = ProjectFactory.create("Test name", "key" + Calendar.getInstance().getTimeInMillis());
 		final Project result = mgr.createProject(template);
 		try {
 			Assert.assertNotNull(result.getId());
@@ -88,8 +89,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testIssueDefaults() throws RedmineException {
-		final Issue template = new Issue();
-		template.setSubject("This is a subject");
+		final Issue template = IssueFactory.createWithSubject("This is a subject");
 		final Issue result = mgr.createIssue(projectKey, template);
 		
 		try {
@@ -126,7 +126,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testUserDefaults() throws RedmineException {
-		final User template = new User();
+		final User template = UserFactory.create();
 		template.setFirstName("first name");
 		template.setLastName("last name");
 		template.setMail("root@globalhost.ru");
@@ -150,10 +150,9 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testTimeEntryDefaults() throws RedmineException {
-		final TimeEntry template = new TimeEntry();
+		final TimeEntry template = TimeEntryFactory.create();
 
-		final Issue tmp = new Issue();
-		tmp.setSubject("aaabbbccc");
+		final Issue tmp = IssueFactory.createWithSubject("aaabbbccc");
 		final Issue tmpIssue = mgr.createIssue(projectKey, tmp);
 		try {
 			template.setHours(123.f);
@@ -184,8 +183,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testRelationDefaults() throws RedmineException {
-		final Issue tmp = new Issue();
-		tmp.setSubject("this is a test");
+		final Issue tmp = IssueFactory.createWithSubject("this is a test");
 		final Issue issue1 = mgr.createIssue(projectKey, tmp);
 		try {
 			final Issue issue2 = mgr.createIssue(projectKey, tmp);
@@ -207,7 +205,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testVersionDefaults() throws RedmineException {
-		final Version template = new Version();
+		final Version template = VersionFactory.create();
 		template.setProject(mgr.getProjectByKey(projectKey));
 		template.setName("2.3.4.5");
 		final Version version = mgr.createVersion(template);
@@ -227,9 +225,7 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testCategoryDefaults() throws RedmineException {
-		final IssueCategory template = new IssueCategory();
-		template.setProject(mgr.getProjectByKey(projectKey));
-		template.setName("test name");
+		final IssueCategory template = IssueCategoryFactory.create(mgr.getProjectByKey(projectKey), "test name");
 		final IssueCategory category = mgr.createCategory(template);
 		try {
 			Assert.assertNotNull(category.getId());

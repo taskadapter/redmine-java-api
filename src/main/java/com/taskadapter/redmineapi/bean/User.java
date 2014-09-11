@@ -12,7 +12,11 @@ import java.util.Set;
  * Redmine's User.
  */
 public class User implements Identifiable {
-    private Integer id;
+    /**
+     * database ID.
+     */
+    private final Integer id;
+
     private String login;
     private String password;
     private String firstName;
@@ -27,6 +31,17 @@ public class User implements Identifiable {
 	private List<Membership> memberships = new ArrayList<Membership>();
 	 private List<Group> groups = new ArrayList<Group>();
 
+    /**
+     * Use UserFactory to create instances of this class.
+     *
+     * @param id database ID.
+     *
+     * @see UserFactory
+     */
+    User(Integer id) {
+        this.id = id;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -34,10 +49,6 @@ public class User implements Identifiable {
     @Override
     public String toString() {
         return getFullName();
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getLogin() {

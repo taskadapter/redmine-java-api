@@ -7,7 +7,12 @@ import java.util.List;
  * User or group membership.
  */
 public class Membership implements Identifiable {
-	private Integer id;
+
+    /**
+     * database ID.
+     */
+    private final Integer id;
+
 	private Project project;
 
 	/**
@@ -16,13 +21,20 @@ public class Membership implements Identifiable {
 	private User user;
 	private List<Role> roles = new ArrayList<Role>();
 
-	@Override
+    /**
+     * Use MembershipFactory to create instances of this class.
+     *
+     * @param id database ID.
+     *
+     * @see com.taskadapter.redmineapi.bean.MembershipFactory
+     */
+    Membership(Integer id) {
+        this.id = id;
+    }
+
+    @Override
 	public Integer getId() {
 		return id;
-	}
-
-	public void setId(Integer id) {
-		this.id = id;
 	}
 
 	public Project getProject() {

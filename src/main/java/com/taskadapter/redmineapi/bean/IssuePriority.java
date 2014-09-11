@@ -1,16 +1,27 @@
 package com.taskadapter.redmineapi.bean;
 
 public class IssuePriority {
-    private Integer id;
+    /**
+     * database ID.
+     */
+    private final Integer id;
+
     private String name;
     private boolean isDefault;
 
-    public Integer getId() {
-        return id;
+    /**
+     * Use IssuePriorityFactory to create instances of this class.
+     *
+     * @param id database ID.
+     *
+     * @see com.taskadapter.redmineapi.bean.IssuePriorityFactory
+     */
+    IssuePriority(Integer id) {
+        this.id = id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Integer getId() {
+        return id;
     }
 
     public String getName() {

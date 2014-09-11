@@ -7,9 +7,9 @@ import static org.fest.assertions.Assertions.assertThat;
 public class UserTest {
     @Test
     public void customFieldWithDuplicateIDReplacesTheOldOne() {
-        User user = new User();
-        CustomField field = new CustomField(5, "name1", "value1");
-        CustomField duplicateField = new CustomField(5, "name1", "value1");
+        User user = UserFactory.create();
+        CustomField field = CustomFieldFactory.create(5, "name1", "value1");
+        CustomField duplicateField = CustomFieldFactory.create(5, "name1", "value1");
         assertThat(user.getCustomFields().size()).isEqualTo(0);
         user.addCustomField(field);
         user.addCustomField(duplicateField);

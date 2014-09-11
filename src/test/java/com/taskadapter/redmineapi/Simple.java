@@ -4,12 +4,15 @@ import com.taskadapter.redmineapi.RedmineManager.INCLUDE;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +69,7 @@ public class Simple {
 		final Issue testIssue = new Issue();
 		testIssue.setSubject("This is upload ticket!");
 		testIssue.addAttachment(attach1);
-		final Project tmpProject = new Project();
-		tmpProject.setIdentifier("uploadtmpproject");
-		tmpProject.setName("Upload project");
+		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
 		final Project project = mgr.createProject(tmpProject);
 		try {
 			final Issue createdIssue = mgr.createIssue(project.getIdentifier(),
@@ -154,11 +155,9 @@ public class Simple {
 			throws RedmineException {
 		Issue issue = new Issue();
 		issue.setSubject("test123");
-		final Version ver = new Version();
-		ver.setId(512);
+		final Version ver = VersionFactory.create(512);
 		issue.setTargetVersion(ver);
-		final IssueCategory cat = new IssueCategory();
-		cat.setId(673);
+		final IssueCategory cat = IssueCategoryFactory.create(673);
 		issue.setCategory(cat);
 		mgr.createIssue(projectKey, issue);
 	}

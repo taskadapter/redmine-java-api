@@ -7,17 +7,28 @@ import java.util.Set;
  */
 public class Role {
 
-	private Integer id;
+    /**
+     * database ID.
+     */
+    private final Integer id;
+
 	private String name;
 	private Boolean inherited;
 	private Set<String> permissions;
 
-	public Integer getId() {
-		return id;
-	}
+    /**
+     * Use RoleFactory to create instances of this class.
+     *
+     * @param id database ID.
+     *
+     * @see com.taskadapter.redmineapi.bean.RoleFactory
+     */
+    Role(Integer id) {
+        this.id = id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
+    public Integer getId() {
+		return id;
 	}
 
 	public String getName() {
