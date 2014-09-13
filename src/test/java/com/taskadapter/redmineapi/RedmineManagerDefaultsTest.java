@@ -1,26 +1,24 @@
 package com.taskadapter.redmineapi;
 
-import java.util.Calendar;
-
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueFactory;
+import com.taskadapter.redmineapi.bean.IssueRelation;
+import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryFactory;
-import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.Version;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Calendar;
 
 /**
  * Tests "default" redmine manager values in a response. Tries to provides
@@ -36,17 +34,22 @@ public class RedmineManagerDefaultsTest {
 	private static RedmineManager mgr;
 
 	private static String projectKey;
+    private static IssueManager issueManager;
+    private static ProjectManager projectManager;
 
-  @BeforeClass
+    @BeforeClass
 	public static void oneTimeSetUp() {
     TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
 		mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        issueManager = mgr.getIssueManager();
+        projectManager = mgr.getProjectManager();
+
         Project junitTestProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
 
 
         try {
-			Project createdProject = mgr.createProject(junitTestProject);
+			Project createdProject = projectManager.createProject(junitTestProject);
 			projectKey = createdProject.getIdentifier();
 		} catch (Exception e) {
 			logger.error("Exception while creating test project", e);
@@ -57,8 +60,8 @@ public class RedmineManagerDefaultsTest {
 	@AfterClass
 	public static void oneTimeTearDown() {
 		try {
-			if (mgr != null && projectKey != null) {
-				mgr.deleteProject(projectKey);
+			if (projectManager != null && projectKey != null) {
+                projectManager.deleteProject(projectKey);
 			}
 		} catch (Exception e) {
 			logger.error("Exception while deleting test project", e);
@@ -70,7 +73,7 @@ public class RedmineManagerDefaultsTest {
 	@Test
 	public void testProjectDefaults() throws RedmineException {
 		final Project template = ProjectFactory.create("Test name", "key" + Calendar.getInstance().getTimeInMillis());
-		final Project result = mgr.createProject(template);
+		final Project result = projectManager.createProject(template);
 		try {
 			Assert.assertNotNull(result.getId());
 			Assert.assertEquals(template.getIdentifier(),
@@ -83,14 +86,14 @@ public class RedmineManagerDefaultsTest {
 			Assert.assertNotNull(result.getTrackers());
 			Assert.assertNull(result.getParentId());
 		} finally {
-			mgr.deleteProject(result.getIdentifier());
+            projectManager.deleteProject(result.getIdentifier());
 		}
 	}
 
 	@Test
 	public void testIssueDefaults() throws RedmineException {
 		final Issue template = IssueFactory.createWithSubject("This is a subject");
-		final Issue result = mgr.createIssue(projectKey, template);
+		final Issue result = issueManager.createIssue(projectKey, template);
 		
 		try {
 			Assert.assertNotNull(result.getId());
@@ -120,31 +123,7 @@ public class RedmineManagerDefaultsTest {
 			Assert.assertNotNull(result.getRelations());
 			Assert.assertNotNull(result.getAttachments());
 		} finally {
-			mgr.deleteIssue(result.getId());
-		}
-	}
-
-	@Test
-	public void testUserDefaults() throws RedmineException {
-		final User template = UserFactory.create();
-		template.setFirstName("first name");
-		template.setLastName("last name");
-		template.setMail("root@globalhost.ru");
-		template.setPassword("aslkdj32jnrfds7asdfn23()[]:kajsdf");
-		template.setLogin("asdNnadnNasd");
-		final User result = mgr.createUser(template);
-		try {
-			Assert.assertNotNull(result.getId());
-			Assert.assertEquals("asdNnadnNasd", result.getLogin());
-			Assert.assertNull(result.getPassword());
-			Assert.assertEquals("first name", result.getFirstName());
-			Assert.assertEquals("last name", result.getLastName());
-			Assert.assertEquals("root@globalhost.ru", result.getMail());
-			Assert.assertNotNull(result.getCreatedOn());
-			Assert.assertNull(result.getLastLoginOn());
-			Assert.assertNotNull(result.getCustomFields());
-		} finally {
-			mgr.deleteUser(result.getId());
+            issueManager.deleteIssue(result.getId());
 		}
 	}
 
@@ -153,12 +132,12 @@ public class RedmineManagerDefaultsTest {
 		final TimeEntry template = TimeEntryFactory.create();
 
 		final Issue tmp = IssueFactory.createWithSubject("aaabbbccc");
-		final Issue tmpIssue = mgr.createIssue(projectKey, tmp);
+		final Issue tmpIssue = issueManager.createIssue(projectKey, tmp);
 		try {
 			template.setHours(123.f);
 			template.setActivityId(ACTIVITY_ID);
 			template.setIssueId(tmpIssue.getId());
-			final TimeEntry result = mgr.createTimeEntry(template);
+			final TimeEntry result = issueManager.createTimeEntry(template);
 			try {
 				Assert.assertNotNull(result.getId());
 				Assert.assertNotNull(result.getIssueId());
@@ -174,21 +153,21 @@ public class RedmineManagerDefaultsTest {
 				Assert.assertNotNull(result.getCreatedOn());
 				Assert.assertNotNull(result.getUpdatedOn());
 			} finally {
-				mgr.deleteTimeEntry(result.getId());
+				issueManager.deleteTimeEntry(result.getId());
 			}
 		} finally {
-			mgr.deleteIssue(tmpIssue.getId());
+            issueManager.deleteIssue(tmpIssue.getId());
 		}
 	}
 
 	@Test
 	public void testRelationDefaults() throws RedmineException {
 		final Issue tmp = IssueFactory.createWithSubject("this is a test");
-		final Issue issue1 = mgr.createIssue(projectKey, tmp);
+		final Issue issue1 = issueManager.createIssue(projectKey, tmp);
 		try {
-			final Issue issue2 = mgr.createIssue(projectKey, tmp);
+			final Issue issue2 = issueManager.createIssue(projectKey, tmp);
 			try {
-				final IssueRelation relation = mgr.createRelation(
+				final IssueRelation relation = issueManager.createRelation(
 						issue1.getId(), issue2.getId(), "blocks");
 				Assert.assertNotNull(relation.getId());
 				Assert.assertEquals(issue1.getId(), relation.getIssueId());
@@ -196,19 +175,19 @@ public class RedmineManagerDefaultsTest {
 				Assert.assertEquals("blocks", relation.getType());
 				Assert.assertEquals(Integer.valueOf(0), relation.getDelay());
 			} finally {
-				mgr.deleteIssue(issue2.getId());
+				issueManager.deleteIssue(issue2.getId());
 			}
 		} finally {
-			mgr.deleteIssue(issue1.getId());
+			issueManager.deleteIssue(issue1.getId());
 		}
 	}
 
 	@Test
 	public void testVersionDefaults() throws RedmineException {
 		final Version template = VersionFactory.create();
-		template.setProject(mgr.getProjectByKey(projectKey));
+		template.setProject(projectManager.getProjectByKey(projectKey));
 		template.setName("2.3.4.5");
-		final Version version = mgr.createVersion(template);
+		final Version version = projectManager.createVersion(template);
 		try {
 			Assert.assertNotNull(version.getId());
 			Assert.assertNotNull(version.getProject());
@@ -219,21 +198,21 @@ public class RedmineManagerDefaultsTest {
 			Assert.assertNotNull(version.getCreatedOn());
 			Assert.assertNotNull(version.getUpdatedOn());
 		} finally {
-			mgr.deleteVersion(version);
+			projectManager.deleteVersion(version);
 		}
 	}
 
 	@Test
 	public void testCategoryDefaults() throws RedmineException {
-		final IssueCategory template = IssueCategoryFactory.create(mgr.getProjectByKey(projectKey), "test name");
-		final IssueCategory category = mgr.createCategory(template);
+		final IssueCategory template = IssueCategoryFactory.create(projectManager.getProjectByKey(projectKey), "test name");
+		final IssueCategory category = issueManager.createCategory(template);
 		try {
 			Assert.assertNotNull(category.getId());
 			Assert.assertEquals("test name", category.getName());
 			Assert.assertNotNull(category.getProject());
 			Assert.assertNull(category.getAssignee());
 		} finally {
-			mgr.deleteCategory(category);
+			issueManager.deleteCategory(category);
 		}
 	}
 }

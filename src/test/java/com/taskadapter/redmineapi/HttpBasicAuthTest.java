@@ -36,8 +36,8 @@ public final class HttpBasicAuthTest {
     @Test
     public void testGetProjectList() throws RedmineException {
 
-        final List<Project> projectsWithApiKey = mgrKey.getProjects();
-        final List<Project> projectsWithHttpBasicAuth = mgrHttpBasicAuth.getProjects();
+        final List<Project> projectsWithApiKey = mgrKey.getProjectManager().getProjects();
+        final List<Project> projectsWithHttpBasicAuth = mgrHttpBasicAuth.getProjectManager().getProjects();
 
         logger.debug(String.format("RedmineManager using API key auth returned %s projects",
                 projectsWithApiKey.size()));

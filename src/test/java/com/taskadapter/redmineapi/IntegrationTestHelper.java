@@ -46,7 +46,7 @@ public class IntegrationTestHelper {
 
         String projectKey;
         try {
-            Project createdProject = mgr.createProject(testProject);
+            Project createdProject = mgr.getProjectManager().createProject(testProject);
             projectKey = createdProject.getIdentifier();
         } catch (Exception e) {
             logger.error("Exception while configuring tests", e);
@@ -55,10 +55,13 @@ public class IntegrationTestHelper {
         return projectKey;
     }
 
+    /**
+     * Delete the project if it exists. this method ignores NULL or empty projectKey parameter.
+     */
     public static void deleteProject(RedmineManager mgr, String projectKey) {
         try {
             if (mgr != null && projectKey != null) {
-                mgr.deleteProject(projectKey);
+                mgr.getProjectManager().deleteProject(projectKey);
             }
         } catch (Exception e) {
             logger.error("Exception while deleting test project", e);
