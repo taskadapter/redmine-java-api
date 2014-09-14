@@ -1,7 +1,7 @@
 # Redmine/Chiliproject Java API.
 
 * Requires Java 6+.
-* Uses Redmine REST API
+* Uses Redmine's REST API (don't forget to enable it in the Redmine server settings).
 * Does not require any plugins installed on Redmine/Chiliproject server.
 * Runs on any standard Java platform
 * Supports HTTP proxy
@@ -13,7 +13,7 @@
 Gradle dependency:
 
     dependencies {
-        compile 'com.taskadapter:redmine-java-api:1.24'
+        compile 'com.taskadapter:redmine-java-api:1.25'
     }
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
@@ -28,7 +28,7 @@ Sample code to retrieve list of Redmine issues:
     private static Integer queryId = null; // any
 
     RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
-    List<Issue> issues = mgr.getIssues(projectKey, queryId);
+    List<Issue> issues = mgr.getIssueManager().getIssues(projectKey, queryId);
     for (Issue issue : issues) {
         System.out.println(issue.toString());
     }
