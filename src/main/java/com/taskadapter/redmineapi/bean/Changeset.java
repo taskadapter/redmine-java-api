@@ -9,7 +9,7 @@ public class Changeset {
     private String revision;
     private User user;
     private String comments;
-    private Date commitedOn;
+    private Date committedOn;
 
     public String getRevision() {
         return revision;
@@ -35,12 +35,12 @@ public class Changeset {
         this.comments = comments;
     }
 
-    public Date getCommitedOn() {
-        return commitedOn;
+    public Date getCommittedOn() {
+        return committedOn;
     }
 
-    public void setCommitedOn(Date commitedOn) {
-        this.commitedOn = commitedOn;
+    public void setCommittedOn(Date committedOn) {
+        this.committedOn = committedOn;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class Changeset {
                 "comments='" + comments + '\'' +
                 ", revision='" + revision + '\'' +
                 ", user=" + user +
-                ", commitedOn=" + commitedOn +
+                ", committedOn=" + committedOn +
                 '}';
     }
 

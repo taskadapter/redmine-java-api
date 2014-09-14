@@ -21,7 +21,6 @@ public class IssueHelper {
 
     public static Issue generateRandomIssue() {
         Random r = new Random();
-        Issue issue = IssueFactory.createWithSubject("some issue " + r.nextInt() + " " + new Date());
-        return issue;
+        return IssueFactory.createWithSubject("some issue " + r.nextInt() + " " + new Date());
     }
 }

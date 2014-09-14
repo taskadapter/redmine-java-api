@@ -17,7 +17,7 @@ public class JournalFactory {
         journal.setNotes(notes);
         journal.setUser(user);
         journal.setCreatedOn(createdOn);
-        journal.setDetails(details);
+        journal.addDetails(details);
         return journal;
     }
 

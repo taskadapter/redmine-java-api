@@ -1,14 +1,17 @@
 package com.taskadapter.redmineapi.internal;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 import com.taskadapter.redmineapi.bean.ProjectFactory;
@@ -56,8 +59,8 @@ public class RedmineJSONParserTest {
 				.parse("11.05.2012 06:53:21 -0700"));
 		template.setUpdatedOn(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss Z")
 				.parse("11.05.2012 06:53:20 -0700"));
-		template.setTrackers(Arrays.asList(TrackerFactory.create(1, "Bug"), TrackerFactory.create(
-				2, "Feature"), TrackerFactory.create(3, "Support")));
+		template.addTrackers(Arrays.asList(TrackerFactory.create(1, "Bug"), TrackerFactory.create(
+                2, "Feature"), TrackerFactory.create(3, "Support")));
 		template.setDescription("");
 		Assert.assertEquals(template, project);
 	}
@@ -77,7 +80,7 @@ public class RedmineJSONParserTest {
 			Assert.assertTrue(issues.isEmpty());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Error:" + e);
+			fail("Error:" + e);
 		}
 	}
 
@@ -87,7 +90,7 @@ public class RedmineJSONParserTest {
 			List<Issue> issues = loadRedmine11Issues();
 			Assert.assertEquals(26, issues.size());
 		} catch (Exception e) {
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 
 	}
@@ -125,7 +128,7 @@ public class RedmineJSONParserTest {
 		Assert.assertEquals(expectedName, project.getName());
 		Assert.assertEquals(expectedKey, project.getIdentifier());
 
-		List<Tracker> trackers = project.getTrackers();
+		Collection<Tracker> trackers = project.getTrackers();
 		Assert.assertNotNull("Trackers list must not be NULL", trackers);
 		Assert.assertEquals(3, trackers.size());
 
@@ -154,8 +157,8 @@ public class RedmineJSONParserTest {
 				.getResourceAsString("redmine_project_no_trackers.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
 				.getResponseSingleObject(json, "project"));
-		List<Tracker> trackers = project.getTrackers();
-		Assert.assertNull("Trackers list must be NULL", trackers);
+		Collection<Tracker> trackers = project.getTrackers();
+		assertThat(trackers).isEmpty();
 	}
 
 	@Test
@@ -167,10 +170,10 @@ public class RedmineJSONParserTest {
 			Assert.assertNotNull(issue52);
 
 			// must be NULL and not "0"
-			Assert.assertNull("estimated time must be null",
-					issue52.getEstimatedHours());
+			assertNull("estimated time must be null",
+                    issue52.getEstimatedHours());
 		} catch (IOException e) {
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 	}
 
@@ -197,9 +200,9 @@ public class RedmineJSONParserTest {
 		try {
 			String text = MyIOUtils.getResourceAsString("invalid_page.txt");
 			RedmineJSONParser.getResponse(text);
-			Assert.fail("Must have failed with RuntimeException");
+			fail("Must have failed with RuntimeException");
 		} catch (IOException e) {
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		} catch (JSONException e) {
 			// success
 		}
@@ -215,7 +218,7 @@ public class RedmineJSONParserTest {
 			Assert.assertTrue(issue65.getDescription().endsWith(
 					"This is the last line."));
 		} catch (Exception e) {
-			Assert.fail(e.getMessage());
+			fail(e.getMessage());
 		}
 	}
 
@@ -338,7 +341,7 @@ public class RedmineJSONParserTest {
 			assertNull(issue1.getEstimatedHours());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Error:" + e);
+			fail("Error:" + e);
 		}
 	}
 
@@ -358,7 +361,7 @@ public class RedmineJSONParserTest {
 			assertEquals(true, status5.isClosed());
 		} catch (Exception e) {
 			e.printStackTrace();
-			Assert.fail("Error:" + e);
+			fail("Error:" + e);
 		}
 
 	}
@@ -374,7 +377,7 @@ public class RedmineJSONParserTest {
 					RedmineJSONParser.NEWS_PARSER);
 			Assert.assertTrue(news.isEmpty());
 		} catch (Exception e) {
-			Assert.fail("Error:" + e);
+			fail("Error:" + e);
 		}
 	}
 
@@ -392,7 +395,7 @@ public class RedmineJSONParserTest {
 			News anyItem = news.get(0);
 			assertEquals("rest last", anyItem.getUser().getFullName());
 		} catch (Exception e) {
-			Assert.fail("Error:" + e);
+			fail("Error:" + e);
 		}
 	}
 
@@ -411,7 +414,7 @@ public class RedmineJSONParserTest {
 			assertEquals("Design", activities.get(0).getName());
 
 		} catch (Exception e) {
-			Assert.fail("Error:" + e);
+			fail("Error:" + e);
 		}
 	}
 

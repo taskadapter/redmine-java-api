@@ -1,11 +1,9 @@
 package com.taskadapter.redmineapi.bean;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,9 +25,9 @@ public class User implements Identifiable {
     private String apiKey;
     private Integer authSourceId;
     // TODO add tests
-    private Set<CustomField> customFields = new HashSet<CustomField>();
-	private List<Membership> memberships = new ArrayList<Membership>();
-	 private List<Group> groups = new ArrayList<Group>();
+    private final Set<CustomField> customFields = new HashSet<CustomField>();
+	private final Set<Membership> memberships = new HashSet<Membership>();
+	private final Set<Group> groups = new HashSet<Group>();
 
     /**
      * Use UserFactory to create instances of this class.
@@ -218,19 +216,19 @@ public class User implements Identifiable {
         customFields.add(customField);
     }
 
-	public List<Membership> getMemberships() {
-		return memberships;
+	public Collection<Membership> getMemberships() {
+		return Collections.unmodifiableCollection(memberships);
 	}
 
-	public void setMemberships(List<Membership> memberships) {
-		this.memberships = memberships;
+	public void addMemberships(Collection<Membership> memberships) {
+		this.memberships.addAll(memberships);
 	}
 
-	public List<Group> getGroups() {
-	   return groups;
+	public Collection<Group> getGroups() {
+	   return Collections.unmodifiableCollection(groups);
 	   }
 
-	public void setGroups(List<Group> groups) {
-	   this.groups = groups;
+	public void addGroups(Collection<Group> groups) {
+	   this.groups.addAll(groups);
 	}
 }

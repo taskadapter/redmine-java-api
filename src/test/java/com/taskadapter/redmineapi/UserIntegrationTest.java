@@ -227,9 +227,9 @@ public class UserIntegrationTest {
             final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
             try {
                 userManager.addUserToGroup(newUser, group);
-                final List<Group> userGroups = userManager.getUserById(newUser.getId()).getGroups();
+                final Collection<Group> userGroups = userManager.getUserById(newUser.getId()).getGroups();
                 assertTrue(userGroups.size() == 1);
-                assertTrue(group.getName().equals(userGroups.get(0).getName()));
+                assertTrue(group.getName().equals(userGroups.iterator().next().getName()));
             } finally {
                 userManager.deleteUser(newUser.getId());
             }
@@ -300,7 +300,7 @@ public class UserIntegrationTest {
         newMembership.setProject(project);
         final User currentUser = mgr.getUserManager().getCurrentUser();
         newMembership.setUser(currentUser);
-        newMembership.setRoles(roles);
+        newMembership.addRoles(roles);
 
         userManager.addMembership(newMembership);
         final List<Membership> memberships1 = userManager.getMemberships(project);
@@ -317,7 +317,7 @@ public class UserIntegrationTest {
         final Membership emptyMembership = MembershipFactory.create(createdMembership.getId());
         emptyMembership.setProject(createdMembership.getProject());
         emptyMembership.setUser(createdMembership.getUser());
-        emptyMembership.setRoles(Collections.singletonList(roles.get(0)));
+        emptyMembership.addRoles(Collections.singletonList(roles.get(0)));
 
         userManager.update(emptyMembership);
         final Membership updatedEmptyMembership = userManager.getMembership(createdMembership.getId());
@@ -336,7 +336,7 @@ public class UserIntegrationTest {
         newMembership.setProject(project);
         final User currentUser = userManager.getCurrentUser();
         newMembership.setUser(currentUser);
-        newMembership.setRoles(roles);
+        newMembership.addRoles(roles);
 
         userManager.addMembership(newMembership);
 
@@ -396,9 +396,8 @@ public class UserIntegrationTest {
     }
 
     private RedmineManager getNonAdminManager() {
-        RedmineManager nonAdminManager = RedmineManagerFactory.createWithUserAuth(IntegrationTestHelper.getTestConfig().getURI(),
+        return RedmineManagerFactory.createWithUserAuth(IntegrationTestHelper.getTestConfig().getURI(),
                     nonAdminUserLogin, nonAdminPassword);
-        return nonAdminManager;
     }
 
 }

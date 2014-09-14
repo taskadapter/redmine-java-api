@@ -47,12 +47,12 @@ public class Issue implements Identifiable {
      * can't have two custom fields with the same ID in the collection, that's why it is declared
      * as a Set, not a List.
      */
-    private Set<CustomField> customFields = new HashSet<CustomField>();
-    private Set<Journal> journals = new HashSet<Journal>();
-    private Set<IssueRelation> relations = new HashSet<IssueRelation>();
-    private Set<Attachment> attachments = new HashSet<Attachment>();
-    private Set<Changeset> changesets = new HashSet<Changeset>();
-    private Set<Watcher> watchers = new HashSet<Watcher>();
+    private final Set<CustomField> customFields = new HashSet<CustomField>();
+    private final Set<Journal> journals = new HashSet<Journal>();
+    private final Set<IssueRelation> relations = new HashSet<IssueRelation>();
+    private final Set<Attachment> attachments = new HashSet<Attachment>();
+    private final Set<Changeset> changesets = new HashSet<Changeset>();
+    private final Set<Watcher> watchers = new HashSet<Watcher>();
 
     /**
      * @param id database ID.

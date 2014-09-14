@@ -31,9 +31,7 @@ public class RedmineManagerDefaultsTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
 
-	private static RedmineManager mgr;
-
-	private static String projectKey;
+    private static String projectKey;
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
 
@@ -41,7 +39,7 @@ public class RedmineManagerDefaultsTest {
 	public static void oneTimeSetUp() {
     TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
-		mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        RedmineManager mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
 

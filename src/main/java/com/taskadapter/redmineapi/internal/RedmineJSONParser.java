@@ -374,9 +374,9 @@ public class RedmineJSONParser {
 				"parent");
 		if (parentProject != null)
 			result.setParentId(JsonInput.getInt(parentProject, "id"));
-		result.setTrackers(JsonInput.getListOrNull(content, "trackers",
+		result.addTrackers(JsonInput.getListOrEmpty(content, "trackers",
 				TRACKER_PARSER));
-        result.setCustomFields(JsonInput.getListOrEmpty(content, "custom_fields",
+        result.addCustomFields(JsonInput.getListOrEmpty(content, "custom_fields",
                 CUSTOM_FIELD_PARSER));
 		return result;
 	}
@@ -465,7 +465,7 @@ public class RedmineJSONParser {
 		result.setDueDate(getShortDateOrNull(content, "due_date"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
-		result.setCustomFields(JsonInput.getListOrEmpty(content,
+		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", RedmineJSONParser.CUSTOM_FIELD_PARSER));
 		return result;
 	}
@@ -519,7 +519,7 @@ public class RedmineJSONParser {
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
-		result.setDetails(JsonInput.getListOrEmpty(content, "details", JOURNAL_DETAIL_PARSER));
+		result.addDetails(JsonInput.getListOrEmpty(content, "details", JOURNAL_DETAIL_PARSER));
 		return result;
 	}
 	
@@ -538,7 +538,7 @@ public class RedmineJSONParser {
 		result.setRevision(JsonInput.getStringOrNull(content, "revision"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
 		result.setComments(JsonInput.getStringOrNull(content, "comments"));
-		result.setCommitedOn(getDateOrNull(content, "committed_on"));
+		result.setCommittedOn(getDateOrNull(content, "committed_on"));
 		return result;
 	}
 
@@ -558,9 +558,9 @@ public class RedmineJSONParser {
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
 			result.setFullName(name);
-		result.setMemberships(JsonInput.getListOrEmpty(content, "memberships",
+		result.addMemberships(JsonInput.getListOrEmpty(content, "memberships",
 				MEMBERSHIP_PARSER));
-		result.setGroups(JsonInput.getListOrEmpty(content, "groups",
+		result.addGroups(JsonInput.getListOrEmpty(content, "groups",
 				GROUP_PARSER));
 		/* Fix user for membership */
 		for (Membership m : result.getMemberships())
@@ -585,7 +585,7 @@ public class RedmineJSONParser {
 		    final Set<String> permSet = new HashSet<String>();
 		    for (int i = 0; i < perms.length(); i++)
 		        permSet.add(perms.getString(i));
-		    role.setPermissions(permSet);
+		    role.addPermissions(permSet);
 		}
 		return role;
 	}
@@ -596,7 +596,7 @@ public class RedmineJSONParser {
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
-		result.setRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
+		result.addRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
 		return result;
 	}
 	

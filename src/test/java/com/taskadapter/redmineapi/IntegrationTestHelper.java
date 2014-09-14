@@ -34,8 +34,7 @@ public class IntegrationTestHelper {
     public static RedmineManager createRedmineManager() {
         TestConfig testConfig = getTestConfig();
         logger.info("Running Redmine integration tests using: " + testConfig.getURI());
-        RedmineManager manager = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
-        return manager;
+        return RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
     }
 
     /**
