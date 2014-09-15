@@ -1,8 +1,9 @@
 package com.taskadapter.redmineapi.bean;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 
 /**
  * Redmine's project version
@@ -37,7 +38,8 @@ public class Version implements Identifiable {
     private String sharing;
     private Date createdOn;
     private Date updatedOn;
-    private List<CustomField> customFields = new ArrayList<CustomField>();
+
+    private final Collection<CustomField> customFields = new HashSet<CustomField>();
 
     /**
      * Use VersionFactory to create an instance of this class.
@@ -136,12 +138,12 @@ public class Version implements Identifiable {
         this.updatedOn = updatedOn;
     }
 
-    public List<CustomField> getCustomFields() {
-        return customFields;
+    public Collection<CustomField> getCustomFields() {
+        return Collections.unmodifiableCollection(customFields);
     }
 
-    public void setCustomFields(List<CustomField> customFields) {
-        this.customFields = customFields;
+    public void addCustomFields(Collection<CustomField> customFields) {
+        this.customFields.addAll(customFields);
     }
 
     /**

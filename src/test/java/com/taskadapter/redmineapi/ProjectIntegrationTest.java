@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -102,7 +103,7 @@ public class ProjectIntegrationTest {
             assertEquals(projectToCreate.getHomepage(),
                     createdProject.getHomepage());
 
-            List<Tracker> trackers = createdProject.getTrackers();
+            Collection<Tracker> trackers = createdProject.getTrackers();
             assertNotNull("checking that project has some trackers",
                     trackers);
             assertTrue("checking that project has some trackers",
@@ -138,7 +139,7 @@ public class ProjectIntegrationTest {
                     updatedProject.getIdentifier());
             assertEquals(newName, updatedProject.getName());
             assertEquals(newDescr, updatedProject.getDescription());
-            List<Tracker> trackers = updatedProject.getTrackers();
+            Collection<Tracker> trackers = updatedProject.getTrackers();
             assertNotNull("checking that project has some trackers",
                     trackers);
             assertTrue("checking that project has some trackers",

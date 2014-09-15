@@ -1,6 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -17,7 +19,8 @@ public class Journal {
     private String notes;
     private User user;
     private Date createdOn;
-    private List<JournalDetail> details = new ArrayList<JournalDetail>();
+
+    private final List<JournalDetail> details = new ArrayList<JournalDetail>();
 
     /**
      * Use JournalFactory to create instances of this class.
@@ -57,11 +60,11 @@ public class Journal {
     }
 
     public List<JournalDetail> getDetails() {
-        return details;
+        return Collections.unmodifiableList(details);
     }
 
-    public void setDetails(List<JournalDetail> details) {
-        this.details = details;
+    public void addDetails(Collection<JournalDetail> details) {
+        this.details.addAll(details);
     }
 
     @Override

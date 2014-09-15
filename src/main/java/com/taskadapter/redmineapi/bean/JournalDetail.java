@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * Redmine journal entry field. Actual set of fields depends on a redmine
- * responce and probably is not documented anywhere.
+ * response and probably is not documented anywhere.
  * 
  */
 public class JournalDetail implements Serializable {

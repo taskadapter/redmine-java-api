@@ -1,6 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
-import java.util.Set;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * User's role.
@@ -14,7 +16,8 @@ public class Role {
 
 	private String name;
 	private Boolean inherited;
-	private Set<String> permissions;
+
+	private final Collection<String> permissions = new HashSet<String>();
 
     /**
      * Use RoleFactory to create instances of this class.
@@ -47,12 +50,12 @@ public class Role {
 		this.inherited = inherited;
 	}
 	
-	public Set<String> getPermissions() {
-        return permissions;
+	public Collection<String> getPermissions() {
+        return Collections.unmodifiableCollection(permissions);
     }
 
-    public void setPermissions(Set<String> permissions) {
-        this.permissions = permissions;
+    public void addPermissions(Collection<String> permissions) {
+        this.permissions.addAll(permissions);
     }
 
     @Override

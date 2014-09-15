@@ -2,13 +2,11 @@ package com.taskadapter.redmineapi.bean;
 
 public class VersionFactory {
     public static Version create() {
-        Version version = new Version(null);
-        return version;
+        return new Version(null);
     }
 
     public static Version create(Integer id) {
-        Version version = new Version(id);
-        return version;
+        return new Version(id);
     }
 
     public static Version create(Project project, String versionName) {

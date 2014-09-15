@@ -1,7 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * User or group membership.
@@ -19,7 +20,8 @@ public class Membership implements Identifiable {
 	 * User. Not set for "group" membership.
 	 */
 	private User user;
-	private List<Role> roles = new ArrayList<Role>();
+
+	private final Collection<Role> roles = new HashSet<Role>();
 
     /**
      * Use MembershipFactory to create instances of this class.
@@ -53,12 +55,12 @@ public class Membership implements Identifiable {
 		this.user = user;
 	}
 
-	public List<Role> getRoles() {
-		return roles;
+	public Collection<Role> getRoles() {
+		return Collections.unmodifiableCollection(roles);
 	}
 
-	public void setRoles(List<Role> roles) {
-		this.roles = roles;
+	public void addRoles(Collection<Role> roles) {
+		this.roles.addAll(roles);
 	}
 
     @Override

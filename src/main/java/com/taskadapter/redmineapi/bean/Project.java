@@ -1,9 +1,10 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 
 /**
  * Redmine's Project.
@@ -35,16 +36,17 @@ public class Project implements Identifiable, Serializable {
     private Date updatedOn;
 
     /**
-     * Trackers available for this project
-     */
-    private List<Tracker> trackers;
-
-    /**
      * This is the *database ID*, not a String-based key.
      */
     private Integer parentId;
     private Boolean projectPublic;
-    private List<CustomField> customFields = new ArrayList<CustomField>();
+
+    private final Collection<CustomField> customFields = new HashSet<CustomField>();
+
+    /**
+     * Trackers available for this project
+     */
+    private final Collection<Tracker> trackers = new HashSet<Tracker>();
 
     Project(Integer id) {
         this.id = id;
@@ -92,14 +94,14 @@ public class Project implements Identifiable, Serializable {
     }
 
     /**
-     * @return list of Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
+     * @return Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
      */
-    public List<Tracker> getTrackers() {
-        return trackers;
+    public Collection<Tracker> getTrackers() {
+        return Collections.unmodifiableCollection(trackers);
     }
 
-    public void setTrackers(List<Tracker> trackers) {
-        this.trackers = trackers;
+    public void addTrackers(Collection<Tracker> trackers) {
+        this.trackers.addAll(trackers);
     }
 
     public Tracker getTrackerByName(String trackerName) {
@@ -175,12 +177,12 @@ public class Project implements Identifiable, Serializable {
         this.projectPublic = projectPublic;
     }
     
-    public List<CustomField> getCustomFields() {
+    public Collection<CustomField> getCustomFields() {
         return customFields;
     }
 
-    public void setCustomFields(List<CustomField> customFields) {
-        this.customFields = customFields;
+    public void addCustomFields(Collection<CustomField> customFields) {
+        this.customFields.addAll(customFields);
     }
 
     public CustomField getCustomFieldById(int customFieldId) {
