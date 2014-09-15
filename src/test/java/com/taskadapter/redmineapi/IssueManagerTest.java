@@ -1264,4 +1264,28 @@ public class IssueManagerTest {
         assertTrue(queries.size() > 0);
     }
 
+    @Test
+    public void statusIsUpdated() throws RedmineException {
+        Issue issue = createIssues(issueManager, projectKey, 1).get(0);
+        Issue retrievedIssue = issueManager.getIssueById(issue.getId());
+        Integer initialStatusId = retrievedIssue.getStatusId();
+
+        List<IssueStatus> statuses = issueManager.getStatuses();
+        // get some status ID that is not equal to the initial one
+        Integer newStatusId = null;
+        for (IssueStatus status : statuses) {
+            if (!status.getId().equals(initialStatusId)) {
+                newStatusId = status.getId();
+                break;
+            }
+        }
+        if (newStatusId == null) {
+            throw new RuntimeException("can't run this test: no Issue Statuses are available except for the initial one");
+        }
+        retrievedIssue.setStatusId(newStatusId);
+        issueManager.update(retrievedIssue);
+
+        Issue issueWithUpdatedStatus = issueManager.getIssueById(retrievedIssue.getId());
+        assertThat(issueWithUpdatedStatus.getStatusId()).isEqualTo(newStatusId);
+    }
 }
