@@ -264,6 +264,7 @@ public final class RedmineManagerFactory {
         try {
             return createShortTermConfig(createSystemDefaultConnectionManager());
         } catch (Exception e) {
+            e.printStackTrace();
             return createDefaultHttpClientConfig();
         }
     }
@@ -285,6 +286,7 @@ public final class RedmineManagerFactory {
             configureProxy(result);
             return result;
         } catch (Exception e) {
+            e.printStackTrace();
             return new DefaultHttpClient();
         }
     }
