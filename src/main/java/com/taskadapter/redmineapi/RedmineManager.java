@@ -26,6 +26,7 @@ public class RedmineManager {
     private final AttachmentManager attachmentManager;
     private final UserManager userManager;
     private final ProjectManager projectManager;
+    private final MembershipManager membershipManager;
 
     /**
      * Internal catch-all constructor.
@@ -39,6 +40,7 @@ public class RedmineManager {
         attachmentManager = new AttachmentManager(transport);
         userManager = new UserManager(transport);
         projectManager = new ProjectManager(transport);
+        membershipManager = new MembershipManager(transport);
         this.shutdownListener = shutdownListener;
     }
 
@@ -56,6 +58,10 @@ public class RedmineManager {
 
     public ProjectManager getProjectManager() {
         return projectManager;
+    }
+
+    public MembershipManager getMembershipManager() {
+        return membershipManager;
     }
 
     /**

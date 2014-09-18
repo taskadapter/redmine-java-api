@@ -1,8 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -140,57 +138,9 @@ public class UserManager {
     public Role getRoleById(int id) throws RedmineException {
         return transport.getObject(Role.class, id);
     }
-    public List<Membership> getMemberships(String project)
-            throws RedmineException {
-        return transport.getChildEntries(Project.class, project,
-                Membership.class);
-    }
-
-    public List<Membership> getMemberships(Project project)
-            throws RedmineException {
-        return getMemberships(getProjectKey(project));
-    }
-
-    /**
-     * Add a membership.
-     *
-     * @param membership
-     *            membership.
-     * @throws RedmineException
-     */
-    public void addMembership(Membership membership) throws RedmineException {
-        final Project project = membership.getProject();
-        if (project == null)
-            throw new IllegalArgumentException("Project must be set");
-        if (membership.getUser() == null)
-            throw new IllegalArgumentException("User must be set");
-        transport.addChildEntry(Project.class, getProjectKey(project),
-                membership);
-    }
-
-    private static String getProjectKey(Project project) {
-        return project.getId() != null ? project.getId().toString() : project
-                .getIdentifier();
-    }
-
-    public Membership getMembership(int id) throws RedmineException {
-        return transport.getObject(Membership.class, id);
-    }
-
-    public void deleteMembership(int id) throws RedmineException {
-        transport.deleteObject(Membership.class, Integer.toString(id));
-    }
-
-    public void delete(Membership membership) throws RedmineException {
-        transport.deleteObject(Membership.class, membership.getId().toString());
-    }
 
     public void update(User obj) throws RedmineException {
         transport.updateObject(obj);
-    }
-
-    public void update(Membership membership) throws RedmineException {
-        transport.updateObject(membership);
     }
 
     public void update(Group group) throws RedmineException {

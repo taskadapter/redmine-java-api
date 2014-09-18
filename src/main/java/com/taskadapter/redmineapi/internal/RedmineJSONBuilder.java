@@ -349,9 +349,12 @@ public class RedmineJSONBuilder {
 
 	public static void writeMembership(JSONWriter writer, Membership membership)
 			throws JSONException {
-		if (membership.getUser() != null)
-			JsonOutput.addIfNotNull(writer, "user_id", membership.getUser()
-					.getId());
+		if (membership.getUser() != null) {
+            JsonOutput.addIfNotNull(writer, "user_id", membership.getUser().getId());
+        }
+        if (membership.getGroup() != null) {
+            JsonOutput.addIfNotNull(writer, "group_id", membership.getGroup().getId());
+        }
 		if (membership.getRoles() != null) {
 			writer.key("role_ids");
 			writer.array();
