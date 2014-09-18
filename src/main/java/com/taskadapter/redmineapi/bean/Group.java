@@ -29,7 +29,10 @@ public class Group implements Identifiable {
 
     @Override
     public String toString() {
-        return getName();
+        return "Group{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     @Override

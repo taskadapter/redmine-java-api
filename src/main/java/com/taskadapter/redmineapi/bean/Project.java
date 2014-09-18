@@ -114,7 +114,11 @@ public class Project implements Identifiable, Serializable {
 
     @Override
     public String toString() {
-        return name;
+        return "Project{" +
+                "id=" + id +
+                ", identifier='" + identifier + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     public String getDescription() {

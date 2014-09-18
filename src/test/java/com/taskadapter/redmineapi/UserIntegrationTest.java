@@ -1,29 +1,23 @@
 package com.taskadapter.redmineapi;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.GroupFactory;
-import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.taskadapter.redmineapi.bean.User;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class UserIntegrationTest {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
@@ -288,60 +282,6 @@ public class UserIntegrationTest {
         } catch (NotFoundException e) {
             // OK!
         }
-    }
-
-    @Test
-    public void testMemberships() throws RedmineException {
-        final List<Role> roles = mgr.getUserManager().getRoles();
-
-        final Membership newMembership = MembershipFactory.create();
-        final Project project = ProjectFactory.create();
-        project.setIdentifier(projectKey);
-        newMembership.setProject(project);
-        final User currentUser = mgr.getUserManager().getCurrentUser();
-        newMembership.setUser(currentUser);
-        newMembership.addRoles(roles);
-
-        userManager.addMembership(newMembership);
-        final List<Membership> memberships1 = userManager.getMemberships(project);
-        assertEquals(1, memberships1.size());
-        final Membership createdMembership = memberships1.get(0);
-        assertEquals(currentUser.getId(), createdMembership.getUser()
-                .getId());
-        assertEquals(roles.size(), createdMembership.getRoles().size());
-
-        final Membership membershipById = userManager.getMembership(createdMembership
-                .getId());
-        assertEquals(createdMembership, membershipById);
-
-        final Membership emptyMembership = MembershipFactory.create(createdMembership.getId());
-        emptyMembership.setProject(createdMembership.getProject());
-        emptyMembership.setUser(createdMembership.getUser());
-        emptyMembership.addRoles(Collections.singletonList(roles.get(0)));
-
-        userManager.update(emptyMembership);
-        final Membership updatedEmptyMembership = userManager.getMembership(createdMembership.getId());
-
-        assertEquals(1, updatedEmptyMembership.getRoles().size());
-        userManager.delete(updatedEmptyMembership);
-    }
-
-    @Test
-    public void testUserMemberships() throws RedmineException {
-        final List<Role> roles = userManager.getRoles();
-        final Membership newMembership = MembershipFactory.create();
-
-        final Project project = ProjectFactory.create();
-        project.setIdentifier(projectKey);
-        newMembership.setProject(project);
-        final User currentUser = userManager.getCurrentUser();
-        newMembership.setUser(currentUser);
-        newMembership.addRoles(roles);
-
-        userManager.addMembership(newMembership);
-
-        final User userWithMembership = userManager.getUserById(currentUser.getId());
-        assertTrue(userWithMembership.getMemberships().size() > 0);
     }
 
     @Test

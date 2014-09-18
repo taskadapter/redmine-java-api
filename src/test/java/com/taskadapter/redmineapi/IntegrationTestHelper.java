@@ -54,6 +54,15 @@ public class IntegrationTestHelper {
         return projectKey;
     }
 
+    public static Project createAndReturnProject(ProjectManager mgr) {
+        Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
+        try {
+            return mgr.createProject(testProject);
+        } catch (Exception e) {
+            logger.error("Exception while configuring tests", e);
+            throw new RuntimeException(e);
+        }
+    }
     /**
      * Delete the project if it exists. this method ignores NULL or empty projectKey parameter.
      */

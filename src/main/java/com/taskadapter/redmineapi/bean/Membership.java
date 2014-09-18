@@ -21,6 +21,8 @@ public class Membership implements Identifiable {
 	 */
 	private User user;
 
+    private Group group;
+
 	private final Collection<Role> roles = new HashSet<Role>();
 
     /**
@@ -55,7 +57,15 @@ public class Membership implements Identifiable {
 		this.user = user;
 	}
 
-	public Collection<Role> getRoles() {
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public Collection<Role> getRoles() {
 		return Collections.unmodifiableCollection(roles);
 	}
 
