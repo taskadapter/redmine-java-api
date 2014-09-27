@@ -41,8 +41,8 @@ import org.json.JSONException;
  * 
  */
 public class RedmineJSONParserTest {
-	private static final String FILE_EMPTY_ISSUES = "issues_empty_list.json";
-	private static final String REDMINE_ISSUES = "redmine_issues.json";
+	private static final String FILE_EMPTY_ISSUES = "issue/issues_empty_list.json";
+	private static final String REDMINE_ISSUES = "issue/redmine_issues.json";
 
 	@Test
 	public void testParseProject1() throws ParseException, JSONException {
@@ -108,7 +108,7 @@ public class RedmineJSONParserTest {
 		/* Check parser correctness */
 		try {
 			String json = MyIOUtils
-					.getResourceAsString("mailformed_redmine_project.json");
+					.getResourceAsString("project/mailformed_redmine_project.json");
 			RedmineJSONParser.parseProject(RedmineJSONParser
 					.getResponseSingleObject(json, "project"));
 		} catch (JSONException e) {
@@ -118,7 +118,7 @@ public class RedmineJSONParserTest {
 
 	@Test
 	public void testParseProjectRedmine() throws IOException, JSONException {
-		String json = MyIOUtils.getResourceAsString("redmine_project.json");
+		String json = MyIOUtils.getResourceAsString("project/redmine_project.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
 				.getResponseSingleObject(json, "project"));
 		Integer expectedProjectID = 23;
@@ -141,7 +141,7 @@ public class RedmineJSONParserTest {
 
     @Test
     public void testProjectWithCustomField() throws IOException, JSONException {
-        String json = MyIOUtils.getResourceAsString("redmine_projectWithCustomField.json");
+        String json = MyIOUtils.getResourceAsString("project/redmine_projectWithCustomField.json");
         Project project = RedmineJSONParser.parseProject(RedmineJSONParser
                 .getResponseSingleObject(json, "project"));
 
@@ -154,7 +154,7 @@ public class RedmineJSONParserTest {
 	@Test
 	public void testParseProjectNoTracker() throws IOException, JSONException {
 		String json = MyIOUtils
-				.getResourceAsString("redmine_project_no_trackers.json");
+				.getResourceAsString("project/redmine_project_no_trackers.json");
 		Project project = RedmineJSONParser.parseProject(RedmineJSONParser
 				.getResponseSingleObject(json, "project"));
 		Collection<Tracker> trackers = project.getTrackers();
@@ -181,7 +181,7 @@ public class RedmineJSONParserTest {
 	public void testParseIssueNonUnicodeSymbols() throws IOException,
 			JSONException {
 		String json = MyIOUtils
-				.getResourceAsString("issues_foreign_symbols.json");
+				.getResourceAsString("issue/issues_foreign_symbols.json");
 		String nonLatinAccentSymbols = "Accent symbols: Ação";
 		String nonLatinRussianSymbols = "Russian symbols: Привет";
 		List<Issue> issues = JsonInput.getListOrEmpty(
@@ -297,7 +297,7 @@ public class RedmineJSONParserTest {
 	public void testMultilineIssueDescription() throws IOException,
 			JSONException {
 		final String json = MyIOUtils
-				.getResourceAsString("issue_with_multiline_description.json");
+				.getResourceAsString("issue/issue_with_multiline_description.json");
 		final Issue issue = RedmineJSONParser.parseIssue(RedmineJSONParser
 				.getResponseSingleObject(json, "issue"));
 		Assert.assertEquals(
@@ -331,7 +331,7 @@ public class RedmineJSONParserTest {
 	public void nullEstimatedTimeProcessedCorrectlyWithRedmine122() {
 		try {
 			String str = MyIOUtils
-					.getResourceAsString("redmine_1.2.2_dev_issues.json");
+					.getResourceAsString("issue/redmine_1.2.2_dev_issues.json");
 			List<Issue> issues = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "issues",
 					RedmineJSONParser.ISSUE_PARSER);
@@ -371,7 +371,7 @@ public class RedmineJSONParserTest {
 		// "news" xml with no items in the list should not break the loader.
 		try {
 			String str = MyIOUtils
-					.getResourceAsString("redmine_news_empty.json");
+					.getResourceAsString("news/redmine_news_empty.json");
 			List<News> news = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "news",
 					RedmineJSONParser.NEWS_PARSER);
@@ -386,7 +386,7 @@ public class RedmineJSONParserTest {
 		// "news" xml with no items in the list should not break the loader.
 		try {
 			String str = MyIOUtils
-					.getResourceAsString("redmine_news_2_items.json");
+					.getResourceAsString("news/redmine_news_2_items.json");
 			List<News> news = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "news",
 					RedmineJSONParser.NEWS_PARSER);
