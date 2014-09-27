@@ -27,6 +27,7 @@ public class RedmineManager {
     private final UserManager userManager;
     private final ProjectManager projectManager;
     private final MembershipManager membershipManager;
+    private final WikiManager wikiManager;
 
     /**
      * Internal catch-all constructor.
@@ -41,7 +42,12 @@ public class RedmineManager {
         userManager = new UserManager(transport);
         projectManager = new ProjectManager(transport);
         membershipManager = new MembershipManager(transport);
+        wikiManager = new WikiManager(transport);
         this.shutdownListener = shutdownListener;
+    }
+
+    public WikiManager getWikiManager() {
+        return wikiManager;
     }
 
     public IssueManager getIssueManager() {

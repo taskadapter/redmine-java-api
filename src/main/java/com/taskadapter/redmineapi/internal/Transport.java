@@ -1,34 +1,5 @@
 package com.taskadapter.redmineapi.internal;
 
-import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.http.HttpEntityEnclosingRequest;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.AbstractHttpEntity;
-import org.apache.http.entity.InputStreamEntity;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
 import com.taskadapter.redmineapi.RedmineException;
@@ -53,6 +24,8 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.WikiPage;
+import com.taskadapter.redmineapi.bean.WikiPageDetail;
 import com.taskadapter.redmineapi.internal.comm.BaseCommunicator;
 import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.Communicator;
@@ -64,6 +37,34 @@ import com.taskadapter.redmineapi.internal.comm.redmine.RedmineErrorHandler;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
+import org.apache.http.HttpEntityEnclosingRequest;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.InputStreamEntity;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<Class<?>, EntityConfig<?>>();
@@ -75,7 +76,7 @@ public final class Transport {
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
 
-  static {
+    static {
 		OBJECT_CONFIGS.put(
 				Project.class,
 				config("project", "projects",
@@ -147,7 +148,17 @@ public final class Transport {
                 Watcher.class,
                 config("watcher", "watchers", null,
                         RedmineJSONParser.WATCHER_PARSER));
-	}
+
+        OBJECT_CONFIGS.put(
+                WikiPage.class,
+                config("wiki_page", "wiki_pages", null, RedmineJSONParser.WIKI_PAGE_PARSER)
+        );
+
+        OBJECT_CONFIGS.put(
+                WikiPageDetail.class,
+                config("wiki_page", null, null, RedmineJSONParser.WIKI_PAGE_DETAIL_PARSER)
+        );
+    }
 
 	private final URIConfigurator configurator;
 	private String login;
@@ -194,8 +205,10 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(object.getClass());
 		URI uri = getURIConfigurator().getObjectsURI(object.getClass(), params);
 		HttpPost httpPost = new HttpPost(uri);
-		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
-				object, config.writer);
+        if (config.writer == null) {
+            throw new RuntimeException("can't create object: writer is not implemented or is not registered in RedmineJSONBuilder for object " + object);
+        }
+		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName, object, config.writer);
 		setEntity(httpPost, body);
 		String response = getCommunicator().sendRequest(httpPost);
 		logger.debug(response);
@@ -469,7 +482,20 @@ public final class Transport {
 		}
 	}
 
-	/**
+    /**
+     * Delivers a single child entry by its identifier.
+     */
+    public <T> T getChildEntry(Class<?> parentClass, String parentId,
+                               Class<T> classs, String childId, NameValuePair... params) throws RedmineException {
+        final EntityConfig<T> config = getConfig(classs);
+        final URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, classs, childId, params);
+        HttpGet http = new HttpGet(uri);
+        String response = getCommunicator().sendRequest(http);
+
+        return parseResponse(response, config.singleObjectName, config.parser);
+    }
+
+    /**
 	 * This number of objects (tasks, projects, users) will be requested from
 	 * Redmine server in 1 request.
 	 */
@@ -529,11 +555,11 @@ public final class Transport {
 		}
 	}
 
-	private void setEntity(HttpEntityEnclosingRequest request, String body) {
+	private static void setEntity(HttpEntityEnclosingRequest request, String body) {
 		setEntity(request, body, CONTENT_TYPE);
 	}
 
-	private void setEntity(HttpEntityEnclosingRequest request, String body, String contentType) {
+	private static void setEntity(HttpEntityEnclosingRequest request, String body, String contentType) {
 		StringEntity entity;
 		try {
 			entity = new StringEntity(body, CHARSET);
