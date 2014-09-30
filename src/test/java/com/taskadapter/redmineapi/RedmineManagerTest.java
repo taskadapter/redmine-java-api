@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
  * Integration tests for RedmineManager.
@@ -14,13 +14,12 @@ public class RedmineManagerTest {
 
     @Test
     public void unknownHostGivesException() throws RedmineException, IOException {
-        final RedmineManager mgr1 = RedmineManagerFactory.createUnauthenticated("http://The.unknown.host");
+        final RedmineManager mgr1 = RedmineManagerFactory.createUnauthenticated("http://someunknownhost.com");
         try {
             mgr1.getProjectManager().getProjects();
         } catch (RedmineTransportException e1) {
-            assertTrue(e1.getMessage().startsWith(
-                    "Cannot fetch data from http://The.unknown.host/"));
-            assertTrue(e1.getCause() instanceof UnknownHostException);
+            assertThat(e1.getMessage()).startsWith("Cannot fetch data from http://someunknownhost.com");
+            assertThat(e1.getCause()).isInstanceOf(UnknownHostException.class);
         }
     }
 }
