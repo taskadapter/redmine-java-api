@@ -117,7 +117,7 @@ public class RedmineJSONBuilder {
 		}
 	};
 
-	/**
+    /**
 	 * Writes a "create project" request.
 	 * 
 	 * @param writer
@@ -273,8 +273,8 @@ public class RedmineJSONBuilder {
 		writeCustomFields(writer, user.getCustomFields());
 
 	}
-	
-	public static void writeGroup(Group group, final JSONWriter writer)
+
+    public static void writeGroup(Group group, final JSONWriter writer)
 			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", group.getId());
 		JsonOutput.addIfNotNull(writer, "name", group.getName());

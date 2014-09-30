@@ -28,6 +28,9 @@ import com.taskadapter.redmineapi.bean.TrackerFactory;
 import com.taskadapter.redmineapi.bean.UserFactory;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.WatcherFactory;
+import com.taskadapter.redmineapi.bean.WikiPage;
+import com.taskadapter.redmineapi.bean.WikiPageDetail;
+import com.taskadapter.redmineapi.bean.WikiPageFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -240,7 +243,21 @@ public class RedmineJSONParser {
             return parseTimeEntryActivity(input);
         }
     };
-    
+
+    public static final JsonObjectParser<WikiPage> WIKI_PAGE_PARSER = new JsonObjectParser<WikiPage>() {
+        @Override
+        public WikiPage parse(JSONObject input) throws JSONException {
+            return parseWikiPage(input);
+        }
+    };
+
+    public static final JsonObjectParser<WikiPageDetail> WIKI_PAGE_DETAIL_PARSER = new JsonObjectParser<WikiPageDetail>() {
+        @Override
+        public WikiPageDetail parse(JSONObject input) throws JSONException {
+            return parseWikiPageDetail(input);
+        }
+    };
+
 	/**
 	 * Parses a tracker.
 	 * 
@@ -621,6 +638,29 @@ public class RedmineJSONParser {
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}
+
+    public static WikiPage parseWikiPage(JSONObject object) throws JSONException {
+        WikiPage wikiPage = WikiPageFactory.create(JsonInput.getStringNotNull(object, "title"));
+        wikiPage.setVersion(JsonInput.getIntOrNull(object, "version"));
+        wikiPage.setCreatedOn(getDateOrNull(object, "created_on"));
+        wikiPage.setUpdatedOn(getDateOrNull(object, "updated_on"));
+        return wikiPage;
+    }
+
+    public static WikiPageDetail parseWikiPageDetail(JSONObject object) throws JSONException {
+        WikiPageDetail wikiPage = new WikiPageDetail();
+
+        wikiPage.setTitle(JsonInput.getStringOrEmpty(object, "title"));
+        wikiPage.setText(JsonInput.getStringOrEmpty(object, "text"));
+        wikiPage.setParent(JsonInput.getObjectOrNull(object, "parent", WIKI_PAGE_DETAIL_PARSER));
+        wikiPage.setUser(JsonInput.getObjectOrNull(object, "author", USER_PARSER));
+        wikiPage.setVersion(JsonInput.getIntOrNull(object, "version"));
+        wikiPage.setCreatedOn(getDateOrNull(object, "created_on"));
+        wikiPage.setUpdatedOn(getDateOrNull(object, "updated_on"));
+        wikiPage.setAttachments(JsonInput.getListOrNull(object, "attachments", ATTACHMENT_PARSER));
+
+        return wikiPage;
+    }
     
 	/**
 	 * @param responseBody

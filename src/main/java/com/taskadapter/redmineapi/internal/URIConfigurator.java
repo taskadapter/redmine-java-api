@@ -1,11 +1,30 @@
 package com.taskadapter.redmineapi.internal;
 
-import com.taskadapter.redmineapi.bean.*;
+import com.taskadapter.redmineapi.RedmineInternalError;
+import com.taskadapter.redmineapi.bean.Attachment;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssuePriority;
+import com.taskadapter.redmineapi.bean.IssueRelation;
+import com.taskadapter.redmineapi.bean.IssueStatus;
+import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.SavedQuery;
+import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
+import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.WikiPage;
+import com.taskadapter.redmineapi.bean.WikiPageDetail;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
-import com.taskadapter.redmineapi.RedmineInternalError;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -42,6 +61,8 @@ public class URIConfigurator {
 		urls.put(IssuePriority.class, "enumerations/issue_priorities");
         urls.put(TimeEntryActivity.class, "enumerations/time_entry_activities");
 		urls.put(Watcher.class, "watchers");
+        urls.put(WikiPage.class, "wiki/index");
+        urls.put(WikiPageDetail.class, "wiki");
 	}
 
 	private final URL baseURL;
@@ -104,13 +125,18 @@ public class URIConfigurator {
 				args);
 	}
 
-	public URI getChildIdURI(Class<?> parent, String parentId,
-                Class<?> child, int value) {
-            final String base = getConfig(parent);
-            final String detal = getConfig(child);
-            return createURI(base + "/" + parentId + "/" + detal +
-                    "/" + value + URL_POSTFIX );
-	}
+    public URI getChildIdURI(Class<?> parent, String parentId,
+                             Class<?> child, int value, NameValuePair... params) {
+        return this.getChildIdURI(parent, parentId, child, String.valueOf(value), params);
+    }
+
+    public URI getChildIdURI(Class<?> parent, String parentId,
+                             Class<?> child, String value, NameValuePair... params) {
+        final String base = getConfig(parent);
+        final String detal = getConfig(child);
+        return createURI(base + "/" + parentId + "/" + detal +
+                "/" + value + URL_POSTFIX, params);
+    }
 
 	public URI getObjectsURI(Class<?> child, NameValuePair... args) {
 		final String detal = getConfig(child);
