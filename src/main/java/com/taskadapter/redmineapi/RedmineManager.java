@@ -29,12 +29,6 @@ public class RedmineManager {
     private final MembershipManager membershipManager;
     private final WikiManager wikiManager;
 
-    /**
-     * Internal catch-all constructor.
-     *
-     * @param transport        target transport.
-     * @param shutdownListener shutdown listener.
-     */
     RedmineManager(Transport transport, Runnable shutdownListener) {
         this.transport = transport;
         issueManager = new IssueManager(transport);

@@ -95,11 +95,9 @@ public class IssueManager {
 
     /**
      * Sample usage:
-     * <p/>
-     * <p/>
      * <pre>
      * {@code
-     *   Issue issueToCreate = new Issue();
+     *   Issue issueToCreate = IssueFactory.create();
      *   issueToCreate.setSubject("This is the summary line 123");
      *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
      * }
@@ -183,10 +181,10 @@ public class IssueManager {
     /**
      * Delete relations for the given issue ID.
      *
-     * @param id issue ID
+     * @param issueId issue ID
      */
-    public void deleteIssueRelationsByIssueId(Integer id) throws RedmineException {
-        Issue issue = getIssueById(id, Include.relations);
+    public void deleteIssueRelationsByIssueId(Integer issueId) throws RedmineException {
+        Issue issue = getIssueById(issueId, Include.relations);
         deleteIssueRelations(issue);
     }
 

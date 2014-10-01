@@ -35,7 +35,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
@@ -264,8 +263,6 @@ public class RedmineJSONParser {
 	 * @param object
 	 *            object to parse.
 	 * @return parsed tracker.
-	 * @throws RedmineFormatException
-	 *             if object is not a valid tracker.
 	 */
 	public static Tracker parseTracker(JSONObject object) throws JSONException {
 		final int id = JsonInput.getInt(object, "id");
@@ -279,8 +276,6 @@ public class RedmineJSONParser {
 	 * @param object
 	 *            object to parse.
 	 * @return parsed tracker.
-	 * @throws RedmineFormatException
-	 *             if object is not a valid tracker.
 	 */
 	public static IssueStatus parseStatus(JSONObject object)
 			throws JSONException {
@@ -662,11 +657,7 @@ public class RedmineJSONParser {
         return wikiPage;
     }
     
-	/**
-	 * @param responseBody
-	 */
-	public static List<String> parseErrors(String responseBody)
-			throws JSONException {
+	public static List<String> parseErrors(String responseBody) throws JSONException {
 		final JSONObject body = getResponse(responseBody);
 		final JSONArray errorsList = JsonInput.getArrayNotNull(body, "errors");
 		final List<String> result = new ArrayList<String>(errorsList.length());
@@ -683,14 +674,12 @@ public class RedmineJSONParser {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws RedmineFormatException
-	 *             if value is not valid
 	 */
-	private static Date getDateOrNull(JSONObject obj, String field)
-			throws JSONException {
+	private static Date getDateOrNull(JSONObject obj, String field) throws JSONException {
 		String dateStr = JsonInput.getStringOrNull(obj, field);
-		if (dateStr == null)
-			return null;
+		if (dateStr == null) {
+            return null;
+        }
 		try {
 			if (dateStr.length() >= 5 && dateStr.charAt(4) == '/') {
 				return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(dateStr);
@@ -720,11 +709,8 @@ public class RedmineJSONParser {
 	 *            object to get a field from.
 	 * @param field
 	 *            field to get a value from.
-	 * @throws RedmineFormatException
-	 *             if value is not valid
 	 */
-	private static Date getShortDateOrNull(JSONObject obj, String field)
-			throws JSONException {
+	private static Date getShortDateOrNull(JSONObject obj, String field) throws JSONException {
         final String dateStr = JsonInput.getStringOrNull(obj, field);
         if (dateStr == null) {
             return null;
@@ -742,10 +728,9 @@ public class RedmineJSONParser {
         }
 	}
 
-	public static JSONObject getResponseSingleObject(String body, String key)
-			throws JSONException {
+	public static JSONObject getResponseSingleObject(String body, String key) throws JSONException {
 		final JSONObject bodyJson = new JSONObject(body);
-    return JsonInput.getObjectNotNull(bodyJson, key);
+        return JsonInput.getObjectNotNull(bodyJson, key);
 	}
 
 	public static JSONObject getResponse(String body) throws JSONException {

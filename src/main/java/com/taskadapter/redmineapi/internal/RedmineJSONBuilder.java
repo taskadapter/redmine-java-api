@@ -28,7 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Builder for requests to Redmine in JSON format.
+ * Converts Redmine objects to JSon format.
  */
 public class RedmineJSONBuilder {
 
