@@ -10,6 +10,11 @@ import java.util.Set;
  * Redmine's User.
  */
 public class User implements Identifiable {
+
+    public static final Integer STATUS_LOCK = 3;
+
+    public static final Integer STATUS_ACTIVE = 1;
+
     /**
      * database ID.
      */
@@ -24,6 +29,7 @@ public class User implements Identifiable {
     private Date lastLoginOn;
     private String apiKey;
     private Integer authSourceId;
+    private Integer status;
     // TODO add tests
     private final Set<CustomField> customFields = new HashSet<CustomField>();
 	private final Set<Membership> memberships = new HashSet<Membership>();
@@ -40,6 +46,7 @@ public class User implements Identifiable {
         this.id = id;
     }
 
+    @Override
     public Integer getId() {
         return id;
     }
@@ -231,4 +238,12 @@ public class User implements Identifiable {
 	public void addGroups(Collection<Group> groups) {
 	   this.groups.addAll(groups);
 	}
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
 }
