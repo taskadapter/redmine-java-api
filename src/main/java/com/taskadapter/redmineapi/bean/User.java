@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class User implements Identifiable {
 
-    public static final Integer STATUS_LOCK = 3;
+    public static final Integer STATUS_LOCKED = 3;
 
     public static final Integer STATUS_ACTIVE = 1;
 
@@ -239,10 +239,24 @@ public class User implements Identifiable {
 	   this.groups.addAll(groups);
 	}
 
+    /**
+     * Returns the user status. As defined in Redmine:
+     * <ul>
+     *   <li>1: status active ({@link #STATUS_ACTIVE})</li>
+     *   <li>3: status locked ({@link #STATUS_LOCKED})</li>
+     * </ul>
+     * 
+     * @return User status
+     */
     public Integer getStatus() {
         return status;
     }
 
+    /**
+     * Sets the user status.
+     * 
+     * @param status must be one of {@link #STATUS_ACTIVE} or {@link #STATUS_LOCKED}
+     */
     public void setStatus(Integer status) {
         this.status = status;
     }

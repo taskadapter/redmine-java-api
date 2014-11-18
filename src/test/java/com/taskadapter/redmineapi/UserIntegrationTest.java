@@ -338,11 +338,11 @@ public class UserIntegrationTest {
     @Test
     public void testLockUser() throws RedmineException {
         User user = userManager.getUserById(nonAdminUserId);
-        user.setStatus(User.STATUS_LOCK);
+        user.setStatus(User.STATUS_LOCKED);
         userManager.update(user);
 
         user = userManager.getUserById(nonAdminUserId);
-        Assert.assertEquals(User.STATUS_LOCK, user.getStatus());
+        Assert.assertEquals(User.STATUS_LOCKED, user.getStatus());
 
         user.setStatus(User.STATUS_ACTIVE);
         userManager.update(user);
