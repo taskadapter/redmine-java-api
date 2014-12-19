@@ -75,6 +75,7 @@ public final class Transport {
 	private final SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
+        private String impersonateUser = null;
 
     static {
 		OBJECT_CONFIGS.put(
@@ -254,7 +255,10 @@ public final class Transport {
 		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
 				Integer.toString(obj.getId()));
 		final HttpPut http = new HttpPut(uri);
-
+                if (getImpersonateUser() != null) {
+                   http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
+  
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
 		setEntity(http, body);
@@ -602,6 +606,19 @@ public final class Transport {
 	public void setLogin(String login) {
 		setCredentials(login, password);
 	}
+        /**
+         * @return the impersonateUser
+         */
+        public String getImpersonateUser() {
+           return impersonateUser;
+        }
+
+        /**
+        * @param impersonateUser the impersonateUser to set
+        */
+        public void setImpersonateUser(String impersonateUser) {
+           this.impersonateUser = impersonateUser;
+        }
 
 	/**
 	 * Entity config.
