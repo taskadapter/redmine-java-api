@@ -293,9 +293,20 @@ public class RedmineJSONBuilder {
 					.getAssignee().getId());
 		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
 		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
-		if (issue.getProject() != null)
+		if (issue.getProject() != null) {
+                    // Checked in Redmine 2.6.0: updating issues based on 
+                    // identifier fails and only using the project id works.
+                    // As the identifier usage is used in several places, this
+                    // case selection is introduced. The identifier is
+                    // used, if no real ID is provided
+                    if(issue.getProject().getId() != null) {
 			JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-					.getIdentifier());
+					.getId());
+                    } else {
+                        JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
+                                .getIdentifier());
+                    }
+                }
 		if (issue.getAuthor() != null)
 			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
 					.getId());
