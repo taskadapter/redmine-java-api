@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi.internal;
 
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.bean.Attachment;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -63,6 +64,7 @@ public class URIConfigurator {
 		urls.put(Watcher.class, "watchers");
         urls.put(WikiPage.class, "wiki/index");
         urls.put(WikiPageDetail.class, "wiki");
+                urls.put(CustomFieldDefinition.class, "custom_fields");
 	}
 
 	private final URL baseURL;

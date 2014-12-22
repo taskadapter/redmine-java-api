@@ -1,0 +1,68 @@
+{
+    "custom_fields": [{
+            "id": 1,
+            "name": "my_custom_1",
+            "customized_type": "issue",
+            "field_format": "string",
+            "regexp": "some.*",
+            "min_length": 5,
+            "max_length": 80,
+            "is_filter": true,
+            "searchable": true,
+            "default_value": "",
+            "visible": true,
+            "trackers": [{
+                    "id": 1,
+                    "name": "Bug"
+                }, {
+                    "id": 2,
+                    "name": "Feature"
+                }, {
+                    "id": 3,
+                    "name": "Support"
+                }],
+            "roles": []
+        }, {
+            "id": 2,
+            "name": "custom_boolean_1",
+            "customized_type": "issue",
+            "field_format": "bool",
+            "regexp": "",
+            "default_value": "",
+            "visible": true,
+            "possible_values": [{
+                    "value": "1"
+                }, {
+                    "value": "0"
+                }],
+            "trackers": [{
+                    "id": 1,
+                    "name": "Bug"
+                }, {
+                    "id": 2,
+                    "name": "Feature"
+                }, {
+                    "id": 3,
+                    "name": "Support"
+                }],
+            "roles": []
+        }, {
+            "id": 3,
+            "name": "Test",
+            "customized_type": "issue",
+            "field_format": "bool",
+            "regexp": "",
+            "default_value": "1",
+            "is_required":true,
+            "possible_values": [{
+                    "value": "1"
+                }, {
+                    "value": "0"
+                }],
+            "trackers": [],
+            "roles": [{
+                    "id": 4,
+                    "name": "Developer"
+                }]
+        }]
+}
