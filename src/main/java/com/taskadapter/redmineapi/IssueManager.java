@@ -101,6 +101,7 @@ public class IssueManager {
      *   issueToCreate.setSubject("This is the summary line 123");
      *   Issue newIssue = mgr.createIssue(PROJECT_KEY, issueToCreate);
      * }
+     * </pre>
      *
      * @param projectKey The project "identifier". This is a string key like "project-ABC", NOT a database numeric ID.
      * @param issue      the Issue object to create on the server.
@@ -131,7 +132,7 @@ public class IssueManager {
      * @param projectKey ignored if NULL
      * @param queryId    id of the saved query in Redmine. the query must be accessible to the user
      *                   represented by the API access key (if the Redmine project requires authorization).
-     *                   This parameter is <b>optional<b>, NULL can be provided to get all available issues.
+     *                   This parameter is <b>optional</b>, NULL can be provided to get all available issues.
      * @return list of Issue objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -252,7 +253,7 @@ public class IssueManager {
     }
 
     /**
-     * creates a new {@link IssueCategory} for the {@link Project} contained. <br/>
+     * creates a new {@link IssueCategory} for the {@link Project} contained. <br>
      * Pre-condition: the attribute {@link Project} for the {@link IssueCategory} must
      * not be null!
      *
@@ -275,7 +276,7 @@ public class IssueManager {
     }
 
     /**
-     * deletes an {@link IssueCategory}. <br/>
+     * deletes an {@link IssueCategory}. <br>
      *
      * @param category the {@link IssueCategory}.
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
@@ -311,8 +312,8 @@ public class IssueManager {
 
     /**
      * Get "saved queries" for the given project available to the current user.
-     * <p/>
-     * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
+     *
+     * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737</p>
      */
     public List<SavedQuery> getSavedQueries(String projectKey) throws RedmineException {
         Set<NameValuePair> params = new HashSet<NameValuePair>();
@@ -326,8 +327,8 @@ public class IssueManager {
 
     /**
      * Get all "saved queries" available to the current user.
-     * <p/>
-     * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737
+     * 
+     * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737</p>
      */
     public List<SavedQuery> getSavedQueries() throws RedmineException {
         return transport.getObjectsList(SavedQuery.class);
