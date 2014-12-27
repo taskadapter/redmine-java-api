@@ -17,6 +17,13 @@ public class CustomFieldManager {
         this.transport = transport;
     }
 
+    /**
+     * Fetch custom field definitions from server.
+     * 
+     * @throws com.taskadapter.redmineapi.RedmineException
+     * @since Redmine 2.4
+     * @return List of custom field definitions
+     */
     public List<CustomFieldDefinition> getCustomFieldDefinitions()
             throws RedmineException {
         return transport.getObjectsList(CustomFieldDefinition.class);
