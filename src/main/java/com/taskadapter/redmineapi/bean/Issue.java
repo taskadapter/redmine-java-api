@@ -333,7 +333,7 @@ public class Issue implements Identifiable {
      *
      * @return relations or EMPTY collection if no relations, never returns NULL
      *
-     * @see com.taskadapter.redmineapi.RedmineManager#getIssueById(Integer id, INCLUDE... include)
+     * @see com.taskadapter.redmineapi.IssueManager#getIssueById(Integer id, Include... include)
      */
     public Collection<IssueRelation> getRelations() {
         return Collections.unmodifiableCollection(relations);

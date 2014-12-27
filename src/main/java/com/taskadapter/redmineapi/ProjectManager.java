@@ -20,7 +20,7 @@ public class ProjectManager {
 
     /**
      * Sample usage:
-     * <p/>
+     * 
      * <pre>
      * {@code
      * 	Project project = new Project();
@@ -95,7 +95,7 @@ public class ProjectManager {
     }
 
     /**
-     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br/>
+     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br>
      * Pre-condition: the attribute {@link Project} for the {@link com.taskadapter.redmineapi.bean.Version} must
      * not be null!
      *
@@ -118,7 +118,7 @@ public class ProjectManager {
     }
 
     /**
-     * deletes a new {@link Version} from the {@link Project} contained. <br/>
+     * deletes a new {@link Version} from the {@link Project} contained. <br>
      *
      * @param version the {@link Version}.
      * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login

@@ -27,7 +27,7 @@ public class WikiManager {
     }
 
     /**
-     * @param @param projectKey the key of the project (like "TEST-12") we want the wiki page from
+     * @param projectKey the key of the project (like "TEST-12") we want the wiki page from
      * @param pageTitle   The name of the page
      *
      * @return the wiki page titled with the name passed as parameter

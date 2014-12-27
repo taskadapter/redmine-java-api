@@ -74,7 +74,7 @@ public final class RedmineManagerFactory {
      *                     number. Example: http://demo.redmine.org:8080
      * @param apiAccessKey Redmine API access key. It is shown on "My Account" /
      *                     "API access key" webpage (check
-     *                     <i>http://redmine_server_url/my/account<i> URL). This
+     *                     <i>http://redmine_server_url/my/account</i> URL). This
      *                     parameter is <b>optional</b> (can be set to NULL) for Redmine
      *                     projects, which are "public".
      */
@@ -92,7 +92,7 @@ public final class RedmineManagerFactory {
      *                     number. Example: http://demo.redmine.org:8080
      * @param apiAccessKey Redmine API access key. It is shown on "My Account" /
      *                     "API access key" webpage (check
-     *                     <i>http://redmine_server_url/my/account<i> URL). This
+     *                     <i>http://redmine_server_url/my/account</i> URL). This
      *                     parameter is <b>optional</b> (can be set to NULL) for Redmine
      *                     projects, which are "public".
      * @param config       transport configuration.
@@ -199,9 +199,10 @@ public final class RedmineManagerFactory {
      * is usefull for some short-time communication. Common scerario for this
      * method is to create RedmineManager, load/update some tasks and then
      * shutdown all the manager.
-     * <p/>
+     * <p>
      * Note that this configuration will shutdown connection manager when
      * shutdown will be called on RedmineManager instance.
+     * </p>
      */
     public static TransportConfiguration createShortTermConfig(
             final ClientConnectionManager connectionManager) {
@@ -218,10 +219,10 @@ public final class RedmineManagerFactory {
      * Creates a transport which supports connection eviction. This transport
      * can be used in a long-term interactive scenarios where actual redmine
      * communications are interleaved with user interactios (data input).
-     * <p/>
+     * <p>
      * Shutting down redmine manager will also shut down provided connection
      * manager.
-     *
+     * </p>
      * @param connectionManager connection manager to use.
      * @param idleTimeout       idle timeout for connection before eviction, seconds.
      * @param evictionCheck     eviction check interval, seconds.
