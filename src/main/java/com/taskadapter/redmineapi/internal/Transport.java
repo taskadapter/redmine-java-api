@@ -6,6 +6,7 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
@@ -158,6 +159,10 @@ public final class Transport {
                 WikiPageDetail.class,
                 config("wiki_page", null, null, RedmineJSONParser.WIKI_PAGE_DETAIL_PARSER)
         );
+        OBJECT_CONFIGS.put(
+                CustomFieldDefinition.class,
+                config("custom_field", "custom_fields", null,
+                        RedmineJSONParser.CUSTOM_FIELD_DEFINITION_PARSER));
     }
 
 	private final URIConfigurator configurator;

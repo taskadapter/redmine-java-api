@@ -20,13 +20,14 @@ import com.taskadapter.redmineapi.internal.Transport;
 
 public class RedmineManager {
 
-	private final Transport transport;
+    private final Transport transport;
     private final Runnable shutdownListener;
     private final IssueManager issueManager;
     private final AttachmentManager attachmentManager;
     private final UserManager userManager;
     private final ProjectManager projectManager;
     private final MembershipManager membershipManager;
+    private final CustomFieldManager customFieldManager;
     private final WikiManager wikiManager;
 
     RedmineManager(Transport transport, Runnable shutdownListener) {
@@ -37,6 +38,7 @@ public class RedmineManager {
         projectManager = new ProjectManager(transport);
         membershipManager = new MembershipManager(transport);
         wikiManager = new WikiManager(transport);
+        customFieldManager = new CustomFieldManager(transport);
         this.shutdownListener = shutdownListener;
     }
 
@@ -62,6 +64,10 @@ public class RedmineManager {
 
     public MembershipManager getMembershipManager() {
         return membershipManager;
+    }
+
+    public CustomFieldManager getCustomFieldManager() {
+        return customFieldManager;
     }
 
     /**

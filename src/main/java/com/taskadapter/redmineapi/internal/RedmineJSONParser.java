@@ -38,6 +38,8 @@ import org.json.JSONObject;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinitionFactory;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -254,6 +256,13 @@ public class RedmineJSONParser {
         @Override
         public WikiPageDetail parse(JSONObject input) throws JSONException {
             return parseWikiPageDetail(input);
+        }
+    };
+    
+    public static final JsonObjectParser<CustomFieldDefinition> CUSTOM_FIELD_DEFINITION_PARSER = new JsonObjectParser<CustomFieldDefinition>() {
+        @Override
+        public CustomFieldDefinition parse(JSONObject input) throws JSONException {
+            return parseCustomFieldDefinition(input);
         }
     };
 
@@ -736,4 +745,50 @@ public class RedmineJSONParser {
 	public static JSONObject getResponse(String body) throws JSONException {
 		return new JSONObject(body);
 	}
+        
+        public static CustomFieldDefinition parseCustomFieldDefinition(JSONObject content)
+                throws JSONException {
+            final CustomFieldDefinition result = CustomFieldDefinitionFactory
+                    .create(JsonInput.getInt(content, "id"));
+            result.setName(JsonInput.getStringOrNull(content, "name"));
+            result.setCustomizedType(JsonInput.getStringNotNull(content, "customized_type"));
+            result.setFieldFormat(JsonInput.getStringNotNull(content, "field_format"));
+            result.setRegexp(JsonInput.getStringOrEmpty(content, "regexp"));
+            result.setMinLength(JsonInput.getIntOrNull(content, "min_length"));
+            result.setMaxLength(JsonInput.getIntOrNull(content, "max_length"));
+            result.setRequired(content.optBoolean("is_required"));
+            result.setFilter(content.optBoolean("is_filter"));
+            result.setSearchable(content.optBoolean("searchable"));
+            result.setMultiple(content.optBoolean("multiple"));
+            result.setDefaultValue(JsonInput.getStringOrEmpty(content, "default_value"));
+            result.setVisible(content.optBoolean("visible"));
+            if (content.has("possible_values")) {
+                JSONArray possible_values = content.getJSONArray("possible_values");
+                for (int i = 0; i < possible_values.length(); i++) {
+                    JSONObject valueObject = possible_values.getJSONObject(i);
+                    result.getPossibleValues().add(valueObject.getString("value"));
+                }
+            }
+            if (content.has("trackers")) {
+                JSONArray possible_values = content.getJSONArray("trackers");
+                for (int i = 0; i < possible_values.length(); i++) {
+                    JSONObject valueObject = possible_values.getJSONObject(i);
+                    int id = valueObject.getInt("id");
+                    String name = valueObject.getString("name");
+                    result.getTrackers().add(TrackerFactory.create(id, name));
+                }
+            }
+            if (content.has("roles")) {
+                JSONArray possible_values = content.getJSONArray("roles");
+                for (int i = 0; i < possible_values.length(); i++) {
+                    JSONObject valueObject = possible_values.getJSONObject(i);
+                    int id = valueObject.getInt("id");
+                    String name = valueObject.getString("name");
+                    Role role = RoleFactory.create(id);
+                    role.setName(name);
+                    result.getRoles().add(role);
+                }
+            }
+            return result;
+        }
 }
