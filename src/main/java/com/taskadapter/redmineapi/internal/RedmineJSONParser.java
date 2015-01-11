@@ -576,6 +576,7 @@ public class RedmineJSONParser {
                 result.setApiKey(JsonInput.getStringOrNull(content, "api_key"));
 		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", CUSTOM_FIELD_PARSER));
+		result.setStatus(JsonInput.getIntOrNull(content, "status"));
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
 			result.setFullName(name);
