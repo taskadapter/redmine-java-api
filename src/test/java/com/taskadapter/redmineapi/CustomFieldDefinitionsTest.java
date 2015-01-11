@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
  *   - id: 2, customized_type: issue, name: custom_boolean_1, type: bool
  */
 public class CustomFieldDefinitionsTest {
-    private static final String CUSTOM_FIELDS_FILE = "custom_fields.json";
+    private static final String CUSTOM_FIELDS_FILE = "custom_fields_redmine_2.3.json";
     private static RedmineManager mgr;
     private static CustomFieldManager customFieldManager;
 
