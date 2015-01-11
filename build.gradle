@@ -2,6 +2,9 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
+
+// 'eclipse' plugin is used to generate native project files for Eclipse
+// from this Gradle script - for those who don't have Gradle plugin installed in Eclipse
 apply plugin: 'eclipse'
 
 group = 'com.taskadapter'
