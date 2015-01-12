@@ -607,14 +607,18 @@ public final class Transport {
 		setCredentials(login, password);
 	}
         /**
-         * @return the impersonateUser
-         */
+         * @return the impersonateUser. This is value of the string "impersonate user".<br>
+         *, aka the string that is being sent to the server as the X-Redmine-Switch-User Header<br>
+         * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
+        */
         public String getImpersonateUser() {
            return impersonateUser;
         }
 
         /**
         * @param impersonateUser the impersonateUser to set
+         *, aka the string that is being sent to the server as the X-Redmine-Switch-User Header<br>
+         * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
         */
         public void setImpersonateUser(String impersonateUser) {
            this.impersonateUser = impersonateUser;
