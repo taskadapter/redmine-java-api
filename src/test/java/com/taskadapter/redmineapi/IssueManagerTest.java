@@ -37,6 +37,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.taskadapter.redmineapi.IssueHelper.createIssues;
+import com.taskadapter.redmineapi.bean.CustomField;
+import java.util.Arrays;
+import java.util.Collections;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1190,12 +1193,29 @@ public class IssueManagerTest {
     @Test
     public void testCustomFields() throws Exception {
         Issue issue = createIssues(issueManager, projectKey, 1).get(0);
-        // default empty values
-        assertThat(issue.getCustomFields().size()).isEqualTo(2);
 
-        // TODO update this!
-        int id1 = 1; // TODO this is pretty much a hack, we don't generally know
-        // these ids!
+        // TODO this needs to be reworked, when Redmine gains a real CRUD interface for custom fields
+        //
+        // To test right now the test system needs:
+        //
+        // Custom Field with ID 1 needs to be:
+        // name: my_custom_1
+        // format: Text (string)
+        // for all project, for all trackers
+        //
+        // Custom Field with ID 2 needs to be:
+        // name: custom_boolean_1
+        // format: Boolean (bool)
+        // 
+        // Custom Field with ID 3 needs to be:
+        // name: custom_multi_list
+        // format: List (list)
+        // multiple values: enabled
+        // possible values: V1, V2, V3
+        // default value: V2
+        //
+        // All fields: need to be issue fields, for all project, for all trackers
+        int id1 = 1;
         String custom1FieldName = "my_custom_1";
         String custom1Value = "some value 123";
 
@@ -1203,6 +1223,9 @@ public class IssueManagerTest {
         String custom2FieldName = "custom_boolean_1";
         String custom2Value = "true";
 
+        // default empty values
+        assertThat(issue.getCustomFields().size()).isEqualTo(3);
+        
         issue.clearCustomFields();
 
         issue.addCustomField(CustomFieldFactory.create(id1, custom1FieldName, custom1Value));
@@ -1210,13 +1233,77 @@ public class IssueManagerTest {
         issueManager.update(issue);
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
-        assertThat(updatedIssue.getCustomFields().size()).isEqualTo(2);
+        assertThat(updatedIssue.getCustomFields().size()).isEqualTo(3);
         assertEquals(custom1Value,
                 updatedIssue.getCustomField(custom1FieldName));
         assertEquals(custom2Value,
                 updatedIssue.getCustomField(custom2FieldName));
     }
-
+  
+    /**
+     * @see #testCustomFields()
+     */
+    @Test
+    public void testCustomFieldsMultipleValues() throws Exception {
+        Issue newIssue;
+        Issue createdIssue;
+        CustomField customField;
+        
+        // Basic check 1: default value is used, when custom field is not supplied
+        // when creating issue
+        newIssue = new Issue();
+        newIssue.setSubject("test");
+        createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldById(3);
+        assertThat(customField).isNotNull();
+        assertThat(customField.getValues().size()).isEqualTo(1);
+        assertThat(customField.getValues().get(0)).isEqualTo("V2");
+        issueManager.deleteIssue(createdIssue.getId());
+        
+        // Basic check 2: Set one value
+        newIssue = new Issue();
+        newIssue.setSubject("test");
+        customField = CustomFieldFactory.create(3);
+        customField.setValues(Collections.singletonList("V1"));
+        newIssue.addCustomField(customField);
+        createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldById(3);
+        assertThat(customField).isNotNull();
+        assertThat(customField.getValues().size()).isEqualTo(1);
+        assertThat(customField.getValues().get(0)).isEqualTo("V1");
+        issueManager.deleteIssue(createdIssue.getId());
+        
+        
+        // Basic check 3: Set multiple values 
+        // (check for https://github.com/taskadapter/redmine-java-api/issues/54)
+        newIssue = new Issue();
+        newIssue.setSubject("test");
+        customField = CustomFieldFactory.create(3);
+        customField.setValues(Arrays.asList("V1", "V3"));
+        newIssue.addCustomField(customField);
+        createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldById(3);
+        assertThat(customField).isNotNull();
+        assertThat(customField.getValues().size()).isEqualTo(2);
+        List<String> values = new ArrayList<String>(customField.getValues());
+        Collections.sort(values);
+        assertThat(customField.getValues().get(0)).isEqualTo("V1");
+        assertThat(customField.getValues().get(1)).isEqualTo("V3");
+        issueManager.deleteIssue(createdIssue.getId());
+        
+        // Basic check 4: Create issue with empty list (known problem in redmine 2.6)
+        newIssue = new Issue();
+        newIssue.setSubject("test");
+        customField = CustomFieldFactory.create(3);
+        customField.setValues(Collections.EMPTY_LIST);
+        newIssue.addCustomField(customField);
+        createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldById(3);
+        assertThat(customField).isNotNull();
+        assertThat(customField.getValues().size()).isEqualTo(0);
+        issueManager.deleteIssue(createdIssue.getId());
+    }
+    
     @Ignore
     @Test
     public void testChangesets() throws RedmineException {

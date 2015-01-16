@@ -10,15 +10,17 @@ import org.junit.Test;
 import java.util.List;
 import org.json.JSONException;
 
-import static org.junit.Assert.*;
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
- * Test CustomFeildDefinitons API - the API is only read-only (as of 2.6.0),
- * so the tests asume a preprogrammed configuration.
- * 
- * Exactly two custom fields are defined (from IssueManagerTest#testCustomFields:
+ * The tests expect some manual (one-time) setup in the Redmine server because
+ * there is no remote API to create custom fields definitions (as of January 2015).
+ * <p>
+ * Exactly 3 custom fields must be configured:
  *   - id: 1, customized_type: issue, name: my_custom_1, type: string
  *   - id: 2, customized_type: issue, name: custom_boolean_1, type: bool
+ *   - id: 3, customized_type: issue, name: custom_multi_list, type: list, 
+ *            multiple: true, possible_values: V1, V2, V3, default: V2
  */
 public class CustomFieldDefinitionsTest {
     private static final String CUSTOM_FIELDS_FILE = "custom_fields_redmine_2.3.json";
@@ -34,81 +36,89 @@ public class CustomFieldDefinitionsTest {
     @Test
     public void testGetCustomFields() throws RedmineException {
         List<CustomFieldDefinition> definitions = customFieldManager.getCustomFieldDefinitions();
-        assertEquals(definitions.size(), 2);
-        for(CustomFieldDefinition cfd: definitions) {
-            if(cfd.getId() == 1) {
-                assertEquals(cfd.getCustomizedType(), "issue");
-                assertEquals(cfd.getName(), "my_custom_1");
-                assertEquals(cfd.getFieldFormat(), "string");
-            } else if (cfd.getId() == 2) {
-                assertEquals(cfd.getCustomizedType(), "issue");
-                assertEquals(cfd.getName(), "custom_boolean_1");
-                assertEquals(cfd.getFieldFormat(), "bool");
+        assertThat(definitions.size()).isEqualTo(3);
+        for(CustomFieldDefinition fieldDefinition: definitions) {
+            if(fieldDefinition.getId() == 1) {
+                assertThat(fieldDefinition.getCustomizedType()).isEqualTo("issue");
+                assertThat(fieldDefinition.getName()).isEqualTo("my_custom_1");
+                assertThat(fieldDefinition.getFieldFormat()).isEqualTo("string");
+            } else if (fieldDefinition.getId() == 2) {
+                assertThat(fieldDefinition.getCustomizedType()).isEqualTo("issue");
+                assertThat(fieldDefinition.getName()).isEqualTo("custom_boolean_1");
+                assertThat(fieldDefinition.getFieldFormat()).isEqualTo("bool");
+            } else if (fieldDefinition.getId() == 3) {
+                assertThat(fieldDefinition.getCustomizedType()).isEqualTo("issue");
+                assertThat(fieldDefinition.getName()).isEqualTo("custom_multi_list");
+                assertThat(fieldDefinition.getFieldFormat()).isEqualTo("list");
+                assertThat(fieldDefinition.getDefaultValue()).isEqualTo("V2");
+                assertThat(fieldDefinition.getPossibleValues()).containsExactly("V1", "V2", "V3");
+                assertThat(fieldDefinition.isMultiple()).isTrue();
             }
         }
     }
     
     @Test
-    public void testDataFormat() throws IOException, JSONException {
+    public void savedJSonResponseFromRedmine23CanBeParsed() throws IOException, JSONException {
         String str = MyIOUtils.getResourceAsString(CUSTOM_FIELDS_FILE);
         List<CustomFieldDefinition> definitions = JsonInput.getListOrEmpty(
-					RedmineJSONParser.getResponse(str),
-                                        "custom_fields",
+					RedmineJSONParser.getResponse(str), "custom_fields",
 					RedmineJSONParser.CUSTOM_FIELD_DEFINITION_PARSER);
-        assertEquals(definitions.get(0).getId(), (Integer) 1);
-        assertEquals(definitions.get(0).getName(), "my_custom_1");
-        assertEquals(definitions.get(0).getCustomizedType(), "issue");
-        assertEquals(definitions.get(0).getFieldFormat(), "string");
-        assertEquals(definitions.get(0).getRegexp(), "some.*");
-        assertEquals(definitions.get(0).getMinLength(), (Integer) 5);
-        assertEquals(definitions.get(0).getMaxLength(), (Integer) 80);
-        assertEquals(definitions.get(0).isFilter(), true);
-        assertEquals(definitions.get(0).isSearchable(), true);
-        assertEquals(definitions.get(0).isMultiple(), false);
-        assertEquals(definitions.get(0).isVisible(), true);
-        assertEquals(definitions.get(0).isRequired(), false);
-        assertEquals(definitions.get(0).getDefaultValue(), "");
-        assertEquals(definitions.get(0).getPossibleValues().size(), 0);
-        assertEquals(definitions.get(0).getTrackers().get(0).getId(), (Integer)1);
-        assertEquals(definitions.get(0).getTrackers().get(1).getId(), (Integer)2);
-        assertEquals(definitions.get(0).getTrackers().get(2).getId(), (Integer)3);
-        assertEquals(definitions.get(0).getRoles().size(), 0);
-        
-        assertEquals(definitions.get(1).getId(), (Integer) 2);
-        assertEquals(definitions.get(1).getName(), "custom_boolean_1");
-        assertEquals(definitions.get(1).getCustomizedType(), "issue");
-        assertEquals(definitions.get(1).getFieldFormat(), "bool");
-        assertEquals(definitions.get(1).getRegexp(), "");
-        assertEquals(definitions.get(1).getMinLength(), null);
-        assertEquals(definitions.get(1).getMaxLength(), null);
-        assertEquals(definitions.get(1).isFilter(), false);
-        assertEquals(definitions.get(1).isSearchable(), false);
-        assertEquals(definitions.get(1).isMultiple(), false);
-        assertEquals(definitions.get(1).isVisible(), true);
-        assertEquals(definitions.get(1).isRequired(), false);
-        assertEquals(definitions.get(1).getDefaultValue(), "");
-        assertEquals(definitions.get(1).getPossibleValues().get(0), "1");
-        assertEquals(definitions.get(1).getPossibleValues().get(1), "0");
-        assertEquals(definitions.get(1).getTrackers().size(), 3);
-        assertEquals(definitions.get(1).getRoles().size(), 0);
-        
-        assertEquals(definitions.get(2).getId(), (Integer) 3);
-        assertEquals(definitions.get(2).getName(), "Test");
-        assertEquals(definitions.get(2).getCustomizedType(), "issue");
-        assertEquals(definitions.get(2).getFieldFormat(), "bool");
-        assertEquals(definitions.get(2).getRegexp(), "");
-        assertEquals(definitions.get(2).getMinLength(), null);
-        assertEquals(definitions.get(2).getMaxLength(), null);
-        assertEquals(definitions.get(2).isFilter(), false);
-        assertEquals(definitions.get(2).isSearchable(), false);
-        assertEquals(definitions.get(2).isMultiple(), false);
-        assertEquals(definitions.get(2).isVisible(), false);
-        assertEquals(definitions.get(2).isRequired(), true);
-        assertEquals(definitions.get(2).getDefaultValue(), "1");
-        assertEquals(definitions.get(2).getPossibleValues().get(0), "1");
-        assertEquals(definitions.get(2).getPossibleValues().get(1), "0");
-        assertEquals(definitions.get(2).getTrackers().size(), 0);
-        assertEquals(definitions.get(2).getRoles().get(0).getId(), (Integer) 4);
-    }
+        CustomFieldDefinition field0 = definitions.get(0);
+        assertThat(field0.getId()).isEqualTo(1);
+        assertThat(field0.getName()).isEqualTo("my_custom_1");
+        assertThat(field0.getCustomizedType()).isEqualTo("issue");
+        assertThat(field0.getFieldFormat()).isEqualTo("string");
+        assertThat(field0.getRegexp()).isEqualTo("some.*");
+        assertThat(field0.getMinLength()).isEqualTo((Integer) 5);
+        assertThat(field0.getMaxLength()).isEqualTo((Integer) 80);
+        assertThat(field0.isFilter()).isEqualTo(true);
+        assertThat(field0.isSearchable()).isEqualTo(true);
+        assertThat(field0.isMultiple()).isEqualTo(false);
+        assertThat(field0.isVisible()).isEqualTo(true);
+        assertThat(field0.isRequired()).isEqualTo(false);
+        assertThat(field0.getDefaultValue()).isEqualTo("");
+        assertThat(field0.getPossibleValues().size()).isEqualTo(0);
+        assertThat(field0.getTrackers().get(0).getId()).isEqualTo((Integer) 1);
+        assertThat(field0.getTrackers().get(1).getId()).isEqualTo((Integer) 2);
+        assertThat(field0.getTrackers().get(2).getId()).isEqualTo((Integer) 3);
+        assertThat(field0.getRoles().size()).isEqualTo(0);
 
+        CustomFieldDefinition field1 = definitions.get(1);
+        assertThat(field1.getId()).isEqualTo((Integer) 2);
+        assertThat(field1.getName()).isEqualTo("custom_boolean_1");
+        assertThat(field1.getCustomizedType()).isEqualTo("issue");
+        assertThat(field1.getFieldFormat()).isEqualTo("bool");
+        assertThat(field1.getRegexp()).isEqualTo("");
+        assertThat(field1.getMinLength()).isEqualTo(null);
+        assertThat(field1.getMaxLength()).isEqualTo(null);
+        assertThat(field1.isFilter()).isEqualTo(false);
+        assertThat(field1.isSearchable()).isEqualTo(false);
+        assertThat(field1.isMultiple()).isEqualTo(false);
+        assertThat(field1.isVisible()).isEqualTo(true);
+        assertThat(field1.isRequired()).isEqualTo(false);
+        assertThat(field1.getDefaultValue()).isEqualTo("");
+        assertThat(field1.getPossibleValues().get(0)).isEqualTo("1");
+        assertThat(field1.getPossibleValues().get(1)).isEqualTo("0");
+        assertThat(field1.getTrackers().size()).isEqualTo(3);
+        assertThat(field1.getRoles().size()).isEqualTo(0);
+
+        CustomFieldDefinition field2 = definitions.get(2);
+        assertThat(field2.getId()).isEqualTo((Integer) 3);
+        assertThat(field2.getName()).isEqualTo("Test");
+        assertThat(field2.getCustomizedType()).isEqualTo("issue");
+        assertThat(field2.getFieldFormat()).isEqualTo("bool");
+        assertThat(field2.getRegexp()).isEqualTo("");
+        assertThat(field2.getMinLength()).isEqualTo(null);
+        assertThat(field2.getMaxLength()).isEqualTo(null);
+        assertThat(field2.isFilter()).isEqualTo(false);
+        assertThat(field2.isSearchable()).isEqualTo(false);
+        assertThat(field2.isMultiple()).isEqualTo(false);
+        assertThat(field2.isVisible()).isEqualTo(false);
+        assertThat(field2.isRequired()).isEqualTo(true);
+        assertThat(field2.getDefaultValue()).isEqualTo("1");
+        assertThat(field2.getPossibleValues().get(0)).isEqualTo("1");
+        assertThat(field2.getPossibleValues().get(1)).isEqualTo("0");
+        assertThat(field2.getTrackers().size()).isEqualTo(0);
+        assertThat(field2.getRoles().get(0).getId()).isEqualTo((Integer) 4);
+    }
 }
