@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.internal.RedmineJSONParser;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import java.io.IOException;
+import java.util.Arrays;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -19,6 +20,8 @@ import static org.junit.Assert.*;
  * Exactly two custom fields are defined (from IssueManagerTest#testCustomFields:
  *   - id: 1, customized_type: issue, name: my_custom_1, type: string
  *   - id: 2, customized_type: issue, name: custom_boolean_1, type: bool
+ *   - id: 3, customized_type: issue, name: custom_multi_list, type: list, 
+ *            multiple: true, possible_values: V1, V2, V3, default: V2
  */
 public class CustomFieldDefinitionsTest {
     private static final String CUSTOM_FIELDS_FILE = "custom_fields_redmine_2.3.json";
@@ -34,7 +37,7 @@ public class CustomFieldDefinitionsTest {
     @Test
     public void testGetCustomFields() throws RedmineException {
         List<CustomFieldDefinition> definitions = customFieldManager.getCustomFieldDefinitions();
-        assertEquals(definitions.size(), 2);
+        assertEquals(definitions.size(), 3);
         for(CustomFieldDefinition cfd: definitions) {
             if(cfd.getId() == 1) {
                 assertEquals(cfd.getCustomizedType(), "issue");
@@ -44,6 +47,13 @@ public class CustomFieldDefinitionsTest {
                 assertEquals(cfd.getCustomizedType(), "issue");
                 assertEquals(cfd.getName(), "custom_boolean_1");
                 assertEquals(cfd.getFieldFormat(), "bool");
+            } else if (cfd.getId() == 3) {
+                assertEquals(cfd.getCustomizedType(), "issue");
+                assertEquals(cfd.getName(), "custom_multi_list");
+                assertEquals(cfd.getFieldFormat(), "list");
+                assertEquals(cfd.getDefaultValue(), "V2");
+                assertEquals(cfd.getPossibleValues(), Arrays.asList("V1", "V2", "V3"));
+                assertTrue(cfd.isMultiple());
             }
         }
     }

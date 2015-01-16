@@ -521,15 +521,26 @@ public class RedmineJSONParser {
 		final CustomField result = CustomFieldFactory.create(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 
-		if (!content.has("multiple"))
+		if (!content.has("multiple")) {
 			result.setValue(JsonInput.getStringOrNull(content, "value"));
-		else {
-			JSONArray tmp = JsonInput.getArrayOrNull(content, "value");
-			ArrayList<String> strings = new ArrayList<String>();
-			for (int i = 0; i < tmp.length(); i++) {
-				strings.add(String.valueOf(tmp.get(i)));
-			}
-			result.setValues(strings);
+                } else {
+                        ArrayList<String> strings = new ArrayList<String>();
+                        Object value = content.get("value");
+                        if(value instanceof JSONArray) {
+                            JSONArray tmp = (JSONArray) value;
+                            for (int i = 0; i < tmp.length(); i++) {
+                                    strings.add(String.valueOf(tmp.get(i)));
+                            }   
+                        } else {
+                            // Known issue: Under the condition:
+                            // - issue is newly created
+                            // - custom_field is multi-field
+                            // - custom_field is set to an empty list or null
+                            // Then:
+                            // - the return structure has "multiple" set
+                            // - but the value is the empty string
+                        }
+                        result.setValues(strings);
 		}
 
 		return result;
