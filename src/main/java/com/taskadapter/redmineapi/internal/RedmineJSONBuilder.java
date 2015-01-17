@@ -275,14 +275,12 @@ public class RedmineJSONBuilder {
 
 	}
 
-    public static void writeGroup(Group group, final JSONWriter writer)
-			throws JSONException {
+    public static void writeGroup(Group group, final JSONWriter writer) throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", group.getId());
 		JsonOutput.addIfNotNull(writer, "name", group.getName());
 	}
 
-	public static void writeIssue(Issue issue, final JSONWriter writer)
-			throws JSONException {
+	public static void writeIssue(Issue issue, final JSONWriter writer) throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", issue.getId());
 		JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
 		JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
@@ -294,40 +292,37 @@ public class RedmineJSONBuilder {
 					.getAssignee().getId());
 		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
 		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
-		if (issue.getProject() != null) {
-                    // Checked in Redmine 2.6.0: updating issues based on 
-                    // identifier fails and only using the project id works.
-                    // As the identifier usage is used in several places, this
-                    // case selection is introduced. The identifier is
-                    // used, if no real ID is provided
-                    if(issue.getProject().getId() != null) {
-			JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-					.getId());
-                    } else {
-                        JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-                                .getIdentifier());
-                    }
-                }
-		if (issue.getAuthor() != null)
-			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
-					.getId());
+        if (issue.getProject() != null) {
+            // Checked in Redmine 2.6.0: updating issues based on
+            // identifier fails and only using the project id works.
+            // As the identifier usage is used in several places, this
+            // case selection is introduced. The identifier is
+            // used, if no real ID is provided
+            if (issue.getProject().getId() != null) {
+                JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
+                        .getId());
+            } else {
+                JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
+                        .getIdentifier());
+            }
+        }
+        if (issue.getAuthor() != null)
+			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor().getId());
 		addShort2(writer, "start_date", issue.getStartDate());
 		addIfNotNullShort2(writer, "due_date", issue.getDueDate());
 		if (issue.getTracker() != null)
-			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker()
-					.getId());
+			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker().getId());
 		JsonOutput.addIfNotNull(writer, "description", issue.getDescription());
 
 		addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
 		JsonOutput.addIfNotNull(writer, "status_id", issue.getStatusId());
-		if (issue.getTargetVersion() != null)
-			JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
-					.getTargetVersion().getId());
-		if (issue.getCategory() != null)
-			JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory()
-					.getId());
-		JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
+        if (issue.getTargetVersion() != null)
+            JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
+                    .getTargetVersion().getId());
+        if (issue.getCategory() != null)
+            JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory().getId());
+        JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
 		writeCustomFields(writer, issue.getCustomFields());
 
         Collection<Watcher> issueWatchers = issue.getWatchers();
