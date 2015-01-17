@@ -56,6 +56,7 @@ public class IssueManagerTest {
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
     private static String projectKey;
+    private static String projectKey2;
     private static RedmineManager mgr;
     private static UserManager userManager;
 
@@ -66,11 +67,13 @@ public class IssueManagerTest {
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
         projectKey = IntegrationTestHelper.createProject(mgr);
+        projectKey2 = IntegrationTestHelper.createProject(mgr);
     }
 
     @AfterClass
     public static void oneTimeTearDown() {
         IntegrationTestHelper.deleteProject(mgr, projectKey);
+        IntegrationTestHelper.deleteProject(mgr, projectKey2);
     }
 
     @Test
@@ -1287,5 +1290,18 @@ public class IssueManagerTest {
 
         Issue issueWithUpdatedStatus = issueManager.getIssueById(retrievedIssue.getId());
         assertThat(issueWithUpdatedStatus.getStatusId()).isEqualTo(newStatusId);
+    }
+    
+    @Test
+    public void changeProject() throws RedmineException {
+        Project project1 = mgr.getProjectManager().getProjectByKey(projectKey);
+        Project project2 = mgr.getProjectManager().getProjectByKey(projectKey2);
+        Issue issue = createIssues(issueManager, projectKey, 1).get(0);
+        Issue retrievedIssue = issueManager.getIssueById(issue.getId());
+        assertEquals(retrievedIssue.getProject(), project1);
+        issue.setProject(project2);
+        issueManager.update(issue);
+        retrievedIssue = issueManager.getIssueById(issue.getId());
+        assertEquals(retrievedIssue.getProject(), project2);
     }
 }
