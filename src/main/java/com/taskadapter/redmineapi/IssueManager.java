@@ -94,6 +94,13 @@ public class IssueManager {
     }
 
     /**
+     * DEPRECATED. use createIssue(Issue issue) instead.
+     * "projectKey" parameter required by this method duplicates what is already available in "issue" parameter.
+     * Also, some Redmine APIs require project database ID instead of the string key (e.g. when updating Issue).
+     * To keep things consistent, we propose using project database IDs for other operations as well, like
+     * for creating new issues. Which means you need to create a Project instance with the project numeric ID
+     * and set it to the new Issue object - see createIssue(Issue issue) method.
+     * <p>
      * Sample usage:
      * <pre>
      * {@code
@@ -110,7 +117,9 @@ public class IssueManager {
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the project with the given projectKey is not found
      * @throws RedmineException
+     * @see #createIssue(com.taskadapter.redmineapi.bean.Issue)
      */
+    @Deprecated
     public Issue createIssue(String projectKey, Issue issue) throws RedmineException {
         final Project oldProject = issue.getProject();
         final Project newProject = ProjectFactory.create();
@@ -122,6 +131,30 @@ public class IssueManager {
         } finally {
             issue.setProject(oldProject);
         }
+    }
+
+    /**
+     * Sample usage:
+     * <pre>
+     * {@code
+     *   Issue issueToCreate = IssueFactory.create();
+     *   issueToCreate.setSubject("This is the summary line 123");
+     *   Project project = ProjectFactory.create(projectDatabaseId)
+     *   issueToCreate.setProject(project);
+     *   Issue newIssue = mgr.createIssue(issueToCreate);
+     * }
+     * </pre>
+     *
+     * @param issue      the Issue object to create on the server.
+     * @return the newly created Issue.
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       the project is not found
+     * @throws RedmineException
+     */
+    public Issue createIssue(Issue issue) throws RedmineException {
+        return transport.addObject(issue, new BasicNameValuePair("include",
+               Include.attachments.toString()));
     }
 
     public void deleteIssue(Integer id) throws RedmineException {
