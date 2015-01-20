@@ -76,6 +76,7 @@ public final class Transport {
 	private final SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
+        private String impersonateUser = null;
 
     static {
 		OBJECT_CONFIGS.put(
@@ -259,7 +260,10 @@ public final class Transport {
 		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
 				Integer.toString(obj.getId()));
 		final HttpPut http = new HttpPut(uri);
-
+                if (getImpersonateUser() != null) {
+                   http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
+  
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
 		setEntity(http, body);
@@ -284,6 +288,10 @@ public final class Transport {
             URI uri = getURIConfigurator().getChildIdURI(parentClass,
                     parentId, object.getClass(), value);
             HttpDelete httpDelete = new HttpDelete(uri);
+	    if (getImpersonateUser() != null) {
+		httpDelete.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+	    }
+
             String response = getCommunicator().sendRequest(httpDelete);
             logger.debug(response);
 	}
@@ -302,6 +310,9 @@ public final class Transport {
 			throws RedmineException {
 		final URI uri = getURIConfigurator().getObjectURI(classs, id);
 		final HttpDelete http = new HttpDelete(uri);
+                if (getImpersonateUser() != null) {
+                   http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
 		getCommunicator().sendRequest(http);
 	}
 
@@ -324,6 +335,9 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getObjectURI(classs, key, args);
 		final HttpGet http = new HttpGet(uri);
+                if (getImpersonateUser() != null) {
+                   http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
 		String response = getCommunicator().sendRequest(http);
 		logger.debug(response);
 		return parseResponse(response, config.singleObjectName, config.parser);
@@ -344,6 +358,9 @@ public final class Transport {
 			ContentHandler<BasicHttpResponse, R> handler)
 			throws RedmineException {
 		final HttpGet request = new HttpGet(uri);
+                if (getImpersonateUser() != null) {
+                   request.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
 		return errorCheckingCommunicator.sendRequest(request, handler);
 	}
 
@@ -359,6 +376,10 @@ public final class Transport {
 	public String upload(InputStream content) throws RedmineException {
 		final URI uploadURI = getURIConfigurator().getUploadURI();
 		final HttpPost request = new HttpPost(uploadURI);
+                if (getImpersonateUser() != null) {
+                   request.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
+
 		final AbstractHttpEntity entity = new InputStreamEntity(content, -1);
 		/* Content type required by a Redmine */
 		entity.setContentType("application/octet-stream");
@@ -422,6 +443,9 @@ public final class Transport {
 
 			logger.debug(uri.toString());
 			final HttpGet http = new HttpGet(uri);
+			if (getImpersonateUser() != null) {
+			    http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+			}
 
 			final String response = getCommunicator().sendRequest(http);
 			logger.debug("received: " + response);
@@ -476,6 +500,9 @@ public final class Transport {
 						.valueOf(objectsPerPage)));
 
 		HttpGet http = new HttpGet(uri);
+                if (getImpersonateUser() != null) {
+                   http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
 		String response = getCommunicator().sendRequest(http);
 		final JSONObject responseObject;
 		try {
@@ -495,6 +522,9 @@ public final class Transport {
         final EntityConfig<T> config = getConfig(classs);
         final URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, classs, childId, params);
         HttpGet http = new HttpGet(uri);
+	if (getImpersonateUser() != null) {
+	    http.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+	}
         String response = getCommunicator().sendRequest(http);
 
         return parseResponse(response, config.singleObjectName, config.parser);
@@ -516,6 +546,10 @@ public final class Transport {
 		logger.debug("adding user " + userId + " to group " + groupId + "...");
 		URI uri = getURIConfigurator().getChildObjectsURI(Group.class, Integer.toString(groupId), User.class);
 		HttpPost httpPost = new HttpPost(uri);
+                if (getImpersonateUser() != null) {
+                   httpPost.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
+
 		final StringWriter writer = new StringWriter();
 		final JSONWriter jsonWriter = new JSONWriter(writer);
 		try {
@@ -533,6 +567,10 @@ public final class Transport {
 		logger.debug("adding watcher " + watcherId + " to issue " + issueId + "...");
 		URI uri = getURIConfigurator().getChildObjectsURI(Issue.class, Integer.toString(issueId), Watcher.class);
 		HttpPost httpPost = new HttpPost(uri);
+                if (getImpersonateUser() != null) {
+                   httpPost.addHeader("X-Redmine-Switch-User", getImpersonateUser());
+                }
+
 		final StringWriter writer = new StringWriter();
 		final JSONWriter jsonWriter = new JSONWriter(writer);
 		try {
@@ -607,6 +645,23 @@ public final class Transport {
 	public void setLogin(String login) {
 		setCredentials(login, password);
 	}
+        /**
+         * @return the impersonateUser. This is value of the string "impersonate user".<br>
+         *, aka the string that is being sent to the server as the X-Redmine-Switch-User Header<br>
+         * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
+        */
+        public String getImpersonateUser() {
+           return impersonateUser;
+        }
+
+        /**
+        * @param impersonateUser the impersonateUser to set
+         *, aka the string that is being sent to the server as the X-Redmine-Switch-User Header<br>
+         * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
+        */
+        public void setImpersonateUser(String impersonateUser) {
+           this.impersonateUser = impersonateUser;
+        }
 
 	/**
 	 * Entity config.

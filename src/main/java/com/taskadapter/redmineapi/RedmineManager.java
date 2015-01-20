@@ -86,6 +86,11 @@ public class RedmineManager {
 		transport.setObjectsPerPage(pageSize);
     }
 
+    public void setImpersonateUser(String username) {
+        transport.setImpersonateUser(username);
+    }
+
+
     /**
      * Shutdown the communicator.
      */
