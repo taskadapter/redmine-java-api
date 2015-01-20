@@ -21,18 +21,18 @@ import java.util.List;
 
 public class Simple {
 	private static final Logger logger = LoggerFactory.getLogger(Simple.class);
-	private static final String projectKey = "test1385579926235";
+	private static final String projectKey = "testid";
 
 	private static final Integer queryId = null; // any
 
 	public static void main(String[] args) {
-		String uri = "http://76.126.10.142:9080/redmine";
-		String apiAccessKey = "0f4e6c32e540b41de8d594f894388e4f299ddd8a";
+		String uri = "http://76.126.10.142:8080/redmine";
+		String apiAccessKey = "22711b438871ebc1ead4261d7a947b1b8fee0536";
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
 		try {
-            getUsersAsNotAdmin(mgr);
+//            getUsersAsNotAdmin(mgr);
 			// getIssueWithRelations(mgr);
-			// tryCreateIssue(mgr);
+			tryCreateIssue(mgr);
 			// tryGetIssues(mgr);
 			// tryGetIssue(mgr);
 			// tryGetAllIssues(mgr);
@@ -149,7 +149,7 @@ public class Simple {
 	}
 
 	@SuppressWarnings("unused")
-	private static void tryCreateIssue(IssueManager issueManager)
+	private static void tryCreateIssue(RedmineManager manager)
 			throws RedmineException {
 		Issue issue = new Issue();
 		issue.setSubject("test123");
@@ -157,7 +157,11 @@ public class Simple {
 		issue.setTargetVersion(ver);
 		final IssueCategory cat = IssueCategoryFactory.create(673);
 		issue.setCategory(cat);
-		issueManager.createIssue(projectKey, issue);
+
+        ProjectManager projectManager = manager.getProjectManager();
+        Project projectByKey = projectManager.getProjectByKey("testid");
+        issue.setProject(projectByKey);
+        manager.getIssueManager().createIssue(issue);
 	}
 
 	@SuppressWarnings("unused")
