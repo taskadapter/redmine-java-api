@@ -87,6 +87,21 @@ public class RedmineManager {
     }
 
     /**
+     * This works only when the main authentication has led to Redmine Admin level user.
+     * The given user name will be sent to the server in "X-Redmine-Switch-User" HTTP Header
+     * to indicate that the action (create issue, delete issue, etc) must be done
+     * on behalf of the given user name.
+     *
+     * @param loginName Redmine user login name to provide to the server
+     *
+     * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
+     */
+    public void setOnBehalfOfUser(String loginName) {
+        transport.setOnBehalfOfUser(loginName);
+    }
+
+
+    /**
      * Shutdown the communicator.
      */
     public void shutdown() {

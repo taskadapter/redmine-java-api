@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.taskadapter.redmineapi.IssueHelper.createIssue;
 import static com.taskadapter.redmineapi.IssueHelper.createIssues;
 import com.taskadapter.redmineapi.bean.CustomField;
 import java.util.Arrays;
@@ -1383,12 +1384,36 @@ public class IssueManagerTest {
     public void changeProject() throws RedmineException {
         Project project1 = mgr.getProjectManager().getProjectByKey(projectKey);
         Project project2 = mgr.getProjectManager().getProjectByKey(projectKey2);
-        Issue issue = createIssues(issueManager, projectKey, 1).get(0);
+        Issue issue = createIssue(issueManager, projectKey);
         Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(retrievedIssue.getProject(), project1);
         issue.setProject(project2);
         issueManager.update(issue);
         retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(retrievedIssue.getProject(), project2);
+        deleteIssueIfNotNull(issue);
+    }
+
+    @Test
+    public void issueCanBeCreatedOnBehalfOfAnotherUser() throws RedmineException {
+        final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+        Issue issue = null;
+        try {
+            RedmineManager managerOnBehalfOfUser = IntegrationTestHelper.createRedmineManager();
+            managerOnBehalfOfUser.setOnBehalfOfUser(newUser.getLogin());
+
+            issue = createIssue(managerOnBehalfOfUser.getIssueManager(), projectKey);
+            assertThat(issue.getAuthor().getFirstName()).isEqualTo(newUser.getFirstName());
+            assertThat(issue.getAuthor().getLastName()).isEqualTo(newUser.getLastName());
+        } finally {
+            userManager.deleteUser(newUser.getId());
+            deleteIssueIfNotNull(issue);
+        }
+    }
+
+    private void deleteIssueIfNotNull(Issue issue) throws RedmineException {
+        if (issue != null) {
+            issueManager.deleteIssue(issue.getId());
+        }
     }
 }

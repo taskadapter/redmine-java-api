@@ -46,6 +46,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
@@ -72,10 +73,13 @@ public final class Transport {
 	private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
+
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 	private final SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
+
+    private String onBehalfOfUser = null;
 
     static {
 		OBJECT_CONFIGS.put(
@@ -181,7 +185,7 @@ public final class Transport {
 				authenticator,
 				Communicators.compose(errorProcessor,
 						Communicators.transportDecoder()));
-    Communicator<String> coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
+        Communicator<String> coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
             Communicators.contentReader());
 		this.communicator = Communicators.simplify(coreCommunicator,
                 Communicators.<String>identityHandler());
@@ -190,7 +194,7 @@ public final class Transport {
 	public User getCurrentUser(NameValuePair... params) throws RedmineException {
 		URI uri = getURIConfigurator().createURI("users/current.json", params);
 		HttpGet http = new HttpGet(uri);
-		String response = getCommunicator().sendRequest(http);
+		String response = send(http);
 		return parseResponse(response, "user", RedmineJSONParser.USER_PARSER);
 	}
 
@@ -208,14 +212,14 @@ public final class Transport {
 	public <T> T addObject(T object, NameValuePair... params)
 			throws RedmineException {
 		final EntityConfig<T> config = getConfig(object.getClass());
-		URI uri = getURIConfigurator().getObjectsURI(object.getClass(), params);
-		HttpPost httpPost = new HttpPost(uri);
         if (config.writer == null) {
             throw new RuntimeException("can't create object: writer is not implemented or is not registered in RedmineJSONBuilder for object " + object);
         }
+		URI uri = getURIConfigurator().getObjectsURI(object.getClass(), params);
+		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName, object, config.writer);
 		setEntity(httpPost, body);
-		String response = getCommunicator().sendRequest(httpPost);
+		String response = send(httpPost);
 		logger.debug(response);
 		return parseResponse(response, config.singleObjectName, config.parser);
 	}
@@ -242,7 +246,7 @@ public final class Transport {
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
 				object, config.writer);
 		setEntity(httpPost, body);
-		String response = getCommunicator().sendRequest(httpPost);
+		String response = send(httpPost);
 		logger.debug(response);
 		return parseResponse(response, config.singleObjectName, config.parser);
 	}
@@ -259,16 +263,14 @@ public final class Transport {
 		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
 				Integer.toString(obj.getId()));
 		final HttpPut http = new HttpPut(uri);
-
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
 		setEntity(http, body);
-
-		getCommunicator().sendRequest(http);
+		send(http);
 	}
 
 	/**
-	 * Performs an "delete child Id" request.
+	 * Performs "delete child Id" request.
 	 * 
 	 * @param parentClass
 	 *            parent object id.
@@ -279,14 +281,13 @@ public final class Transport {
 	 * @throws RedmineException
 	 *             if something goes wrong.
 	 */
-	public <T> void deleteChildId(Class<?> parentClass, String parentId, T object, 
-                Integer value) throws RedmineException {
-            URI uri = getURIConfigurator().getChildIdURI(parentClass,
-                    parentId, object.getClass(), value);
-            HttpDelete httpDelete = new HttpDelete(uri);
-            String response = getCommunicator().sendRequest(httpDelete);
-            logger.debug(response);
-	}
+    public <T> void deleteChildId(Class<?> parentClass, String parentId, T object, Integer value) throws RedmineException {
+        URI uri = getURIConfigurator().getChildIdURI(parentClass,
+                parentId, object.getClass(), value);
+        HttpDelete httpDelete = new HttpDelete(uri);
+        String response = send(httpDelete);
+        logger.debug(response);
+    }
 
 	/**
 	 * Deletes an object.
@@ -302,7 +303,7 @@ public final class Transport {
 			throws RedmineException {
 		final URI uri = getURIConfigurator().getObjectURI(classs, id);
 		final HttpDelete http = new HttpDelete(uri);
-		getCommunicator().sendRequest(http);
+		send(http);
 	}
 
 	/**
@@ -324,13 +325,13 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getObjectURI(classs, key, args);
 		final HttpGet http = new HttpGet(uri);
-		String response = getCommunicator().sendRequest(http);
+		String response = send(http);
 		logger.debug(response);
 		return parseResponse(response, config.singleObjectName, config.parser);
 	}
 
 	/**
-	 * Downloads a redmine content.
+	 * Downloads redmine content.
 	 * 
 	 * @param uri
 	 *            target uri.
@@ -344,8 +345,11 @@ public final class Transport {
 			ContentHandler<BasicHttpResponse, R> handler)
 			throws RedmineException {
 		final HttpGet request = new HttpGet(uri);
-		return errorCheckingCommunicator.sendRequest(request, handler);
-	}
+        if (onBehalfOfUser != null) {
+            request.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
+        }
+        return errorCheckingCommunicator.sendRequest(request, handler);
+    }
 
 	/**
 	 * UPloads content on a server.
@@ -364,9 +368,8 @@ public final class Transport {
 		entity.setContentType("application/octet-stream");
 		request.setEntity(entity);
 
-		final String result = getCommunicator().sendRequest(request);
-		return parseResponse(result, "upload",
-            RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+		final String result = send(request);
+		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
 	}
 
 	/**
@@ -422,8 +425,7 @@ public final class Transport {
 
 			logger.debug(uri.toString());
 			final HttpGet http = new HttpGet(uri);
-
-			final String response = getCommunicator().sendRequest(http);
+			final String response = send(http);
 			logger.debug("received: " + response);
 
 			final List<T> foundItems;
@@ -476,7 +478,7 @@ public final class Transport {
 						.valueOf(objectsPerPage)));
 
 		HttpGet http = new HttpGet(uri);
-		String response = getCommunicator().sendRequest(http);
+		String response = send(http);
 		final JSONObject responseObject;
 		try {
 			responseObject = RedmineJSONParser.getResponse(response);
@@ -495,7 +497,7 @@ public final class Transport {
         final EntityConfig<T> config = getConfig(classs);
         final URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, classs, childId, params);
         HttpGet http = new HttpGet(uri);
-        String response = getCommunicator().sendRequest(http);
+        String response = send(http);
 
         return parseResponse(response, config.singleObjectName, config.parser);
     }
@@ -525,7 +527,7 @@ public final class Transport {
 		}
 		String body = writer.toString();
 		setEntity(httpPost, body);
-		String response = getCommunicator().sendRequest(httpPost);
+		String response = send(httpPost);
 		logger.debug(response);
 	}
 
@@ -542,14 +544,16 @@ public final class Transport {
 		}
 		String body = writer.toString();
 		setEntity(httpPost, body);
-		String response = getCommunicator().sendRequest(httpPost);
+		String response = send(httpPost);
 		logger.debug(response);
 	}
 
-	private SimpleCommunicator<String> getCommunicator()
-			throws RedmineException {
-		return communicator;
-	}
+    private String send(HttpRequestBase http) throws RedmineException {
+        if (onBehalfOfUser != null) {
+            http.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
+        }
+        return communicator.sendRequest(http);
+    }
 
 	private static <T> T parseResponse(String response, String tag,
                                      JsonObjectParser<T> parser) throws RedmineFormatException {
@@ -607,6 +611,20 @@ public final class Transport {
 	public void setLogin(String login) {
 		setCredentials(login, password);
 	}
+
+    /**
+     * This works only when the main authentication has led to Redmine Admin level user.
+     * The given user name will be sent to the server in "X-Redmine-Switch-User" HTTP Header
+     * to indicate that the action (create issue, delete issue, etc) must be done
+     * on behalf of the given user name.
+     *
+     * @param loginName Redmine user login name to provide to the server
+     *
+     * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
+     */
+    public void setOnBehalfOfUser(String loginName) {
+        this.onBehalfOfUser = loginName;
+    }
 
 	/**
 	 * Entity config.

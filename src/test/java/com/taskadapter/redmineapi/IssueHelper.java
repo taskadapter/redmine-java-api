@@ -19,6 +19,10 @@ public class IssueHelper {
         return issues;
     }
 
+    public static Issue createIssue(IssueManager issueManager, String projectKey) throws RedmineException {
+        return issueManager.createIssue(projectKey, generateRandomIssue());
+    }
+
     public static Issue generateRandomIssue() {
         Random r = new Random();
         return IssueFactory.createWithSubject("some issue " + r.nextInt() + " " + new Date());
