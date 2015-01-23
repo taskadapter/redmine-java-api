@@ -79,7 +79,7 @@ public final class Transport {
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
 	private final RedmineAuthenticator<HttpResponse> authenticator;
 
-    private String impersonateUser = null;
+    private String onBehalfOfUser = null;
 
     static {
 		OBJECT_CONFIGS.put(
@@ -345,8 +345,8 @@ public final class Transport {
 			ContentHandler<BasicHttpResponse, R> handler)
 			throws RedmineException {
 		final HttpGet request = new HttpGet(uri);
-        if (impersonateUser != null) {
-            request.addHeader("X-Redmine-Switch-User", impersonateUser);
+        if (onBehalfOfUser != null) {
+            request.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
         }
         return errorCheckingCommunicator.sendRequest(request, handler);
     }
@@ -549,8 +549,8 @@ public final class Transport {
 	}
 
     private String send(HttpRequestBase http) throws RedmineException {
-        if (impersonateUser != null) {
-            http.addHeader("X-Redmine-Switch-User", impersonateUser);
+        if (onBehalfOfUser != null) {
+            http.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
         }
         return communicator.sendRequest(http);
     }
@@ -613,12 +613,17 @@ public final class Transport {
 	}
 
     /**
-     * @param impersonateUser the impersonateUser to set
-     *                        , aka the string that is being sent to the server as the X-Redmine-Switch-User Header<br>
+     * This works only when the main authentication has led to Redmine Admin level user.
+     * The given user name will be sent to the server in "X-Redmine-Switch-User" HTTP Header
+     * to indicate that the action (create issue, delete issue, etc) must be done
+     * on behalf of the given user name.
+     *
+     * @param loginName Redmine user login name to provide to the server
+     *
      * @see <a href="http://www.redmine.org/issues/11755">Redmine issue 11755</a>
      */
-    public void setImpersonateUser(String impersonateUser) {
-        this.impersonateUser = impersonateUser;
+    public void setOnBehalfOfUser(String loginName) {
+        this.onBehalfOfUser = loginName;
     }
 
 	/**
