@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.taskadapter.redmineapi.IssueHelper.createIssue;
 import static com.taskadapter.redmineapi.IssueHelper.createIssues;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -1296,7 +1297,7 @@ public class IssueManagerTest {
     public void changeProject() throws RedmineException {
         Project project1 = mgr.getProjectManager().getProjectByKey(projectKey);
         Project project2 = mgr.getProjectManager().getProjectByKey(projectKey2);
-        Issue issue = createIssues(issueManager, projectKey, 1).get(0);
+        Issue issue = createIssue(issueManager, projectKey);
         Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(retrievedIssue.getProject(), project1);
         issue.setProject(project2);
@@ -1314,7 +1315,7 @@ public class IssueManagerTest {
             RedmineManager managerOnBehalfOfUser = IntegrationTestHelper.createRedmineManager();
             managerOnBehalfOfUser.setOnBehalfOfUser(newUser.getLogin());
 
-            issue = createIssues(managerOnBehalfOfUser.getIssueManager(), projectKey, 1).get(0);
+            issue = createIssue(managerOnBehalfOfUser.getIssueManager(), projectKey);
             assertThat(issue.getAuthor().getFirstName()).isEqualTo(newUser.getFirstName());
             assertThat(issue.getAuthor().getLastName()).isEqualTo(newUser.getLastName());
         } finally {
