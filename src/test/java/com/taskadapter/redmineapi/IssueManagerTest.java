@@ -1303,5 +1303,29 @@ public class IssueManagerTest {
         issueManager.update(issue);
         retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(retrievedIssue.getProject(), project2);
+        deleteIssueIfNotNull(issue);
+    }
+
+    @Test
+    public void issueCanBeCreatedOnBehalfOfAnotherUser() throws RedmineException {
+        final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+        Issue issue = null;
+        try {
+            RedmineManager managerOnBehalfOfUser = IntegrationTestHelper.createRedmineManager();
+            managerOnBehalfOfUser.setOnBehalfOfUser(newUser.getLogin());
+
+            issue = createIssues(managerOnBehalfOfUser.getIssueManager(), projectKey, 1).get(0);
+            assertThat(issue.getAuthor().getFirstName()).isEqualTo(newUser.getFirstName());
+            assertThat(issue.getAuthor().getLastName()).isEqualTo(newUser.getLastName());
+        } finally {
+            userManager.deleteUser(newUser.getId());
+            deleteIssueIfNotNull(issue);
+        }
+    }
+
+    private void deleteIssueIfNotNull(Issue issue) throws RedmineException {
+        if (issue != null) {
+            issueManager.deleteIssue(issue.getId());
+        }
     }
 }
