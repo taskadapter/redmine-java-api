@@ -22,10 +22,10 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
 
 Sample code to retrieve list of Redmine issues:
 
-    private static String uri = "https://www.hostedredmine.com";
-    private static String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
-    private static String projectKey = "taskconnector-test";
-    private static Integer queryId = null; // any
+    String uri = "https://www.hostedredmine.com";
+    String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
+    String projectKey = "taskconnector-test";
+    Integer queryId = null; // any
 
     RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
     List<Issue> issues = mgr.getIssueManager().getIssues(projectKey, queryId);
@@ -38,4 +38,4 @@ Sample code to retrieve list of Redmine issues:
 * To build in command line: run "gradle build".
 * To open the project code in IDEA or Eclipse: open "build.gradle" file. Your IDE will create a project basing on the gradle's script.
 * Please make sure you add unit and/or integration tests when submitting your changes. 
-Don't forget to document the required Redmine version and other limitations. 
+Don't forget to document required Redmine version and other limitations & requirements. 
