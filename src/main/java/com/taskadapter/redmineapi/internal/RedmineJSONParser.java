@@ -231,8 +231,7 @@ public final class RedmineJSONParser {
 		result.setStartDate(getDateOrNull(content, "start_date"));
 		result.setDueDate(getDateOrNull(content, "due_date"));
 		result.setTracker(JsonInput.getObjectOrNull(content, "tracker", RedmineJSONParser::parseTracker));
-		result.setDescription(JsonInput
-				.getStringOrEmpty(content, "description"));
+		result.setDescription(JsonInput.getStringOrNull(content, "description"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
 		result.setClosedOn(getDateOrNull(content, "closed_on"));

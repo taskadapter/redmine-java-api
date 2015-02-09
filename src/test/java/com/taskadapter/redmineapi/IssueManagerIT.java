@@ -627,7 +627,7 @@ public class IssueManagerIT {
     }
 
     @Test
-    public void testIssueNullDescriptionDoesNotEraseIt() throws RedmineException {
+    public void nullDescriptionErasesItOnServer() throws RedmineException {
         Issue issue = new Issue();
         String subject = "Issue " + new Date();
         String descr = "Some description";
@@ -636,23 +636,14 @@ public class IssueManagerIT {
         issue.setProject(ProjectFactory.create(projectId));
 
         Issue createdIssue = issueManager.createIssue(issue);
-        assertEquals("Checking description", descr,
-                createdIssue.getDescription());
+        assertThat(createdIssue.getDescription()).isEqualTo(descr);
 
         createdIssue.setDescription(null);
         issueManager.update(createdIssue);
 
         Integer issueId = createdIssue.getId();
         Issue reloadedFromRedmineIssue = issueManager.getIssueById(issueId);
-        assertEquals("Description must not be erased", descr,
-                reloadedFromRedmineIssue.getDescription());
-
-        reloadedFromRedmineIssue.setDescription("");
-        issueManager.update(reloadedFromRedmineIssue);
-
-        Issue reloadedFromRedmineIssueUnchanged = issueManager.getIssueById(issueId);
-        assertEquals("Description must be erased", "",
-                reloadedFromRedmineIssueUnchanged.getDescription());
+        assertThat(reloadedFromRedmineIssue.getDescription()).isNull();
     }
 
     @Test
@@ -695,14 +686,6 @@ public class IssueManagerIT {
 
         Issue loadedIssueWithoutJournals = issueManager.getIssueById(newIssue.getId());
         assertTrue(loadedIssueWithoutJournals.getJournals().isEmpty());
-    }
-
-    @Test
-    public void emptyDescriptionReturnedAsEmptyString() throws RedmineException {
-        Issue issue = IssueFactory.create(projectId, "Issue " + new Date());
-        Issue createdIssue = issueManager.createIssue(issue);
-        assertEquals("Description must be an empty string, not NULL", "",
-                createdIssue.getDescription());
     }
 
     @Test

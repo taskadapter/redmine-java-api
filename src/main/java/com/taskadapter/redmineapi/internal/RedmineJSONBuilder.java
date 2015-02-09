@@ -9,6 +9,8 @@ import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.Property;
+import com.taskadapter.redmineapi.bean.PropertyStorage;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
@@ -174,15 +176,17 @@ public class RedmineJSONBuilder {
 
 	public static void writeUser(final JSONWriter writer, User user)
 			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", user.getId());
-		JsonOutput.addIfNotNull(writer, "login", user.getLogin());
-		JsonOutput.addIfNotNull(writer, "password", user.getPassword());
-		JsonOutput.addIfNotNull(writer, "firstname", user.getFirstName());
-		JsonOutput.addIfNotNull(writer, "lastname", user.getLastName());
-		JsonOutput.addIfNotNull(writer, "name", user.getFullName());
-		JsonOutput.addIfNotNull(writer, "mail", user.getMail());
-		JsonOutput.addIfNotNull(writer, "auth_source_id", user.getAuthSourceId());
-		JsonOutput.addIfNotNull(writer, "status", user.getStatus());
+		PropertyStorage storage = user.getStorage();
+		addIfSet(writer, "id", storage, User.ID);
+		addIfSet(writer, "login", storage, User.LOGIN);
+		addIfSet(writer, "password", storage, User.PASSWORD);
+		addIfSet(writer, "firstname", storage, User.FIRST_NAME);
+		addIfSet(writer, "lastname", storage, User.LAST_NAME);
+		// TODO I don't think this "name" is required... check this.
+//		addIfSet(writer, "name", storage, User.FULL_NAME);
+		addIfSet(writer, "mail", storage, User.MAIL);
+		addIfSet(writer, "auth_source_id", storage, User.AUTH_SOURCE_ID);
+		addIfSet(writer, "status", storage, User.STATUS);
 		addIfNotNullFull(writer, "created_on", user.getCreatedOn());
 		addIfNotNullFull(writer, "last_login_on", user.getLastLoginOn());
 		writeCustomFields(writer, user.getCustomFields());
@@ -190,21 +194,22 @@ public class RedmineJSONBuilder {
 	}
 
     public static void writeGroup(final JSONWriter writer, Group group) throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", group.getId());
-		JsonOutput.addIfNotNull(writer, "name", group.getName());
+		PropertyStorage storage = group.getStorage();
+		addIfSet(writer, "id", storage, Group.ID);
+		addIfSet(writer, "name", storage, Group.NAME);
 	}
 
 	public static void writeIssue(final JSONWriter writer, Issue issue) throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", issue.getId());
-		JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
-		JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
-		JsonOutput.addIfNotNull(writer, "estimated_hours",
-				issue.getEstimatedHours());
-		JsonOutput.addIfNotNull(writer, "spent_hours", issue.getSpentHours());
-		JsonOutput.addIfNotNull(writer, "assigned_to_id", issue.getAssigneeId());
-		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
-		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
-		JsonOutput.addIfNotNull(writer, "is_private", issue.isPrivateIssue());
+        PropertyStorage storage = issue.getStorage();
+		addIfSet(writer, "id", storage, Issue.DATABASE_ID);
+		addIfSet(writer, "subject", storage, Issue.SUBJECT);
+		addIfSet(writer, "parent_issue_id", storage, Issue.PARENT_ID);
+		addIfSet(writer, "estimated_hours", storage, Issue.ESTIMATED_HOURS);
+		addIfSet(writer, "spent_hours", storage, Issue.SPENT_HOURS);
+		addIfSet(writer, "assigned_to_id", storage, Issue.ASSIGNEE_ID);
+		addIfSet(writer, "priority_id", storage, Issue.PRIORITY_ID);
+        addIfSet(writer, "done_ratio", storage, Issue.DONE_RATIO);
+		addIfSet(writer, "is_private", storage, Issue.PRIVATE_ISSUE);
         if (issue.getProject() != null) {
             // Checked in Redmine 2.6.0: updating issues based on
             // identifier fails and only using the project id works.
@@ -221,11 +226,11 @@ public class RedmineJSONBuilder {
         }
         if (issue.getAuthor() != null)
 			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor().getId());
-		addShort2(writer, "start_date", issue.getStartDate());
-		addIfNotNullShort2(writer, "due_date", issue.getDueDate());
+		addIfSet(writer, "start_date", storage, Issue.START_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
+		addIfSet(writer, "due_date", storage, Issue.DUE_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
 		if (issue.getTracker() != null)
 			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker().getId());
-		JsonOutput.addIfNotNull(writer, "description", issue.getDescription());
+		addIfSet(writer, "description", storage, Issue.DESCRIPTION);
 
 		addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
@@ -235,7 +240,7 @@ public class RedmineJSONBuilder {
                     .getTargetVersion().getId());
         if (issue.getCategory() != null)
             JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory().getId());
-        JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
+        addIfSet(writer, "notes", storage, Issue.NOTES);
 		writeCustomFields(writer, issue.getCustomFields());
 
         Collection<Watcher> issueWatchers = issue.getWatchers();
@@ -254,6 +259,19 @@ public class RedmineJSONBuilder {
 		 * Journals and Relations cannot be set for an issue during creation or
 		 * updates.
 		 */
+	}
+
+	private static void addIfSet(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<?> property) throws JSONException {
+		if (storage.isPropertySet(property)) {
+			writer.key(jsonKeyName);
+			writer.value(storage.get(property));
+		}
+	}
+
+	private static void addIfSet(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<Date> property, SimpleDateFormat format) throws JSONException {
+		if (storage.isPropertySet(property)) {
+			JsonOutput.add(writer, jsonKeyName, storage.get(property), format);
+		}
 	}
 
 	public static void writeUpload(JSONWriter writer, Attachment attachment)

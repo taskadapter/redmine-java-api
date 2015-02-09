@@ -15,25 +15,24 @@ public class User implements Identifiable {
 
     public static final Integer STATUS_ACTIVE = 1;
 
-    /**
-     * database ID.
-     */
-    private final Integer id;
+    private final PropertyStorage storage;
 
-    private String login;
-    private String password;
-    private String firstName;
-    private String lastName;
-    private String mail;
-    private Date createdOn;
-    private Date lastLoginOn;
-    private String apiKey;
-    private Integer authSourceId;
-    private Integer status;
-    // TODO add tests
-    private final Set<CustomField> customFields = new HashSet<>();
-	private final Set<Membership> memberships = new HashSet<>();
-	private final Set<Group> groups = new HashSet<>();
+    public final static Property<Integer> ID = new Property<Integer>(Integer.class, "id");
+    public final static Property<String> LOGIN = new Property<String>(String.class, "login");
+    public final static Property<String> PASSWORD = new Property<String>(String.class, "password");
+    public final static Property<String> FIRST_NAME = new Property<String>(String.class, "firstName");
+    public final static Property<String> LAST_NAME = new Property<String>(String.class, "lastName");
+    public final static Property<String> MAIL = new Property<String>(String.class, "mail");
+    public final static Property<String> API_KEY = new Property<String>(String.class, "apiKey");
+    public final static Property<Date> CREATED_ON = new Property<Date>(Date.class, "createdOn");
+    public final static Property<Date> LAST_LOGIN_ON = new Property<Date>(Date.class, "lastLoginOn");
+    public final static Property<Integer> AUTH_SOURCE_ID = new Property<Integer>(Integer.class, "authSourceId");
+    public final static Property<Integer> STATUS = new Property<Integer>(Integer.class, "status");
+
+    private final Set<CustomField> customFields = new HashSet<CustomField>();
+	private final Set<Membership> memberships = new HashSet<Membership>();
+
+    public final static Property<Collection> GROUPS = new SetProperty("groups");
 
     /**
      * Use UserFactory to create instances of this class.
@@ -43,72 +42,77 @@ public class User implements Identifiable {
      * @see UserFactory
      */
     User(Integer id) {
-        this.id = id;
+        storage = new PropertyStorage();
+        storage.set(ID, id);
+    }
+
+    User(PropertyStorage storage) {
+        this.storage = storage;
     }
 
     @Override
     public Integer getId() {
-        return id;
+        return storage.get(ID);
     }
 
     @Override
     public String toString() {
-        return getFullName();
+        return getLogin();
     }
 
     public String getLogin() {
-        return login;
+        return storage.get(LOGIN);
     }
 
     public void setLogin(String login) {
-        this.login = login;
+        storage.set(LOGIN, login);
     }
 
     public String getFirstName() {
-        return firstName;
+        return storage.get(FIRST_NAME);
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName;
+        storage.set(FIRST_NAME, firstName);
     }
 
     public String getLastName() {
-        return lastName;
+        return storage.get(LAST_NAME);
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName;
+        storage.set(LAST_NAME, lastName);
     }
 
     /**
      * This field is empty when using issues.get(i).getAssignee().getMail()
      */
     public String getMail() {
-        return mail;
+        return storage.get(MAIL);
     }
 
     public void setMail(String mail) {
-        this.mail = mail;
+        storage.set(MAIL, mail);
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return storage.get(CREATED_ON);
     }
 
     public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+        storage.set(CREATED_ON, createdOn);
     }
 
     public Date getLastLoginOn() {
-        return lastLoginOn;
+        return storage.get(LAST_LOGIN_ON);
     }
 
     public void setLastLoginOn(Date lastLoginOn) {
-        this.lastLoginOn = lastLoginOn;
+        storage.set(LAST_LOGIN_ON, lastLoginOn);
     }
 
     public String getApiKey() {
-        return apiKey;
+        return storage.get(API_KEY);
     }
 
     /**
@@ -117,7 +121,7 @@ public class User implements Identifiable {
      */
     @Deprecated
     public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
+        storage.set(API_KEY, apiKey);
     }
 
     /**
@@ -127,11 +131,11 @@ public class User implements Identifiable {
      */
     @Deprecated
     public Integer getAuthSourceId() {
-		return authSourceId;
+		return storage.get(AUTH_SOURCE_ID);
 	}
 
 	public void setAuthSourceId(Integer authSource) {
-		this.authSourceId = authSource;
+        storage.set(AUTH_SOURCE_ID, authSource);
 	}
 
     @Override
@@ -141,19 +145,19 @@ public class User implements Identifiable {
 
         User user = (User) o;
 
-        return id != null ? id.equals(user.id) : user.id == null;
+        return getId() != null ? getId().equals(user.getId()) : user.getId() == null;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
     /**
      * @return firstName + space + lastName
      */
     public String getFullName() {
-        return firstName + " " + lastName;
+        return getFirstName() + " " + getLastName();
     }
 
     /**
@@ -163,19 +167,19 @@ public class User implements Identifiable {
     public void setFullName(String fullName) {
         int ind = fullName.indexOf(' ');
         if (ind != -1) {
-            this.firstName = fullName.substring(0, ind);
-            this.lastName = fullName.substring(ind + 1);
+            setFirstName(fullName.substring(0, ind));
+            setLastName(fullName.substring(ind + 1));
         } else {
-            this.firstName = fullName;
+            setFirstName(fullName);
         }
     }
 
     public String getPassword() {
-        return password;
+        return storage.get(PASSWORD);
     }
 
     public void setPassword(String password) {
-        this.password = password;
+        storage.set(PASSWORD, password);
     }
 
     /**
@@ -228,11 +232,14 @@ public class User implements Identifiable {
 	}
 
 	public Collection<Group> getGroups() {
-	   return Collections.unmodifiableCollection(groups);
-	   }
+        return Collections.unmodifiableCollection(storage.get(GROUPS));
+    }
 
 	public void addGroups(Collection<Group> groups) {
-	   this.groups.addAll(groups);
+        if (!storage.isPropertySet(GROUPS)) {
+            storage.set(GROUPS, new HashSet<Group>());
+        }
+        storage.get(GROUPS).addAll(groups);
 	}
 
     /**
@@ -245,7 +252,7 @@ public class User implements Identifiable {
      * @return User status
      */
     public Integer getStatus() {
-        return status;
+        return storage.get(STATUS);
     }
 
     /**
@@ -254,6 +261,14 @@ public class User implements Identifiable {
      * @param status must be one of {@link #STATUS_ACTIVE} or {@link #STATUS_LOCKED}
      */
     public void setStatus(Integer status) {
-        this.status = status;
+        storage.set(STATUS, status);
+    }
+
+    public User cloneDeep() {
+        return new User(storage.deepClone());
+    }
+
+    public PropertyStorage getStorage() {
+        return storage;
     }
 }

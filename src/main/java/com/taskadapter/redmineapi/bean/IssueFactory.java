@@ -12,6 +12,14 @@ public class IssueFactory {
         return issue;
     }
 
+    public static Issue createWithSubject(int projectId, String subject) {
+        Issue issue = new Issue();
+        issue.setSubject(subject);
+        Project project = ProjectFactory.create(projectId);
+        issue.setProject(project);
+        return issue;
+    }
+
     public static Issue create(Integer databaseId) {
         return new Issue(databaseId);
     }

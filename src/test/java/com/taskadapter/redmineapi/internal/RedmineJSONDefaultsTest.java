@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -28,7 +29,7 @@ public class RedmineJSONDefaultsTest {
 	public void testIssueDefaults() throws JSONException {
 		final String MINIMAL_ISSUE = "{\"issue\":{\"status\":{\"name\":\"New\",\"id\":1},\"author\":{\"name\":\"Redmine Admin\",\"id\":1},\"created_on\":\"2012/05/16 01:25:27 -0700\",\"tracker\":{\"name\":\"Bug\",\"id\":1},\"project\":{\"name\":\"test project\",\"id\":1063},\"spent_hours\":0.0,\"updated_on\":\"2012/05/16 01:25:27 -0700\",\"done_ratio\":0,\"subject\":\"This is a subject\",\"id\":1926,\"custom_fields\":[{\"value\":\"\",\"name\":\"my_custom_1\",\"id\":1},{\"value\":\"on\",\"name\":\"custom_boolean_1\",\"id\":2}],\"priority\":{\"name\":\"Normal\",\"id\":4}}}";
 		final Issue issue = parse(MINIMAL_ISSUE, "issue", RedmineJSONParser::parseIssue);
-		assertEquals("", issue.getDescription());
+		assertThat(issue.getDescription()).isNull();
 	}
 
 	@Test

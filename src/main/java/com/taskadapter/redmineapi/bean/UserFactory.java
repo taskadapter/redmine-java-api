@@ -6,6 +6,6 @@ public class UserFactory {
     }
 
     public static User create() {
-        return new User(null);
+        return new User(new PropertyStorage());
     }
 }
