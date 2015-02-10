@@ -1247,49 +1247,45 @@ public class IssueManagerTest {
         throw new RuntimeException("Custom Field definition '" + fieldName + "' is not found on server.");
     }
 
-    /**
-     * @see #testCustomFields()
-     */
     @Test
-    public void testCustomFieldsMultipleValues() throws Exception {
-        Issue newIssue;
-        Issue createdIssue;
-        CustomField customField;
-        
-        // Basic check 1: default value is used, when custom field is not supplied
-        // when creating issue
-        newIssue = new Issue();
-        newIssue.setSubject("test");
-        createdIssue = issueManager.createIssue(projectKey, newIssue);
-        customField = createdIssue.getCustomFieldById(3);
+    public void defaultValueUsedWhenCustomFieldNotProvidedWhenCreatingIssue() throws Exception {
+        Issue newIssue = IssueFactory.createWithSubject("test for custom multi fields");
+        Issue createdIssue = issueManager.createIssue(projectKey, newIssue);
+        CustomField customField = createdIssue.getCustomFieldByName("custom_multi_list");
         assertThat(customField).isNotNull();
         assertThat(customField.getValues().size()).isEqualTo(1);
         assertThat(customField.getValues().get(0)).isEqualTo("V2");
         issueManager.deleteIssue(createdIssue.getId());
-        
-        // Basic check 2: Set one value
-        newIssue = new Issue();
-        newIssue.setSubject("test");
-        customField = CustomFieldFactory.create(3);
+    }
+
+    @Test
+    public void setOneValueForMultiLineCustomField() throws Exception {
+        Issue newIssue = IssueFactory.createWithSubject("test for custom multi fields - set one value");
+        CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
+        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId());
+
         customField.setValues(Collections.singletonList("V1"));
         newIssue.addCustomField(customField);
-        createdIssue = issueManager.createIssue(projectKey, newIssue);
-        customField = createdIssue.getCustomFieldById(3);
+        Issue createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldByName("custom_multi_list");
         assertThat(customField).isNotNull();
         assertThat(customField.getValues().size()).isEqualTo(1);
         assertThat(customField.getValues().get(0)).isEqualTo("V1");
         issueManager.deleteIssue(createdIssue.getId());
-        
-        
-        // Basic check 3: Set multiple values 
-        // (check for https://github.com/taskadapter/redmine-java-api/issues/54)
-        newIssue = new Issue();
-        newIssue.setSubject("test");
-        customField = CustomFieldFactory.create(3);
+    }
+
+    /**
+     * See check for https://github.com/taskadapter/redmine-java-api/issues/54
+     */
+    @Test
+    public void setMultiValuesForMultiLineCustomField() throws Exception {
+        Issue newIssue = IssueFactory.createWithSubject("test for custom multi fields - set multiple values");
+        CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
+        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId());
         customField.setValues(Arrays.asList("V1", "V3"));
         newIssue.addCustomField(customField);
-        createdIssue = issueManager.createIssue(projectKey, newIssue);
-        customField = createdIssue.getCustomFieldById(3);
+        Issue createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldByName("custom_multi_list");
         assertThat(customField).isNotNull();
         assertThat(customField.getValues().size()).isEqualTo(2);
         List<String> values = new ArrayList<String>(customField.getValues());
@@ -1297,20 +1293,30 @@ public class IssueManagerTest {
         assertThat(customField.getValues().get(0)).isEqualTo("V1");
         assertThat(customField.getValues().get(1)).isEqualTo("V3");
         issueManager.deleteIssue(createdIssue.getId());
-        
-        // Basic check 4: Create issue with empty list (known problem in redmine 2.6)
-        newIssue = new Issue();
-        newIssue.setSubject("test");
-        customField = CustomFieldFactory.create(3);
+    }
+
+    /**
+     * This is to make sure we have a workaround for a known bug in redmine 2.6.
+     */
+    @Test
+    public void createIssueWithEmptyListInMultilineCustomFields() throws Exception {
+        Issue newIssue = IssueFactory.createWithSubject("test for custom multi fields - set multiple values");
+        CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
+        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId());
         customField.setValues(Collections.EMPTY_LIST);
         newIssue.addCustomField(customField);
-        createdIssue = issueManager.createIssue(projectKey, newIssue);
-        customField = createdIssue.getCustomFieldById(3);
+        Issue createdIssue = issueManager.createIssue(projectKey, newIssue);
+        customField = createdIssue.getCustomFieldByName("custom_multi_list");
         assertThat(customField).isNotNull();
         assertThat(customField.getValues().size()).isEqualTo(0);
         issueManager.deleteIssue(createdIssue.getId());
     }
-    
+
+    private static CustomFieldDefinition loadMultiLineCustomFieldDefinition() throws RedmineException {
+        List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();
+        return getCustomFieldByName(customFieldDefinitions, "custom_multi_list");
+    }
+
     @Ignore
     @Test
     public void testChangesets() throws RedmineException {
