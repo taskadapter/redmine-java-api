@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Changeset;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -1216,31 +1217,36 @@ public class IssueManagerTest {
         // default value: V2
         //
         // All fields: need to be issue fields, for all project, for all trackers
-        int id1 = 1;
-        String custom1FieldName = "my_custom_1";
-        String custom1Value = "some value 123";
-
-        int id2 = 2;
-        String custom2FieldName = "custom_boolean_1";
-        String custom2Value = "true";
+        List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();
+        CustomFieldDefinition customField1 = getCustomFieldByName(customFieldDefinitions, "my_custom_1");
+        CustomFieldDefinition customField2 = getCustomFieldByName(customFieldDefinitions, "custom_boolean_1");
 
         // default empty values
         assertThat(issue.getCustomFields().size()).isEqualTo(3);
         
         issue.clearCustomFields();
 
-        issue.addCustomField(CustomFieldFactory.create(id1, custom1FieldName, custom1Value));
-        issue.addCustomField(CustomFieldFactory.create(id2, custom2FieldName, custom2Value));
+        String custom1Value = "some value 123";
+        String custom2Value = "true";
+        issue.addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value));
+        issue.addCustomField(CustomFieldFactory.create(customField2.getId(), customField2.getName(), custom2Value));
         issueManager.update(issue);
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
         assertThat(updatedIssue.getCustomFields().size()).isEqualTo(3);
-        assertEquals(custom1Value,
-                updatedIssue.getCustomField(custom1FieldName));
-        assertEquals(custom2Value,
-                updatedIssue.getCustomField(custom2FieldName));
+        assertThat(updatedIssue.getCustomField(customField1.getName())).isEqualTo(custom1Value);
+        assertThat(updatedIssue.getCustomField(customField2.getName())).isEqualTo(custom2Value);
     }
-  
+
+    private static CustomFieldDefinition getCustomFieldByName(List<CustomFieldDefinition> customFieldDefinitions, String fieldName) {
+        for (CustomFieldDefinition customFieldDefinition : customFieldDefinitions) {
+            if (customFieldDefinition.getName().equals(fieldName)) {
+                return customFieldDefinition;
+            }
+        }
+        throw new RuntimeException("Custom Field definition '" + fieldName + "' is not found on server.");
+    }
+
     /**
      * @see #testCustomFields()
      */
