@@ -20,7 +20,7 @@ import com.taskadapter.redmineapi.internal.Transport;
 
 public class RedmineManager {
 
-    private final Transport transport;
+	private final Transport transport;
     private final Runnable shutdownListener;
     private final IssueManager issueManager;
     private final AttachmentManager attachmentManager;
@@ -118,4 +118,12 @@ public class RedmineManager {
             shutdown();
         }
     }
+
+	/**
+	 * Returns the transport object. It offers to possibility to configure the objectsPerPage configuratioN.
+	 * @return the transport
+	 */
+	public Transport getTransport() {
+		return transport;
+	}
 }
