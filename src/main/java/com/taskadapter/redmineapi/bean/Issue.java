@@ -89,7 +89,8 @@ public class Issue implements Identifiable {
      * @deprecated This method has no effect when creating issues on Redmine Server, so we might as well just delete it
      * in the future releases.
      */
-    public void setPriorityText(String priority) {
+    @Deprecated
+	public void setPriorityText(String priority) {
         this.priorityText = priority;
     }
 
