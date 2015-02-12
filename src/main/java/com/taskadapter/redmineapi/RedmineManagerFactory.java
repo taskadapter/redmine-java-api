@@ -100,7 +100,7 @@ public final class RedmineManagerFactory {
     public static RedmineManager createWithApiKey(String uri,
                                                   String apiAccessKey, TransportConfiguration config) {
         return new RedmineManager(new Transport(new URIConfigurator(uri,
-                apiAccessKey), config.client), config.shutdownListener);
+                apiAccessKey), config.getClient()), config.getShutdownListener());
     }
 
     /**
@@ -127,9 +127,9 @@ public final class RedmineManagerFactory {
     public static RedmineManager createWithUserAuth(String uri, String login,
                                                     String password, TransportConfiguration config) {
         final Transport transport = new Transport(
-                new URIConfigurator(uri, null), config.client);
+                new URIConfigurator(uri, null), config.getClient());
         transport.setCredentials(login, password);
-        return new RedmineManager(transport, config.shutdownListener);
+        return new RedmineManager(transport, config.getShutdownListener());
     }
 
     /**
