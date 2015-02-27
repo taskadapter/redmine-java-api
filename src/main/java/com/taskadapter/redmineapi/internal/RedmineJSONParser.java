@@ -699,26 +699,11 @@ public class RedmineJSONParser {
 	private static Date getDateOrNull(JSONObject obj, String field) throws JSONException {
 		String dateStr = JsonInput.getStringOrNull(obj, field);
 		if (dateStr == null) {
-            return null;
-        }
+                    return null;
+                }
 		try {
-			if (dateStr.length() >= 5 && dateStr.charAt(4) == '/') {
-				return RedmineDateUtils.FULL_DATE_FORMAT.get().parse(dateStr);
-			}
-			if (dateStr.endsWith("Z")) {
-				dateStr = dateStr.substring(0, dateStr.length() - 1)
-						+ "GMT-00:00";
-			} else {
-				final int inset = 6;
-				if (dateStr.length() <= inset)
-					throw new JSONException("Bad date value " + dateStr);
-				String s0 = dateStr.substring(0, dateStr.length() - inset);
-				String s1 = dateStr.substring(dateStr.length() - inset,
-						dateStr.length());
-				dateStr = s0 + "GMT" + s1;
-			}
-			return RedmineDateUtils.FULL_DATE_FORMAT_V2.get().parse(dateStr);
-		} catch (ParseException e) {
+			return RedmineDateUtils.parseDate(dateStr);
+		} catch (IllegalStateException e) {
 			throw new JSONException("Bad date value " + dateStr);
 		}
 	}
@@ -732,21 +717,15 @@ public class RedmineJSONParser {
 	 *            field to get a value from.
 	 */
 	private static Date getShortDateOrNull(JSONObject obj, String field) throws JSONException {
-        final String dateStr = JsonInput.getStringOrNull(obj, field);
-        if (dateStr == null) {
-            return null;
-        }
-        final SimpleDateFormat dateFormat; 
-        if (dateStr.length() >= 5 && dateStr.charAt(4) == '/')
-            dateFormat = RedmineDateUtils.SHORT_DATE_FORMAT.get();
-        else
-            dateFormat = RedmineDateUtils.SHORT_DATE_FORMAT_V2.get();
-
-        try {
-            return dateFormat.parse(dateStr);
-        } catch (ParseException e) {
-            throw new JSONException("Bad date " + dateStr);
-        }
+            final String dateStr = JsonInput.getStringOrNull(obj, field);
+            if (dateStr == null) {
+                return null;
+            }
+            try {
+                return RedmineDateUtils.parseDate(dateStr);
+            } catch (IllegalArgumentException e) {
+                throw new JSONException("Bad date " + dateStr);
+            }
 	}
 
 	public static JSONObject getResponseSingleObject(String body, String key) throws JSONException {
