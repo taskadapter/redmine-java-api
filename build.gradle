@@ -114,3 +114,7 @@ artifacts {
     archives packageSources
     archives packageJavadoc
 }
+
+javadoc {
+    exclude "**/internal/**"
+}
