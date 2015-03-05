@@ -4,14 +4,31 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
  * Redmine's Issue
  */
 public class Issue implements Identifiable {
-
+    public static final String PROP_SUBJECT = "subject";
+    public static final String PROP_PARENT_ID = "parentId";
+    public static final String PROP_ESTIMATED_HOURS = "estimatedHours";
+    public static final String PROP_SPENT_HOURS = "spentHours";
+    public static final String PROP_ASSIGNEE = "assignee";
+    public static final String PROP_PRIORITY_ID = "priorityId";
+    public static final String PROP_DONE_RATIO = "doneRatio";
+    public static final String PROP_PROJECT = "project";
+    public static final String PROP_AUTHOR = "author";
+    public static final String PROP_START_DATE = "startDate";
+    public static final String PROP_DUE_DATE = "dueDate";
+    public static final String PROP_TRACKER = "tracker";
+    public static final String PROP_DESCRIPTION = "description";
+    public static final String PROP_CREATED_ON = "createdOn";
+    public static final String PROP_UPDATED_ON = "updatedOn";
+    public static final String PROP_STATUS_ID = "statusId";
+    public static final String PROP_TARGET_VERSION = "targetVersion";
+    public static final String PROP_CATEGORY = "category";
+    
     /**
      * @param id database ID.
      */
@@ -54,6 +71,10 @@ public class Issue implements Identifiable {
     private final Set<Changeset> changesets = new HashSet<Changeset>();
     private final Set<Watcher> watchers = new HashSet<Watcher>();
 
+    private boolean updateTracking = false;
+    // Package visible to be accessible by unittests
+    final Set<String> updated = new HashSet<String>();
+    
     /**
      * @param id database ID.
      */
@@ -70,6 +91,7 @@ public class Issue implements Identifiable {
     }
 
     public void setProject(Project project) {
+        updated.add(PROP_PROJECT);
         this.project = project;
     }
 
@@ -78,6 +100,7 @@ public class Issue implements Identifiable {
     }
 
     public void setDoneRatio(Integer doneRatio) {
+        updated.add(PROP_DONE_RATIO);
         this.doneRatio = doneRatio;
     }
 
@@ -98,6 +121,7 @@ public class Issue implements Identifiable {
     }
 
     public void setAssignee(User assignee) {
+        updated.add(PROP_ASSIGNEE);
         this.assignee = assignee;
     }
 
@@ -106,6 +130,7 @@ public class Issue implements Identifiable {
     }
 
     public void setEstimatedHours(Float estimatedTime) {
+        updated.add(PROP_ESTIMATED_HOURS);
         this.estimatedHours = estimatedTime;
     }
 
@@ -114,6 +139,7 @@ public class Issue implements Identifiable {
     }
 
     public void setSpentHours(Float spentHours) {
+         updated.add(PROP_SPENT_HOURS);
          this.spentHours = spentHours;
     }
 
@@ -127,6 +153,7 @@ public class Issue implements Identifiable {
     }
 
     public void setParentId(Integer parentId) {
+        updated.add(PROP_PARENT_ID);
         this.parentId = parentId;
     }
 
@@ -143,6 +170,7 @@ public class Issue implements Identifiable {
     }
 
     public void setSubject(String subject) {
+        updated.add(PROP_SUBJECT);
         this.subject = subject;
     }
 
@@ -151,6 +179,7 @@ public class Issue implements Identifiable {
     }
 
     public void setAuthor(User author) {
+        updated.add(PROP_AUTHOR);
         this.author = author;
     }
 
@@ -159,6 +188,7 @@ public class Issue implements Identifiable {
     }
 
     public void setStartDate(Date startDate) {
+        updated.add(PROP_START_DATE);
         this.startDate = startDate;
     }
 
@@ -167,6 +197,7 @@ public class Issue implements Identifiable {
     }
 
     public void setDueDate(Date dueDate) {
+        updated.add(PROP_DUE_DATE);
         this.dueDate = dueDate;
     }
 
@@ -175,6 +206,7 @@ public class Issue implements Identifiable {
     }
 
     public void setTracker(Tracker tracker) {
+        updated.add(PROP_TRACKER);
         this.tracker = tracker;
     }
 
@@ -186,6 +218,7 @@ public class Issue implements Identifiable {
     }
 
     public void setDescription(String description) {
+        updated.add(PROP_DESCRIPTION);
         this.description = description;
     }
 
@@ -194,6 +227,7 @@ public class Issue implements Identifiable {
     }
 
     public void setCreatedOn(Date createdOn) {
+        updated.add(PROP_CREATED_ON);
         this.createdOn = createdOn;
     }
 
@@ -202,6 +236,7 @@ public class Issue implements Identifiable {
     }
 
     public void setUpdatedOn(Date updatedOn) {
+        updated.add(PROP_UPDATED_ON);
         this.updatedOn = updatedOn;
     }
 
@@ -210,6 +245,7 @@ public class Issue implements Identifiable {
     }
 
     public void setStatusId(Integer statusId) {
+        updated.add(PROP_STATUS_ID);
         this.statusId = statusId;
     }
 
@@ -371,6 +407,7 @@ public class Issue implements Identifiable {
     }
 
     public void setPriorityId(Integer priorityId) {
+        updated.add(PROP_PRIORITY_ID);
         this.priorityId = priorityId;
     }
 
@@ -394,6 +431,7 @@ public class Issue implements Identifiable {
     }
 
     public void setTargetVersion(Version version) {
+        updated.add(PROP_TARGET_VERSION);
         this.targetVersion = version;
     }
 
@@ -402,6 +440,61 @@ public class Issue implements Identifiable {
     }
 
     public void setCategory(IssueCategory category) {
+        updated.add(PROP_CATEGORY);
         this.category = category;
+    }
+    
+    /**
+     * Check update state of an issue property.
+     * 
+     * @param property name of property to check, see the static PROP_* fields of this class
+     * @return true if property was changed since last invocation of setUpdateTracking
+     */
+    public boolean wasUpdated(String property) {
+        return updated.contains(property);
+    }
+
+    public boolean isUpdateTracking() {
+        return updateTracking;
+    }
+
+    /**
+     * Clear/set update tracking.
+     * 
+     * <p>updateTracking is only a state - calling this method does not change
+     * the behaviour of the issue object, but is an indicator for other
+     * methods working with issues.</p>
+     * 
+     * <p>It is the intention to provide a backwards compatible way of tracking
+     * changes in the object state. Before the introduction of this updateTracking
+     * null was used as an indicator of an unchanged value. This breaks when
+     * trying to set the value to null (parent issue, duedate, ...).</p>
+     * 
+     * <p>Calling this method resets the wasUpdated state of all fields. So for this
+     * sequence:</p>
+     * 
+     * <pre>
+     * {@code
+     * // retrieve the current state of the issue
+     * Issue currentState = issueManager.getIssueById(12);
+     * // enable update tracking and reset list of updated properties
+     * currentState.setUpdateTracking(true);
+     * // Change state of issue
+     * currentState.setSubject("New subject");
+     * // now the change can be detected (used when updating issue)
+     * assert currentState.wasUpdated(Issue.PROP_SUBJECT);
+     * // and it is visible, that updateTracking as used
+     * assert currentState.isUpdateTracking();
+     * }
+     * </pre>
+     * 
+     * <p>It is expected, that this method is only called once the issue was
+     * retrieved by the backend.</p>
+     * 
+     * @param updateTracking new state of update tracking
+     */
+    public void setUpdateTracking(boolean updateTracking) {
+        this.updateTracking = updateTracking;
+        updated.clear();
     }
 }

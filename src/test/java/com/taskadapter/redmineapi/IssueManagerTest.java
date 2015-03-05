@@ -196,6 +196,42 @@ public class IssueManagerTest {
         }
     }
 
+   @Test
+    public void issueClearParent() {
+        try {
+            Issue parentIssue = IssueFactory.createWithSubject("parent 1");
+            Issue newParentIssue = issueManager.createIssue(projectKey, parentIssue);
+
+            assertNotNull("Checking parent was created", newParentIssue);
+            assertNotNull("Checking ID of parent issue is not null",
+                    newParentIssue.getId());
+
+            Integer parentId = newParentIssue.getId();
+
+            Issue childIssue = IssueFactory.createWithSubject("child 1");
+            childIssue.setParentId(parentId);
+
+            Issue newChildIssue = issueManager.createIssue(projectKey, childIssue);
+
+            assertEquals("Checking parent ID of the child issue",
+                    parentId, newChildIssue.getParentId());
+
+            Issue updateIssue = IssueFactory.create(newChildIssue.getId());
+            updateIssue.setUpdateTracking(true);
+            updateIssue.setParentId(null);
+            
+            issueManager.update(updateIssue);
+            
+            newChildIssue = issueManager.getIssueById(newChildIssue.getId());
+            
+            assertNull("Checking parent ID of the child issue - it should be null now",
+                    newChildIssue.getParentId());  
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+    
     @Test
     public void testUpdateIssue() {
         try {

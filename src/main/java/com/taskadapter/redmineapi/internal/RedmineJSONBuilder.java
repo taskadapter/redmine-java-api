@@ -280,70 +280,169 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "name", group.getName());
 	}
 
-	public static void writeIssue(Issue issue, final JSONWriter writer) throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", issue.getId());
-		JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
-		JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
-		JsonOutput.addIfNotNull(writer, "estimated_hours",
-				issue.getEstimatedHours());
-		JsonOutput.addIfNotNull(writer, "spent_hours", issue.getSpentHours());
-		if (issue.getAssignee() != null)
-			JsonOutput.addIfNotNull(writer, "assigned_to_id", issue
-					.getAssignee().getId());
-		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
-		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
-        if (issue.getProject() != null) {
-            // Checked in Redmine 2.6.0: updating issues based on
-            // identifier fails and only using the project id works.
-            // As the identifier usage is used in several places, this
-            // case selection is introduced. The identifier is
-            // used, if no real ID is provided
-            if (issue.getProject().getId() != null) {
-                JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-                        .getId());
-            } else {
-                JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-                        .getIdentifier());
-            }
+        public static void writeIssue(Issue issue, final JSONWriter writer)
+                throws JSONException {
+                JsonOutput.addIfNotNull(writer, "id", issue.getId());
+                if (!issue.isUpdateTracking()) {
+                        JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
+                        JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
+                        JsonOutput.addIfNotNull(writer, "estimated_hours", issue.getEstimatedHours());
+                        JsonOutput.addIfNotNull(writer, "spent_hours", issue.getSpentHours());
+                        if (issue.getAssignee() != null) {
+                                JsonOutput.addIfNotNull(writer, "assigned_to_id", issue
+                                        .getAssignee().getId());
+                        }
+                        JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
+                        JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
+                        if (issue.getProject() != null) {
+                                // Checked in Redmine 2.6.0: updating issues based on
+                                // identifier fails and only using the project id works.
+                                // As the identifier usage is used in several places, this
+                                // case selection is introduced. The identifier is
+                                // used, if no real ID is provided
+                                if (issue.getProject().getId() != null) {
+                                        JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
+                                                .getId());
+                                } else {
+                                        JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
+                                                .getIdentifier());
+                                }
+                        }
+                        if (issue.getAuthor() != null) {
+                                JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor()
+                                        .getId());
+                        }
+                        addShort2(writer, "start_date", issue.getStartDate());
+                        addIfNotNullShort2(writer, "due_date", issue.getDueDate());
+                        if (issue.getTracker() != null) {
+                                JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker()
+                                        .getId());
+                        }
+                        JsonOutput.addIfNotNull(writer, "description", issue.getDescription());
+                        addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
+                        addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
+                        JsonOutput.addIfNotNull(writer, "status_id", issue.getStatusId());
+                        if (issue.getTargetVersion() != null) {
+                                JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
+                                        .getTargetVersion().getId());
+                        }
+                        if (issue.getCategory() != null) {
+                                JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory()
+                                        .getId());
+                        }
+                } else {
+                        if (issue.wasUpdated(Issue.PROP_SUBJECT)) {
+                                writer.key("subject").value(issue.getSubject());
+                        }
+                        if(issue.wasUpdated(Issue.PROP_PARENT_ID)) {
+                                writer.key("parent_issue_id").value(issue.getParentId());
+                        }
+                        if(issue.wasUpdated(Issue.PROP_ESTIMATED_HOURS)) {
+                                writer.key("estimated_hours").value(issue.getEstimatedHours());
+                        }
+                        if(issue.wasUpdated(Issue.PROP_SPENT_HOURS)) {
+                                writer.key("spent_hours").value(issue.getSpentHours());
+                        }
+                        if (issue.wasUpdated(Issue.PROP_ASSIGNEE)) {
+                                Integer assignee_id = null;
+                                if (issue.getAssignee() != null) {
+                                        assignee_id =  issue.getAssignee().getId();
+                                }
+                                writer.key("assigned_to_id").value(assignee_id);
+                        }
+                        if(issue.wasUpdated(Issue.PROP_PRIORITY_ID)) {
+                                writer.key("priority_id").value(issue.getPriorityId());
+                        }
+                        if(issue.wasUpdated(Issue.PROP_DONE_RATIO)) {
+                                writer.key("done_ratio").value(issue.getDoneRatio());
+                        }
+                        if (issue.wasUpdated(Issue.PROP_PROJECT)) {
+                                Object project_id = null;
+                                if (issue.getProject() != null) {
+                                        // Checked in Redmine 2.6.0: updating issues based on
+                                        // identifier fails and only using the project id works.
+                                        // As the identifier usage is used in several places, this
+                                        // case selection is introduced. The identifier is
+                                        // used, if no real ID is provided
+                                        if (issue.getProject().getId() != null) {
+                                                project_id = issue.getProject()
+                                                        .getId();
+                                        } else {
+                                                project_id = issue.getProject()
+                                                        .getIdentifier();
+                                        }
+                                
+                                }
+                                writer.key("project_id").value(project_id);
+                        }
+                        if(issue.wasUpdated(Issue.PROP_AUTHOR)) {
+                                Integer author_id = null;
+                                if (issue.getAuthor() != null) {
+                                        author_id = issue.getAuthor().getId();
+                                }
+                                writer.key("author_id").value(author_id);
+                        }
+                        if(issue.wasUpdated(Issue.PROP_START_DATE)) {
+                                addShort2(writer, "start_date", issue.getStartDate());
+                        }
+                        if(issue.wasUpdated(Issue.PROP_DUE_DATE)) {
+                                addShort2(writer, "due_date", issue.getDueDate());
+                        }
+                        if (issue.wasUpdated(Issue.PROP_TRACKER)) {
+                                Integer tracker_id = null;
+                                if (issue.getTracker() != null) {
+                                        tracker_id = issue.getTracker().getId();
+                                }
+                                writer.key("tracker_id").value(tracker_id);
+                        }
+                        if(issue.wasUpdated(Issue.PROP_DESCRIPTION)) {
+                                writer.key("description").value(issue.getDescription());
+                        }
+                        if(issue.wasUpdated(Issue.PROP_CREATED_ON)) {
+                                writer.key("created_on").value(issue.getCreatedOn());
+                        }
+                        if (issue.wasUpdated(Issue.PROP_UPDATED_ON)) {
+                                writer.key("updated_on").value(issue.getUpdatedOn());
+                        }
+                        if ( issue.wasUpdated(Issue.PROP_STATUS_ID)) {
+                                writer.key("status_id").value(issue.getStatusId());
+                        }
+                        if (issue.wasUpdated(Issue.PROP_TARGET_VERSION)) {
+                                Integer target_version_id = null;
+                                if (issue.getTargetVersion() != null) {
+                                        target_version_id = issue.getTargetVersion().getId();
+                                }
+                                writer.key("fixed_version_id").value(target_version_id);
+                        }
+                        if (issue.wasUpdated(Issue.PROP_CATEGORY)) {
+                                Integer category_id = null;
+                                if (issue.getCategory() != null) {
+                                        category_id = issue.getCategory().getId();
+                                }
+                                writer.key("category_id").value(category_id);
+                        }
+                }
+                JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
+                writeCustomFields(writer, issue.getCustomFields());
+                Collection<Watcher> issueWatchers = issue.getWatchers();
+                if (issueWatchers != null && !issueWatchers.isEmpty()) {
+                        writeWatchers(writer, issueWatchers);
+                }
+
+                final List<Attachment> uploads = new ArrayList<Attachment>();
+                for (Attachment attachment : issue.getAttachments()) {
+                        if (attachment.getToken() != null) {
+                                uploads.add(attachment);
+                        }
+                }
+                JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
+                        UPLOAD_WRITER);
+
+                /*
+                 * Journals and Relations cannot be set for an issue during creation or
+                 * updates.
+                 */
         }
-        if (issue.getAuthor() != null)
-			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor().getId());
-		addShort2(writer, "start_date", issue.getStartDate());
-		addIfNotNullShort2(writer, "due_date", issue.getDueDate());
-		if (issue.getTracker() != null)
-			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker().getId());
-		JsonOutput.addIfNotNull(writer, "description", issue.getDescription());
-
-		addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
-		addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
-		JsonOutput.addIfNotNull(writer, "status_id", issue.getStatusId());
-        if (issue.getTargetVersion() != null)
-            JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
-                    .getTargetVersion().getId());
-        if (issue.getCategory() != null)
-            JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory().getId());
-        JsonOutput.addIfNotNull(writer, "notes", issue.getNotes());
-		writeCustomFields(writer, issue.getCustomFields());
-
-        Collection<Watcher> issueWatchers = issue.getWatchers();
-        if (issueWatchers != null && !issueWatchers.isEmpty()) {
-            writeWatchers(writer, issueWatchers);
-        }
-
-        final List<Attachment> uploads = new ArrayList<Attachment>();
-        for (Attachment attachment : issue.getAttachments()) {
-            if (attachment.getToken() != null) {
-                uploads.add(attachment);
-            }
-        }
-        JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
-                UPLOAD_WRITER);
-
-		/*
-		 * Journals and Relations cannot be set for an issue during creation or
-		 * updates.
-		 */
-	}
 
 	public static void writeUpload(JSONWriter writer, Attachment attachment)
 			throws JSONException {
