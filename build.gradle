@@ -114,3 +114,31 @@ artifacts {
     archives packageSources
     archives packageJavadoc
 }
+
+javadoc {
+    exclude "**/internal/**"
+}
+
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath "org.ajoberstar:gradle-git:1.1.0-milestone.1"
+  }
+}
+
+apply plugin: 'org.ajoberstar.github-pages'
+
+githubPages {
+  repoUri = 'https://github.com/taskadapter/redmine-java-api'
+  deleteExistingFiles true
+  pages {
+    from javadoc.outputs.files
+  }
+}
+
+task generateJavadocAndPushToGhPages{
+  dependsOn javadoc
+  dependsOn publishGhPages
+}
