@@ -455,6 +455,7 @@ public class RedmineJSONBuilder {
 	 * @throws JSONException
 	 *             if io error occurs.
 	 */
+        @Deprecated
 	public static void addIfNotNullShort(JSONWriter writer, String field,
 			Date value) throws JSONException {
 		final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT
