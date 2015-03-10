@@ -27,14 +27,14 @@ public class Simple {
 
 	public static void main(String[] args) {
 		String uri = "http://76.126.10.142:8080/redmine";
-		String apiAccessKey = "22711b438871ebc1ead4261d7a947b1b8fee0536";
+		String apiAccessKey = "3f907ae90b8ce8d5de4c0c5ea9fbc9c678092cfe";
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
 		try {
 //            getUsersAsNotAdmin(mgr);
 			// getIssueWithRelations(mgr);
-			tryCreateIssue(mgr);
+//			tryCreateIssue(mgr);
 			// tryGetIssues(mgr);
-			// tryGetIssue(mgr);
+			 tryGetIssue(mgr.getIssueManager());
 			// tryGetAllIssues(mgr);
 			// printCurrentUser(mgr);
 			// generateXMLForUser();
@@ -174,8 +174,8 @@ public class Simple {
 
 	@SuppressWarnings("unused")
 	private static void tryGetIssue(IssueManager issueManager) throws Exception {
-		issueManager.getIssueById(4808, Include.journals, Include.relations,
-                Include.attachments);
+		Issue issue = issueManager.getIssueById(3205, Include.journals, Include.relations, Include.attachments);
+		System.out.println(issue.getJournals());
 	}
 
 	@SuppressWarnings("unused")

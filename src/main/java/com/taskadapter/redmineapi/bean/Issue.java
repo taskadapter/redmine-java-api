@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -13,7 +12,7 @@ import java.util.Set;
 public class Issue implements Identifiable {
 
     /**
-     * @param id database ID.
+     * database ID.
      */
     private final Integer id;
 
@@ -260,6 +259,14 @@ public class Issue implements Identifiable {
         this.notes = notes;
     }
 
+    /**
+     * Don't forget to use Include.journals flag when loading issue from Redmine server:
+     * <pre>
+     *     Issue issue = issueManager.getIssueById(3205, Include.journals);
+     * </pre>
+     * @return Collection of Journal entries or empty collection if no objects found.
+     * @see com.taskadapter.redmineapi.Include#journals
+     */
     public Collection<Journal> getJournals() {
         return Collections.unmodifiableCollection(journals);
     }
@@ -268,6 +275,14 @@ public class Issue implements Identifiable {
         this.journals.addAll(journals);
     }
 
+    /**
+     * Don't forget to use Include.changesets flag when loading issue from Redmine server:
+     * <pre>
+     *     Issue issue = issueManager.getIssueById(3205, Include.changesets);
+     * </pre>
+     * @return Collection of entries or empty collection if no objects found.
+     * @see com.taskadapter.redmineapi.Include#changesets
+     */
     public Collection<Changeset> getChangesets() {
         return Collections.unmodifiableCollection(changesets);
     }
@@ -276,6 +291,14 @@ public class Issue implements Identifiable {
         this.changesets.addAll(changesets);
     }
 
+    /**
+     * Don't forget to use Include.watchers flag when loading issue from Redmine server:
+     * <pre>
+     *     Issue issue = issueManager.getIssueById(3205, Include.watchers);
+     * </pre>
+     * @return Collection of entries or empty collection if no objects found.
+     * @see com.taskadapter.redmineapi.Include#watchers
+     */
     public Collection<Watcher> getWatchers() {
         return Collections.unmodifiableCollection(watchers);
     }
@@ -353,10 +376,11 @@ public class Issue implements Identifiable {
 
     /**
      * Relations are only loaded if you include INCLUDE.relations when loading the Issue.
-     *
+     * <pre>
+     *     Issue issue = issueManager.getIssueById(3205, Include.relations);
+     * </pre>
      * @return relations or EMPTY collection if no relations, never returns NULL
-     *
-     * @see com.taskadapter.redmineapi.IssueManager#getIssueById(Integer id, Include... include)
+     * @see com.taskadapter.redmineapi.Include#relations
      */
     public Collection<IssueRelation> getRelations() {
         return Collections.unmodifiableCollection(relations);
@@ -379,7 +403,12 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * @return attachments. the collection can be empty, but never null.
+     * Don't forget to use <i>Include.attachments</i> flag when loading issue from Redmine server:
+     * <pre>
+     *     Issue issue = issueManager.getIssueById(3205, Include.attachments);
+     * </pre>
+     * @return Collection of entries or empty collection if no objects found.
+     * @see com.taskadapter.redmineapi.Include#attachments
      */
     public Collection<Attachment> getAttachments() {
         return Collections.unmodifiableCollection(attachments);
