@@ -421,7 +421,7 @@ public class RedmineJSONBuilder {
 	 */
 	public static void addIfNotNullFull(JSONWriter writer, String field,
 			Date value) throws JSONException {
-		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
+		final SimpleDateFormat format = RedmineDateParser.FULL_DATE_FORMAT.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
 	}
 
@@ -439,7 +439,7 @@ public class RedmineJSONBuilder {
 	 */
 	public static void addFull(JSONWriter writer, String field, Date value)
 			throws JSONException {
-		final SimpleDateFormat format = RedmineDateUtils.FULL_DATE_FORMAT.get();
+		final SimpleDateFormat format = RedmineDateParser.FULL_DATE_FORMAT.get();
 		JsonOutput.add(writer, field, value, format);
 	}
 
@@ -457,7 +457,7 @@ public class RedmineJSONBuilder {
 	 */
 	public static void addIfNotNullShort(JSONWriter writer, String field,
 			Date value) throws JSONException {
-		final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT
+		final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT
 				.get();
 		JsonOutput.addIfNotNull(writer, field, value, format);
 	}
@@ -476,7 +476,7 @@ public class RedmineJSONBuilder {
      */
     public static void addIfNotNullShort2(JSONWriter writer, String field,
             Date value) throws JSONException {
-        final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT_V2
+        final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT_V2
                 .get();
         JsonOutput.addIfNotNull(writer, field, value, format);
     }
@@ -495,7 +495,7 @@ public class RedmineJSONBuilder {
      */
     public static void addShort2(JSONWriter writer, String field, Date value)
             throws JSONException {
-        final SimpleDateFormat format = RedmineDateUtils.SHORT_DATE_FORMAT_V2.get();
+        final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT_V2.get();
         JsonOutput.add(writer, field, value, format);
     }
 }
