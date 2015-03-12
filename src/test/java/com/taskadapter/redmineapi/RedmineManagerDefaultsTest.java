@@ -32,6 +32,7 @@ public class RedmineManagerDefaultsTest {
 	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
 
     private static String projectKey;
+    private static int projectId;
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
 
@@ -49,6 +50,7 @@ public class RedmineManagerDefaultsTest {
         try {
 			Project createdProject = projectManager.createProject(junitTestProject);
 			projectKey = createdProject.getIdentifier();
+			projectId = createdProject.getId();
 		} catch (Exception e) {
 			logger.error("Exception while creating test project", e);
 			Assert.fail("can't create a test project. " + e.getMessage());
@@ -90,8 +92,8 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testIssueDefaults() throws RedmineException {
-		final Issue template = IssueFactory.createWithSubject("This is a subject");
-		final Issue result = issueManager.createIssue(projectKey, template);
+		final Issue template = IssueFactory.create(projectId, "This is a subject");
+		final Issue result = issueManager.createIssue(template);
 		
 		try {
 			Assert.assertNotNull(result.getId());
@@ -129,8 +131,8 @@ public class RedmineManagerDefaultsTest {
 	public void testTimeEntryDefaults() throws RedmineException {
 		final TimeEntry template = TimeEntryFactory.create();
 
-		final Issue tmp = IssueFactory.createWithSubject("aaabbbccc");
-		final Issue tmpIssue = issueManager.createIssue(projectKey, tmp);
+		final Issue tmp = IssueFactory.create(projectId, "aaabbbccc");
+		final Issue tmpIssue = issueManager.createIssue(tmp);
 		try {
 			template.setHours(123.f);
 			template.setActivityId(ACTIVITY_ID);
@@ -160,10 +162,11 @@ public class RedmineManagerDefaultsTest {
 
 	@Test
 	public void testRelationDefaults() throws RedmineException {
-		final Issue tmp = IssueFactory.createWithSubject("this is a test");
-		final Issue issue1 = issueManager.createIssue(projectKey, tmp);
+		final Issue tmp = IssueFactory.create(projectId, "this is a test");
+		// TODO why is not everything inside TRY? fix!
+		final Issue issue1 = issueManager.createIssue(tmp);
 		try {
-			final Issue issue2 = issueManager.createIssue(projectKey, tmp);
+			final Issue issue2 = issueManager.createIssue(tmp);
 			try {
 				final IssueRelation relation = issueManager.createRelation(
 						issue1.getId(), issue2.getId(), "blocks");

@@ -38,6 +38,9 @@ public class UserManager {
 
     /**
      * Adds the given user to the given group.
+     * <p>
+     * Note: "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0 when
+     * executed twice on the same user. I submitted a bug: http://www.redmine.org/issues/19363
      *
      * @param user  - The user being added.
      * @param group - The new group of the user.

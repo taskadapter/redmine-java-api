@@ -302,8 +302,8 @@ public class RedmineJSONBuilder {
                 JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
                         .getId());
             } else {
-                JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-                        .getIdentifier());
+				throw new IllegalArgumentException("Project ID must be set on issue. " +
+						"You can use a factory method to create Issue object in memory: IssueFactory.create(projectId, subject)");
             }
         }
         if (issue.getAuthor() != null)

@@ -37,21 +37,14 @@ public class IntegrationTestHelper {
         return RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
     }
 
-    /**
-     * @return project key
-     */
-    public static String createProject(RedmineManager mgr) {
+    public static Project createProject(RedmineManager mgr) {
         Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
-
-        String projectKey;
         try {
-            Project createdProject = mgr.getProjectManager().createProject(testProject);
-            projectKey = createdProject.getIdentifier();
+            return mgr.getProjectManager().createProject(testProject);
         } catch (Exception e) {
             logger.error("Exception while configuring tests", e);
             throw new RuntimeException(e);
         }
-        return projectKey;
     }
 
     public static Project createAndReturnProject(ProjectManager mgr) {

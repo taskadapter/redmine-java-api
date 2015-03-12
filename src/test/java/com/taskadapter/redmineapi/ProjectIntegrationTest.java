@@ -33,7 +33,7 @@ public class ProjectIntegrationTest {
         mgr = IntegrationTestHelper.createRedmineManager();
         projectManager = mgr.getProjectManager();
         try {
-            projectKey = IntegrationTestHelper.createProject(mgr);
+            projectKey = IntegrationTestHelper.createProject(mgr).getIdentifier();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
