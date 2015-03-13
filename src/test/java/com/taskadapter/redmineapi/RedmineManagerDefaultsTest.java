@@ -100,7 +100,15 @@ public class RedmineManagerDefaultsTest {
 			Assert.assertEquals("This is a subject", result.getSubject());
 			Assert.assertNull(result.getParentId());
 			Assert.assertNull(result.getEstimatedHours());
-			Assert.assertEquals(Float.valueOf(0), result.getSpentHours());
+			/* result.getSpentHours() is NULL for Redmine 3.0.0 and is equal to "0.0" for Redmine 2.6.2
+			* so we can't really check this because we don't know the Redmine version.
+			* Ideally we would want something like
+			* if (redmine.getVersion()>=3) {
+			*     assertThat()...
+			* } else {
+			*     assertThat()...
+			* }
+			*/
 			Assert.assertNull(result.getAssignee());
 			Assert.assertNotNull(result.getPriorityText());
 			Assert.assertNotNull(result.getPriorityId());

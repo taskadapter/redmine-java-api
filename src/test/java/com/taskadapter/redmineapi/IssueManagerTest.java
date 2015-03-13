@@ -1182,7 +1182,7 @@ public class IssueManagerTest {
      */
     @Test
     public void testCustomFields() throws Exception {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
+        Issue issue = createIssue(issueManager, projectId);
 
         // TODO this needs to be reworked, when Redmine gains a real CRUD interface for custom fields
         //

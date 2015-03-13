@@ -42,14 +42,14 @@ public class CustomField {
     }
     
 	/**
-	 * @return the values
+	 * @return values list if this is a multi-line field, NULL otherwise.
 	 */
 	public List<String> getValues() {
 		return values;
 	}
 
 	/**
-	 * @param values the values to set
+	 * @param values the values for multi-line custom field.
 	 */
 	public void setValues(List<String> values) {
 		this.values = values;
