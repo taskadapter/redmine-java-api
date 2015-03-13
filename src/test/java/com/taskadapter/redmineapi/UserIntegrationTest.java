@@ -5,7 +5,6 @@ import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,29 +21,21 @@ import static org.junit.Assert.fail;
 public class UserIntegrationTest {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
 
-    private static RedmineManager mgr;
     private static UserManager userManager;
 
-    private static String projectKey;
     private static Integer nonAdminUserId;
     private static String nonAdminUserLogin;
     private static String nonAdminPassword;
 
     @BeforeClass
     public static void oneTimeSetup() {
-        mgr = IntegrationTestHelper.createRedmineManager();
+        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
         userManager = mgr.getUserManager();
         try {
-            projectKey = IntegrationTestHelper.createProject(mgr);
             createNonAdminUser();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @AfterClass
-    public static void oneTimeTearDown() {
-        IntegrationTestHelper.deleteProject(mgr, projectKey);
     }
 
     private static void createNonAdminUser() throws RedmineException {
@@ -232,8 +223,12 @@ public class UserIntegrationTest {
         }
     }
 
+
     /**
-     * Requires Redmine 2.1
+     * Requires Redmine 2.1.
+     * <p>
+     * "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0.
+     * I submitted a bug: http://www.redmine.org/issues/19363
      */
     @Test
     public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {

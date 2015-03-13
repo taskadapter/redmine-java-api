@@ -3,6 +3,7 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueFactory;
+import com.taskadapter.redmineapi.bean.Project;
 import org.apache.http.entity.ContentType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -23,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 public class AttachmentIntegrationTest {
 
     private static RedmineManager mgr;
+    private static int projectId;
     private static String projectKey;
     private static IssueManager issueManager;
     private static AttachmentManager attachmentManager;
@@ -33,7 +35,9 @@ public class AttachmentIntegrationTest {
 
         issueManager = mgr.getIssueManager();
         attachmentManager = mgr.getAttachmentManager();
-        projectKey = IntegrationTestHelper.createProject(mgr);
+        Project project = IntegrationTestHelper.createProject(mgr);
+        projectId = project.getId();
+        projectKey = project.getIdentifier();
     }
 
     @AfterClass
@@ -46,9 +50,9 @@ public class AttachmentIntegrationTest {
         final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
                 "application/ternary", content);
-        final Issue testIssue = IssueFactory.createWithSubject("This is upload ticket!");
+        final Issue testIssue = IssueFactory.create(projectId, "This is upload ticket!");
         testIssue.addAttachment(attach1);
-        final Issue createdIssue = issueManager.createIssue(projectKey, testIssue);
+        final Issue createdIssue = issueManager.createIssue(testIssue);
         try {
             final Collection<Attachment> attachments = createdIssue.getAttachments();
             assertThat(attachments.size()).isEqualTo(1);
@@ -73,8 +77,8 @@ public class AttachmentIntegrationTest {
         fileWriter.write(attachmentContent);
         fileWriter.close();
 
-        final Issue issue = IssueFactory.createWithSubject("task with attachment");
-        final Issue createdIssue = issueManager.createIssue(projectKey, issue);
+        final Issue issue = IssueFactory.create(projectId, "task with attachment");
+        final Issue createdIssue = issueManager.createIssue(issue);
         attachmentManager.addAttachmentToIssue(createdIssue.getId(), tempFile, ContentType.TEXT_PLAIN.getMimeType());
         try {
             Issue loadedIssue = issueManager.getIssueById(createdIssue.getId(), Include.attachments);
@@ -167,9 +171,8 @@ public class AttachmentIntegrationTest {
         Issue newIssue = null;
         try {
             // create at least 1 issue
-            Issue issueToCreate = IssueFactory.createWithSubject("testGetIssueAttachment_"
-                    + UUID.randomUUID());
-            newIssue = issueManager.createIssue(projectKey, issueToCreate);
+            Issue issueToCreate = IssueFactory.create(projectId, "testGetIssueAttachment_" + UUID.randomUUID());
+            newIssue = issueManager.createIssue(issueToCreate);
             // TODO create test attachments for the issue once the Redmine REST
             // API allows for it
             // retrieve issue attachments
