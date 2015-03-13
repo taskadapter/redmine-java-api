@@ -1265,6 +1265,10 @@ public class IssueManagerTest {
 
     /**
      * See check for https://github.com/taskadapter/redmine-java-api/issues/54
+     *
+     * BUG in Redmine 3.0.0: multi-line custom fields values are not accepted by Redmine 3.0.0 for new issues.
+     * the server ignores values V1, V3 and assigns default V2 value to that multi-line custom field.
+     * I submitted this as http://www.redmine.org/issues/19368
      */
     @Test
     public void setMultiValuesForMultiLineCustomField() throws Exception {
