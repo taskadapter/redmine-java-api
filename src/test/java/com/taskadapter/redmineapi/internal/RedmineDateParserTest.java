@@ -14,25 +14,25 @@ public class RedmineDateParserTest {
     @Test
     public void allRedmineDateFormatsAreParsed() throws ParseException {
         // Redmine 1.x short format
-        dateIsParsedTo("2015/03/11", "2015-03-11T00:00:00.000PDT");
-
-        // Redmine 2.x short format
-        dateIsParsedTo("2015-03-11", "2015-03-11T00:00:00.000PDT");
-
+        dateIsParsedTo("2015/03/11", new Date(115, 02, 11));
         // Redmine 1.x long format
         dateIsParsedTo("2015/03/11 17:22:37 -0700", "2015-03-11T17:22:37.000PDT");
 
+        // Redmine 2.x short format
+        dateIsParsedTo("2015-03-11", new Date(115, 02, 11));
         // Redmine 2.x long format
         dateIsParsedTo("2015-03-12T00:22:37Z", "2015-03-11T17:22:37.000PDT");
 
         // Redmine 3.0 long format
         dateIsParsedTo("2015-03-12T00:22:37.123Z", "2015-03-11T17:22:37.123PDT");
-
-        // side note... can you please STOP CHANGING FREAKING DATE FORMATS already? please?
     }
 
     private void dateIsParsedTo(String originalDateString, String expectedDateString) throws ParseException {
         assertThat(parse(originalDateString)).isEqualTo(getDate(expectedDateString));
+    }
+
+    private void dateIsParsedTo(String originalDateString, Date expectedDate) throws ParseException {
+        assertThat(parse(originalDateString)).isEqualTo(expectedDate);
     }
 
     private static Date getDate(String str) {

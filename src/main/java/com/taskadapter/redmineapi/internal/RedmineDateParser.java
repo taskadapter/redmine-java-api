@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-// side note... can you please STOP CHANGING FREAKING DATE FORMATS already? please?
+// side note... can you PLEASE stop changing date formats already? please?
 // I submitted a Redmine feature request to read current date format from the server: http://www.redmine.org/issues/19354
 public final class RedmineDateParser {
     /**
