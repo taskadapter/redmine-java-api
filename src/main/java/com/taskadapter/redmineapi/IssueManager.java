@@ -55,10 +55,9 @@ public class IssueManager {
      * Generic method to search for issues.
      *
      * @param pParameters the http parameters key/value pairs to append to the rest api request
-     * @return empty list if not issues with this summary field exist, never NULL
+     * @return empty list if no issues found matching given parameters
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException
      * @throws RedmineException
      */
     public List<Issue> getIssues(Map<String, String> pParameters) throws RedmineException {
@@ -72,9 +71,9 @@ public class IssueManager {
     }
 
     /**
-     * @param id      the Redmine issue ID
+     * @param id      Redmine issue Id
      * @param include list of "includes". e.g. "relations", "journals", ...
-     * @return Issue object
+     * @return Issue object. never Null: an exception is thrown if the issue is not found (see Throws section).
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       the issue with the given id is not found on the server
@@ -90,7 +89,7 @@ public class IssueManager {
     }
 
     public void deleteWatcherFromIssue(Watcher watcher, Issue issue) throws RedmineException {
-        transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId() );
+        transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId());
     }
 
     /**
@@ -187,6 +186,15 @@ public class IssueManager {
         return transport.getObjectsList(Issue.class, params);
     }
 
+    /**
+     * @param issueId id of the source issue
+     * @param issueToId if of the target issue
+     * @param type type of the relation. e.g. "precedes". see IssueRelation.TYPE for possible types.
+     * @return newly created IssueRelation instance.
+     *
+     * @throws RedmineException
+     * @see IssueRelation.TYPE
+     */
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
         IssueRelation toCreate = IssueRelationFactory.create();
         toCreate.setIssueId(issueId);
@@ -197,7 +205,7 @@ public class IssueManager {
     }
 
     /**
-     * Delete Issue Relation with the given ID.
+     * Delete Issue Relation with the given Id.
      */
     public void deleteRelation(Integer id) throws RedmineException {
         transport.deleteObject(IssueRelation.class, Integer.toString(id));
