@@ -108,8 +108,6 @@ public class ProjectIntegrationTest {
                     trackers);
             assertTrue("checking that project has some trackers",
                     !(trackers.isEmpty()));
-        } catch (Exception e) {
-            fail(e.getMessage());
         } finally {
             if (key != null) {
                 projectManager.deleteProject(key);
@@ -198,22 +196,17 @@ public class ProjectIntegrationTest {
     // It will be included in Redmine 2.6.0 which isn't out yet.
     @Ignore
     @Test
-    public void testGetProjectsIncludesTrackers() {
-        try {
-            List<Project> projects = projectManager.getProjects();
-            assertTrue(projects.size() > 0);
-            Project p1 = projects.get(0);
-            assertNotNull(p1.getTrackers());
-            for (Project p : projects) {
-                if (!p.getTrackers().isEmpty()) {
-                    return;
-                }
+    public void testGetProjectsIncludesTrackers() throws RedmineException {
+        List<Project> projects = projectManager.getProjects();
+        assertTrue(projects.size() > 0);
+        Project p1 = projects.get(0);
+        assertNotNull(p1.getTrackers());
+        for (Project p : projects) {
+            if (!p.getTrackers().isEmpty()) {
+                return;
             }
-            fail("No projects with trackers found");
-        } catch (Exception e) {
-            e.printStackTrace();
-            Assert.fail(e.getMessage());
         }
+        fail("No projects with trackers found");
     }
 
     @Test

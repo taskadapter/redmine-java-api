@@ -47,14 +47,9 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void usersAreLoadedByAdmin() {
-        try {
-            List<User> users = userManager.getUsers();
-            assertTrue(users.size() > 0);
-        } catch (Exception e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
+    public void usersAreLoadedByAdmin() throws RedmineException {
+        List<User> users = userManager.getUsers();
+        assertTrue(users.size() > 0);
     }
 
     @Test(expected = NotAuthorizedException.class)
@@ -106,9 +101,6 @@ public class UserIntegrationTest {
                     createdUser.getLastName());
             Integer id = createdUser.getId();
             assertNotNull(id);
-
-        } catch (Exception e) {
-            fail(e.getMessage());
         } finally {
             if (createdUser != null) {
                 userManager.deleteUser(createdUser.getId());
@@ -129,9 +121,6 @@ public class UserIntegrationTest {
 //            Redmine doesn't return it, so let's consider a non-exceptional return as success for now. 
 //            assertNotNull("checking that a non-null auth_source_id is returned", createdUser.getAuthSourceId());
 //            assertEquals(1, createdUser.getAuthSourceId().intValue());
-
-        } catch (Exception e) {
-            fail(e.getMessage());
         } finally {
             if (createdUser != null) {
                 userManager.deleteUser(createdUser.getId());
@@ -140,8 +129,7 @@ public class UserIntegrationTest {
     }
 
     @Test
-    public void testUpdateUser() throws RedmineAuthenticationException,
-            NotFoundException {
+    public void testUpdateUser() throws RedmineException {
         User userToCreate = UserFactory.create();
         userToCreate.setFirstName("fname2");
         userToCreate.setLastName("lname2");
@@ -149,31 +137,26 @@ public class UserIntegrationTest {
         userToCreate.setLogin("login33" + randomNumber);
         userToCreate.setMail("email" + randomNumber + "@somedomain.com");
         userToCreate.setPassword("1234asdf");
-        try {
-            User createdUser = userManager.createUser(userToCreate);
-            Integer userId = createdUser.getId();
-            assertNotNull(
-                    "checking that a non-null project is returned", createdUser);
+        User createdUser = userManager.createUser(userToCreate);
+        Integer userId = createdUser.getId();
+        assertNotNull(
+                "checking that a non-null project is returned", createdUser);
 
-            String newFirstName = "fnameNEW";
-            String newLastName = "lnameNEW";
-            String newMail = "newmail" + randomNumber + "@asd.com";
-            createdUser.setFirstName(newFirstName);
-            createdUser.setLastName(newLastName);
-            createdUser.setMail(newMail);
+        String newFirstName = "fnameNEW";
+        String newLastName = "lnameNEW";
+        String newMail = "newmail" + randomNumber + "@asd.com";
+        createdUser.setFirstName(newFirstName);
+        createdUser.setLastName(newLastName);
+        createdUser.setMail(newMail);
 
-            userManager.update(createdUser);
+        userManager.update(createdUser);
 
-            User updatedUser = userManager.getUserById(userId);
+        User updatedUser = userManager.getUserById(userId);
 
-            assertEquals(newFirstName, updatedUser.getFirstName());
-            assertEquals(newLastName, updatedUser.getLastName());
-            assertEquals(newMail, updatedUser.getMail());
-            assertEquals(userId, updatedUser.getId());
-
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        assertEquals(newFirstName, updatedUser.getFirstName());
+        assertEquals(newLastName, updatedUser.getLastName());
+        assertEquals(newMail, updatedUser.getMail());
+        assertEquals(userId, updatedUser.getId());
     }
 
     @Test
