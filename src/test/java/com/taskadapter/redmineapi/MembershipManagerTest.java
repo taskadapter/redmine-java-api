@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Random;
 
 import static org.fest.assertions.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class MembershipManagerTest {
     private static RedmineManager mgr;
@@ -51,11 +49,9 @@ public class MembershipManagerTest {
         final User user = UserGenerator.generateRandomUser();
         User createdUser = mgr.getUserManager().createUser(user);
         try {
-
-        membershipManager.createMembershipForUser(project.getId(), createdUser.getId(), roles);
-
-        final User userWithMembership = userManager.getUserById(createdUser.getId());
-        assertTrue(userWithMembership.getMemberships().size() > 0);
+            membershipManager.createMembershipForUser(project.getId(), createdUser.getId(), roles);
+            final User userWithMembership = userManager.getUserById(createdUser.getId());
+            assertThat(userWithMembership.getMemberships()).isNotEmpty();
         } finally {
             userManager.deleteUser(createdUser.getId());
         }
@@ -113,9 +109,10 @@ public class MembershipManagerTest {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
+        final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
         final List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
         verifyMemberships(roles, currentUser, memberships);
+        membershipManager.delete(membershipForUser);
     }
 
     @Test
@@ -123,9 +120,10 @@ public class MembershipManagerTest {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
+        final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
         final List<Membership> memberships = membershipManager.getMemberships(project.getId());
         verifyMemberships(roles, currentUser, memberships);
+        membershipManager.delete(membershipForUser);
     }
 
     private void verifyMemberships(List<Role> roles, User currentUser, List<Membership> memberships) throws RedmineException {
