@@ -149,7 +149,7 @@ public class Project implements Identifiable, Serializable {
      * Redmine's REST API "get project" operation does NOT return the 
      * parent project ID in redmine 1.1.2 (and maybe earlier). Which means 
      * calling getParentId() of the project loaded from Redmine server will
-     * return <b>NULL</b> with that redmine. This bug was fixed in redmine 1.2.1.
+     * return <strong>NULL</strong> with that redmine. This bug was fixed in redmine 1.2.1.
      * See bug http://www.redmine.org/issues/8229
      * 
      *

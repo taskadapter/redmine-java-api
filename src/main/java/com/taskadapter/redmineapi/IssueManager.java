@@ -180,7 +180,7 @@ public class IssueManager {
      * @param projectKey ignored if NULL
      * @param queryId    id of the saved query in Redmine. the query must be accessible to the user
      *                   represented by the API access key (if the Redmine project requires authorization).
-     *                   This parameter is <b>optional</b>, NULL can be provided to get all available issues.
+     *                   This parameter is <strong>optional</strong>, NULL can be provided to get all available issues.
      * @return list of Issue objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.

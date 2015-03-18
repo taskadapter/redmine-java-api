@@ -206,7 +206,7 @@ public class User implements Identifiable {
     }
 
     /**
-     * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
+     * NOTE: The custom field(s) <strong>must have correct database ID set</strong> to be saved to Redmine. This is Redmine REST API's limitation.
      * ID can be seen in database or in Redmine administration when editing the custom field (number is part of the URL!).
      */
     public void addCustomFields(Collection<CustomField> customFields) {

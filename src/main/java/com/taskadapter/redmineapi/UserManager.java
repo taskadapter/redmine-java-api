@@ -15,7 +15,7 @@ import java.util.List;
  RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
  UserManager userManager = redmineManager.getUserManager();
  * </pre>
- * <b>Note that some operations with users require Redmine Admin privileges.</b>
+ * <strong>Note that some operations with users require Redmine Admin privileges.</strong>
  *
  * <p>Sample usage:
  * <pre>
@@ -68,8 +68,8 @@ public class UserManager {
     }
 
     /**
-     * Load the list of users on the server.
-     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     * Load list of users from the server.
+     * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      *
      * @return list of User objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
@@ -91,8 +91,8 @@ public class UserManager {
     }
 
     /**
-     * Load the list of groups on the server.
-     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     * Load list of groups on the server.
+     * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      *
      * @return list of User objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
@@ -107,10 +107,9 @@ public class UserManager {
     /**
      * Returns the group based on its id.
      * <p>
-     * <b>This operation requires "Redmine Administrators" permission.</b>
+     * <strong>This operation requires "Redmine Administrators" permission.</strong>
      *
-     * @param id
-     *            the id of the group
+     * @param id id of the group
      * @return the group
      * @throws RedmineException
      */
@@ -121,7 +120,7 @@ public class UserManager {
     /**
      * Returns the group based on its name.
      * <p>
-     * <b>This operation requires "Redmine Administrators" permission.</b>
+     * <strong>This operation requires "Redmine Administrators" permission.</strong>
      *
      * @param name
      *            the name of the group
@@ -134,7 +133,7 @@ public class UserManager {
 
     /**
      * Creates a new group.
-     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      * @return created group.
      * @throws RedmineException
      */
@@ -144,7 +143,7 @@ public class UserManager {
 
     /**
      * Deletes a group.
-     * <p><b>This operation requires "Redmine Administrator" permission.</b>
+     * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      */
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());

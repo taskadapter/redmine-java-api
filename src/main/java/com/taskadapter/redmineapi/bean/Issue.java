@@ -232,7 +232,7 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * NOTE: The custom field(s) <b>must have correct database ID set</b> to be saved to Redmine. This is Redmine REST API's limitation.
+     * NOTE: The custom field(s) <strong>must have correct database ID set</strong> to be saved to Redmine. This is Redmine REST API's limitation.
      */
     public void addCustomFields(Collection<CustomField> customFields) {
         this.customFields.addAll(customFields);
