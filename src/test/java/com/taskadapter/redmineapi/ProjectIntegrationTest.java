@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -27,13 +28,15 @@ public class ProjectIntegrationTest {
     private static RedmineManager mgr;
     private static ProjectManager projectManager;
     private static String projectKey;
+    private static Project project;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
         projectManager = mgr.getProjectManager();
         try {
-            projectKey = IntegrationTestHelper.createProject(mgr).getIdentifier();
+            project = IntegrationTestHelper.createProject(mgr);
+            projectKey = project.getIdentifier();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -45,13 +48,24 @@ public class ProjectIntegrationTest {
     }
 
     @Test(expected = NotFoundException.class)
-    public void testGetProjectNonExistingId() throws RedmineException {
-        projectManager.getProjectByKey("some-non-existing-key");
+    public void testDeleteNonExistingProject() throws RedmineException {
+        projectManager.deleteProject("some-non-existing-key");
+    }
+
+    @Test
+    public void projectIsLoadedById() throws RedmineException {
+        final Project projectById = projectManager.getProjectById(project.getId());
+        assertThat(projectById.getName()).isEqualTo(project.getName());
     }
 
     @Test(expected = NotFoundException.class)
-    public void testDeleteNonExistingProject() throws RedmineException {
-        projectManager.deleteProject("some-non-existing-key");
+    public void requestingPojectNonExistingIdGivesNFE() throws RedmineException {
+        projectManager.getProjectById(999999999);
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void requestingPojectNonExistingStrignKeyGivesNFE() throws RedmineException {
+        projectManager.getProjectByKey("some-non-existing-key");
     }
 
     /**

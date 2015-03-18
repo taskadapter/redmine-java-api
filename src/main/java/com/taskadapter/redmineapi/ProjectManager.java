@@ -72,6 +72,7 @@ public class ProjectManager {
 
     /**
      * @param projectKey string key like "project-ABC", NOT a database numeric ID
+     *
      * @return Redmine's project
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
@@ -81,6 +82,19 @@ public class ProjectManager {
     public Project getProjectByKey(String projectKey) throws RedmineException {
         return transport.getObject(Project.class, projectKey,
                 new BasicNameValuePair("include", "trackers"));
+    }
+
+    /**
+     * @param id project database Id, like 123. this is not a string "key" like "myproject".
+     *
+     * @return Redmine's project
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization.
+     * @throws NotFoundException       the project with the given id is not found
+     * @throws RedmineException
+     */
+    public Project getProjectById(int id) throws RedmineException {
+        return transport.getObject(Project.class, id, new BasicNameValuePair("include", "trackers"));
     }
 
     /**
