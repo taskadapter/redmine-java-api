@@ -8,6 +8,22 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.util.List;
 
+/**
+ * Works with Users and Groups.
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+ RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ UserManager userManager = redmineManager.getUserManager();
+ * </pre>
+ * <b>Note that some operations with users require Redmine Admin privileges.</b>
+ *
+ * <p>Sample usage:
+ * <pre>
+     users = mgr.getUserManager().getUsers();
+ * </pre>
+ *
+ * @see RedmineManager#getUserManager()
+ */
 public class UserManager {
     private final Transport transport;
 

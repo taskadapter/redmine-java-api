@@ -37,6 +37,13 @@ import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
  * external APIs. Moreover, we can create "named constructor" for redmine
  * instances. This will allow us to have many construction methods with the same
  * signature.
+ * <p>
+ * Sample usage:
+ * <pre>
+ RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ * </pre>
+ *
+ * @see RedmineManager
  */
 public final class RedmineManagerFactory {
     /**

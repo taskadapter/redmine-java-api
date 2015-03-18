@@ -18,6 +18,22 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.internal.Transport;
 
+/**
+ * Wrapper to hold all manager classes.
+ * <p>Once you obtained an instance of RedmineManager, you can get references to all other xManagers:
+ * <pre>
+ RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ redmineManager.getIssueManager();
+ redmineManager.getUserManager();
+ ...etc...
+ * </pre>
+ *
+ * @see RedmineManagerFactory
+ * @see IssueManager
+ * @see UserManager
+ * @see AttachmentManager
+ * @see ProjectManager
+ */
 public class RedmineManager {
 
     private final Transport transport;

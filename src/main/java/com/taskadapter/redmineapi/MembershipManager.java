@@ -12,6 +12,25 @@ import com.taskadapter.redmineapi.internal.Transport;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Works with User-Project Memberships.
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+ RedmineManager mgr = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ MembershipManager membershipManager = mgr.getMembershipManager();
+ * </pre>
+ *
+ * <p>Sample usage:
+ * <pre>
+ roles = mgr.getUserManager().getRoles();
+ currentUser = mgr.getUserManager().getCurrentUser();
+ final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
+ memberships = membershipManager.getMemberships(project.getId());
+ membershipManager.delete(membershipForUser);
+ * </pre>
+ *
+ * @see RedmineManager
+ */
 public class MembershipManager {
     private final Transport transport;
 

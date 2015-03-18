@@ -8,6 +8,22 @@ import org.apache.http.message.BasicNameValuePair;
 
 import java.util.List;
 
+/**
+ * Works with Wiki entries (read-only at this moment).
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+ RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ WikiManager wikiManager = redmineManager.getWikiManager();
+ * </pre>
+ *
+ * <p>Sample usage:
+ * <pre>
+ String projectKey = "projkey1410979585758";
+ wikiPages = manager.getWikiPagesByProject(projectKey);
+ * </pre>
+ *
+ * @see RedmineManager
+ */
 public class WikiManager {
     private final Transport transport;
 

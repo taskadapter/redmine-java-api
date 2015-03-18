@@ -24,6 +24,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Works with Issues, Time Entries, Issue Statuses, Issue Relations.
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+ RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ IssueManager issueManager = redmineManager.getIssueManager();
+ * </pre>
+ *
+ * <p>Sample usage:
+ * <pre>
+ Issue issue = issueManager.getIssueById(3205, Include.journals, Include.relations, Include.attachments);
+ System.out.println(issue.getJournals());
+ * </pre>
+ *
+ * @see RedmineManager#getIssueManager()
+ */
 public class IssueManager {
     private final Transport transport;
 

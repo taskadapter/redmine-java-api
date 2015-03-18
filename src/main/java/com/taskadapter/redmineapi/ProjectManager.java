@@ -11,6 +11,30 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Works with Projects and their Versions.
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+ RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ ProjectManager projectManager = redmineManager.getProjectManager();
+ * </pre>
+ *
+ * <p>Sample usage:
+ * <pre>
+ projectManager.getProjectById(123);
+
+ projects = projectManager.getProjects();
+
+ // create project
+ Project project = ProjectFactory.create();
+ project.setName("MyProject");
+ project.setDescription("description");
+ project.setHomepage("www.mypage.com");
+ createdProject = projectManager.createProject(project);
+ * </pre>
+ *
+ * @see RedmineManager#getIssueManager()
+ */
 public class ProjectManager {
     private final Transport transport;
 

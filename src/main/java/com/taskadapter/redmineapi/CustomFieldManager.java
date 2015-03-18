@@ -6,9 +6,22 @@ import com.taskadapter.redmineapi.internal.Transport;
 import java.util.List;
 
 /**
- * CustomFieldManager is currently read-only.
- * 
- * Please see http://www.redmine.org/issues/9664 for details.
+ * Works with Custom Field Definitions (read-only at this moment).
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+ RedmineManager mgr = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+ CustomFieldManager customFieldManager = mgr.getIssueManager();
+ * </pre>
+ *
+ * The current version only allows loading custom fields definition from the server (Redmine v. 1 through 3).
+ * You cannot create new Custom Field definitions through Redmine REST API. Please see http://www.redmine.org/issues/9664 for details.
+ *
+ * <p>Sample usage:
+ * <pre>
+  definitions = customFieldManager.getCustomFieldDefinitions();
+ * </pre>
+ *
+ * @see RedmineManager
  */
 public class CustomFieldManager {
     private final Transport transport;

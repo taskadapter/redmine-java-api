@@ -17,6 +17,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Works with Attachments (files).
+ * <p>Obtain it via RedmineManager:
+ * <pre>
+       RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
+       AttachmentManager attachmentManager = redmineManager.getAttachmentManager();
+ * </pre>
+ *
+ * <p>Sample usage:
+ * <pre>
+ File file = ...
+ attachmentManager.addAttachmentToIssue(issueId, file, ContentType.TEXT_PLAIN.getMimeType());
+ * </pre>
+ *
+ * @see RedmineManager#getAttachmentManager()
+ */
 public class AttachmentManager {
     private final Transport transport;
 
