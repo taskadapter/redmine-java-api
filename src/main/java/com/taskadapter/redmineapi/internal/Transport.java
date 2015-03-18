@@ -282,8 +282,7 @@ public final class Transport {
 	 *             if something goes wrong.
 	 */
     public <T> void deleteChildId(Class<?> parentClass, String parentId, T object, Integer value) throws RedmineException {
-        URI uri = getURIConfigurator().getChildIdURI(parentClass,
-                parentId, object.getClass(), value);
+        URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, object.getClass(), value);
         HttpDelete httpDelete = new HttpDelete(uri);
         String response = send(httpDelete);
         logger.debug(response);
@@ -464,17 +463,22 @@ public final class Transport {
 		return objectsPerPage;
 	}
 
+	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId,
+									   Class<T> classs) throws RedmineException {
+		return getChildEntries(parentClass, parentId + "", classs);
+	}
+
 	/**
 	 * Delivers a list of a child entries.
 	 * 
 	 * @param classs
 	 *            target class.
 	 */
-	public <T> List<T> getChildEntries(Class<?> parentClass, String parentId,
+	public <T> List<T> getChildEntries(Class<?> parentClass, String parentKey,
 			Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
-				parentId, classs, new BasicNameValuePair("limit", String
+				parentKey, classs, new BasicNameValuePair("limit", String
 						.valueOf(objectsPerPage)));
 
 		HttpGet http = new HttpGet(uri);

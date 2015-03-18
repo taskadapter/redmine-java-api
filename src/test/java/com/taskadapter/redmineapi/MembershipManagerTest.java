@@ -18,10 +18,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class MembershipTest {
+public class MembershipManagerTest {
     private static RedmineManager mgr;
     private static UserManager userManager;
     private static MembershipManager membershipManager;
@@ -86,33 +87,54 @@ public class MembershipTest {
     }
 
     @Test
-    public void testMemberships() throws RedmineException {
+    public void extraRolesRemovedFromMembership() throws RedmineException {
         final List<Role> roles = mgr.getUserManager().getRoles();
+        final User currentUser = mgr.getUserManager().getCurrentUser();
+        final int totalRoles = roles.size();
 
+        final Membership membership = membershipManager.createMembershipForUser(project.getId(),
+                                        currentUser.getId(), roles);
+        assertThat(membership.getRoles().size()).isEqualTo(totalRoles);
+
+        final Membership membershipWithOnlyOneRole = MembershipFactory.create(membership.getId());
+        membershipWithOnlyOneRole.setProject(membership.getProject());
+        membershipWithOnlyOneRole.setUser(membership.getUser());
+        membershipWithOnlyOneRole.addRoles(Collections.singletonList(roles.get(0)));
+
+        membershipManager.update(membershipWithOnlyOneRole);
+        final Membership updatedEmptyMembership = membershipManager.getMembership(membership.getId());
+
+        assertThat(updatedEmptyMembership.getRoles().size()).isEqualTo(1);
+        membershipManager.delete(membership);
+    }
+
+    @Test
+    public void membershipsLoadedByProjectStringKey() throws RedmineException {
+        final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
         membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
-        final List<Membership> memberships1 = membershipManager.getMemberships(project.getIdentifier());
-        assertEquals(1, memberships1.size());
-        final Membership createdMembership = memberships1.get(0);
-        assertEquals(currentUser.getId(), createdMembership.getUser()
-                .getId());
-        assertEquals(roles.size(), createdMembership.getRoles().size());
-
-        final Membership membershipById = membershipManager.getMembership(createdMembership
-                .getId());
-        assertEquals(createdMembership, membershipById);
-
-        final Membership emptyMembership = MembershipFactory.create(createdMembership.getId());
-        emptyMembership.setProject(createdMembership.getProject());
-        emptyMembership.setUser(createdMembership.getUser());
-        emptyMembership.addRoles(Collections.singletonList(roles.get(0)));
-
-        membershipManager.update(emptyMembership);
-        final Membership updatedEmptyMembership = membershipManager.getMembership(createdMembership.getId());
-
-        assertEquals(1, updatedEmptyMembership.getRoles().size());
-        membershipManager.delete(updatedEmptyMembership);
+        final List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
+        verifyMemberships(roles, currentUser, memberships);
     }
 
+    @Test
+    public void membershipsLoadedByProjectId() throws RedmineException {
+        final List<Role> roles = mgr.getUserManager().getRoles();
+        final User currentUser = mgr.getUserManager().getCurrentUser();
+
+        membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
+        final List<Membership> memberships = membershipManager.getMemberships(project.getId());
+        verifyMemberships(roles, currentUser, memberships);
+    }
+
+    private void verifyMemberships(List<Role> roles, User currentUser, List<Membership> memberships) throws RedmineException {
+        assertThat(memberships.size()).isEqualTo(1);
+        final Membership membership = memberships.get(0);
+        assertThat(membership.getUser().getId()).isEqualTo(currentUser.getId());
+        assertThat(membership.getRoles().size()).isEqualTo(roles.size());
+
+        final Membership membershipById = membershipManager.getMembership(membership.getId());
+        assertThat(membershipById).isEqualTo(membership);
+    }
 }
