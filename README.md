@@ -12,7 +12,7 @@
 Gradle dependency:
 
     dependencies {
-        compile 'com.taskadapter:redmine-java-api:2.1.0'
+        compile 'com.taskadapter:redmine-java-api:2.2.0'
     }
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
