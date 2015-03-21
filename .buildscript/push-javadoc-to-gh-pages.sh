@@ -12,7 +12,7 @@ cp -R build/docs/javadoc $TDIR/javadoc-latest
 cd $TDIR
 
 echo "Cloning current gh-pages branch..."
-git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/a11n/redmine-java-api gh-pages > /dev/null
+git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/taskadapter/redmine-java-api gh-pages > /dev/null
 
 cd gh-pages
 
