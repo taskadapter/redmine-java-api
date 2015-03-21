@@ -114,3 +114,8 @@ artifacts {
     archives packageSources
     archives packageJavadoc
 }
+
+task generateJavadocForGhPages(type: Javadoc) {
+    source = sourceSets.main.allJava
+    exclude '**/internal/**' 
+}
