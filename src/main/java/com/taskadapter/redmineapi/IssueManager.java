@@ -69,6 +69,9 @@ public class IssueManager {
 
     /**
      * Generic method to search for issues.
+     * <p>Note that you cannot currently use "offset" and "limit" parameters because
+     * paging is managed by Transport class internally. This method will always return all found objects
+     * even if it had to perform multiple requests to the server to load several pages.
      *
      * @param pParameters the http parameters key/value pairs to append to the rest api request
      * @return empty list if no issues found matching given parameters
