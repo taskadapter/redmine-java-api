@@ -301,7 +301,6 @@ public class IssueManagerTest {
     public void testGetIssuesPaging() throws RedmineException {
         // create 27 issues. default page size is 25.
         createIssues(issueManager, projectId, 27);
-        // mgr.setObjectsPerPage(5); <-- does not work now
         List<Issue> issues = issueManager.getIssues(projectKey, null);
         assertTrue(issues.size() > 26);
 

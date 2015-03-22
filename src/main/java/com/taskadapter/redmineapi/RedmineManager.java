@@ -88,15 +88,9 @@ public class RedmineManager {
 
     /**
      * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
-     */
-    public int getObjectsPerPage() {
-		return transport.getObjectsPerPage();
-    }
-
-    // TODO add test
-
-    /**
-     * This number of objects (tasks, projects, users) will be requested from Redmine server in 1 request.
+     * Note that if you set objects per page to be, say, 10, and you have 20 objects on the server,
+     * then issueManager.getIssues() will still return ALL 20 objects at once even though the library
+     * will perform 2 requests to the server (to load 10 objects each time).
      */
     public void setObjectsPerPage(int pageSize) {
 		transport.setObjectsPerPage(pageSize);
