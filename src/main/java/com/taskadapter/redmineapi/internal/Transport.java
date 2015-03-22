@@ -385,13 +385,11 @@ public final class Transport {
 	 *             the object with the given key is not found
 	 * @throws RedmineException
 	 */
-	public <T> T getObject(Class<T> classs, Integer key, NameValuePair... args)
-			throws RedmineException {
+	public <T> T getObject(Class<T> classs, Integer key, NameValuePair... args) throws RedmineException {
 		return getObject(classs, key.toString(), args);
 	}
 
-	public <T> List<T> getObjectsList(Class<T> objectClass,
-			NameValuePair... params) throws RedmineException {
+	public <T> List<T> getObjectsList(Class<T> objectClass, NameValuePair... params) throws RedmineException {
 		return getObjectsList(objectClass, Arrays.asList(params));
 	}
 
@@ -405,22 +403,17 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(objectClass);
 		final List<T> result = new ArrayList<T>();
 
-		final List<NameValuePair> newParams = new ArrayList<NameValuePair>(
-				params);
+		final List<NameValuePair> newParams = new ArrayList<NameValuePair>(params);
 
-		newParams.add(new BasicNameValuePair("limit", String
-				.valueOf(objectsPerPage)));
+		newParams.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
 		int offset = 0;
 
 		int totalObjectsFoundOnServer;
 		do {
-			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(
-					newParams);
-			paramsList.add(new BasicNameValuePair("offset", String
-					.valueOf(offset)));
+			List<NameValuePair> paramsList = new ArrayList<NameValuePair>(newParams);
+			paramsList.add(new BasicNameValuePair("offset", String.valueOf(offset)));
 
-			final URI uri = getURIConfigurator().getObjectsURI(objectClass,
-					paramsList);
+			final URI uri = getURIConfigurator().getObjectsURI(objectClass, paramsList);
 
 			logger.debug(uri.toString());
 			final HttpGet http = new HttpGet(uri);
@@ -429,18 +422,15 @@ public final class Transport {
 
 			final List<T> foundItems;
 			try {
-				final JSONObject responseObject = RedmineJSONParser
-						.getResponse(response);
-				foundItems = JsonInput.getListOrNull(responseObject,
-						config.multiObjectName, config.parser);
+				final JSONObject responseObject = RedmineJSONParser.getResponse(response);
+				foundItems = JsonInput.getListOrNull(responseObject,config.multiObjectName, config.parser);
 				result.addAll(foundItems);
 
 				/* Necessary for trackers */
 				if (!responseObject.has(KEY_TOTAL_COUNT)) {
 					break;
 				}
-				totalObjectsFoundOnServer = JsonInput.getInt(responseObject,
-						KEY_TOTAL_COUNT);
+				totalObjectsFoundOnServer = JsonInput.getInt(responseObject,KEY_TOTAL_COUNT);
 			} catch (JSONException e) {
 				throw new RedmineFormatException(e);
 			}
@@ -463,8 +453,7 @@ public final class Transport {
 		return objectsPerPage;
 	}
 
-	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId,
-									   Class<T> classs) throws RedmineException {
+	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId, Class<T> classs) throws RedmineException {
 		return getChildEntries(parentClass, parentId + "", classs);
 	}
 
@@ -474,20 +463,17 @@ public final class Transport {
 	 * @param classs
 	 *            target class.
 	 */
-	public <T> List<T> getChildEntries(Class<?> parentClass, String parentKey,
-			Class<T> classs) throws RedmineException {
+	public <T> List<T> getChildEntries(Class<?> parentClass, String parentKey, Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
-				parentKey, classs, new BasicNameValuePair("limit", String
-						.valueOf(objectsPerPage)));
+				parentKey, classs, new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
 
 		HttpGet http = new HttpGet(uri);
 		String response = send(http);
 		final JSONObject responseObject;
 		try {
 			responseObject = RedmineJSONParser.getResponse(response);
-			return JsonInput.getListNotNull(responseObject,
-					config.multiObjectName, config.parser);
+			return JsonInput.getListNotNull(responseObject, config.multiObjectName, config.parser);
 		} catch (JSONException e) {
 			throw new RedmineFormatException("Bad categories response " + response, e);
 		}
@@ -512,8 +498,7 @@ public final class Transport {
 	 */
 	public void setObjectsPerPage(int pageSize) {
 		if (pageSize <= 0) {
-			throw new IllegalArgumentException(
-					"Page size must be >= 0. You provided: " + pageSize);
+			throw new IllegalArgumentException("Page size must be >= 0. You provided: " + pageSize);
 		}
 		this.objectsPerPage = pageSize;
 	}
