@@ -152,10 +152,7 @@ public class IssueManager {
      * Sample usage:
      * <pre>
      * {@code
-     *   Issue issueToCreate = IssueFactory.create();
-     *   issueToCreate.setSubject("This is the summary line 123");
-     *   Project project = ProjectFactory.create(projectDatabaseId)
-     *   issueToCreate.setProject(project);
+     *   Issue issueToCreate = IssueFactory.create(projectDatabaseId, subject);
      *   Issue newIssue = mgr.createIssue(issueToCreate);
      * }
      * </pre>
