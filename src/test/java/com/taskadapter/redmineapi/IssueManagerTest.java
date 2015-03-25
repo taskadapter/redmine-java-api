@@ -33,8 +33,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -302,10 +304,24 @@ public class IssueManagerTest {
         // create 27 issues. default page size is 25.
         createIssues(issueManager, projectId, 27);
         List<Issue> issues = issueManager.getIssues(projectKey, null);
-        assertTrue(issues.size() > 26);
+        assertThat(issues.size()).isGreaterThan(26);
 
+        // check that there are no duplicates in the list.
         Set<Issue> issueSet = new HashSet<Issue>(issues);
-        assertEquals(issues.size(), issueSet.size());
+        assertThat(issueSet.size()).isEqualTo(issues.size());
+    }
+
+    @Test
+    public void canControlLimitAndOffsetDirectly() throws RedmineException {
+        // create 27 issues. default Redmine page size is usually 25 (unless changed in the server settings).
+        createIssues(issueManager, projectId, 27);
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("limit", "3");
+        params.put("offset", "0");
+        params.put("project_id", projectId + "");
+        List<Issue> issues = issueManager.getIssues(params);
+        // only the requested number of issues is loaded, not all result pages.
+        assertThat(issues.size()).isEqualTo(3);
     }
 
     @Test(expected = NotFoundException.class)

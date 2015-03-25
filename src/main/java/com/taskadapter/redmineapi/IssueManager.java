@@ -68,10 +68,9 @@ public class IssueManager {
     }
 
     /**
-     * Generic method to search for issues.
-     * <p>Note that you cannot currently use "offset" and "limit" parameters because
-     * paging is managed by Transport class internally. This method will always return all found objects
-     * even if it had to perform multiple requests to the server to load several pages.
+     * Direct method to search for issues using any Redmine REST API parameters you want.
+     * <p>Unlike other getXXXObjects() methods in this library, this one does NOT handle paging for you so
+     * you have to provide "offset" and "limit" parameters if you want to control paging.
      *
      * @param pParameters the http parameters key/value pairs to append to the rest api request
      * @return empty list if no issues found matching given parameters
@@ -86,7 +85,8 @@ public class IssueManager {
             params.add(new BasicNameValuePair(param.getKey(), param.getValue()));
         }
 
-        return transport.getObjectsList(Issue.class, params);
+        final Transport.ResultsWrapper<Issue> wrapper = transport.getObjectsListNoPaging(Issue.class, params);
+        return wrapper.getResults();
     }
 
     /**
