@@ -370,6 +370,32 @@ public final class Transport {
 		final String result = send(request);
 		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
 	}
+	
+	
+		/**
+	 * UPloads content on a server.
+	 * 
+	 * @param content
+	 *            content stream of type file.
+	 * @return uploaded item token.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public String upload(File content) throws RedmineException {
+
+		final URI uploadURI = getURIConfigurator().getUploadURI();
+		final HttpPost request = new HttpPost(uploadURI);
+
+		MultipartEntityBuilder mpEntity = MultipartEntityBuilder.create();
+		mpEntity.addBinaryBody("userfile", content);
+		mpEntity.seContentType(ContentType.APPLICATION_OCTET_STREAM);
+
+		HttpEntity entity = mpEntity.build();
+		request.setEntity(entity);
+
+		final String result = send(request);
+		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+	}
 
 	/**
 	 * @param classs
