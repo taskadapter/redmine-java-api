@@ -4,9 +4,13 @@ import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.Transport;
+import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Works with Users and Groups.
@@ -80,6 +84,20 @@ public class UserManager {
     public List<User> getUsers() throws RedmineException {
         return transport.getObjectsList(User.class, new BasicNameValuePair(
                 "include", "memberships,groups"));
+    }
+
+    /**
+     * @param pParameters the http parameters key/value pairs to append to the rest api request
+     */
+    public List<User> getUsers(Map<String, String> pParameters) throws RedmineException {
+        Set<NameValuePair> params = new HashSet<NameValuePair>();
+
+        for (final Map.Entry<String, String> param : pParameters.entrySet()) {
+            params.add(new BasicNameValuePair(param.getKey(), param.getValue()));
+        }
+
+        final Transport.ResultsWrapper<User> wrapper = transport.getObjectsListNoPaging(User.class, params);
+        return wrapper.getResults();
     }
 
     /**
