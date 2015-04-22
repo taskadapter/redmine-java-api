@@ -160,7 +160,7 @@ public class AttachmentManager {
 
     public void downloadAttachmentContent(Attachment issueAttachment,
                                           OutputStream stream) throws RedmineException {
-        transport.download(issueAttachment.getContentURL(),
+        transport.downloadAttachmentContent(issueAttachment,
                 new CopyBytesHandler(stream));
     }
 

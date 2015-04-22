@@ -355,6 +355,15 @@ public final class Transport {
         return errorCheckingCommunicator.sendRequest(request, handler);
     }
 
+	public <R> R downloadAttachmentContent(Attachment attachment, ContentHandler<BasicHttpResponse, R> handler) throws RedmineException {
+		final URI uri = getURIConfigurator().getDownloadURI(attachment);
+		final HttpGet request = new HttpGet(uri);
+		if (onBehalfOfUser != null) {
+			request.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
+		}
+		return errorCheckingCommunicator.sendRequest(request, handler);
+	}
+
 	/**
 	 * UPloads content on a server.
 	 * 

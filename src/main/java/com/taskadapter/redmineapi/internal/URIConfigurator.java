@@ -164,6 +164,10 @@ public class URIConfigurator {
 		return guess;
 	}
 
+	public URI getDownloadURI( Attachment attachment ) {
+		return createURI("attachments/download/" + attachment.getId() + "/" + attachment.getFileName());
+	}
+
 	public URI getUploadURI() {
 		return createURI("uploads" + URL_POSTFIX);
 	}
