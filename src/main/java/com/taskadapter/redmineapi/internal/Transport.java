@@ -365,7 +365,32 @@ public final class Transport {
 	}
 
 	/**
-	 * UPloads content on a server.
+	 * Uploads content on a server.
+	 * 
+	 * @param content
+	 *            content stream.
+	 * @param contentLength
+	 *            content length.
+	 * @return uploaded item token.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public String upload(InputStream content, long contentLength) throws RedmineException {
+		if (contentLength < -1)
+			throw new IllegalArgumentException("Illegal content length: " + contentLength);
+		final URI uploadURI = getURIConfigurator().getUploadURI();
+		final HttpPost request = new HttpPost(uploadURI);
+		final AbstractHttpEntity entity = new InputStreamEntity(content, contentLength);
+		/* Content type required by a Redmine */
+		entity.setContentType("application/octet-stream");
+		request.setEntity(entity);
+
+		final String result = send(request);
+		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+	}
+
+	/**
+	 * Uploads content on a server.
 	 * 
 	 * @param content
 	 *            content stream.
@@ -374,15 +399,7 @@ public final class Transport {
 	 *             if something goes wrong.
 	 */
 	public String upload(InputStream content) throws RedmineException {
-		final URI uploadURI = getURIConfigurator().getUploadURI();
-		final HttpPost request = new HttpPost(uploadURI);
-		final AbstractHttpEntity entity = new InputStreamEntity(content, -1);
-		/* Content type required by a Redmine */
-		entity.setContentType("application/octet-stream");
-		request.setEntity(entity);
-
-		final String result = send(request);
-		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+		return upload(content, -1);
 	}
 
 	/**
