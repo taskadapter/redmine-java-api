@@ -209,13 +209,6 @@ public class RedmineJSONParser {
 		}
 	};
 
-	public static final JsonObjectParser<String> ERROR_PARSER = new JsonObjectParser<String>() {
-		@Override
-		public String parse(JSONObject input) throws JSONException {
-			return input.toString();
-		}
-	};
-
 	public static final JsonObjectParser<Changeset> CHANGESET_PARSER = new JsonObjectParser<Changeset>() {
 		@Override
 		public Changeset parse(JSONObject input) throws JSONException {
