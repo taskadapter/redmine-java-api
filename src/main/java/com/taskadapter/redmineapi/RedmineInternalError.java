@@ -1,12 +1,6 @@
 package com.taskadapter.redmineapi;
 
-/**
- * Internal redmine error. Should never happen.
- *
- * @author maxkar
- *
- */
-public class RedmineInternalError extends Error {
+public class RedmineInternalError extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
