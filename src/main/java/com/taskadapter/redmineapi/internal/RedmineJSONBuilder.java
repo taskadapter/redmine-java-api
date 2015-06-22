@@ -239,6 +239,7 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "homepage", project.getHomepage());
 		addIfNotNullFull(writer, "created_on", project.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
+		writeCustomFields(writer, project.getCustomFields());
 		JsonOutput.addIfNotNull(writer, "parent_id", project.getParentId());
                 JsonOutput.addIfNotNull(writer, "is_public", project.getProjectPublic());
 		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(),
