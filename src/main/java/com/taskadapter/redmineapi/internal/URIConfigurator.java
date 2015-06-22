@@ -22,7 +22,9 @@ import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.bean.WikiPage;
 import com.taskadapter.redmineapi.bean.WikiPageDetail;
+
 import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -166,5 +168,23 @@ public class URIConfigurator {
 
 	public URI getUploadURI() {
 		return createURI("uploads" + URL_POSTFIX);
+	}
+
+	/**
+	 * Adds API key to URI, if the key is specified
+	 *
+	 * @param uri Original URI string
+	 * @return URI with API key added
+	 */
+	public URI addAPIKey(String uri) {
+		try {
+			final URIBuilder builder = new URIBuilder(uri);
+			if (apiAccessKey != null) {
+				builder.setParameter("key", apiAccessKey);
+			}
+			return builder.build();
+		} catch (URISyntaxException e) {
+			throw new RedmineInternalError(e);
+		}
 	}
 }
