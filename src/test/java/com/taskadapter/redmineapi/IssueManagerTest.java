@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static com.taskadapter.redmineapi.CustomFieldResolver.getCustomFieldByName;
 import static com.taskadapter.redmineapi.IssueHelper.createIssue;
 import static com.taskadapter.redmineapi.IssueHelper.createIssues;
 import com.taskadapter.redmineapi.bean.CustomField;
@@ -1122,15 +1123,6 @@ public class IssueManagerTest {
         assertThat(updatedIssue.getCustomFields().size()).isEqualTo(3);
         assertThat(updatedIssue.getCustomField(customField1.getName())).isEqualTo(custom1Value);
         assertThat(updatedIssue.getCustomField(customField2.getName())).isEqualTo(custom2Value);
-    }
-
-    private static CustomFieldDefinition getCustomFieldByName(List<CustomFieldDefinition> customFieldDefinitions, String fieldName) {
-        for (CustomFieldDefinition customFieldDefinition : customFieldDefinitions) {
-            if (customFieldDefinition.getName().equals(fieldName)) {
-                return customFieldDefinition;
-            }
-        }
-        throw new RuntimeException("Custom Field definition '" + fieldName + "' is not found on server.");
     }
 
     @Test
