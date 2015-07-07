@@ -157,6 +157,37 @@ public class AttachmentIntegrationTest {
     }
 
     /**
+     * Tests the download of the content of an
+     * {@link com.taskadapter.redmineapi.bean.Attachment Attachment} using API key authentication.
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
+     */
+    // TODO reactivate once Redmine REST API allows for creating attachments
+    @Ignore
+    @Test
+    public void testDownloadAttachmentContentWithAPIKey() throws RedmineException {
+        // TODO where do we get a valid attachment number from? We can't create
+        // an attachment by our own for the test as the Redmine REST API does
+        // not support that.
+        int attachmentID = 1;
+        // Create managers using API key authentication
+        RedmineManager mgrWithApiKey = IntegrationTestHelper.createRedmineManagerWithAPIKey();
+        AttachmentManager attachmentMgr = mgrWithApiKey.getAttachmentManager();
+        // retrieve issue attachment
+        Attachment attachment = attachmentMgr.getAttachmentById(attachmentID);
+        // download attachment content
+        byte[] attachmentContent = attachmentMgr.downloadAttachmentContent(attachment);
+        assertNotNull("Download of content of attachment with content URL " + attachment.getContentURL()
+                + " should not be null", attachmentContent);
+        // TODO perform downloaded content validation (when we'll be able to create
+        // an attachment using Redmine REST API)
+    }
+
+    /**
      * Tests the retrieval of an {@link Issue}, inlcuding the
      * {@link com.taskadapter.redmineapi.bean.Attachment}s.
      *
