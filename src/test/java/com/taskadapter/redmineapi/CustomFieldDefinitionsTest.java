@@ -35,28 +35,34 @@ public class CustomFieldDefinitionsTest {
 
     @Test
     public void testGetCustomFields() throws RedmineException {
-        List<CustomFieldDefinition> definitions = customFieldManager.getCustomFieldDefinitions();
-        assertThat(definitions.size()).isEqualTo(3);
-        for(CustomFieldDefinition fieldDefinition: definitions) {
-            if(fieldDefinition.getId() == 1) {
-                assertThat(fieldDefinition.getCustomizedType()).isEqualTo("issue");
-                assertThat(fieldDefinition.getName()).isEqualTo("my_custom_1");
-                assertThat(fieldDefinition.getFieldFormat()).isEqualTo("string");
-            } else if (fieldDefinition.getId() == 2) {
-                assertThat(fieldDefinition.getCustomizedType()).isEqualTo("issue");
-                assertThat(fieldDefinition.getName()).isEqualTo("custom_boolean_1");
-                assertThat(fieldDefinition.getFieldFormat()).isEqualTo("bool");
-            } else if (fieldDefinition.getId() == 3) {
-                assertThat(fieldDefinition.getCustomizedType()).isEqualTo("issue");
-                assertThat(fieldDefinition.getName()).isEqualTo("custom_multi_list");
-                assertThat(fieldDefinition.getFieldFormat()).isEqualTo("list");
-                assertThat(fieldDefinition.getDefaultValue()).isEqualTo("V2");
-                assertThat(fieldDefinition.getPossibleValues()).containsExactly("V1", "V2", "V3");
-                assertThat(fieldDefinition.isMultiple()).isTrue();
+        final List<CustomFieldDefinition> definitions = customFieldManager.getCustomFieldDefinitions();
+        assertThat(definitions.size()).isGreaterThanOrEqualTo(3);
+
+        final CustomFieldDefinition myCustom1 = getCustomFieldDefinitionByName(definitions, "my_custom_1");
+        assertThat(myCustom1.getCustomizedType()).isEqualTo("issue");
+        assertThat(myCustom1.getFieldFormat()).isEqualTo("string");
+
+        final CustomFieldDefinition customBoolean1 = getCustomFieldDefinitionByName(definitions, "custom_boolean_1");
+        assertThat(customBoolean1.getCustomizedType()).isEqualTo("issue");
+        assertThat(customBoolean1.getFieldFormat()).isEqualTo("bool");
+
+        final CustomFieldDefinition customMultiList = getCustomFieldDefinitionByName(definitions, "custom_multi_list");
+        assertThat(customMultiList.getCustomizedType()).isEqualTo("issue");
+        assertThat(customMultiList.getFieldFormat()).isEqualTo("list");
+        assertThat(customMultiList.getDefaultValue()).isEqualTo("V2");
+        assertThat(customMultiList.getPossibleValues()).containsExactly("V1", "V2", "V3");
+        assertThat(customMultiList.isMultiple()).isTrue();
+    }
+
+    private static CustomFieldDefinition getCustomFieldDefinitionByName(List<CustomFieldDefinition> definitions, String name) {
+        for (CustomFieldDefinition definition : definitions) {
+            if (name.equals(definition.getName())) {
+                return definition;
             }
         }
+        throw new RuntimeException("Custom Field Definition not found: " + name);
     }
-    
+
     @Test
     public void savedJSonResponseFromRedmine23CanBeParsed() throws IOException, JSONException {
         String str = MyIOUtils.getResourceAsString(CUSTOM_FIELDS_FILE);
