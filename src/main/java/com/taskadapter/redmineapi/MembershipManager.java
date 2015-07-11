@@ -81,22 +81,18 @@ public class MembershipManager {
         transport.updateObject(membership);
     }
 
-    /**
-     * THIS DOES NOT WORK YET!
-     * fails on Redmine 2.5.2: apparently, it does not support adding group memberships.
-     * I submitted bug http://www.redmine.org/issues/17904
-     *
-     * This method is here only to show what the future API will look like
-     */
-    @Deprecated
-    public void createMembershipForGroup(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
+    public Membership createMembershipForGroup(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
         final Membership membership = MembershipFactory.create();
         final Project project = ProjectFactory.create(projectId);
         membership.setProject(project);
-        membership.setGroup(GroupFactory.create(groupId));
+        // This is nuts, but according to the documentation the way it is supposed
+        // to work:
+        // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
+        // http://www.redmine.org/issues/17904
+        membership.setUser(UserFactory.create(groupId));
         membership.addRoles(roles);
 
-        addMembership(membership);
+        return addMembership(membership);
     }
 
     public Membership createMembershipForUser(int projectId, int userId, Collection<Role> roles) throws RedmineException {
