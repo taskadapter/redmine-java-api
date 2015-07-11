@@ -1,3 +1,22 @@
+# Version 2.3.0 (July 11, 2015)
+
+* Issue #201 Save custom fields for projects.
+* Issue #195 Change in RedmineInternalError: it was derived from Error, now it extends RuntimeException
+* Issue #114 #188 BREAKING change! getIssues(params map) does NOT handle paging anymore, you can/must use your own limit&offset http params.
+note: same for all other object lists - Issue, User, Group, Project, ....
+See detailed explanation for this change here: https://github.com/taskadapter/redmine-java-api/issues/114 .
+The original API usage model was "load all objects at once" and fetching individual pages was never a goal.
+OLD BEHAVIOR: You could previously use setObjectsPerPage() method on RedmineManager, but this only affected the internal page size used for loading issues. clients would only see the final result with all objects anyway.
+Backward compatibility is important, of course. But in this case this method is totally misleading as couple people complained.
+I believe fixing this bug is more important than maintaining compatibility.
+Git commit 82d29bb17c236b87efc834f7dda15b6d0df68da4
+
+# Version 2.2.0 (March 18, 2015)
+
+* Feature #183 Support Redmine 3.0.x date formats. Redmine 3.0.x has date formats that are different from v. 2.6.x
+* Feature #184 New methods: ProjectManager:getProjectById() and MembershipManager:getMemberships(int projectId)
+* Updates in javadoc
+
 # Version 2.1.0 (January 25, 2015)
 
 * Feature #120. Support "on behalf of user" operations  
