@@ -7,6 +7,7 @@ import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Collection;
@@ -208,11 +209,11 @@ public class UserIntegrationTest {
 
 
     /**
-     * Requires Redmine 2.1.
-     * <p>
      * "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0.
-     * I submitted a bug: http://www.redmine.org/issues/19363
+     * I submitted a bug: http://www.redmine.org/issues/19363, which was closed as "invalid".
+     * Marking this test as "Ignored" for now.
      */
+    @Ignore
     @Test
     public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
         final Group template = GroupFactory.create();
