@@ -260,8 +260,13 @@ public final class Transport {
 	public <T extends Identifiable> void updateObject(T obj,
 			NameValuePair... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(obj.getClass());
+		final Integer id = obj.getId();
+		if (id == null) {
+			throw new RuntimeException("'id' field cannot be NULL in the given object:" +
+					" it is required to identify the object in the target system");
+		}
 		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
-				Integer.toString(obj.getId()));
+				Integer.toString(id));
 		final HttpPut http = new HttpPut(uri);
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
