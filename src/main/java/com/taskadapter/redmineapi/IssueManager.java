@@ -73,6 +73,14 @@ public class IssueManager {
      * <p>Unlike other getXXXObjects() methods in this library, this one does NOT handle paging for you so
      * you have to provide "offset" and "limit" parameters if you want to control paging.
      *
+     * <p>Sample usage:
+     <pre>
+     final Map<String, String> params = new HashMap<String, String>();
+     params.put("project_id", projectId);
+     params.put("subject", "~free_form_search");
+     final List<Issue> issues = issueManager.getIssues(params);
+     </pre>
+
      * @param parameters the http parameters key/value pairs to append to the rest api request
      * @return empty list if no issues found matching given parameters
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which

@@ -90,6 +90,12 @@ public class UserManager {
     /**
      * <p>This method does NOT handle paging for you. You need to provide "offset" and "limit" parameters
      * if you want to control paging.
+     * <p>Sample usage:
+     <pre>
+     final Map<String, String> params = new HashMap<String, String>();
+     params.put("name", name);
+     final List<User> users = userManager.getUsers(params);
+     </pre>
      *
      * @param parameters http parameters: key/value pairs to append to the rest api request
      * @return empty list if no objects found using provided parameters
