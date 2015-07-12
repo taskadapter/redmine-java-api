@@ -255,6 +255,20 @@ public class IssueManager {
     }
 
     /**
+     * @param pParameters the http parameters key/value pairs to append to the rest api request
+     */
+    public List<TimeEntry> getTimeEntries(Map<String, String> pParameters) throws RedmineException {
+        Set<NameValuePair> params = new HashSet<NameValuePair>();
+
+        for (final Map.Entry<String, String> param : pParameters.entrySet()) {
+            params.add(new BasicNameValuePair(param.getKey(), param.getValue()));
+        }
+
+        final Transport.ResultsWrapper<TimeEntry> wrapper = transport.getObjectsListNoPaging(TimeEntry.class, params);
+        return wrapper.getResults();
+    }
+
+    /**
      * @param id the database Id of the TimeEntry record
      */
     public TimeEntry getTimeEntry(Integer id) throws RedmineException {

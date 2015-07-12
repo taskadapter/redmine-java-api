@@ -6,6 +6,7 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineFormatException;
 import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
@@ -167,6 +168,10 @@ public final class Transport {
                 CustomFieldDefinition.class,
                 config("custom_field", "custom_fields", null,
                         RedmineJSONParser.CUSTOM_FIELD_DEFINITION_PARSER));
+        OBJECT_CONFIGS.put(
+                Attachment.class,
+                config("attachment", "attachments", null,
+                        RedmineJSONParser.ATTACHMENT_PARSER));
     }
 
 	private final URIConfigurator configurator;
@@ -355,8 +360,42 @@ public final class Transport {
         return errorCheckingCommunicator.sendRequest(request, handler);
     }
 
+	public <R> R downloadAttachmentContent(Attachment attachment, ContentHandler<BasicHttpResponse, R> handler) throws RedmineException {
+		final URI uri = getURIConfigurator().getDownloadURI(attachment);
+		final HttpGet request = new HttpGet(uri);
+		if (onBehalfOfUser != null) {
+			request.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
+		}
+		return errorCheckingCommunicator.sendRequest(request, handler);
+	}
+
 	/**
-	 * UPloads content on a server.
+	 * Uploads content on a server.
+	 * 
+	 * @param content
+	 *            content stream.
+	 * @param contentLength
+	 *            content length.
+	 * @return uploaded item token.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 */
+	public String upload(InputStream content, long contentLength) throws RedmineException {
+		if (contentLength < -1)
+			throw new IllegalArgumentException("Illegal content length: " + contentLength);
+		final URI uploadURI = getURIConfigurator().getUploadURI();
+		final HttpPost request = new HttpPost(uploadURI);
+		final AbstractHttpEntity entity = new InputStreamEntity(content, contentLength);
+		/* Content type required by a Redmine */
+		entity.setContentType("application/octet-stream");
+		request.setEntity(entity);
+
+		final String result = send(request);
+		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+	}
+
+	/**
+	 * Uploads content on a server.
 	 * 
 	 * @param content
 	 *            content stream.
@@ -365,15 +404,7 @@ public final class Transport {
 	 *             if something goes wrong.
 	 */
 	public String upload(InputStream content) throws RedmineException {
-		final URI uploadURI = getURIConfigurator().getUploadURI();
-		final HttpPost request = new HttpPost(uploadURI);
-		final AbstractHttpEntity entity = new InputStreamEntity(content, -1);
-		/* Content type required by a Redmine */
-		entity.setContentType("application/octet-stream");
-		request.setEntity(entity);
-
-		final String result = send(request);
-		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+		return upload(content, -1);
 	}
 
 	/**

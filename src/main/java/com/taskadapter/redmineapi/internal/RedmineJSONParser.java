@@ -453,6 +453,8 @@ public class RedmineJSONParser {
 				CHANGESET_PARSER));
 		result.addWatchers(JsonInput.getListOrEmpty(content, "watchers",
 				WATCHER_PARSER));
+		result.addChildren(JsonInput.getListOrEmpty(content, "children",
+				ISSUE_PARSER));
 		return result;
 	}
 
