@@ -1311,6 +1311,26 @@ public class IssueManagerTest {
         }
     }
 
+    @Test
+    public void issuesCanBeFoundByFreeFormSearch() throws RedmineException {
+        final String subject = "test for free_form_search.";
+        final Issue issueToCreate = IssueFactory.create(projectId, subject);
+        Integer createdIssueId = null;
+        try {
+            createdIssueId = issueManager.createIssue(issueToCreate).getId();
+
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("project_id", projectId + "");
+            params.put("summary", "=~free_form_search");
+            List<Issue> issues = issueManager.getIssues(params);
+            assertThat(issues.size()).isEqualTo(1);
+            final Issue loaded = issues.get(0);
+            assertThat(loaded.getSubject()).isEqualTo(subject);
+        } finally {
+            issueManager.deleteIssue(createdIssueId);
+        }
+    }
+
     private void deleteIssueIfNotNull(Issue issue) throws RedmineException {
         if (issue != null) {
             issueManager.deleteIssue(issue.getId());

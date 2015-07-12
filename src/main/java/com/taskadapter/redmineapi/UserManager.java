@@ -1,12 +1,17 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
+import com.taskadapter.redmineapi.internal.ParameterMapConverter;
 import com.taskadapter.redmineapi.internal.Transport;
+import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Works with Users and Groups.
@@ -80,6 +85,20 @@ public class UserManager {
     public List<User> getUsers() throws RedmineException {
         return transport.getObjectsList(User.class, new BasicNameValuePair(
                 "include", "memberships,groups"));
+    }
+
+    /**
+     * <p>This method does NOT handle paging for you. You need to provide "offset" and "limit" parameters
+     * if you want to control paging.
+     *
+     * @param parameters http parameters: key/value pairs to append to the rest api request
+     * @return empty list if no objects found using provided parameters
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws RedmineException
+     */
+    public List<User> getUsers(Map<String, String> parameters) throws RedmineException {
+        return DirectObjectsSearcher.getObjectsListNoPaging(transport, parameters, User.class);
     }
 
     /**
