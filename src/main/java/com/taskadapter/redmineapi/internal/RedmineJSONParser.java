@@ -621,6 +621,7 @@ public class RedmineJSONParser {
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				MINIMAL_PROJECT_PARSER));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+                result.setGroup(JsonInput.getObjectOrNull(content, "group", GROUP_PARSER));
 		result.addRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
 		return result;
 	}

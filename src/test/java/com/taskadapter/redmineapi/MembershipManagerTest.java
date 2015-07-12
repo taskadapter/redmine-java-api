@@ -57,11 +57,6 @@ public class MembershipManagerTest {
         }
     }
 
-    /**
-     * This test fails on Redmine 2.5.2: apparently, it does not support adding group memberships.
-     * I submitted bug http://www.redmine.org/issues/17904
-     */
-    @Ignore("Bug in Redmine 2.5.2: can't add a group membership. see http://www.redmine.org/issues/17904")
     @Test
     public void membershipCanBeSetForGroups() throws RedmineException {
         final List<Role> roles = userManager.getRoles();
@@ -73,10 +68,13 @@ public class MembershipManagerTest {
         try {
             createdGroup = mgr.getUserManager().createGroup(group);
 
-            membershipManager.createMembershipForGroup(project.getId(), createdGroup.getId(), rolesToSet);
-            // TODO add assert here
+            Membership newMembership = membershipManager
+                    .createMembershipForGroup(project.getId(), createdGroup.getId(), rolesToSet);
             List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
-            System.out.println(memberships);
+            assertThat(memberships).contains(newMembership);
+            Group memberGroup = newMembership.getGroup();
+            assertThat(memberGroup).isNotNull();
+            assertThat(memberGroup.getId()).isEqualTo(createdGroup.getId());
         } finally {
             mgr.getUserManager().deleteGroup(createdGroup);
         }

@@ -93,6 +93,6 @@ public class Membership implements Identifiable {
     @Override
 	public String toString() {
 		return "Membership [id=" + id + ", project=" + project + ", user="
-				+ user + ", roles=" + roles + "]";
+				+ user + ", group=" + group + ", roles=" + roles + "]";
 	}
 }
