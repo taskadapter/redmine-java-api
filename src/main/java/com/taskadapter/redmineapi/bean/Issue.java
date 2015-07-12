@@ -7,7 +7,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Redmine's Issue
+ * Redmine's Issue.
+ * <p>
+ * Note that methods returning lists of elements (like getRelations(), getWatchers(), etc return
+ * unmodifiable collections.
+ * You need to use methods like addRelations() if you want to add elements, e.g.:
+ * <pre>
+ *     issue.addRelations(Collections.singletonList(relation));
+ * </pre>
  */
 public class Issue implements Identifiable {
 
@@ -378,6 +385,11 @@ public class Issue implements Identifiable {
      * Relations are only loaded if you include Include.relations when loading the Issue.
      * <pre>
      *     Issue issue = issueManager.getIssueById(3205, Include.relations);
+     * </pre>
+     * <p>Since the returned collection is not modifiable, you need to use addRelations() method
+     * if you want to add elements, e.g.:
+     * <pre>
+     *     issue.addRelations(Collections.singletonList(relation));
      * </pre>
      * @return unmodifiable collection of Relations or EMPTY collection if none found. Never returns NULL.
      * @see com.taskadapter.redmineapi.Include#relations
