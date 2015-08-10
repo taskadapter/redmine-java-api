@@ -1,3 +1,10 @@
+# Version 2.4.0 (August 9, 2015)
+
+* Issue 209 support free-form search for users
+* when an object with NULL id is given to update() method in Transport class, it fails with NPE 
+* add create(id) method to TrackerFactory class enhancement 
+* Fix reading group members for memberships and fix failing unittest enhancement 
+
 # Version 2.3.0 (July 11, 2015)
 
 * Issue #201 Save custom fields for projects.
