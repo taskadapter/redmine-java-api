@@ -13,6 +13,7 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
 import com.taskadapter.redmineapi.internal.Joiner;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.NameValuePair;
@@ -72,21 +73,22 @@ public class IssueManager {
      * <p>Unlike other getXXXObjects() methods in this library, this one does NOT handle paging for you so
      * you have to provide "offset" and "limit" parameters if you want to control paging.
      *
-     * @param pParameters the http parameters key/value pairs to append to the rest api request
+     * <p>Sample usage:
+     <pre>
+     final Map<String, String> params = new HashMap<String, String>();
+     params.put("project_id", projectId);
+     params.put("subject", "~free_form_search");
+     final List<Issue> issues = issueManager.getIssues(params);
+     </pre>
+
+     * @param parameters the http parameters key/value pairs to append to the rest api request
      * @return empty list if no issues found matching given parameters
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public List<Issue> getIssues(Map<String, String> pParameters) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
-
-        for (final Map.Entry<String, String> param : pParameters.entrySet()) {
-            params.add(new BasicNameValuePair(param.getKey(), param.getValue()));
-        }
-
-        final Transport.ResultsWrapper<Issue> wrapper = transport.getObjectsListNoPaging(Issue.class, params);
-        return wrapper.getResults();
+    public List<Issue> getIssues(Map<String, String> parameters) throws RedmineException {
+        return DirectObjectsSearcher.getObjectsListNoPaging(transport, parameters, Issue.class);
     }
 
     /**

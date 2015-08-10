@@ -12,8 +12,11 @@ import org.junit.Test;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -78,6 +81,30 @@ public class UserIntegrationTest {
         assertEquals(OUR_USER.getId(), loadedUser.getId());
         assertEquals(OUR_USER.getLogin(), loadedUser.getLogin());
         assertEquals(OUR_USER.getApiKey(), loadedUser.getApiKey());
+    }
+
+    @Test
+    public void userCanBeFoundByFreeFormSearch() throws RedmineException {
+        final User user = UserFactory.create();
+        user.setLogin("somelogin");
+        final String name = "FirstNameUnique";
+        user.setFirstName(name);
+        user.setLastName("LastNameUnique");
+        user.setMail("aa@aaa.ccc");
+        Integer id = null;
+        try {
+            final User created = userManager.createUser(user);
+            id = created.getId();
+
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("name", name);
+            List<User> list = userManager.getUsers(params);
+            assertThat(list.size()).isEqualTo(1);
+            final User loaded = list.get(0);
+            assertThat(loaded.getFirstName()).isEqualTo(name);
+        } finally {
+            userManager.deleteUser(id);
+        }
     }
 
     @Test(expected = NotFoundException.class)
