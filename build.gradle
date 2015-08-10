@@ -17,6 +17,18 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+// turn off strict Javadoc checks in Java8 that break the build.
+// http://blog.joda.org/2014/02/turning-off-doclint-in-jdk-8-javadoc.html
+// you could say that it is better to fix all Javadoc issues instead, but
+// they don't seem important enough to justify this.
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 repositories {
     mavenCentral()
 }
