@@ -4,6 +4,11 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.CustomFieldFactory;
+import java.util.Collections;
 
 public class RedmineJSONGeneratorTest {
 	/**
@@ -20,4 +25,17 @@ public class RedmineJSONGeneratorTest {
 		assertTrue(generatedJSON.contains("\"priority_id\":1,"));
 	}
 
+	/**
+	 * Tests whether custom fields are serialized to the JSON of a {@link Version}
+	 */
+	@Test
+	public void customFieldsAreWrittenToVersionIfProvided() {
+		Version version = VersionFactory.create(1);
+		CustomField field = CustomFieldFactory.create(2, "myName", "myValue");
+		version.addCustomFields(Collections.singletonList(field));
+
+		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON(
+				"dummy", version, RedmineJSONBuilder.VERSION_WRITER);
+		assertTrue(generatedJSON.contains("\"custom_field_values\":{\"2\":\"myValue\"}"));
+	}
 }
