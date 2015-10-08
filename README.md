@@ -19,7 +19,7 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
 
 # Sample code.
 
-Sample code to retrieve list of Redmine issues:
+## Get list of issues
 
     String uri = "https://www.hostedredmine.com";
     String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
@@ -31,3 +31,15 @@ Sample code to retrieve list of Redmine issues:
     for (Issue issue : issues) {
         System.out.println(issue.toString());
     }
+    
+## Create an issue
+
+    Issue issue = IssueFactory.createWithSubject("test123");
+	Version ver = VersionFactory.create(512);
+	issue.setTargetVersion(ver);
+	IssueCategory cat = IssueCategoryFactory.create(673);
+	issue.setCategory(cat);
+    ProjectManager projectManager = manager.getProjectManager();
+    Project projectByKey = projectManager.getProjectByKey("testid");
+    issue.setProject(projectByKey);
+    manager.getIssueManager().createIssue(issue);
