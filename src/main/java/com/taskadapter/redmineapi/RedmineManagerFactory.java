@@ -4,10 +4,12 @@ import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
 
 import java.security.KeyManagementException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Collection;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
@@ -26,6 +28,7 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
 import com.taskadapter.redmineapi.internal.comm.ConnectionEvictor;
+import com.taskadapter.redmineapi.internal.comm.betterssl.BetterSSLFactory;
 import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
 
 /**
@@ -143,13 +146,27 @@ public final class RedmineManagerFactory {
      * Creates default insecure connection manager.
      *
      * @return default insecure connection manager.
+     * @deprecated Use better key-managed factory with additional keystores.
      */
+    @Deprecated
     public static PoolingClientConnectionManager createInsecureConnectionManager()
             throws KeyStoreException, NoSuchAlgorithmException,
             CertificateException, KeyManagementException,
             UnrecoverableKeyException {
         return createConnectionManager(Integer.MAX_VALUE,
                 NaiveSSLFactory.createNaiveSSLSocketFactory());
+    }
+    
+    /**
+     * Creates a connection manager with extended trust relations. It would 
+     * use both default system trusted certificates as well as all certificates
+     * defined in the <code>trustStores</code>.
+     * @param trustStores list of additional trust stores.
+     * @return connection manager with extended trust relationship.
+     */
+    public static PoolingClientConnectionManager createConnectionManagerWithExtraTrust(Collection<KeyStore> trustStores) throws KeyManagementException, KeyStoreException {
+    	return createConnectionManager(Integer.MAX_VALUE, 
+    			BetterSSLFactory.createSocketFactory(trustStores));
     }
 
     /**
