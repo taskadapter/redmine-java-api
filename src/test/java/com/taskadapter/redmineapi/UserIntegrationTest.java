@@ -86,7 +86,7 @@ public class UserIntegrationTest {
     @Test
     public void userCanBeFoundByFreeFormSearch() throws RedmineException {
         final User user = UserFactory.create();
-        user.setLogin("somelogin");
+        user.setLogin("somelogin" + System.currentTimeMillis());
         final String name = "FirstNameUnique";
         user.setFirstName(name);
         user.setLastName("LastNameUnique");
@@ -322,17 +322,19 @@ public class UserIntegrationTest {
         final User template = UserFactory.create();
         template.setFirstName("first name");
         template.setLastName("last name");
-        template.setMail("root@globalhost.ru");
+        final String email = System.currentTimeMillis() + "@globalhost.ru";
+        template.setMail(email);
         template.setPassword("aslkdj32jnrfds7asdfn23()[]:kajsdf");
-        template.setLogin("asdNnadnNasd");
+        final String login = "login" + System.currentTimeMillis();
+        template.setLogin(login);
         final User result = userManager.createUser(template);
         try {
             Assert.assertNotNull(result.getId());
-            Assert.assertEquals("asdNnadnNasd", result.getLogin());
+            Assert.assertEquals(login, result.getLogin());
             Assert.assertNull(result.getPassword());
             Assert.assertEquals("first name", result.getFirstName());
             Assert.assertEquals("last name", result.getLastName());
-            Assert.assertEquals("root@globalhost.ru", result.getMail());
+            Assert.assertEquals(email, result.getMail());
             Assert.assertNotNull(result.getCreatedOn());
             Assert.assertNull(result.getLastLoginOn());
             Assert.assertNotNull(result.getCustomFields());
