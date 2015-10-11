@@ -3,6 +3,7 @@
 .idea
 build
 target
+bin
 
 /.settings/**
 /.classpath
