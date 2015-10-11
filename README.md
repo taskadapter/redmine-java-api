@@ -55,3 +55,14 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
     Map<String, String> params = new HashMap<String, String>();
     params.put("name", name);
     List<User> list = userManager.getUsers(params);
+
+## Create a group and add user to it
+
+    Group template = GroupFactory.create("group " + System.currentTimeMillis());
+    Group group = userManager.createGroup(template);
+    User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+    userManager.addUserToGroup(newUser, group);
+
+##  Delete user
+    userManager.deleteUser(123);
+
