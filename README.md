@@ -43,3 +43,15 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
     Project projectByKey = projectManager.getProjectByKey("testid");
     issue.setProject(projectByKey);
     manager.getIssueManager().createIssue(issue);
+
+## Get issue by Id
+    Issue retrievedIssue = issueManager.getIssueById(123);
+
+## Get all projects
+
+    List<Project> projects = mgr.getProjectManager().getProjects();
+
+## Free-form search for users
+    Map<String, String> params = new HashMap<String, String>();
+    params.put("name", name);
+    List<User> list = userManager.getUsers(params);
