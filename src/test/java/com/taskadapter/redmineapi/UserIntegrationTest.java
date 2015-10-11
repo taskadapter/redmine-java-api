@@ -212,12 +212,11 @@ public class UserIntegrationTest {
     }
 
     /**
-     * Requires Redmine 2.1
+     * Requires Redmine 2.1+
      */
     @Test
     public void testAddUserToGroup() throws RedmineException {
-        final Group template = GroupFactory.create();
-        template.setName("testAddUserToGroup " + System.currentTimeMillis());
+        final Group template = GroupFactory.create("group " + System.currentTimeMillis());
         final Group group = userManager.createGroup(template);
         try {
             final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
@@ -243,8 +242,7 @@ public class UserIntegrationTest {
     @Ignore
     @Test
     public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
-        final Group template = GroupFactory.create();
-        template.setName("some test " + System.currentTimeMillis());
+        final Group template = GroupFactory.create("some test " + System.currentTimeMillis());
         final Group group = userManager.createGroup(template);
         try {
             final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
@@ -262,8 +260,7 @@ public class UserIntegrationTest {
 
     @Test
     public void testGroupCRUD() throws RedmineException {
-        final Group template = GroupFactory.create();
-        template.setName("Template group " + System.currentTimeMillis());
+        final Group template = GroupFactory.create("Template group " + System.currentTimeMillis());
         final Group created = userManager.createGroup(template);
 
         try {

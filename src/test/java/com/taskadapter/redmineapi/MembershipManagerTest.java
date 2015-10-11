@@ -9,7 +9,6 @@ import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -60,10 +59,8 @@ public class MembershipManagerTest {
     @Test
     public void membershipCanBeSetForGroups() throws RedmineException {
         final List<Role> roles = userManager.getRoles();
-        Collection<Role> rolesToSet = Arrays.asList(roles.get(0));
-
-        Group group = GroupFactory.create();
-        group.setName("group" + new Random().nextDouble());
+        final Collection<Role> rolesToSet = Arrays.asList(roles.get(0));
+        final Group group = GroupFactory.create("group" + new Random().nextDouble());
         Group createdGroup = null;
         try {
             createdGroup = mgr.getUserManager().createGroup(group);

@@ -11,4 +11,11 @@ public class GroupFactory {
     public static Group create(Integer id) {
         return new Group(id);
     }
+
+    public static Group create(String name) {
+        final Group group = new Group(null);
+        group.setName(name);
+        return group;
+    }
+
 }
