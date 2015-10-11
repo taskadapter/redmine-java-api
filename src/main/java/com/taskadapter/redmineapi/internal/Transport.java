@@ -59,8 +59,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -594,7 +594,7 @@ public final class Transport {
 		StringEntity entity;
 		try {
 			entity = new StringEntity(body, CHARSET);
-		} catch (UnsupportedCharsetException e) {
+		} catch (UnsupportedEncodingException e) {
 			throw new RedmineInternalError("Required charset " + CHARSET
 					+ " is not supported", e);
 		}
