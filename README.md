@@ -32,6 +32,13 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
         System.out.println(issue.toString());
     }
     
+## Get related objects when retrieving issues
+    
+    issue = issueManager.getIssueById(123, Include.journals, Include.relations, Include.attachments, 
+                              Include.changesets, Include.watchers);
+    journals = issue.getJournals();
+
+
 ## Create an issue
 
     Issue issue = IssueFactory.createWithSubject("test123");
