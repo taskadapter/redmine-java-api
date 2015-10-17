@@ -1,3 +1,10 @@
+# Version 2.5.0 (October 17, 2015)
+
+* Issue 214. new feature: support custom fields for Versions.
+* Issue 219. new feature: support for additional keystores to enable SSL connections to servers
+ with certificates issued by lesser-known authorities.
+* Issue 220. minor improvement: added a method to GroupFactory to create Groups. 
+
 # Version 2.4.0 (August 9, 2015)
 
 * Issue 209 support free-form search for users
