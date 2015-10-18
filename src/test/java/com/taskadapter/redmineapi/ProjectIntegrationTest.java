@@ -301,6 +301,7 @@ public class ProjectIntegrationTest {
      * cannot create custom fields in Redmine programmatically - no support in its REST API.
      * See feature request http://www.redmine.org/issues/9664
      */
+    @Ignore
     @Test
     public void projectIsCreatedWithCustomField() throws RedmineException {
         List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();

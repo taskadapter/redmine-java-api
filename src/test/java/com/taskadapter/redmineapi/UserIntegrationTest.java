@@ -80,7 +80,6 @@ public class UserIntegrationTest {
         User loadedUser = userManager.getUserById(OUR_USER.getId());
         assertEquals(OUR_USER.getId(), loadedUser.getId());
         assertEquals(OUR_USER.getLogin(), loadedUser.getLogin());
-        assertEquals(OUR_USER.getApiKey(), loadedUser.getApiKey());
     }
 
     @Test

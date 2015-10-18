@@ -33,6 +33,7 @@ public final class HttpBasicAuthTest {
         mgrHttpBasicAuth = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
     }
 
+    // TODO this test is useless if you don't have any projects on the server.
     @Test
     public void testGetProjectList() throws RedmineException {
 
