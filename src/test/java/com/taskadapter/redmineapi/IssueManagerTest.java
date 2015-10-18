@@ -22,6 +22,7 @@ import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.bean.WatcherFactory;
+import org.apache.http.client.HttpClient;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -548,10 +549,10 @@ public class IssueManagerTest {
     @Test(expected = RedmineAuthenticationException.class)
     public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
         TestConfig testConfig = new TestConfig();
-        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+        final HttpClient httpClient = IntegrationTestHelper.getHttpClientForTestServer();
 
         RedmineManager redmineMgrEmpty = RedmineManagerFactory.createUnauthenticated(testConfig.getURI(),
-                transportConfiguration);
+                httpClient);
         Issue issue = IssueFactory.create(projectId, "test zzx");
         redmineMgrEmpty.getIssueManager().createIssue(issue);
     }
@@ -559,10 +560,10 @@ public class IssueManagerTest {
     @Test(expected = RedmineAuthenticationException.class)
     public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
         TestConfig testConfig = new TestConfig();
-        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+        final HttpClient httpClient = IntegrationTestHelper.getHttpClientForTestServer();
 
         RedmineManager redmineMgrInvalidKey = RedmineManagerFactory.createWithApiKey(
-                testConfig.getURI(), "wrong_key", transportConfiguration);
+                testConfig.getURI(), "wrong_key", httpClient);
         Issue issue = IssueFactory.create(projectId, "test zzx");
         redmineMgrInvalidKey.getIssueManager().createIssue(issue);
     }

@@ -1,3 +1,23 @@
+# Version 2.6.0 (... 2015)
+  
+=== Breaking API changes to address issue #222.
+  
+Migration for RedmineManagerFactory:
+
+* createShortTermConfig(connectionManager) -> getNewHttpClient(connectionManager)
+* createUnauthenticated(String uri, TransportConfiguration config) -> createUnauthenticated(String uri, HttpClient httpClient)
+* similarly for other createXX() methods that required TransportConfiguration - they now work with HttpClient
+  directly.
+  
+Other changes to address threading issues:
+
+* deleted Pooling connections. createConnectionManagerWithExtraTrust(), createDefaultConnectionManager()
+ and all similar methods now return ClientConnectionManager instead of PoolingClientConnectionManager.
+* no more shutdown() method in RedmineManager. if you want to close HttpClient connections, do it directly
+on HttpClient you create.
+* no more createShortTermConfig() and createLongTermConfiguration() methods. create your own HttpClient
+instances and pass them to RedmineManagerFactory if you want to control connection pooling, evictions, etc.
+  
 # Version 2.5.0 (October 17, 2015)
 
 * Issue 214. new feature: support custom fields for Versions.

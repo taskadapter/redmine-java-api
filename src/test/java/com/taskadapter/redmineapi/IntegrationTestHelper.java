@@ -4,7 +4,8 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ClientConnectionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,10 +46,10 @@ public class IntegrationTestHelper {
     public static RedmineManager createRedmineManager() {
         TestConfig testConfig = getTestConfig();
         logger.info("Running Redmine integration tests using: " + testConfig.getURI());
-        final TransportConfiguration transportConfiguration = getTransportConfigurationForTestServer();
+        final HttpClient client = getHttpClientForTestServer();
         return RedmineManagerFactory.createWithUserAuth(testConfig.getURI(),
                 testConfig.getLogin(), testConfig.getPassword(),
-                transportConfiguration);
+                client);
     }
 
     public static Project createProject(RedmineManager mgr) {
@@ -84,17 +85,17 @@ public class IntegrationTestHelper {
         }
     }
 
-    public static TransportConfiguration getTransportConfigurationForTestServer() {
-        final PoolingClientConnectionManager connectionManager;
+    public static HttpClient getHttpClientForTestServer() {
+        final ClientConnectionManager connectionManager;
         try {
             connectionManager = createConnectionManagerWithOurDevKeystore();
         } catch (Exception e) {
             throw new RuntimeException("cannot create connection manager: " + e, e);
         }
-        return RedmineManagerFactory.createShortTermConfig(connectionManager);
+        return RedmineManagerFactory.getNewHttpClient(connectionManager);
     }
 
-    private static PoolingClientConnectionManager createConnectionManagerWithOurDevKeystore() throws
+    private static ClientConnectionManager createConnectionManagerWithOurDevKeystore() throws
             NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException,
             CertificateException, KeyStoreException {
         final Collection<KeyStore> extraStores = new ArrayList<KeyStore>();

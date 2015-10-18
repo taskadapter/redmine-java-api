@@ -5,6 +5,7 @@ import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
+import org.apache.http.client.HttpClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,7 +27,6 @@ import static org.junit.Assert.fail;
 public class UserIntegrationTest {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
 
-    private static RedmineManager mgr;
     private static UserManager userManager;
 
     private static Integer nonAdminUserId;
@@ -35,7 +35,7 @@ public class UserIntegrationTest {
 
     @BeforeClass
     public static void oneTimeSetup() {
-        mgr = IntegrationTestHelper.createRedmineManager();
+        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
         userManager = mgr.getUserManager();
         try {
             createNonAdminUser();
@@ -371,9 +371,9 @@ public class UserIntegrationTest {
     }
 
     private RedmineManager getNonAdminManager() {
-        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+        final HttpClient httpClient = IntegrationTestHelper.getHttpClientForTestServer();
         return RedmineManagerFactory.createWithUserAuth(IntegrationTestHelper.getTestConfig().getURI(),
-                    nonAdminUserLogin, nonAdminPassword, transportConfiguration);
+                    nonAdminUserLogin, nonAdminPassword, httpClient);
     }
 
 }
