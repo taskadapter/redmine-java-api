@@ -12,12 +12,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Check the RedmineManager returns the same amount of projects using HTTP basic authentication and
+ * Check that RedmineManager returns the same amount of projects using HTTP basic authentication and
  * API key.
- * <p/>
- * It's better to use the redmine account with access to at least 1 public and 1 private project.
- *
- * @author JÃ©rÃ©mie Huchet
+ * <p>
+ * It is better to use a redmine account with access to at least 1 public and 1 private project.
  */
 public final class HttpBasicAuthTest {
 
@@ -29,8 +27,12 @@ public final class HttpBasicAuthTest {
     @BeforeClass
     public static void setup() {
         TestConfig testConfig = new TestConfig();
-        mgrKey = RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey());
-        mgrHttpBasicAuth = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+
+        mgrKey = RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey(), transportConfiguration);
+        mgrHttpBasicAuth = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(),
+                testConfig.getLogin(), testConfig.getPassword(),
+                transportConfiguration);
     }
 
     // TODO this test is useless if you don't have any projects on the server.

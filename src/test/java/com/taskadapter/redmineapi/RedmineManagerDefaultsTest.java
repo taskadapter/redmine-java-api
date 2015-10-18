@@ -40,7 +40,7 @@ public class RedmineManagerDefaultsTest {
 	public static void oneTimeSetUp() {
     TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
-        RedmineManager mgr = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
 

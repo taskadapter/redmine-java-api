@@ -175,7 +175,7 @@ public final class RedmineManagerFactory {
      * @return default insecure connection manager.
      */
     public static PoolingClientConnectionManager createDefaultConnectionManager()
-            throws KeyStoreException, NoSuchAlgorithmException,
+            throws NoSuchAlgorithmException,
             CertificateException, KeyManagementException,
             UnrecoverableKeyException {
         return createConnectionManager(Integer.MAX_VALUE,
@@ -189,7 +189,7 @@ public final class RedmineManagerFactory {
      * @return default insecure connection manager.
      */
     public static PoolingClientConnectionManager createSystemDefaultConnectionManager()
-            throws KeyStoreException, NoSuchAlgorithmException,
+            throws NoSuchAlgorithmException,
             CertificateException, KeyManagementException,
             UnrecoverableKeyException {
         return createConnectionManager(Integer.MAX_VALUE,

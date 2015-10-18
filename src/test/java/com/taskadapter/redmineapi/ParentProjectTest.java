@@ -13,8 +13,7 @@ public class ParentProjectTest {
 
     @BeforeClass
     public static void oneTimeSetUp() {
-        TestConfig testConfig = new TestConfig();
-        RedmineManager redmineManager = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(), testConfig.getLogin(), testConfig.getPassword());
+        RedmineManager redmineManager = IntegrationTestHelper.createRedmineManager();
         projectManager = redmineManager.getProjectManager();
     }
 

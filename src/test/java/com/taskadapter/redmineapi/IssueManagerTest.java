@@ -548,7 +548,10 @@ public class IssueManagerTest {
     @Test(expected = RedmineAuthenticationException.class)
     public void noAPIKeyOnCreateIssueThrowsAE() throws Exception {
         TestConfig testConfig = new TestConfig();
-        RedmineManager redmineMgrEmpty = RedmineManagerFactory.createUnauthenticated(testConfig.getURI());
+        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+
+        RedmineManager redmineMgrEmpty = RedmineManagerFactory.createUnauthenticated(testConfig.getURI(),
+                transportConfiguration);
         Issue issue = IssueFactory.create(projectId, "test zzx");
         redmineMgrEmpty.getIssueManager().createIssue(issue);
     }
@@ -556,8 +559,10 @@ public class IssueManagerTest {
     @Test(expected = RedmineAuthenticationException.class)
     public void wrongAPIKeyOnCreateIssueThrowsAE() throws Exception {
         TestConfig testConfig = new TestConfig();
+        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+
         RedmineManager redmineMgrInvalidKey = RedmineManagerFactory.createWithApiKey(
-                testConfig.getURI(), "wrong_key");
+                testConfig.getURI(), "wrong_key", transportConfiguration);
         Issue issue = IssueFactory.create(projectId, "test zzx");
         redmineMgrInvalidKey.getIssueManager().createIssue(issue);
     }
