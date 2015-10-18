@@ -5,6 +5,7 @@ import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -37,6 +38,15 @@ public class UserIntegrationTest {
         userManager = mgr.getUserManager();
         try {
             createNonAdminUser();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @AfterClass
+    public static void afterClass() {
+        try {
+            userManager.deleteUser(nonAdminUserId);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -85,10 +95,10 @@ public class UserIntegrationTest {
     @Test
     public void userCanBeFoundByFreeFormSearch() throws RedmineException {
         final User user = UserFactory.create();
-        user.setLogin("somelogin" + System.currentTimeMillis());
-        final String name = "FirstNameUnique";
+        user.setLogin("login" + System.currentTimeMillis());
+        final String name = "UniqueName";
         user.setFirstName(name);
-        user.setLastName("LastNameUnique");
+        user.setLastName("LName");
         user.setMail("aa@aaa.ccc");
         Integer id = null;
         try {
@@ -166,24 +176,28 @@ public class UserIntegrationTest {
         userToCreate.setPassword("1234asdf");
         User createdUser = userManager.createUser(userToCreate);
         Integer userId = createdUser.getId();
-        assertNotNull(
-                "checking that a non-null project is returned", createdUser);
+        try {
+            assertNotNull(
+                    "checking that a non-null project is returned", createdUser);
 
-        String newFirstName = "fnameNEW";
-        String newLastName = "lnameNEW";
-        String newMail = "newmail" + randomNumber + "@asd.com";
-        createdUser.setFirstName(newFirstName);
-        createdUser.setLastName(newLastName);
-        createdUser.setMail(newMail);
+            String newFirstName = "fnameNEW";
+            String newLastName = "lnameNEW";
+            String newMail = "newmail" + randomNumber + "@asd.com";
+            createdUser.setFirstName(newFirstName);
+            createdUser.setLastName(newLastName);
+            createdUser.setMail(newMail);
 
-        userManager.update(createdUser);
+            userManager.update(createdUser);
 
-        User updatedUser = userManager.getUserById(userId);
+            User updatedUser = userManager.getUserById(userId);
 
-        assertEquals(newFirstName, updatedUser.getFirstName());
-        assertEquals(newLastName, updatedUser.getLastName());
-        assertEquals(newMail, updatedUser.getMail());
-        assertEquals(userId, updatedUser.getId());
+            assertEquals(newFirstName, updatedUser.getFirstName());
+            assertEquals(newLastName, updatedUser.getLastName());
+            assertEquals(newMail, updatedUser.getMail());
+            assertEquals(userId, updatedUser.getId());
+        } finally {
+            userManager.deleteUser(userId);
+        }
     }
 
     @Test
