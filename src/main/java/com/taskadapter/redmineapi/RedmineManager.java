@@ -37,7 +37,6 @@ import com.taskadapter.redmineapi.internal.Transport;
 public class RedmineManager {
 
     private final Transport transport;
-    private final Runnable shutdownListener;
     private final IssueManager issueManager;
     private final AttachmentManager attachmentManager;
     private final UserManager userManager;
@@ -46,7 +45,7 @@ public class RedmineManager {
     private final CustomFieldManager customFieldManager;
     private final WikiManager wikiManager;
 
-    RedmineManager(Transport transport, Runnable shutdownListener) {
+    RedmineManager(Transport transport) {
         this.transport = transport;
         issueManager = new IssueManager(transport);
         attachmentManager = new AttachmentManager(transport);
@@ -55,7 +54,6 @@ public class RedmineManager {
         membershipManager = new MembershipManager(transport);
         wikiManager = new WikiManager(transport);
         customFieldManager = new CustomFieldManager(transport);
-        this.shutdownListener = shutdownListener;
     }
 
     public WikiManager getWikiManager() {
@@ -110,22 +108,4 @@ public class RedmineManager {
         transport.setOnBehalfOfUser(loginName);
     }
 
-
-    /**
-     * Shutdown the communicator.
-     */
-    public void shutdown() {
-        if (shutdownListener != null) {
-            shutdownListener.run();
-        }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        try {
-            super.finalize();
-        } finally {
-            shutdown();
-        }
-    }
 }

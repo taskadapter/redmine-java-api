@@ -6,28 +6,25 @@ import com.taskadapter.redmineapi.internal.URIConfigurator;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.Collection;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.conn.BasicClientConnectionManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
-import com.taskadapter.redmineapi.internal.comm.ConnectionEvictor;
 import com.taskadapter.redmineapi.internal.comm.betterssl.BetterSSLFactory;
 import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
 
@@ -62,18 +59,19 @@ public final class RedmineManagerFactory {
      * @param uri redmine manager URI.
      */
     public static RedmineManager createUnauthenticated(String uri) {
-        return createUnauthenticated(uri, createDefaultTransportConfig());
+        return createUnauthenticated(uri, createDefaultHttpClient());
     }
 
     /**
      * Creates a non-authenticating redmine manager.
      *
      * @param uri    redmine manager URI.
-     * @param config transport configuration.
+     * @param httpClient you can provide your own pre-configured HttpClient if you want
+     *                     to control connection pooling, manage connections eviction, closing, etc.
      */
     public static RedmineManager createUnauthenticated(String uri,
-                                                TransportConfiguration config) {
-        return createWithUserAuth(uri, null, null, config);
+                                                HttpClient httpClient) {
+        return createWithUserAuth(uri, null, null, httpClient);
     }
 
     /**
@@ -91,7 +89,7 @@ public final class RedmineManagerFactory {
     public static RedmineManager createWithApiKey(String uri,
                                                   String apiAccessKey) {
         return createWithApiKey(uri, apiAccessKey,
-                createDefaultTransportConfig());
+                createDefaultHttpClient());
     }
 
     /**
@@ -105,12 +103,13 @@ public final class RedmineManagerFactory {
      *                     <i>http://redmine_server_url/my/account</i> URL). This
      *                     parameter is <strong>optional</strong> (can be set to NULL) for Redmine
      *                     projects, which are "public".
-     * @param config       transport configuration.
+     * @param httpClient   Http Client. you can provide your own pre-configured HttpClient if you want
+     *                     to control connection pooling, manage connections eviction, closing, etc.
      */
     public static RedmineManager createWithApiKey(String uri,
-                                                  String apiAccessKey, TransportConfiguration config) {
+                                                  String apiAccessKey, HttpClient httpClient) {
         return new RedmineManager(new Transport(new URIConfigurator(uri,
-                apiAccessKey), config.client), config.shutdownListener);
+                apiAccessKey), httpClient));
     }
 
     /**
@@ -123,7 +122,7 @@ public final class RedmineManagerFactory {
     public static RedmineManager createWithUserAuth(String uri, String login,
                                                     String password) {
         return createWithUserAuth(uri, login, password,
-                createDefaultTransportConfig());
+                createDefaultHttpClient());
     }
 
     /**
@@ -132,14 +131,15 @@ public final class RedmineManagerFactory {
      * @param uri      redmine manager URI.
      * @param login    user's name.
      * @param password user's password.
-     * @param config   transport configuration.
+     * @param httpClient you can provide your own pre-configured HttpClient if you want
+     *                     to control connection pooling, manage connections eviction, closing, etc.
      */
     public static RedmineManager createWithUserAuth(String uri, String login,
-                                                    String password, TransportConfiguration config) {
+                                                    String password, HttpClient httpClient) {
         final Transport transport = new Transport(
-                new URIConfigurator(uri, null), config.client);
+                new URIConfigurator(uri, null), httpClient);
         transport.setCredentials(login, password);
-        return new RedmineManager(transport, config.shutdownListener);
+        return new RedmineManager(transport);
     }
 
     /**
@@ -149,12 +149,8 @@ public final class RedmineManagerFactory {
      * @deprecated Use better key-managed factory with additional keystores.
      */
     @Deprecated
-    public static PoolingClientConnectionManager createInsecureConnectionManager()
-            throws KeyStoreException, NoSuchAlgorithmException,
-            CertificateException, KeyManagementException,
-            UnrecoverableKeyException {
-        return createConnectionManager(Integer.MAX_VALUE,
-                NaiveSSLFactory.createNaiveSSLSocketFactory());
+    public static ClientConnectionManager createInsecureConnectionManager() {
+        return createConnectionManager(NaiveSSLFactory.createNaiveSSLSocketFactory());
     }
     
     /**
@@ -164,22 +160,15 @@ public final class RedmineManagerFactory {
      * @param trustStores list of additional trust stores.
      * @return connection manager with extended trust relationship.
      */
-    public static PoolingClientConnectionManager createConnectionManagerWithExtraTrust(Collection<KeyStore> trustStores) throws KeyManagementException, KeyStoreException {
-    	return createConnectionManager(Integer.MAX_VALUE, 
-    			BetterSSLFactory.createSocketFactory(trustStores));
+    public static ClientConnectionManager createConnectionManagerWithExtraTrust(Collection<KeyStore> trustStores) throws KeyManagementException, KeyStoreException {
+    	return createConnectionManager(BetterSSLFactory.createSocketFactory(trustStores));
     }
 
     /**
      * Creates default connection manager.
-     *
-     * @return default insecure connection manager.
      */
-    public static PoolingClientConnectionManager createDefaultConnectionManager()
-            throws NoSuchAlgorithmException,
-            CertificateException, KeyManagementException,
-            UnrecoverableKeyException {
-        return createConnectionManager(Integer.MAX_VALUE,
-                SSLSocketFactory.getSocketFactory());
+    public static ClientConnectionManager createDefaultConnectionManager() {
+        return createConnectionManager(SSLSocketFactory.getSocketFactory());
     }
 
     /**
@@ -188,109 +177,23 @@ public final class RedmineManagerFactory {
      *
      * @return default insecure connection manager.
      */
-    public static PoolingClientConnectionManager createSystemDefaultConnectionManager()
-            throws NoSuchAlgorithmException,
-            CertificateException, KeyManagementException,
-            UnrecoverableKeyException {
-        return createConnectionManager(Integer.MAX_VALUE,
-                SSLSocketFactory.getSystemSocketFactory());
+    public static ClientConnectionManager createSystemDefaultConnectionManager() {
+        return createConnectionManager(SSLSocketFactory.getSystemSocketFactory());
     }
 
-    public static PoolingClientConnectionManager createConnectionManager(
-            int maxConnections, SSLSocketFactory sslSocketFactory) {
+    public static ClientConnectionManager createConnectionManager(SSLSocketFactory sslSocketFactory) {
         SchemeRegistry registry = new SchemeRegistry();
-        registry.register(new Scheme("http", 80, PlainSocketFactory
-                .getSocketFactory()));
+        registry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
         registry.register(new Scheme("https", 443, sslSocketFactory));
-
-        PoolingClientConnectionManager manager = new PoolingClientConnectionManager(
-                registry);
-        manager.setMaxTotal(maxConnections);
-        manager.setDefaultMaxPerRoute(maxConnections);
-        return manager;
+        return new BasicClientConnectionManager(registry);
     }
 
-    /**
-     * Creates a default configuration using a default HTTP client.
-     */
-    public static TransportConfiguration createDefaultHttpClientConfig() {
-        return TransportConfiguration.create(new DefaultHttpClient(), null);
-    }
-
-    /**
-     * Creates a transport which uses a client connection manager underneath.
-     * This transport configuration do not perform any connectino eviction and
-     * is usefull for some short-time communication. Common scerario for this
-     * method is to create RedmineManager, load/update some tasks and then
-     * shutdown all the manager.
-     * <p>
-     * Note that this configuration will shutdown connection manager when
-     * shutdown will be called on RedmineManager instance.
-     * </p>
-     */
-    public static TransportConfiguration createShortTermConfig(
-            final ClientConnectionManager connectionManager) {
-        return TransportConfiguration.create(
-                getNewHttpClient(connectionManager), new Runnable() {
-                    @Override
-                    public void run() {
-                        connectionManager.shutdown();
-                    }
-                });
-    }
-
-    /**
-     * Creates a transport which supports connection eviction. This transport
-     * can be used in a long-term interactive scenarios where actual redmine
-     * communications are interleaved with user interactios (data input).
-     * <p>
-     * Shutting down redmine manager will also shut down provided connection
-     * manager.
-     * </p>
-     * @param connectionManager connection manager to use.
-     * @param idleTimeout       idle timeout for connection before eviction, seconds.
-     * @param evictionCheck     eviction check interval, seconds.
-     */
-    public static TransportConfiguration createLongTermConfiguration(
-            final ClientConnectionManager connectionManager, int idleTimeout,
-            int evictionCheck) {
-        final ConnectionEvictor evictor = new ConnectionEvictor(
-                connectionManager, evictionCheck, idleTimeout);
-
-        final Thread evictorThread = new Thread(evictor);
-        evictorThread.setDaemon(true);
-        evictorThread
-                .setName("Redmine communicator connection eviction thread");
-        evictorThread.start();
-
+    public static HttpClient createDefaultHttpClient() {
         try {
-            return TransportConfiguration.create(
-                    getNewHttpClient(connectionManager), new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                connectionManager.shutdown();
-                            } finally {
-                                evictor.shutdown();
-                            }
-                        }
-                    });
-        } catch (RuntimeException t) {
-            /* A little paranoia, StackOferflow, OOM, other excetpions. */
-            evictor.shutdown();
-            throw t;
-        } catch (Error e) {
-            evictor.shutdown();
-            throw e;
-        }
-    }
-
-    public static TransportConfiguration createDefaultTransportConfig() {
-        try {
-            return createShortTermConfig(createSystemDefaultConnectionManager());
+            return getNewHttpClient(createSystemDefaultConnectionManager());
         } catch (Exception e) {
             e.printStackTrace();
-            return createDefaultHttpClientConfig();
+            return new DefaultHttpClient();
         }
     }
 
@@ -298,8 +201,7 @@ public final class RedmineManagerFactory {
      * Helper method to create an http client from connection manager. This new
      * client is configured to use system proxy (if any).
      */
-    public static DefaultHttpClient getNewHttpClient(
-            ClientConnectionManager connectionManager) {
+    public static HttpClient getNewHttpClient(ClientConnectionManager connectionManager) {
         try {
 
             HttpParams params = new BasicHttpParams();

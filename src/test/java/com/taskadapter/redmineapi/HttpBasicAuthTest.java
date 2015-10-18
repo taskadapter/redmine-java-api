@@ -1,5 +1,6 @@
 package com.taskadapter.redmineapi;
 
+import org.apache.http.client.HttpClient;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import com.taskadapter.redmineapi.bean.Project;
@@ -27,12 +28,12 @@ public final class HttpBasicAuthTest {
     @BeforeClass
     public static void setup() {
         TestConfig testConfig = new TestConfig();
-        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
+        final HttpClient httpClient = IntegrationTestHelper.getHttpClientForTestServer();
 
-        mgrKey = RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey(), transportConfiguration);
+        mgrKey = RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey(), httpClient);
         mgrHttpBasicAuth = RedmineManagerFactory.createWithUserAuth(testConfig.getURI(),
                 testConfig.getLogin(), testConfig.getPassword(),
-                transportConfiguration);
+                httpClient);
     }
 
     // TODO this test is useless if you don't have any projects on the server.
