@@ -356,8 +356,9 @@ public class UserIntegrationTest {
     }
 
     private RedmineManager getNonAdminManager() {
+        final TransportConfiguration transportConfiguration = IntegrationTestHelper.getTransportConfigurationForTestServer();
         return RedmineManagerFactory.createWithUserAuth(IntegrationTestHelper.getTestConfig().getURI(),
-                    nonAdminUserLogin, nonAdminPassword);
+                    nonAdminUserLogin, nonAdminPassword, transportConfiguration);
     }
 
 }
