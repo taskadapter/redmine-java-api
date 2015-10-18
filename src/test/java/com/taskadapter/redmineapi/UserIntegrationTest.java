@@ -26,6 +26,7 @@ import static org.junit.Assert.fail;
 public class UserIntegrationTest {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
 
+    private static RedmineManager mgr;
     private static UserManager userManager;
 
     private static Integer nonAdminUserId;
@@ -34,7 +35,7 @@ public class UserIntegrationTest {
 
     @BeforeClass
     public static void oneTimeSetup() {
-        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
+        mgr = IntegrationTestHelper.createRedmineManager();
         userManager = mgr.getUserManager();
         try {
             createNonAdminUser();
