@@ -21,10 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Calendar;
 
 /**
- * Tests "default" redmine manager values in a response. Tries to provides
- * behavior compatible with an XML version, see issue 29,
- * https://github.com/redminedev/redmine-java-api/issues/29
- * 
+ * Tests default redmine manager values in a response. Tries to provides
+ * behavior compatible with an XML version.
  */
 public class RedmineManagerDefaultsTest {
 	private static final Integer ACTIVITY_ID = 8;
