@@ -33,14 +33,15 @@ public class RedmineManagerDefaultsTest {
 
     private static String projectKey;
     private static int projectId;
+	private static RedmineManager mgr;
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
 
     @BeforeClass
 	public static void oneTimeSetUp() {
-    TestConfig testConfig = new TestConfig();
+        TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
-        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
+		mgr = IntegrationTestHelper.createRedmineManager();
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
 
