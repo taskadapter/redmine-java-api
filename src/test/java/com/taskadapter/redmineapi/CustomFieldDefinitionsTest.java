@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.List;
 import org.json.JSONException;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * The tests expect some manual (one-time) setup in the Redmine server because

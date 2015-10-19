@@ -5,7 +5,7 @@ import com.taskadapter.redmineapi.bean.ProjectFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ParentProjectTest {
 
@@ -27,7 +27,7 @@ public class ParentProjectTest {
                 createProject(childKey, "Child Project", parentProject.getId());
 
         try {
-            assertEquals(childProject.getParentId(), parentProject.getId());
+            assertThat(childProject.getParentId()).isEqualTo(parentProject.getId());
         } finally {
             // Alexey: I verified that deleting the parent project deletes the child one as well
             // (at least on Redmine 2.3.3)

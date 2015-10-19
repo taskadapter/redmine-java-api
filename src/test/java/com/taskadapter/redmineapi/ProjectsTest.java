@@ -4,12 +4,13 @@ import java.util.List;
 
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import org.json.JSONObject;
-import org.junit.Assert;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.internal.RedmineJSONParser;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProjectsTest {
 
@@ -26,8 +27,7 @@ public class ProjectsTest {
 
     @Test
     public void testProjectsNumber() {
-        int expectedProjectsNumber = 12;
-        Assert.assertEquals("Checking projects number", expectedProjectsNumber, projectsList.size());
+        assertThat(projectsList.size()).isEqualTo(12);
     }
 
     @Test
@@ -37,12 +37,12 @@ public class ProjectsTest {
         aceProject.setName("test project 15");
 
         Project projectFromList = findProjectInList(aceProject.getId());
-        Assert.assertNotNull("Checking project is loaded", projectFromList);
+        assertThat(projectFromList).isNotNull();
 
         // could use project.equals later when it's implemented in the class
-        Assert.assertEquals("Checking the loaded project info", aceProject.getId(), projectFromList.getId());
-        Assert.assertEquals("Checking the loaded project info", aceProject.getName(), projectFromList.getName());
-        Assert.assertEquals("Checking the loaded project info", aceProject.getIdentifier(), projectFromList.getIdentifier());
+        assertThat(projectFromList.getId()).isEqualTo(aceProject.getId());
+        assertThat(projectFromList.getName()).isEqualTo(aceProject.getName());
+        assertThat(projectFromList.getIdentifier()).isEqualTo(aceProject.getIdentifier());
     }
 
     /*

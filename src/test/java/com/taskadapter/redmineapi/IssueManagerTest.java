@@ -47,7 +47,7 @@ import static com.taskadapter.redmineapi.IssueHelper.createIssues;
 import com.taskadapter.redmineapi.bean.CustomField;
 import java.util.Arrays;
 import java.util.Collections;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
