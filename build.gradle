@@ -39,7 +39,7 @@ dependencies {
             'org.slf4j:slf4j-api:1.7.1')
 
     testCompile(
-            'junit:junit:4.10',
+            'junit:junit:4.12',
             'org.easytesting:fest-assert:1.4',
             'org.slf4j:slf4j-jdk14:1.7.1'
     )
