@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.UUID;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 

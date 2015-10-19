@@ -6,7 +6,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import static com.taskadapter.redmineapi.internal.RedmineDateParser.parse;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RedmineDateParserTest {
     private static final LocalDateFormat FULL_DATE_FORMAT_V3 = new LocalDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz");

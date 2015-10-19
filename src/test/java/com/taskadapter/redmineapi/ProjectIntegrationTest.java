@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.taskadapter.redmineapi.CustomFieldResolver.getCustomFieldByName;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;

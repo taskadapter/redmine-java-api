@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Integration tests for RedmineManager.
