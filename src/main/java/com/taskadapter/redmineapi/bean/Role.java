@@ -17,7 +17,7 @@ public class Role {
 	private String name;
 	private Boolean inherited;
 
-	private final Collection<String> permissions = new HashSet<String>();
+	private final Collection<String> permissions = new HashSet<>();
 
     /**
      * Use RoleFactory to create instances of this class.

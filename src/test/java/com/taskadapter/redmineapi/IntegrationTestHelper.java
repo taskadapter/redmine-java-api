@@ -14,9 +14,6 @@ import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -105,10 +102,8 @@ public class IntegrationTestHelper {
         return RedmineManagerFactory.getNewHttpClient(connectionManager);
     }
 
-    private static ClientConnectionManager createConnectionManagerWithOurDevKeystore() throws
-            NoSuchAlgorithmException, KeyManagementException, UnrecoverableKeyException,
-            CertificateException, KeyStoreException {
-        final Collection<KeyStore> extraStores = new ArrayList<KeyStore>();
+    private static ClientConnectionManager createConnectionManagerWithOurDevKeystore() throws KeyManagementException, KeyStoreException {
+        final Collection<KeyStore> extraStores = new ArrayList<>();
         final KeyStore builtInExtension = getExtensionKeystore();
         if (builtInExtension != null) {
             extraStores.add(builtInExtension);

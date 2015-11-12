@@ -20,7 +20,7 @@ public class Journal {
     private User user;
     private Date createdOn;
 
-    private final List<JournalDetail> details = new ArrayList<JournalDetail>();
+    private final List<JournalDetail> details = new ArrayList<>();
 
     /**
      * Use JournalFactory to create instances of this class.

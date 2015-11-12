@@ -41,12 +41,12 @@ public class Project implements Identifiable, Serializable {
     private Integer parentId;
     private Boolean projectPublic;
 
-    private final Collection<CustomField> customFields = new HashSet<CustomField>();
+    private final Collection<CustomField> customFields = new HashSet<>();
 
     /**
      * Trackers available for this project
      */
-    private final Collection<Tracker> trackers = new HashSet<Tracker>();
+    private final Collection<Tracker> trackers = new HashSet<>();
 
     Project(Integer id) {
         this.id = id;

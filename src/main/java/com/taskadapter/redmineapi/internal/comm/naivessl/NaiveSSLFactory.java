@@ -27,9 +27,7 @@ public class NaiveSSLFactory {
             TrustManager[] managers = new TrustManager[] { manager };
             sslcontext = SSLContext.getInstance("SSL");
             sslcontext.init(null, managers, null);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             e.printStackTrace();
         }
         return new SSLSocketFactory(sslcontext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);

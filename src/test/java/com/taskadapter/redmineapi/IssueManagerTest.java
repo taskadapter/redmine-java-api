@@ -312,7 +312,7 @@ public class IssueManagerTest {
         assertThat(issues.size()).isGreaterThan(26);
 
         // check that there are no duplicates in the list.
-        Set<Issue> issueSet = new HashSet<Issue>(issues);
+        Set<Issue> issueSet = new HashSet<>(issues);
         assertThat(issueSet.size()).isEqualTo(issues.size());
     }
 
@@ -320,7 +320,7 @@ public class IssueManagerTest {
     public void canControlLimitAndOffsetDirectly() throws RedmineException {
         // create 27 issues. default Redmine page size is usually 25 (unless changed in the server settings).
         createIssues(issueManager, projectId, 27);
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("limit", "3");
         params.put("offset", "0");
         params.put("project_id", projectId + "");
@@ -496,7 +496,7 @@ public class IssueManagerTest {
         final User newUserWatcher = userManager.createUser(UserGenerator.generateRandomUser());
 
         try {
-            List<Watcher> watchers = new ArrayList<Watcher>();
+            List<Watcher> watchers = new ArrayList<>();
             Watcher watcher = WatcherFactory.create(newUserWatcher.getId());
             watchers.add(watcher);
 
@@ -1182,7 +1182,7 @@ public class IssueManagerTest {
         CustomField loadedCustomField = createdIssue.getCustomFieldByName("custom_multi_list");
         assertThat(loadedCustomField).isNotNull();
         assertThat(loadedCustomField.getValues().size()).isEqualTo(2);
-        List<String> values = new ArrayList<String>(loadedCustomField.getValues());
+        List<String> values = new ArrayList<>(loadedCustomField.getValues());
         Collections.sort(values);
         assertThat(loadedCustomField.getValues().get(0)).isEqualTo("V1");
         assertThat(loadedCustomField.getValues().get(1)).isEqualTo("V3");
@@ -1328,7 +1328,7 @@ public class IssueManagerTest {
         try {
             createdIssueId = issueManager.createIssue(issueToCreate).getId();
 
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             params.put("project_id", Integer.toString(projectId));
             params.put("subject", "~free_form_search");
             List<Issue> issues = issueManager.getIssues(params);

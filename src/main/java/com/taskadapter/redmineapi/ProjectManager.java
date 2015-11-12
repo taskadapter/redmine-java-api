@@ -201,7 +201,7 @@ public class ProjectManager {
      * @see com.taskadapter.redmineapi.bean.News
      */
     public List<News> getNews(String projectKey) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
+        Set<NameValuePair> params = new HashSet<>();
         if ((projectKey != null) && (projectKey.length() > 0)) {
             params.add(new BasicNameValuePair("project_id", projectKey));
         }

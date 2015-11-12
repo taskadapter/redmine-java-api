@@ -106,7 +106,7 @@ public class UserIntegrationTest {
             final User created = userManager.createUser(user);
             id = created.getId();
 
-            Map<String, String> params = new HashMap<String, String>();
+            Map<String, String> params = new HashMap<>();
             params.put("name", name);
             List<User> list = userManager.getUsers(params);
             assertThat(list.size()).isEqualTo(1);

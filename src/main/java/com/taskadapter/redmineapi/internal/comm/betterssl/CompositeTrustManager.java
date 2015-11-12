@@ -26,7 +26,7 @@ final class CompositeTrustManager implements X509TrustManager {
 	 */
 	CompositeTrustManager(Collection<X509TrustManager> peers) {
 		this.peers = peers;
-		final List<X509Certificate> certs = new ArrayList<X509Certificate>();
+		final List<X509Certificate> certs = new ArrayList<>();
 		for (X509TrustManager peer: peers) {
 			certs.addAll(Arrays.asList(peer.getAcceptedIssuers()));
 		}

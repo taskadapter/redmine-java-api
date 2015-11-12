@@ -23,7 +23,7 @@ public class Membership implements Identifiable {
 
     private Group group;
 
-	private final Collection<Role> roles = new HashSet<Role>();
+	private final Collection<Role> roles = new HashSet<>();
 
     /**
      * Use MembershipFactory to create instances of this class.

@@ -43,7 +43,7 @@ import java.util.Map;
 public class URIConfigurator {
     private static final String URL_POSTFIX = ".json";
 
-    private static final Map<Class<?>, String> urls = new HashMap<Class<?>, String>();
+    private static final Map<Class<?>, String> urls = new HashMap<>();
 
     static {
         urls.put(User.class, "users");
@@ -99,7 +99,7 @@ public class URIConfigurator {
      */
     private URI createURI(String query,
                           Collection<? extends NameValuePair> origParams) {
-        final List<NameValuePair> params = new ArrayList<NameValuePair>(
+        final List<NameValuePair> params = new ArrayList<>(
                 origParams);
         if (apiAccessKey != null) {
             params.add(new BasicNameValuePair("key", apiAccessKey));

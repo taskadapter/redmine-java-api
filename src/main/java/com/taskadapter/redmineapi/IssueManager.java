@@ -190,7 +190,7 @@ public class IssueManager {
      * @see Issue
      */
     public List<Issue> getIssues(String projectKey, Integer queryId, Include... include) throws RedmineException {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
+        List<NameValuePair> params = new ArrayList<>();
         if (queryId != null) {
             params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
         }
@@ -375,7 +375,7 @@ public class IssueManager {
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737</p>
      */
     public List<SavedQuery> getSavedQueries(String projectKey) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<NameValuePair>();
+        Set<NameValuePair> params = new HashSet<>();
 
         if ((projectKey != null) && (projectKey.length() > 0)) {
             params.add(new BasicNameValuePair("project_id", projectKey));

@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class Transport {
-	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<Class<?>, EntityConfig<?>>();
+	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<>();
 	private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
@@ -183,7 +183,7 @@ public final class Transport {
 	public Transport(URIConfigurator configurator, HttpClient client) {
 		this.configurator = configurator;
         final Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(client);
-		this.authenticator = new RedmineAuthenticator<HttpResponse>(
+		this.authenticator = new RedmineAuthenticator<>(
 				baseCommunicator, CHARSET);
 		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
 		errorCheckingCommunicator = Communicators.fmap(
@@ -415,12 +415,12 @@ public final class Transport {
 	 */
 	public <T> List<T> getObjectsList(Class<T> objectClass,
 									  Collection<? extends NameValuePair> params) throws RedmineException {
-		final List<T> result = new ArrayList<T>();
+		final List<T> result = new ArrayList<>();
 		int offset = 0;
 
 		Integer totalObjectsFoundOnServer;
 		do {
-			final List<NameValuePair> newParams = new ArrayList<NameValuePair>(params);
+			final List<NameValuePair> newParams = new ArrayList<>(params);
 			newParams.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
 			newParams.add(new BasicNameValuePair("offset", String.valueOf(offset)));
 
@@ -451,8 +451,8 @@ public final class Transport {
 	public <T> ResultsWrapper<T> getObjectsListNoPaging(Class<T> objectClass,
 											  Collection<? extends NameValuePair> params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(objectClass);
-		final List<NameValuePair> newParams = new ArrayList<NameValuePair>(params);
-		List<NameValuePair> paramsList = new ArrayList<NameValuePair>(newParams);
+		final List<NameValuePair> newParams = new ArrayList<>(params);
+		List<NameValuePair> paramsList = new ArrayList<>(newParams);
 		final URI uri = getURIConfigurator().getObjectsURI(objectClass, paramsList);
 		final HttpGet http = new HttpGet(uri);
 		final String response = send(http);
@@ -460,7 +460,7 @@ public final class Transport {
 			final JSONObject responseObject = RedmineJSONParser.getResponse(response);
 			List<T> results = JsonInput.getListOrNull(responseObject, config.multiObjectName, config.parser);
 			Integer totalFoundOnServer = JsonInput.getIntOrNull(responseObject, KEY_TOTAL_COUNT);
-			return new ResultsWrapper<T>(totalFoundOnServer, results);
+			return new ResultsWrapper<>(totalFoundOnServer, results);
 		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}
@@ -623,7 +623,7 @@ public final class Transport {
 	private static <T> EntityConfig<T> config(String objectField,
 			String urlPrefix, JsonObjectWriter<T> writer,
 			JsonObjectParser<T> parser) {
-		return new EntityConfig<T>(objectField, urlPrefix, writer, parser);
+		return new EntityConfig<>(objectField, urlPrefix, writer, parser);
 	}
 
 	public void setCredentials(String login, String password) {

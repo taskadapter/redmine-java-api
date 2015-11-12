@@ -18,9 +18,9 @@ public class CustomFieldDefinition {
     private boolean multiple;
     private String defaultValue;
     private boolean visible;
-    private final List<String> possibleValues = new ArrayList<String>();
-    private final List<Tracker> trackers = new ArrayList<Tracker>();
-    private final List<Role> roles = new ArrayList<Role>();
+    private final List<String> possibleValues = new ArrayList<>();
+    private final List<Tracker> trackers = new ArrayList<>();
+    private final List<Role> roles = new ArrayList<>();
 
     /**
      * Use CustomFieldDefinitionFactory to create instances of this class.

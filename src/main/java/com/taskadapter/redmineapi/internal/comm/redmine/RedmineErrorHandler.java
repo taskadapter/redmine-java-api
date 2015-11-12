@@ -21,7 +21,7 @@ import java.util.Map;
 public final class RedmineErrorHandler implements
         ContentHandler<BasicHttpResponse, BasicHttpResponse> {
 
-	private static final Map<String, String> ERROR_REMAP = new HashMap<String, String>();
+	private static final Map<String, String> ERROR_REMAP = new HashMap<>();
 
 	static {
 		ERROR_REMAP
@@ -61,7 +61,7 @@ public final class RedmineErrorHandler implements
 	}
 
 	private List<String> remap(List<String> errors) {
-		final List<String> result = new ArrayList<String>(errors.size());
+		final List<String> result = new ArrayList<>(errors.size());
 		for (String message : errors)
 			result.add(remap(message));
 		return result;

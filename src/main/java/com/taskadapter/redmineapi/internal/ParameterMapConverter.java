@@ -9,7 +9,7 @@ import java.util.Set;
 
 public final class ParameterMapConverter {
     public static Set<NameValuePair> getNameValuePairs(Map<String, String> pParameters) {
-        final Set<NameValuePair> params = new HashSet<NameValuePair>();
+        final Set<NameValuePair> params = new HashSet<>();
 
         for (final Map.Entry<String, String> param : pParameters.entrySet()) {
             params.add(new BasicNameValuePair(param.getKey(), param.getValue()));

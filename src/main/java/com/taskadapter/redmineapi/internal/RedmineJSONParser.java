@@ -516,7 +516,7 @@ public class RedmineJSONParser {
 		if (!content.has("multiple")) {
 			result.setValue(JsonInput.getStringOrNull(content, "value"));
                 } else {
-                        ArrayList<String> strings = new ArrayList<String>();
+                        ArrayList<String> strings = new ArrayList<>();
                         Object value = content.get("value");
                         if(value instanceof JSONArray) {
                             JSONArray tmp = (JSONArray) value;
@@ -607,7 +607,7 @@ public class RedmineJSONParser {
 				&& content.getBoolean("inherited"));
 		if (content.has("permissions")) {
 		    final JSONArray perms = content.getJSONArray("permissions");
-		    final Set<String> permSet = new HashSet<String>();
+		    final Set<String> permSet = new HashSet<>();
 		    for (int i = 0; i < perms.length(); i++)
 		        permSet.add(perms.getString(i));
 		    role.addPermissions(permSet);
@@ -674,7 +674,7 @@ public class RedmineJSONParser {
 	public static List<String> parseErrors(String responseBody) throws JSONException {
 		final JSONObject body = getResponse(responseBody);
 		final JSONArray errorsList = JsonInput.getArrayNotNull(body, "errors");
-		final List<String> result = new ArrayList<String>(errorsList.length());
+		final List<String> result = new ArrayList<>(errorsList.length());
 		for (int i = 0; i < errorsList.length(); i++) {
 			result.add(errorsList.get(i).toString());
 		}

@@ -332,7 +332,7 @@ public class RedmineJSONBuilder {
             writeWatchers(writer, issueWatchers);
         }
 
-        final List<Attachment> uploads = new ArrayList<Attachment>();
+        final List<Attachment> uploads = new ArrayList<>();
         for (Attachment attachment : issue.getAttachments()) {
             if (attachment.getToken() != null) {
                 uploads.add(attachment);

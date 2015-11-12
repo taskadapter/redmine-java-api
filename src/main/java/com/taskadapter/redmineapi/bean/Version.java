@@ -39,7 +39,7 @@ public class Version implements Identifiable {
     private Date createdOn;
     private Date updatedOn;
 
-    private final Collection<CustomField> customFields = new HashSet<CustomField>();
+    private final Collection<CustomField> customFields = new HashSet<>();
 
     /**
      * Use VersionFactory to create an instance of this class.

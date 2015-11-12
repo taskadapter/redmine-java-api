@@ -35,7 +35,7 @@ public class BetterSSLFactory {
 	 * @throws KeyManagementException if new SSL context could not be initialized.
 	 */
 	public static SSLSocketFactory createSocketFactory(Collection<KeyStore> extraStores) throws KeyStoreException, KeyManagementException {
-		final Collection<X509TrustManager> managers = new ArrayList<X509TrustManager>();
+		final Collection<X509TrustManager> managers = new ArrayList<>();
 		for (KeyStore ks : extraStores) {
 			addX509Managers(managers, ks); 
 		}

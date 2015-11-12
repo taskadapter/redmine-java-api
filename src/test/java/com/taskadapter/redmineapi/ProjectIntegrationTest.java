@@ -243,7 +243,7 @@ public class ProjectIntegrationTest {
     }
 
     private List<Project> createProjects(int num) throws RedmineException {
-        List<Project> projects = new ArrayList<Project>(num);
+        List<Project> projects = new ArrayList<>(num);
         for (int i = 0; i < num; i++) {
             Project projectToCreate = generateRandomProject();
             Project p = projectManager.createProject(projectToCreate);

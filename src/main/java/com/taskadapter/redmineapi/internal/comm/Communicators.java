@@ -76,7 +76,7 @@ public final class Communicators {
 
 	public static <K, V> SimpleCommunicator<V> simplify(
 			Communicator<K> communicator, ContentHandler<K, V> handler) {
-		return new BasicSimplifier<V, K>(handler, communicator);
+		return new BasicSimplifier<>(handler, communicator);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -90,12 +90,12 @@ public final class Communicators {
 
 	public static <K, I, R> ContentHandler<K, R> compose(
 			ContentHandler<I, R> cont1, ContentHandler<K, I> cont2) {
-		return new ComposingHandler<K, I, R>(cont1, cont2);
+		return new ComposingHandler<>(cont1, cont2);
 	}
 
 	public static <K, R> Communicator<R> fmap(Communicator<K> comm,
 			ContentHandler<K, R> handler) {
-		return new FmapCommunicator<R, K>(handler, comm);
+		return new FmapCommunicator<>(handler, comm);
 	}
 
 	public static ContentHandler<HttpResponse, BasicHttpResponse> transportDecoder() {

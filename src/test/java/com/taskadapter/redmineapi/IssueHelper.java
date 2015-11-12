@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class IssueHelper {
     public static List<Issue> createIssues(IssueManager issueManager, int projectId, int issuesNumber) throws RedmineException {
-        List<Issue> issues = new ArrayList<Issue>(issuesNumber);
+        List<Issue> issues = new ArrayList<>(issuesNumber);
         for (int i = 0; i < issuesNumber; i++) {
             Issue issueToCreate = IssueFactory.create(projectId, "some issue " + i + " " + new Date());
             Issue issue = issueManager.createIssue(issueToCreate);

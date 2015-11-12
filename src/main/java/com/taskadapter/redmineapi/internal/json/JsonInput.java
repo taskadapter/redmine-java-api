@@ -28,7 +28,7 @@ public class JsonInput {
 			JsonObjectParser<T> parser) throws JSONException {
 		final JSONArray items = getArrayNotNull(obj, field);
 		final int length = items.length();
-		final List<T> result = new ArrayList<T>(length);
+		final List<T> result = new ArrayList<>(length);
 		for (int i = 0; i < length; i++)
 			result.add(parser.parse(items.getJSONObject(i)));
 		return result;
@@ -53,7 +53,7 @@ public class JsonInput {
 			return null;
 		final JSONArray items = obj.getJSONArray(field);
 		final int length = items.length();
-		final List<T> result = new ArrayList<T>(length);
+		final List<T> result = new ArrayList<>(length);
 		for (int i = 0; i < length; i++)
 			result.add(parser.parse(items.getJSONObject(i)));
 		return result;
@@ -75,12 +75,12 @@ public class JsonInput {
 	public static <T> List<T> getListOrEmpty(JSONObject obj, String field,
 			JsonObjectParser<T> parser) throws JSONException {
 		if (!obj.has(field) || obj.isNull(field))
-			return new ArrayList<T>();
+			return new ArrayList<>();
 		final JSONArray items = obj.getJSONArray(field);
 		if (items == null)
-			return new ArrayList<T>();
+			return new ArrayList<>();
 		final int length = items.length();
-		final List<T> result = new ArrayList<T>(length);
+		final List<T> result = new ArrayList<>(length);
 		for (int i = 0; i < length; i++)
 			result.add(parser.parse(items.getJSONObject(i)));
 		return result;

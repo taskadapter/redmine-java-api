@@ -31,9 +31,9 @@ public class User implements Identifiable {
     private Integer authSourceId;
     private Integer status;
     // TODO add tests
-    private final Set<CustomField> customFields = new HashSet<CustomField>();
-	private final Set<Membership> memberships = new HashSet<Membership>();
-	private final Set<Group> groups = new HashSet<Group>();
+    private final Set<CustomField> customFields = new HashSet<>();
+	private final Set<Membership> memberships = new HashSet<>();
+	private final Set<Group> groups = new HashSet<>();
 
     /**
      * Use UserFactory to create instances of this class.
