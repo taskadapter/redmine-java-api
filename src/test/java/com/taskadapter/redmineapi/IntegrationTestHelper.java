@@ -55,7 +55,8 @@ public class IntegrationTestHelper {
     public static RedmineManager createRedmineManagerWithAPIKey() {
         TestConfig testConfig = getTestConfig();
         logger.info("Running Redmine integration tests using: " + testConfig.getURI());
-        return RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey());
+        final HttpClient client = getHttpClientForTestServer();
+        return RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey(), client);
     }
 
     public static Project createProject(RedmineManager mgr) {
@@ -91,6 +92,9 @@ public class IntegrationTestHelper {
         }
     }
 
+    /**
+     * @return The client configured for our Dev Redmine server which has a self-signed SSL certificate.
+     */
     public static HttpClient getHttpClientForTestServer() {
         final ClientConnectionManager connectionManager;
         try {
