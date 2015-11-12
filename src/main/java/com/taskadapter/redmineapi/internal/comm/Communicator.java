@@ -10,7 +10,6 @@ public interface Communicator<K> {
 	 * 
 	 * @return the response body.
 	 */
-	public abstract <R> R sendRequest(HttpRequest request,
-			ContentHandler<K, R> contentHandler) throws RedmineException;
+	<R> R sendRequest(HttpRequest request, ContentHandler<K, R> contentHandler) throws RedmineException;
 
 }

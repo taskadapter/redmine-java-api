@@ -1,13 +1,10 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
-import com.taskadapter.redmineapi.internal.ParameterMapConverter;
 import com.taskadapter.redmineapi.internal.Transport;
-import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.util.List;

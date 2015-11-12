@@ -5,12 +5,9 @@ import org.json.JSONObject;
 
 /**
  * Json object parser.
- * 
- * @author maxkar
- * 
- * @param <T>
- *            parsing result type.
+ *
+ * @param <T> parsing result type.
  */
 public interface JsonObjectParser<T> {
-	public T parse(JSONObject input) throws JSONException;
+	T parse(JSONObject input) throws JSONException;
 }
