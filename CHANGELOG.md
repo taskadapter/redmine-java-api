@@ -1,6 +1,6 @@
 # Version 2.6.0 (... 2015)
   
-=== Breaking API changes to address issue #222.
+## ! This version has breaking API changes to address issue #222!
   
 Migration for RedmineManagerFactory:
 
@@ -17,7 +17,16 @@ Other changes to address threading issues:
 on HttpClient you create.
 * no more createShortTermConfig() and createLongTermConfiguration() methods. create your own HttpClient
 instances and pass them to RedmineManagerFactory if you want to control connection pooling, evictions, etc.
-  
+
+* Bug fixed: #229 "Unsupported class class Attachment" when calling attachmentManager.getAttachmentById() bug 
+
+Other changes in version 2.6.0 are internal, they should not affect end-users:
+
+* Integration tests are switched from HTTP to HTTPS to make sure HTTPS is supported alright.
+* Switched from JUnit 4.10 to 4.12 (test scope dependency - will not affect consumers)
+* Switched testing library from Fest-assert to AssertJ  (test scope dependency - will not affect consumers)
+
+
 # Version 2.5.0 (October 17, 2015)
 
 * Issue 214. new feature: support custom fields for Versions.
