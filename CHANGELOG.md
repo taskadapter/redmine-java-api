@@ -1,3 +1,7 @@
+# Version 2.7.0 (...)
+
+* Issue #121. Bug fixed: download attachments using API access key 
+
 # Version 2.6.0 (November 11, 2015)
   
 ## ! This version has breaking API changes to address issue #222!
