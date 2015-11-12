@@ -3,7 +3,7 @@ package com.taskadapter.redmineapi.bean;
 public class TimeEntryActivity {
 
     /**
-     * @param id database Id
+     * database Id
      */
     private final Integer id;
 
