@@ -353,7 +353,8 @@ public final class Transport {
 	public <R> R download(String uri,
 			ContentHandler<BasicHttpResponse, R> handler)
 			throws RedmineException {
-		final HttpGet request = new HttpGet(uri);
+		final URI requestUri = configurator.addAPIKey(uri);
+		final HttpGet request = new HttpGet(requestUri);
         if (onBehalfOfUser != null) {
             request.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
         }

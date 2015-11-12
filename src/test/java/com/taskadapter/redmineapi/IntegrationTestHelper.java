@@ -52,6 +52,12 @@ public class IntegrationTestHelper {
                 client);
     }
 
+    public static RedmineManager createRedmineManagerWithAPIKey() {
+        TestConfig testConfig = getTestConfig();
+        logger.info("Running Redmine integration tests using: " + testConfig.getURI());
+        return RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey());
+    }
+
     public static Project createProject(RedmineManager mgr) {
         Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
         try {
