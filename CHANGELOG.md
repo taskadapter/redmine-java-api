@@ -20,6 +20,7 @@ instances and pass them to RedmineManagerFactory if you want to control connecti
 
 Other changes in 2.6.0:
 
+* Apache HttpClient dependency is updated from 4.2 to v. 4.5.1
 * Bug fixed: #229 "Unsupported class class Attachment" when calling attachmentManager.getAttachmentById() bug 
 
 Internal changes in 2.6.0 (should not affect end-users):
