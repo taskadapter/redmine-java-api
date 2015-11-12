@@ -9,10 +9,6 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.internal.comm.BasicHttpResponse;
 import com.taskadapter.redmineapi.internal.comm.ContentHandler;
 
-/**
- * "Copy bytes" handler.
- * 
- */
 public final class CopyBytesHandler implements ContentHandler<BasicHttpResponse, Void> {
 
 	private final OutputStream outStream;
@@ -25,14 +21,11 @@ public final class CopyBytesHandler implements ContentHandler<BasicHttpResponse,
 	public Void processContent(BasicHttpResponse content)
 			throws RedmineException {
 		final byte[] buffer = new byte[4096 * 4];
-		int readed;
+		int numberOfBytesRead;
 		try {
-			final InputStream input = content.getStream();
-			try {
-				while ((readed = input.read(buffer)) > 0)
-					outStream.write(buffer, 0, readed);
-			} finally {
-				input.close();
+			try (InputStream input = content.getStream()) {
+				while ((numberOfBytesRead = input.read(buffer)) > 0)
+					outStream.write(buffer, 0, numberOfBytesRead);
 			}
 		} catch (IOException e) {
 			throw new RedmineCommunicationException(e);

@@ -102,11 +102,8 @@ public class AttachmentManager {
      */
     public Attachment uploadAttachment(String contentType, File content)
             throws RedmineException, IOException {
-        final InputStream is = new FileInputStream(content);
-        try {
+        try (InputStream is = new FileInputStream(content)) {
             return uploadAttachment(content.getName(), contentType, is);
-        } finally {
-            is.close();
         }
     }
 
