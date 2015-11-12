@@ -2,7 +2,7 @@
 
 * Uses Redmine's REST API (don't forget to enable it in Redmine server settings).
 * Does not require any plugins installed on Redmine/Chiliproject server.
-* Runs on any standard Java 6+ platform.
+* Runs on any standard Java 7+ platform (Android does not have standard Java).
 * Supports HTTP proxy
 * Supports GZipped responses from servers
 * Uses SLF4J for logging. Provide [your own SLF4J binding](http://www.slf4j.org/codes.html#StaticLoggerBinder)
@@ -12,7 +12,7 @@
 Gradle dependency:
 
     dependencies {
-        compile 'com.taskadapter:redmine-java-api:2.5.0'
+        compile 'com.taskadapter:redmine-java-api:2.6.0'
     }
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
