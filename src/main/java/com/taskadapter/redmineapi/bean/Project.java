@@ -105,7 +105,6 @@ public class Project implements Identifiable, Serializable {
     }
 
     public Tracker getTrackerByName(String trackerName) {
-        if (this.trackers == null) return null;
         for (Tracker t : this.trackers) {
             if (t.getName().equals(trackerName)) return t;
         }

@@ -362,7 +362,6 @@ public class Issue implements Identifiable {
      * @return the custom field with given Id or NULL if the field is not found
      */
     public CustomField getCustomFieldById(int customFieldId) {
-        if(customFields == null) return null;
         for (CustomField customField : customFields) {
             if (customFieldId == customField.getId()) {
                 return customField;
@@ -375,7 +374,6 @@ public class Issue implements Identifiable {
      * @return the custom field with given name or NULL if the field is not found
      */
     public CustomField getCustomFieldByName(String customFieldName) {
-        if(customFields == null) return null;
         for (CustomField customField : customFields) {
             if (customFieldName.equals(customField.getName())) {
                 return customField;
