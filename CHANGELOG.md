@@ -9,7 +9,7 @@ Migration for RedmineManagerFactory:
 * similarly for other createXX() methods that required TransportConfiguration - they now work with HttpClient
   directly.
   
-Other changes to address threading issues:
+Also changes to address threading issues:
 
 * deleted Pooling connections. createConnectionManagerWithExtraTrust(), createDefaultConnectionManager()
  and all similar methods now return ClientConnectionManager instead of PoolingClientConnectionManager.
@@ -18,9 +18,11 @@ on HttpClient you create.
 * no more createShortTermConfig() and createLongTermConfiguration() methods. create your own HttpClient
 instances and pass them to RedmineManagerFactory if you want to control connection pooling, evictions, etc.
 
+Other changes in 2.6.0:
+
 * Bug fixed: #229 "Unsupported class class Attachment" when calling attachmentManager.getAttachmentById() bug 
 
-Other changes in version 2.6.0 are internal, they should not affect end-users:
+Internal changes in 2.6.0 (should not affect end-users):
 
 * Integration tests are switched from HTTP to HTTPS to make sure HTTPS is supported alright.
 * Switched from JUnit 4.10 to 4.12 (test scope dependency - will not affect consumers)
