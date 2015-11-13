@@ -210,8 +210,7 @@ public class IssueManager {
      * @param type type of the relation. e.g. "precedes". see IssueRelation.TYPE for possible types.
      * @return newly created IssueRelation instance.
      *
-     * @throws RedmineException
-     * @see IssueRelation.TYPE
+     * @see com.taskadapter.redmineapi.bean.IssueRelation.TYPE
      */
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
         IssueRelation toCreate = IssueRelationFactory.create();
