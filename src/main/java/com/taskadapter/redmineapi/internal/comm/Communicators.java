@@ -13,17 +13,8 @@ import com.taskadapter.redmineapi.RedmineTransportException;
 
 /**
  * Communicator utilities.
- * 
- * @author maxkar
- * 
  */
 public final class Communicators {
-	private static final ContentHandler<Object, Object> IDENTITY_HANDLER = new ContentHandler<Object, Object>() {
-		@Override
-		public Object processContent(Object content) throws RedmineException {
-			return content;
-		}
-	};
 
 	private static final ContentHandler<HttpResponse, BasicHttpResponse> TRANSPORT_DECODER = new TransportDecoder();
 
@@ -41,13 +32,6 @@ public final class Communicators {
 		}
 	};
 	
-	private static final ContentHandler<HttpResponse, Integer> HTTP_RESPONSE_CODE = new ContentHandler<HttpResponse, Integer>() {
-		@Override
-		public Integer processContent(HttpResponse content) throws RedmineException {
-			return content.getStatusLine().getStatusCode();
-		}
-	};
-
 	private static final ContentHandler<Reader, String> READ_CHARS = new ContentHandler<Reader, String>() {
 		@Override
 		public String processContent(Reader content) throws RedmineException {
@@ -77,11 +61,6 @@ public final class Communicators {
 	public static <K, V> SimpleCommunicator<V> simplify(
 			Communicator<K> communicator, ContentHandler<K, V> handler) {
 		return new BasicSimplifier<>(handler, communicator);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <K> ContentHandler<K, K> identityHandler() {
-		return (ContentHandler<K, K>) IDENTITY_HANDLER;
 	}
 
 	public static ContentHandler<BasicHttpResponse, String> contentReader() {
