@@ -101,16 +101,4 @@ public final class Communicators {
 	public static ContentHandler<HttpResponse, BasicHttpResponse> transportDecoder() {
 		return TRANSPORT_DECODER;
 	}
-
-	public static ContentHandler<BasicHttpResponse, Reader> characterDecoder() {
-		return CHARACTER_DECODER;
-	}
-
-	public static ContentHandler<Reader, String> readChars() {
-		return READ_CHARS;
-	}
-	
-	public static ContentHandler<HttpResponse, Integer> httpResponseCodeReader() {
-		return HTTP_RESPONSE_CODE;
-	}
 }
