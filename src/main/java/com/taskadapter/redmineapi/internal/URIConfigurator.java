@@ -86,7 +86,7 @@ public class URIConfigurator {
     }
 
     public URI createURI(String query) {
-        return createURI(query, new ArrayList<NameValuePair>());
+        return createURI(query, new ArrayList<>());
     }
 
     public URI createURI(String query, NameValuePair... param) {

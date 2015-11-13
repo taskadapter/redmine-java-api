@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Converts Redmine objects to JSon format.
@@ -332,14 +333,12 @@ public class RedmineJSONBuilder {
             writeWatchers(writer, issueWatchers);
         }
 
-        final List<Attachment> uploads = new ArrayList<>();
-        for (Attachment attachment : issue.getAttachments()) {
-            if (attachment.getToken() != null) {
-                uploads.add(attachment);
-            }
-        }
-        JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads,
-                UPLOAD_WRITER);
+        final List<Attachment> uploads = issue.getAttachments()
+				.stream()
+				.filter(attachment -> attachment.getToken() != null)
+				.collect(Collectors.toList());
+
+		JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads, UPLOAD_WRITER);
 
 		/*
 		 * Journals and Relations cannot be set for an issue during creation or

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class RedmineErrorHandler implements
         ContentHandler<BasicHttpResponse, BasicHttpResponse> {
@@ -48,23 +49,17 @@ public final class RedmineErrorHandler implements
 		}
 
 		if (responseCode == HttpStatus.SC_UNPROCESSABLE_ENTITY) {
-			List<String> errors;
 			try {
-				errors = RedmineJSONParser.parseErrors(getContent(httpResponse));
-				errors = remap(errors);
+				final List<String> sourceErrors = RedmineJSONParser.parseErrors(getContent(httpResponse));
+				final List<String> errors = sourceErrors.stream()
+						.map(this::remap)
+						.collect(Collectors.toList());
+				throw new RedmineProcessingException(errors);
 			} catch (JSONException e) {
 				throw new RedmineFormatException("Bad redmine error response", e);
 			}
-			throw new RedmineProcessingException(errors);
 		}
 		return httpResponse;
-	}
-
-	private List<String> remap(List<String> errors) {
-		final List<String> result = new ArrayList<>(errors.size());
-		for (String message : errors)
-			result.add(remap(message));
-		return result;
 	}
 
 	private String remap(String message) {

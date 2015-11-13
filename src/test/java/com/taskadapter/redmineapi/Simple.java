@@ -111,9 +111,7 @@ public class Simple {
 	@SuppressWarnings("unused")
 	private static void tryGetNews(ProjectManager mgr) throws RedmineException {
 		List<News> news = mgr.getNews(null);
-		for (News aNew : news) {
-			System.out.println(aNew);
-		}
+		news.forEach(System.out::println);
 	}
 
 	@SuppressWarnings("unused")
