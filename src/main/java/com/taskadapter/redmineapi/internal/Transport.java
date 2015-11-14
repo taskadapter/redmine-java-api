@@ -192,9 +192,16 @@ public final class Transport {
 						Communicators.transportDecoder()));
         Communicator<String> coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
             Communicators.contentReader());
-		this.communicator = Communicators.simplify(coreCommunicator,
-                Communicators.<String>identityHandler());
+		this.communicator = Communicators.simplify(coreCommunicator, IDENTITY_HANDLER);
 	}
+
+	// TODO can this be deleted completely?
+	private static final ContentHandler<String, String> IDENTITY_HANDLER = new ContentHandler<String, String>() {
+		@Override
+		public String processContent(String content) throws RedmineException {
+			return content;
+		}
+	};
 
 	public User getCurrentUser(NameValuePair... params) throws RedmineException {
 		URI uri = getURIConfigurator().createURI("users/current.json", params);
