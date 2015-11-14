@@ -64,199 +64,7 @@ import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 /**
  * A parser for JSON items sent by Redmine.
  */
-public class RedmineJSONParser {
-
-	public static final JsonObjectParser<Tracker> TRACKER_PARSER = new JsonObjectParser<Tracker>() {
-		@Override
-		public Tracker parse(JSONObject input) throws JSONException {
-			return parseTracker(input);
-		}
-	};
-
-	public static final JsonObjectParser<IssueStatus> STATUS_PARSER = new JsonObjectParser<IssueStatus>() {
-		@Override
-		public IssueStatus parse(JSONObject input) throws JSONException {
-			return parseStatus(input);
-		}
-	};
-
-	public static final JsonObjectParser<Project> MINIMAL_PROJECT_PARSER = new JsonObjectParser<Project>() {
-		@Override
-		public Project parse(JSONObject input) throws JSONException {
-			return parseMinimalProject(input);
-		}
-	};
-
-	public static final JsonObjectParser<Project> PROJECT_PARSER = new JsonObjectParser<Project>() {
-		@Override
-		public Project parse(JSONObject input) throws JSONException {
-			return parseProject(input);
-		}
-	};
-
-	public static final JsonObjectParser<Issue> ISSUE_PARSER = new JsonObjectParser<Issue>() {
-		@Override
-		public Issue parse(JSONObject input) throws JSONException {
-			return parseIssue(input);
-		}
-	};
-
-	public static final JsonObjectParser<User> USER_PARSER = new JsonObjectParser<User>() {
-		@Override
-		public User parse(JSONObject input) throws JSONException {
-			return parseUser(input);
-		}
-	};
-
-	public static final JsonObjectParser<Group> GROUP_PARSER = new JsonObjectParser<Group>() {
-		@Override
-		public Group parse(JSONObject input) throws JSONException {
-			return parseGroup(input);
-		}
-	};
-
-	public static final JsonObjectParser<CustomField> CUSTOM_FIELD_PARSER = new JsonObjectParser<CustomField>() {
-		@Override
-		public CustomField parse(JSONObject input) throws JSONException {
-			return parseCustomField(input);
-		}
-	};
-
-	public static final JsonObjectParser<Journal> JOURNAL_PARSER = new JsonObjectParser<Journal>() {
-		@Override
-		public Journal parse(JSONObject input) throws JSONException {
-			return parseJournal(input);
-		}
-	};
-
-    public static final JsonObjectParser<JournalDetail> JOURNAL_DETAIL_PARSER = new JsonObjectParser<JournalDetail>() {
-        @Override
-        public JournalDetail parse(JSONObject input) throws JSONException {
-            return parseJournalDetail(input);
-        }
-    };
-
-	public static final JsonObjectParser<Attachment> ATTACHMENT_PARSER = new JsonObjectParser<Attachment>() {
-		@Override
-		public Attachment parse(JSONObject input) throws JSONException {
-			return parseAttachments(input);
-		}
-	};
-
-	public static final JsonObjectParser<IssueRelation> RELATION_PARSER = new JsonObjectParser<IssueRelation>() {
-		@Override
-		public IssueRelation parse(JSONObject input) throws JSONException {
-			return parseRelation(input);
-		}
-	};
-
-	public static final JsonObjectParser<News> NEWS_PARSER = new JsonObjectParser<News>() {
-		@Override
-		public News parse(JSONObject input) throws JSONException {
-			return parseNews(input);
-		}
-	};
-
-	public static final JsonObjectParser<Version> VERSION_PARSER = new JsonObjectParser<Version>() {
-		@Override
-		public Version parse(JSONObject input) throws JSONException {
-			return parseVersion(input);
-		}
-	};
-
-	public static final JsonObjectParser<IssueCategory> CATEGORY_PARSER = new JsonObjectParser<IssueCategory>() {
-		@Override
-		public IssueCategory parse(JSONObject input) throws JSONException {
-			return parseCategory(input);
-		}
-	};
-
-	public static final JsonObjectParser<TimeEntry> TIME_ENTRY_PARSER = new JsonObjectParser<TimeEntry>() {
-		@Override
-		public TimeEntry parse(JSONObject input) throws JSONException {
-			return parseTimeEntry(input);
-		}
-	};
-
-	public static final JsonObjectParser<SavedQuery> QUERY_PARSER = new JsonObjectParser<SavedQuery>() {
-		@Override
-		public SavedQuery parse(JSONObject input) throws JSONException {
-			return parseSavedQuery(input);
-		}
-	};
-
-	/**
-	 * Parser for upload tokens.
-	 */
-	public static final JsonObjectParser<String> UPLOAD_TOKEN_PARSER = new JsonObjectParser<String>() {
-		@Override
-		public String parse(JSONObject input) throws JSONException {
-			return JsonInput.getStringNotNull(input, "token");
-		}
-	};
-
-	public static final JsonObjectParser<Role> ROLE_PARSER = new JsonObjectParser<Role>() {
-		@Override
-		public Role parse(JSONObject input) throws JSONException {
-			return parseRole(input);
-		}
-	};
-
-	public static final JsonObjectParser<Membership> MEMBERSHIP_PARSER = new JsonObjectParser<Membership>() {
-		@Override
-		public Membership parse(JSONObject input) throws JSONException {
-			return parseMembership(input);
-		}
-	};
-
-	public static final JsonObjectParser<Changeset> CHANGESET_PARSER = new JsonObjectParser<Changeset>() {
-		@Override
-		public Changeset parse(JSONObject input) throws JSONException {
-			return parseChangeset(input);
-		}
-	};
-
-	public static final JsonObjectParser<Watcher> WATCHER_PARSER = new JsonObjectParser<Watcher>() {
-		@Override
-		public Watcher parse(JSONObject input) throws JSONException {
-			return parseWatcher(input);
-		}
-	};
-
-    public static final JsonObjectParser<IssuePriority> ISSUE_PRIORITY_PARSER = new JsonObjectParser<IssuePriority>() {
-        @Override
-        public IssuePriority parse(JSONObject input) throws JSONException {
-            return parseIssuePriority(input);
-        }
-    };
-
-    public static final JsonObjectParser<TimeEntryActivity> TIME_ENTRY_ACTIVITY_PARSER = new JsonObjectParser<TimeEntryActivity>() {
-        @Override
-        public TimeEntryActivity parse(JSONObject input) throws JSONException {
-            return parseTimeEntryActivity(input);
-        }
-    };
-
-    public static final JsonObjectParser<WikiPage> WIKI_PAGE_PARSER = new JsonObjectParser<WikiPage>() {
-        @Override
-        public WikiPage parse(JSONObject input) throws JSONException {
-            return parseWikiPage(input);
-        }
-    };
-
-    public static final JsonObjectParser<WikiPageDetail> WIKI_PAGE_DETAIL_PARSER = new JsonObjectParser<WikiPageDetail>() {
-        @Override
-        public WikiPageDetail parse(JSONObject input) throws JSONException {
-            return parseWikiPageDetail(input);
-        }
-    };
-
-    public static final JsonObjectParser<CustomFieldDefinition> CUSTOM_FIELD_DEFINITION_PARSER = new JsonObjectParser<CustomFieldDefinition>() {
-        @Override
-        public CustomFieldDefinition parse(JSONObject input) throws JSONException {
-            return parseCustomFieldDefinition(input);
-        }
-    };
+public final class RedmineJSONParser {
 
 	/**
 	 * Parses a tracker.
@@ -302,9 +110,8 @@ public class RedmineJSONParser {
 
 	public static News parseNews(JSONObject object) throws JSONException {
 		final News result = NewsFactory.create(JsonInput.getIntOrNull(object, "id"));
-		result.setProject(JsonInput.getObjectOrNull(object, "project",
-				MINIMAL_PROJECT_PARSER));
-		result.setUser(JsonInput.getObjectOrNull(object, "author", USER_PARSER));
+		result.setProject(JsonInput.getObjectOrNull(object, "project", RedmineJSONParser::parseMinimalProject));
+		result.setUser(JsonInput.getObjectOrNull(object, "author", RedmineJSONParser::parseUser));
 		result.setTitle(JsonInput.getStringOrNull(object, "title"));
 		result.setDescription(JsonInput.getStringOrNull(object, "description"));
 		result.setCreatedOn(getDateOrNull(object, "created_on"));
@@ -387,10 +194,8 @@ public class RedmineJSONParser {
 				"parent");
 		if (parentProject != null)
 			result.setParentId(JsonInput.getInt(parentProject, "id"));
-		result.addTrackers(JsonInput.getListOrEmpty(content, "trackers",
-				TRACKER_PARSER));
-        result.addCustomFields(JsonInput.getListOrEmpty(content, "custom_fields",
-                CUSTOM_FIELD_PARSER));
+		result.addTrackers(JsonInput.getListOrEmpty(content, "trackers", RedmineJSONParser::parseTracker));
+        result.addCustomFields(JsonInput.getListOrEmpty(content, "custom_fields", RedmineJSONParser::parseCustomField));
 		return result;
 	}
 
@@ -405,8 +210,7 @@ public class RedmineJSONParser {
 		result.setEstimatedHours(JsonInput.getFloatOrNull(content,
 				"estimated_hours"));
 		result.setSpentHours(JsonInput.getFloatOrNull(content, "spent_hours"));
-		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to",
-				USER_PARSER));
+		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to", RedmineJSONParser::parseUser));
 
 		final JSONObject priorityObject = JsonInput.getObjectOrNull(content,
 				"priority");
@@ -418,13 +222,11 @@ public class RedmineJSONParser {
 
 		result.setDoneRatio(JsonInput.getIntOrNull(content, "done_ratio"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				MINIMAL_PROJECT_PARSER));
-		result.setAuthor(JsonInput.getObjectOrNull(content, "author",
-				USER_PARSER));
+				RedmineJSONParser::parseMinimalProject));
+		result.setAuthor(JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser));
 		result.setStartDate(getDateOrNull(content, "start_date"));
 		result.setDueDate(getDateOrNull(content, "due_date"));
-		result.setTracker(JsonInput.getObjectOrNull(content, "tracker",
-				TRACKER_PARSER));
+		result.setTracker(JsonInput.getObjectOrNull(content, "tracker", RedmineJSONParser::parseTracker));
 		result.setDescription(JsonInput
 				.getStringOrEmpty(content, "description"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
@@ -438,21 +240,18 @@ public class RedmineJSONParser {
 		}
 
 		result.addCustomFields(JsonInput.getListOrEmpty(content,
-				"custom_fields", CUSTOM_FIELD_PARSER));
+				"custom_fields", RedmineJSONParser::parseCustomField));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
-		result.addJournals(JsonInput.getListOrEmpty(content, "journals",
-				JOURNAL_PARSER));
+		result.addJournals(JsonInput.getListOrEmpty(content, "journals", RedmineJSONParser::parseJournal));
 		result.addAttachments(
 				JsonInput.getListOrEmpty(content, "attachments",
-						ATTACHMENT_PARSER));
-		result.addRelations(JsonInput.getListOrEmpty(content, "relations", RELATION_PARSER));
-		result.setTargetVersion(JsonInput.getObjectOrNull(content, "fixed_version", VERSION_PARSER));
+						RedmineJSONParser::parseAttachments));
+		result.addRelations(JsonInput.getListOrEmpty(content, "relations", RedmineJSONParser::parseRelation));
+		result.setTargetVersion(JsonInput.getObjectOrNull(content, "fixed_version", RedmineJSONParser::parseVersion));
 		result.setCategory(JsonInput.getObjectOrNull(content, "category",
-				CATEGORY_PARSER));
-		result.addChangesets(JsonInput.getListOrEmpty(content, "changesets",
-				CHANGESET_PARSER));
-		result.addWatchers(JsonInput.getListOrEmpty(content, "watchers",
-				WATCHER_PARSER));
+				RedmineJSONParser::parseCategory));
+		result.addChangesets(JsonInput.getListOrEmpty(content, "changesets", RedmineJSONParser::parseChangeset));
+		result.addWatchers(JsonInput.getListOrEmpty(content, "watchers", RedmineJSONParser::parseWatcher));
 		return result;
 	}
 
@@ -461,16 +260,16 @@ public class RedmineJSONParser {
 		final IssueCategory result = IssueCategoryFactory.create(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				MINIMAL_PROJECT_PARSER));
+				RedmineJSONParser::parseMinimalProject));
 		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to",
-				USER_PARSER));
+				RedmineJSONParser::parseUser));
 		return result;
 	}
 
 	public static Version parseVersion(JSONObject content) throws JSONException {
 		final Version result = VersionFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				MINIMAL_PROJECT_PARSER));
+				RedmineJSONParser::parseMinimalProject));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setDescription(JsonInput.getStringOrNull(content, "description"));
 		result.setSharing(JsonInput.getStringOrNull(content, "sharing"));
@@ -478,8 +277,7 @@ public class RedmineJSONParser {
 		result.setDueDate(getDateOrNull(content, "due_date"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
-		result.addCustomFields(JsonInput.getListOrEmpty(content,
-				"custom_fields", RedmineJSONParser.CUSTOM_FIELD_PARSER));
+		result.addCustomFields(JsonInput.getListOrEmpty(content, "custom_fields", RedmineJSONParser::parseCustomField));
 		return result;
 	}
 
@@ -504,7 +302,7 @@ public class RedmineJSONParser {
 		result.setDescription(JsonInput.getStringOrNull(content, "description"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setAuthor(JsonInput.getObjectOrNull(content, "author",
-				USER_PARSER));
+				RedmineJSONParser::parseUser));
 		return result;
 	}
 
@@ -542,8 +340,8 @@ public class RedmineJSONParser {
 		final Journal result = JournalFactory.create(JsonInput.getInt(content, "id"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
-		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
-		result.addDetails(JsonInput.getListOrEmpty(content, "details", JOURNAL_DETAIL_PARSER));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser));
+		result.addDetails(JsonInput.getListOrEmpty(content, "details", RedmineJSONParser::parseJournalDetail));
 		return result;
 	}
 
@@ -560,7 +358,7 @@ public class RedmineJSONParser {
 			throws JSONException {
 		final Changeset result = new Changeset();
 		result.setRevision(JsonInput.getStringOrNull(content, "revision"));
-		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser));
 		result.setComments(JsonInput.getStringOrNull(content, "comments"));
 		result.setCommittedOn(getDateOrNull(content, "committed_on"));
 		return result;
@@ -578,15 +376,15 @@ public class RedmineJSONParser {
 		result.setLastLoginOn(getDateOrNull(content, "last_login_on"));
                 result.setApiKey(JsonInput.getStringOrNull(content, "api_key"));
 		result.addCustomFields(JsonInput.getListOrEmpty(content,
-				"custom_fields", CUSTOM_FIELD_PARSER));
+				"custom_fields", RedmineJSONParser::parseCustomField));
 		result.setStatus(JsonInput.getIntOrNull(content, "status"));
 		final String name = JsonInput.getStringOrNull(content, "name");
 		if (name != null)
 			result.setFullName(name);
 		result.addMemberships(JsonInput.getListOrEmpty(content, "memberships",
-				MEMBERSHIP_PARSER));
+				RedmineJSONParser::parseMembership));
 		result.addGroups(JsonInput.getListOrEmpty(content, "groups",
-				GROUP_PARSER));
+				RedmineJSONParser::parseGroup));
 		/* Fix user for membership */
 		for (Membership m : result.getMemberships())
 			m.setUser(result);
@@ -619,10 +417,10 @@ public class RedmineJSONParser {
 			throws JSONException {
 		final Membership result = MembershipFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				MINIMAL_PROJECT_PARSER));
-		result.setUser(JsonInput.getObjectOrNull(content, "user", USER_PARSER));
-                result.setGroup(JsonInput.getObjectOrNull(content, "group", GROUP_PARSER));
-		result.addRoles(JsonInput.getListOrEmpty(content, "roles", ROLE_PARSER));
+				RedmineJSONParser::parseMinimalProject));
+		result.setUser(JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser));
+                result.setGroup(JsonInput.getObjectOrNull(content, "group", RedmineJSONParser::parseGroup));
+		result.addRoles(JsonInput.getListOrEmpty(content, "roles", RedmineJSONParser::parseRole));
 		return result;
 	}
 
@@ -661,12 +459,12 @@ public class RedmineJSONParser {
 
         wikiPage.setTitle(JsonInput.getStringOrEmpty(object, "title"));
         wikiPage.setText(JsonInput.getStringOrEmpty(object, "text"));
-        wikiPage.setParent(JsonInput.getObjectOrNull(object, "parent", WIKI_PAGE_DETAIL_PARSER));
-        wikiPage.setUser(JsonInput.getObjectOrNull(object, "author", USER_PARSER));
+        wikiPage.setParent(JsonInput.getObjectOrNull(object, "parent", RedmineJSONParser::parseWikiPageDetail));
+        wikiPage.setUser(JsonInput.getObjectOrNull(object, "author", RedmineJSONParser::parseUser));
         wikiPage.setVersion(JsonInput.getIntOrNull(object, "version"));
         wikiPage.setCreatedOn(getDateOrNull(object, "created_on"));
         wikiPage.setUpdatedOn(getDateOrNull(object, "updated_on"));
-        wikiPage.setAttachments(JsonInput.getListOrNull(object, "attachments", ATTACHMENT_PARSER));
+        wikiPage.setAttachments(JsonInput.getListOrNull(object, "attachments", RedmineJSONParser::parseAttachments));
 
         return wikiPage;
     }

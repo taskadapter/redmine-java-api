@@ -21,8 +21,7 @@ public class ProjectsTest {
     public void setup() throws Exception {
 		String text = MyIOUtils.getResourceAsString("project/redmine_projects.json");
 		final JSONObject object = RedmineJSONParser.getResponse(text);
-		projectsList = JsonInput.getListNotNull(object, "projects",
-				RedmineJSONParser.PROJECT_PARSER);
+		projectsList = JsonInput.getListNotNull(object, "projects", RedmineJSONParser::parseProject);
     }
 
     @Test

@@ -16,6 +16,7 @@ import java.util.List;
 
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.TrackerFactory;
+import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -36,9 +37,6 @@ import org.json.JSONException;
 
 /**
  * Redmine JSON parser tests.
- * 
- * @author maxkar
- * 
  */
 public class RedmineJSONParserTest {
 	private static final String FILE_EMPTY_ISSUES = "issue/issues_empty_list.json";
@@ -47,9 +45,9 @@ public class RedmineJSONParserTest {
 	@Test
 	public void testParseProject1() throws ParseException, JSONException {
 		final String projectString = "{\"project\":{\"created_on\":\"2012/05/11 06:53:21 -0700\",\"updated_on\":\"2012/05/11 06:53:20 -0700\",\"homepage\":\"\",\"trackers\":[{\"name\":\"Bug\",\"id\":1},{\"name\":\"Feature\",\"id\":2},{\"name\":\"Support\",\"id\":3}],\"identifier\":\"test1336744548920\",\"name\":\"test project\",\"id\":6143}}";
-		final Project project = RedmineJSONParser.PROJECT_PARSER
-				.parse(RedmineJSONParser.getResponseSingleObject(projectString,
-						"project"));
+
+		final JsonObjectParser<Project> parser = RedmineJSONParser::parseProject;
+		final Project project = parser.parse(RedmineJSONParser.getResponseSingleObject(projectString,"project"));
 
 		final Project template = ProjectFactory.create(6143);
 		template.setIdentifier("test1336744548920");
@@ -76,7 +74,7 @@ public class RedmineJSONParserTest {
 			String str = MyIOUtils.getResourceAsString(FILE_EMPTY_ISSUES);
 			List<Issue> issues = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "issues",
-					RedmineJSONParser.ISSUE_PARSER);
+					RedmineJSONParser::parseIssue);
 			Assert.assertTrue(issues.isEmpty());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -98,7 +96,7 @@ public class RedmineJSONParserTest {
 	private List<Issue> loadRedmine11Issues() throws IOException, JSONException {
 		String json = MyIOUtils.getResourceAsString(REDMINE_ISSUES);
 		return JsonInput.getListOrEmpty(RedmineJSONParser.getResponse(json),
-				"issues", RedmineJSONParser.ISSUE_PARSER);
+				"issues", RedmineJSONParser::parseIssue);
 	}
 
 	/* Gson parser is bad at detecting errors :( */
@@ -186,7 +184,7 @@ public class RedmineJSONParserTest {
 		String nonLatinRussianSymbols = "Russian symbols: Привет";
 		List<Issue> issues = JsonInput.getListOrEmpty(
 				RedmineJSONParser.getResponse(json), "issues",
-				RedmineJSONParser.ISSUE_PARSER);
+				RedmineJSONParser::parseIssue);
 		// must be 2 issues in the file
 		Assert.assertTrue(issues.size() == 2);
 		assertNotNull(RedmineTestUtils.findIssueInList(issues,
@@ -227,7 +225,7 @@ public class RedmineJSONParserTest {
 		String json = MyIOUtils.getResourceAsString("redmine_users.json");
 		List<User> users = JsonInput.getListOrEmpty(
 				RedmineJSONParser.getResponse(json), "users",
-				RedmineJSONParser.USER_PARSER);
+				RedmineJSONParser::parseUser);
 		boolean found = false;
 		for (User u : users) {
 			if (u.getLogin().equals("dina")) {
@@ -259,7 +257,7 @@ public class RedmineJSONParserTest {
 		String xml = MyIOUtils.getResourceAsString("redmine_time_entries.json");
 		List<TimeEntry> objects = JsonInput.getListOrEmpty(
 				RedmineJSONParser.getResponse(xml), "time_entries",
-				RedmineJSONParser.TIME_ENTRY_PARSER);
+				RedmineJSONParser::parseTimeEntry);
 		Integer objId = 2;
 		TimeEntry obj2 = RedmineTestUtils.findTimeEntry(objects, objId);
 		Assert.assertNotNull(obj2);
@@ -334,7 +332,7 @@ public class RedmineJSONParserTest {
 					.getResourceAsString("issue/redmine_1.2.2_dev_issues.json");
 			List<Issue> issues = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "issues",
-					RedmineJSONParser.ISSUE_PARSER);
+					RedmineJSONParser::parseIssue);
 			Issue issue = RedmineTestUtils.findIssueInList(issues, 4808);
 			assertNull(issue.getEstimatedHours());
 			Issue issue1 = RedmineTestUtils.findIssueInList(issues, 4809);
@@ -352,7 +350,7 @@ public class RedmineJSONParserTest {
 					.getResourceAsString("redmine_issue_statuses.json");
 			List<IssueStatus> statuses = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "statuses",
-					RedmineJSONParser.STATUS_PARSER);
+					RedmineJSONParser::parseStatus);
 			assertEquals(6, statuses.size());
 			IssueStatus status5 = statuses.get(4);
 			assertEquals(new Integer(5), status5.getId());
@@ -374,7 +372,7 @@ public class RedmineJSONParserTest {
 					.getResourceAsString("news/redmine_news_empty.json");
 			List<News> news = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "news",
-					RedmineJSONParser.NEWS_PARSER);
+					RedmineJSONParser::parseNews);
 			Assert.assertTrue(news.isEmpty());
 		} catch (Exception e) {
 			fail("Error:" + e);
@@ -389,7 +387,7 @@ public class RedmineJSONParserTest {
 					.getResourceAsString("news/redmine_news_2_items.json");
 			List<News> news = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "news",
-					RedmineJSONParser.NEWS_PARSER);
+					RedmineJSONParser::parseNews);
 			assertEquals(2, news.size());
 
 			News anyItem = news.get(0);
@@ -407,7 +405,7 @@ public class RedmineJSONParserTest {
 			List<TimeEntryActivity> activities = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str),
 					"time_entry_activities",
-					RedmineJSONParser.TIME_ENTRY_ACTIVITY_PARSER);
+					RedmineJSONParser::parseTimeEntryActivity);
 			assertEquals(2, activities.size());
 
 			assertEquals(8, (long) activities.get(0).getId());

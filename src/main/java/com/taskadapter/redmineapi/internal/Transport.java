@@ -86,92 +86,92 @@ public final class Transport {
 		OBJECT_CONFIGS.put(
 				Project.class,
 				config("project", "projects",
-						RedmineJSONBuilder.PROJECT_WRITER,
-						RedmineJSONParser.PROJECT_PARSER));
+						RedmineJSONBuilder::writeProject,
+						RedmineJSONParser::parseProject));
 		OBJECT_CONFIGS.put(
 				Issue.class,
-				config("issue", "issues", RedmineJSONBuilder.ISSUE_WRITER,
-						RedmineJSONParser.ISSUE_PARSER));
+				config("issue", "issues", RedmineJSONBuilder::writeIssue,
+						RedmineJSONParser::parseIssue));
 		OBJECT_CONFIGS.put(
 				User.class,
-				config("user", "users", RedmineJSONBuilder.USER_WRITER,
-						RedmineJSONParser.USER_PARSER));
+				config("user", "users", RedmineJSONBuilder::writeUser,
+						RedmineJSONParser::parseUser));
 		OBJECT_CONFIGS.put(
 				Group.class,
-				config("group", "groups", RedmineJSONBuilder.GROUP_WRITER,
-						RedmineJSONParser.GROUP_PARSER));
+				config("group", "groups", RedmineJSONBuilder::writeGroup,
+						RedmineJSONParser::parseGroup));
 		OBJECT_CONFIGS.put(
 				IssueCategory.class,
 				config("issue_category", "issue_categories",
-						RedmineJSONBuilder.CATEGORY_WRITER,
-						RedmineJSONParser.CATEGORY_PARSER));
+						RedmineJSONBuilder::writeCategory,
+						RedmineJSONParser::parseCategory));
 		OBJECT_CONFIGS.put(
 				Version.class,
 				config("version", "versions",
-						RedmineJSONBuilder.VERSION_WRITER,
-						RedmineJSONParser.VERSION_PARSER));
+						RedmineJSONBuilder::writeVersion,
+						RedmineJSONParser::parseVersion));
 		OBJECT_CONFIGS.put(
 				TimeEntry.class,
 				config("time_entry", "time_entries",
-						RedmineJSONBuilder.TIME_ENTRY_WRITER,
-						RedmineJSONParser.TIME_ENTRY_PARSER));
+						RedmineJSONBuilder::writeTimeEntry,
+						RedmineJSONParser::parseTimeEntry));
 		OBJECT_CONFIGS.put(News.class,
-				config("news", "news", null, RedmineJSONParser.NEWS_PARSER));
+				config("news", "news", null, RedmineJSONParser::parseNews));
 		OBJECT_CONFIGS.put(
 				IssueRelation.class,
 				config("relation", "relations",
-						RedmineJSONBuilder.RELATION_WRITER,
-						RedmineJSONParser.RELATION_PARSER));
+						RedmineJSONBuilder::writeRelation,
+						RedmineJSONParser::parseRelation));
 		OBJECT_CONFIGS.put(
 				Tracker.class,
 				config("tracker", "trackers", null,
-						RedmineJSONParser.TRACKER_PARSER));
+						RedmineJSONParser::parseTracker));
 		OBJECT_CONFIGS.put(
 				IssueStatus.class,
 				config("status", "issue_statuses", null,
-						RedmineJSONParser.STATUS_PARSER));
+						RedmineJSONParser::parseStatus));
 		OBJECT_CONFIGS
 				.put(SavedQuery.class,
 						config("query", "queries", null,
-								RedmineJSONParser.QUERY_PARSER));
+								RedmineJSONParser::parseSavedQuery));
 		OBJECT_CONFIGS.put(Role.class,
-				config("role", "roles", null, RedmineJSONParser.ROLE_PARSER));
+				config("role", "roles", null, RedmineJSONParser::parseRole));
 		OBJECT_CONFIGS.put(
 				Membership.class,
 				config("membership", "memberships",
-						RedmineJSONBuilder.MEMBERSHIP_WRITER,
-						RedmineJSONParser.MEMBERSHIP_PARSER));
+						RedmineJSONBuilder::writeMembership,
+						RedmineJSONParser::parseMembership));
         OBJECT_CONFIGS.put(
                 IssuePriority.class,
                 config("issue_priority", "issue_priorities", null,
-                        RedmineJSONParser.ISSUE_PRIORITY_PARSER));
+                        RedmineJSONParser::parseIssuePriority));
         OBJECT_CONFIGS.put(
                 TimeEntryActivity.class,
                 config("time_entry_activity", "time_entry_activities", null,
-                        RedmineJSONParser.TIME_ENTRY_ACTIVITY_PARSER));
+                        RedmineJSONParser::parseTimeEntryActivity));
 
         OBJECT_CONFIGS.put(
                 Watcher.class,
                 config("watcher", "watchers", null,
-                        RedmineJSONParser.WATCHER_PARSER));
+                        RedmineJSONParser::parseWatcher));
 
         OBJECT_CONFIGS.put(
                 WikiPage.class,
-                config("wiki_page", "wiki_pages", null, RedmineJSONParser.WIKI_PAGE_PARSER)
+                config("wiki_page", "wiki_pages", null, RedmineJSONParser::parseWikiPage)
         );
 
         OBJECT_CONFIGS.put(
                 WikiPageDetail.class,
-                config("wiki_page", null, null, RedmineJSONParser.WIKI_PAGE_DETAIL_PARSER)
+                config("wiki_page", null, null, RedmineJSONParser::parseWikiPageDetail)
         );
         OBJECT_CONFIGS.put(
                 CustomFieldDefinition.class,
                 config("custom_field", "custom_fields", null,
-                        RedmineJSONParser.CUSTOM_FIELD_DEFINITION_PARSER));
+                        RedmineJSONParser::parseCustomFieldDefinition));
 		OBJECT_CONFIGS.put(
 				Attachment.class,
 				config("attachment", "attachments", null,
-						RedmineJSONParser.ATTACHMENT_PARSER));
+						RedmineJSONParser::parseAttachments));
     }
 
 	private final URIConfigurator configurator;
@@ -200,7 +200,7 @@ public final class Transport {
 		URI uri = getURIConfigurator().createURI("users/current.json", params);
 		HttpGet http = new HttpGet(uri);
 		String response = send(http);
-		return parseResponse(response, "user", RedmineJSONParser.USER_PARSER);
+		return parseResponse(response, "user", RedmineJSONParser::parseUser);
 	}
 
 	/**
@@ -379,7 +379,7 @@ public final class Transport {
 		request.setEntity(entity);
 
 		final String result = send(request);
-		return parseResponse(result, "upload", RedmineJSONParser.UPLOAD_TOKEN_PARSER);
+		return parseResponse(result, "upload", input -> JsonInput.getStringNotNull(input, "token"));
 	}
 
 	/**

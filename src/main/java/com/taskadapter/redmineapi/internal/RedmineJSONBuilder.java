@@ -22,7 +22,6 @@ import org.json.JSONWriter;
 
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -32,91 +31,6 @@ import java.util.stream.Collectors;
  * Converts Redmine objects to JSon format.
  */
 public class RedmineJSONBuilder {
-
-	private static final JsonObjectWriter<Tracker> TRACKER_WRITER = new JsonObjectWriter<Tracker>() {
-		@Override
-		public void write(JSONWriter writer, Tracker object)
-				throws JSONException {
-			writeTracker(writer, object);
-		}
-	};
-
-	public static final JsonObjectWriter<Project> PROJECT_WRITER = new JsonObjectWriter<Project>() {
-		@Override
-		public void write(JSONWriter writer, Project object)
-				throws JSONException {
-			writeProject(writer, object);
-		}
-	};
-
-	public static final JsonObjectWriter<Issue> ISSUE_WRITER = new JsonObjectWriter<Issue>() {
-		@Override
-		public void write(JSONWriter writer, Issue object) throws JSONException {
-			writeIssue(object, writer);
-		}
-	};
-
-	public static final JsonObjectWriter<User> USER_WRITER = new JsonObjectWriter<User>() {
-		@Override
-		public void write(JSONWriter writer, User object) throws JSONException {
-			writeUser(object, writer);
-		}
-	};
-	
-	public static final JsonObjectWriter<Group> GROUP_WRITER = new JsonObjectWriter<Group>() {
-		@Override
-		public void write(JSONWriter writer, Group object) throws JSONException {
-			writeGroup(object, writer);
-		}
-	};
-
-	public static final JsonObjectWriter<IssueRelation> RELATION_WRITER = new JsonObjectWriter<IssueRelation>() {
-		@Override
-		public void write(JSONWriter writer, IssueRelation object)
-				throws JSONException {
-			writeRelation(writer, object);
-		}
-	};
-
-	public static final JsonObjectWriter<IssueCategory> CATEGORY_WRITER = new JsonObjectWriter<IssueCategory>() {
-		@Override
-		public void write(JSONWriter writer, IssueCategory object)
-				throws JSONException {
-			writeCategory(object, writer);
-		}
-	};
-
-	public static final JsonObjectWriter<Version> VERSION_WRITER = new JsonObjectWriter<Version>() {
-		@Override
-		public void write(JSONWriter writer, Version object)
-				throws JSONException {
-			writeVersion(writer, object);
-		}
-	};
-
-	public static final JsonObjectWriter<TimeEntry> TIME_ENTRY_WRITER = new JsonObjectWriter<TimeEntry>() {
-		@Override
-		public void write(JSONWriter writer, TimeEntry object)
-				throws JSONException {
-			writeTimeEntry(writer, object);
-		}
-	};
-
-	public static final JsonObjectWriter<Attachment> UPLOAD_WRITER = new JsonObjectWriter<Attachment>() {
-		@Override
-		public void write(JSONWriter writer, Attachment object)
-				throws JSONException {
-			writeUpload(writer, object);
-		}
-	};
-
-	public static final JsonObjectWriter<Membership> MEMBERSHIP_WRITER = new JsonObjectWriter<Membership>() {
-		@Override
-		public void write(JSONWriter writer, Membership object)
-				throws JSONException {
-			writeMembership(writer, object);
-		}
-	};
 
     /**
 	 * Writes a "create project" request.
@@ -244,12 +158,10 @@ public class RedmineJSONBuilder {
 		writeCustomFields(writer, project.getCustomFields());
 		JsonOutput.addIfNotNull(writer, "parent_id", project.getParentId());
                 JsonOutput.addIfNotNull(writer, "is_public", project.getProjectPublic());
-		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(),
-				TRACKER_WRITER);
+		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(), RedmineJSONBuilder::writeTracker);
 	}
 
-	public static void writeCategory(IssueCategory category,
-			final JSONWriter writer) throws JSONException {
+	public static void writeCategory(final JSONWriter writer, IssueCategory category) throws JSONException {
 		writer.key("id");
 		writer.value(category.getId());
 		JsonOutput.addIfNotNull(writer, "name", category.getName());
@@ -261,7 +173,7 @@ public class RedmineJSONBuilder {
 					.getAssignee().getId());
 	}
 
-	public static void writeUser(User user, final JSONWriter writer)
+	public static void writeUser(final JSONWriter writer, User user)
 			throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", user.getId());
 		JsonOutput.addIfNotNull(writer, "login", user.getLogin());
@@ -278,12 +190,12 @@ public class RedmineJSONBuilder {
 
 	}
 
-    public static void writeGroup(Group group, final JSONWriter writer) throws JSONException {
+    public static void writeGroup(final JSONWriter writer, Group group) throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", group.getId());
 		JsonOutput.addIfNotNull(writer, "name", group.getName());
 	}
 
-	public static void writeIssue(Issue issue, final JSONWriter writer) throws JSONException {
+	public static void writeIssue(final JSONWriter writer, Issue issue) throws JSONException {
 		JsonOutput.addIfNotNull(writer, "id", issue.getId());
 		JsonOutput.addIfNotNull(writer, "subject", issue.getSubject());
 		JsonOutput.addIfNotNull(writer, "parent_issue_id", issue.getParentId());
@@ -338,7 +250,7 @@ public class RedmineJSONBuilder {
 				.filter(attachment -> attachment.getToken() != null)
 				.collect(Collectors.toList());
 
-		JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads, UPLOAD_WRITER);
+		JsonOutput.addArrayIfNotEmpty(writer, "uploads", uploads, RedmineJSONBuilder::writeUpload);
 
 		/*
 		 * Journals and Relations cannot be set for an issue during creation or

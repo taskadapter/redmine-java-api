@@ -21,7 +21,7 @@ public class RedmineJSONGeneratorTest {
 		Issue issue = new Issue();
 		issue.setPriorityId(1);
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON(
-                "some_project_key", issue, RedmineJSONBuilder.ISSUE_WRITER);
+                "some_project_key", issue, RedmineJSONBuilder::writeIssue);
 		assertTrue(generatedJSON.contains("\"priority_id\":1,"));
 	}
 
@@ -35,7 +35,7 @@ public class RedmineJSONGeneratorTest {
 		version.addCustomFields(Collections.singletonList(field));
 
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON(
-				"dummy", version, RedmineJSONBuilder.VERSION_WRITER);
+				"dummy", version, RedmineJSONBuilder::writeVersion);
 		assertTrue(generatedJSON.contains("\"custom_field_values\":{\"2\":\"myValue\"}"));
 	}
 }

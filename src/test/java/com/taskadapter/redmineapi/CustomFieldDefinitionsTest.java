@@ -68,7 +68,7 @@ public class CustomFieldDefinitionsTest {
         String str = MyIOUtils.getResourceAsString(CUSTOM_FIELDS_FILE);
         List<CustomFieldDefinition> definitions = JsonInput.getListOrEmpty(
 					RedmineJSONParser.getResponse(str), "custom_fields",
-					RedmineJSONParser.CUSTOM_FIELD_DEFINITION_PARSER);
+					RedmineJSONParser::parseCustomFieldDefinition);
         CustomFieldDefinition field0 = definitions.get(0);
         assertThat(field0.getId()).isEqualTo(1);
         assertThat(field0.getName()).isEqualTo("my_custom_1");
