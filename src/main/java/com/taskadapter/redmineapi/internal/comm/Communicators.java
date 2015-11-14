@@ -13,9 +13,6 @@ import com.taskadapter.redmineapi.RedmineTransportException;
 
 /**
  * Communicator utilities.
- * 
- * @author maxkar
- * 
  */
 public final class Communicators {
 	private static final ContentHandler<Object, Object> IDENTITY_HANDLER = new ContentHandler<Object, Object>() {
@@ -29,8 +26,7 @@ public final class Communicators {
 
 	private static final ContentHandler<BasicHttpResponse, Reader> CHARACTER_DECODER = new ContentHandler<BasicHttpResponse, Reader>() {
 		@Override
-		public Reader processContent(BasicHttpResponse content)
-				throws RedmineException {
+		public Reader processContent(BasicHttpResponse content) throws RedmineException {
 			final String charset = content.getCharset();
 			try {
 				return new InputStreamReader(content.getStream(), charset);
@@ -41,22 +37,8 @@ public final class Communicators {
 		}
 	};
 	
-	private static final ContentHandler<HttpResponse, Integer> HTTP_RESPONSE_CODE = new ContentHandler<HttpResponse, Integer>() {
-		@Override
-		public Integer processContent(HttpResponse content) throws RedmineException {
-			return content.getStatusLine().getStatusCode();
-		}
-	};
-
-	private static final ContentHandler<Reader, String> READ_CHARS = new ContentHandler<Reader, String>() {
-		@Override
-		public String processContent(Reader content) throws RedmineException {
-			return readAll(content);
-		}
-	};
-
 	private static final ContentHandler<BasicHttpResponse, String> CHAR_CONTENT_READER = compose(
-			READ_CHARS, CHARACTER_DECODER);
+			Communicators::readAll, CHARACTER_DECODER);
 
 	static String readAll(Reader r) throws RedmineException {
 		final StringWriter writer = new StringWriter();
