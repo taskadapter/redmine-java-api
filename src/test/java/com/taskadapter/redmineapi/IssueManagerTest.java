@@ -44,7 +44,11 @@ import java.util.UUID;
 import static com.taskadapter.redmineapi.CustomFieldResolver.getCustomFieldByName;
 import static com.taskadapter.redmineapi.IssueHelper.createIssue;
 import static com.taskadapter.redmineapi.IssueHelper.createIssues;
+import com.taskadapter.redmineapi.bean.Assignee;
 import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.GenericAssignee;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.GroupFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -72,9 +76,10 @@ public class IssueManagerTest {
     private static String projectKey2;
     private static RedmineManager mgr;
     private static UserManager userManager;
+    private static Group demoGroup;
 
     @BeforeClass
-    public static void oneTimeSetup() {
+    public static void oneTimeSetup() throws RedmineException {
         mgr = IntegrationTestHelper.createRedmineManager();
         userManager = mgr.getUserManager();
         issueManager = mgr.getIssueManager();
@@ -84,12 +89,16 @@ public class IssueManagerTest {
         projectKey = project.getIdentifier();
         project2 = IntegrationTestHelper.createProject(mgr);
         projectKey2 = project2.getIdentifier();
+        Group g = GroupFactory.create();
+        g.setName("DemoGroup");
+        demoGroup = userManager.createGroup(g);
     }
 
     @AfterClass
-    public static void oneTimeTearDown() {
+    public static void oneTimeTearDown() throws RedmineException {
         IntegrationTestHelper.deleteProject(mgr, project.getIdentifier());
         IntegrationTestHelper.deleteProject(mgr, project2.getIdentifier());
+        userManager.deleteGroup(demoGroup);
     }
 
     @Test
@@ -141,7 +150,7 @@ public class IssueManagerTest {
         assertEquals(due.get(Calendar.DAY_OF_MONTH), returnedDueCal.get(Calendar.DAY_OF_MONTH));
 
         // check ASSIGNEE
-        User actualAssignee = newIssue.getAssignee();
+        Assignee actualAssignee = newIssue.getAssignee();
         assertNotNull("Checking assignee not null", actualAssignee);
         assertEquals("Checking assignee id", assignee.getId(), actualAssignee.getId());
 
@@ -933,6 +942,10 @@ public class IssueManagerTest {
         assertNotNull("Expected project of new category not to be null", newIssueCategory.getProject());
         assertNotNull("Expected assignee of new category not to be null",
                 newIssueCategory.getAssignee());
+
+        assertThat(newIssueCategory.getAssignee()).isInstanceOf(GenericAssignee.class);
+        assertThat(newIssueCategory.getAssignee().getId()).isEqualTo(IntegrationTestHelper.getOurUser().getId());
+
         // now delete category
         issueManager.deleteCategory(newIssueCategory);
         // assert that the category is gone
@@ -942,6 +955,40 @@ public class IssueManagerTest {
                         + categories, categories.isEmpty());
     }
 
+    /**
+     * tests the creation and deletion of a {@link com.taskadapter.redmineapi.bean.IssueCategory}
+     * with the group as assignee
+     *
+     * @throws RedmineException               thrown in case something went wrong in Redmine
+     * @throws java.io.IOException                    thrown in case something went wrong while performing I/O
+     *                                        operations
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws NotFoundException              thrown in case the objects requested for could not be found
+     */
+    @Test
+    public void testCreateAndDeleteIssueCategoryGroupAssignee() throws RedmineException {
+        Project project = projectManager.getProjectByKey(projectKey);
+        IssueCategory category = IssueCategoryFactory.create(project, "Category" + new Date().getTime());
+        category.setAssignee(demoGroup);
+        IssueCategory newIssueCategory = issueManager.createCategory(category);
+        assertNotNull("Expected new category not to be null", newIssueCategory);
+        assertNotNull("Expected project of new category not to be null", newIssueCategory.getProject());
+        assertNotNull("Expected assignee of new category not to be null",
+                newIssueCategory.getAssignee());
+
+        assertThat(newIssueCategory.getAssignee()).isInstanceOf(GenericAssignee.class);
+        assertThat(newIssueCategory.getAssignee().getId()).isEqualTo(demoGroup.getId());
+        assertThat(newIssueCategory.getAssignee()).isEqualTo(demoGroup);
+        
+        // now delete category
+        issueManager.deleteCategory(newIssueCategory);
+        // assert that the category is gone
+        List<IssueCategory> categories = issueManager.getCategories(project.getId());
+        assertTrue(
+                "List of categories of test project must be empty now but is "
+                        + categories, categories.isEmpty());
+    }
+    
     /**
      * tests the retrieval of {@link IssueCategory}s.
      *
@@ -1297,6 +1344,23 @@ public class IssueManagerTest {
         issueManager.update(issue);
         retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(retrievedIssue.getProject(), project2);
+        deleteIssueIfNotNull(issue);
+    }
+    
+    @Test
+    public void issueAssignmentUserAndGroup() throws RedmineException {
+        Issue issue = createIssue(issueManager, projectId);
+        assertNull(issue.getAssignee());
+        issue.setAssignee(IntegrationTestHelper.getOurUser());
+        issueManager.update(issue);
+        Issue retrievedIssue = issueManager.getIssueById(issue.getId());
+        // User assignement succeeded
+        assertEquals(retrievedIssue.getAssignee(), IntegrationTestHelper.getOurUser());
+        issue.setAssignee(demoGroup);
+        issueManager.update(issue);
+        retrievedIssue = issueManager.getIssueById(issue.getId());
+        // Group assignement succeeded
+        assertEquals(retrievedIssue.getAssignee(), demoGroup);
         deleteIssueIfNotNull(issue);
     }
 

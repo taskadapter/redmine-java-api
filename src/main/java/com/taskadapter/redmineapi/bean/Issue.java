@@ -27,7 +27,7 @@ public class Issue implements Identifiable {
     private Integer parentId;
     private Float estimatedHours;
     private Float spentHours;
-    private User assignee;
+    private Assignee assignee;
     private String priorityText;
     private Integer priorityId;
     private Integer doneRatio;
@@ -99,11 +99,11 @@ public class Issue implements Identifiable {
         this.priorityText = priority;
     }
 
-    public User getAssignee() {
+    public Assignee getAssignee() {
         return assignee;
     }
 
-    public void setAssignee(User assignee) {
+    public void setAssignee(Assignee assignee) {
         this.assignee = assignee;
     }
 
