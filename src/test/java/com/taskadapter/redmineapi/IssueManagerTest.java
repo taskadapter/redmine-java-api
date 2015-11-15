@@ -1131,8 +1131,8 @@ public class IssueManagerTest {
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
         assertThat(updatedIssue.getCustomFields().size()).isEqualTo(3);
-        assertThat(updatedIssue.getCustomFieldByName(customField1.getName())).isEqualTo(custom1Value);
-        assertThat(updatedIssue.getCustomFieldByName(customField2.getName())).isEqualTo(custom2Value);
+        assertThat(updatedIssue.getCustomFieldByName(customField1.getName()).getValue()).isEqualTo(custom1Value);
+        assertThat(updatedIssue.getCustomFieldByName(customField2.getName()).getValue()).isEqualTo(custom2Value);
     }
 
     @Test
