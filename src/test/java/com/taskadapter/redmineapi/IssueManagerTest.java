@@ -835,15 +835,16 @@ public class IssueManagerTest {
     @Test
     public void issueFixVersionIsSet() throws Exception {
 
-        String existingProjectKey = "test";
-        Issue toCreate = IssueHelper.generateRandomIssue(projectId);
-        Version v = VersionFactory.create(1);
-        String versionName = "1.0";
-        v.setName("1.0");
-        v.setProject(mgr.getProjectManager().getProjectByKey(projectKey));
-        v = mgr.getProjectManager().createVersion(v);
-        toCreate.setTargetVersion(v);
-        Issue createdIssue = issueManager.createIssue(existingProjectKey, toCreate);
+        final String versionName = "1.0";
+        final Issue issueToCreate = IssueHelper.generateRandomIssue(projectId);
+        final Version version = VersionFactory.create(1);
+        version.setName(versionName);
+        Project project = mgr.getProjectManager().getProjectByKey(projectKey);
+        version.setProject(project);
+        final Version createdVersion = mgr.getProjectManager().createVersion(version);
+        issueToCreate.setTargetVersion(createdVersion);
+        issueToCreate.setProject(project);
+        final Issue createdIssue = issueManager.createIssue(issueToCreate);
 
         assertNotNull(createdIssue.getTargetVersion());
         assertEquals(createdIssue.getTargetVersion().getName(),
@@ -1130,8 +1131,8 @@ public class IssueManagerTest {
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
         assertThat(updatedIssue.getCustomFields().size()).isEqualTo(3);
-        assertThat(updatedIssue.getCustomField(customField1.getName())).isEqualTo(custom1Value);
-        assertThat(updatedIssue.getCustomField(customField2.getName())).isEqualTo(custom2Value);
+        assertThat(updatedIssue.getCustomFieldByName(customField1.getName())).isEqualTo(custom1Value);
+        assertThat(updatedIssue.getCustomFieldByName(customField2.getName())).isEqualTo(custom2Value);
     }
 
     @Test

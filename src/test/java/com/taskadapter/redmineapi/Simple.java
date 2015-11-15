@@ -64,14 +64,14 @@ public class Simple {
 		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 		final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
 				"application/ternary", content);
+		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
+		final Project project = mgr.getProjectManager().createProject(tmpProject);
 		final Issue testIssue = new Issue();
 		testIssue.setSubject("This is upload ticket!");
 		testIssue.addAttachment(attach1);
-		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
-		final Project project = mgr.getProjectManager().createProject(tmpProject);
+		testIssue.setProject(project);
 		try {
-			final Issue createdIssue = issueManager.createIssue(project.getIdentifier(),
-					testIssue);
+			final Issue createdIssue = issueManager.createIssue(testIssue);
 			try {
 				System.out.println(createdIssue.getAttachments());
 			} finally {
