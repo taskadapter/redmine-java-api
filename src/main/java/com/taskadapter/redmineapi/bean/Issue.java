@@ -341,24 +341,6 @@ public class Issue implements Identifiable {
     }
 
     /**
-     * Deprecated. Please use the new getCustomFieldByName() method instead because the return value of this method
-     * is not consistent with getCustomFieldById().
-     *
-     * @return the value or NULL if the field is not found
-     *
-     * @see #getCustomFieldByName(String customFieldName)
-     */
-    @Deprecated
-    public String getCustomField(String fieldName) {
-        for (CustomField f : customFields) {
-            if (f.getName().equals(fieldName)) {
-                return f.getValue();
-            }
-        }
-        return null;
-    }
-
-    /**
      * @return the custom field with given Id or NULL if the field is not found
      */
     public CustomField getCustomFieldById(int customFieldId) {

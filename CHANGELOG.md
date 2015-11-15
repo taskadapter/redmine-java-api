@@ -1,6 +1,24 @@
-# Version 2.7.0 (...)
+# Version 3.0.0 (...)
 
-* Issue #121. Bug fixed: download attachments using API access key 
+## Java 8.
+
+
+* Issue #121. Bug fixed: download attachments using API access key
+
+ Migration guide:
+
+Issue class:
+* Method deleted:    public String getCustomField(String fieldName).
+ use the new getCustomFieldByName() method instead
+
+IssueFactory class:
+* Method deleted: public static Issue createWithSubject(String subject).
+ Use create(int projectId, String subject) instead.
+
+IssueManager class:
+* Method deleted: createIssue(String projectKey, Issue issue).
+ Use createIssue(Issue issue) instead. The old method had ambiguity in it: not clear which project key value
+ to use when it is also set in the Issue itself.
 
 # Version 2.6.0 (November 11, 2015)
   
