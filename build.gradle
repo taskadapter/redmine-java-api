@@ -40,8 +40,7 @@ dependencies {
 
     testCompile(
             'junit:junit:4.12',
-            // can't use AssertJ 3.x because it requires Java 8
-            'org.assertj:assertj-core:2.1.0',
+            'org.assertj:assertj-core:3.2.0',
             'org.slf4j:slf4j-jdk14:1.7.1'
     )
 }
