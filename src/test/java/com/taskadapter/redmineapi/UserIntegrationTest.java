@@ -19,10 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.assertj.core.api.Fail.fail;
 
 public class UserIntegrationTest {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
@@ -64,7 +61,7 @@ public class UserIntegrationTest {
     @Test
     public void usersAreLoadedByAdmin() throws RedmineException {
         List<User> users = userManager.getUsers();
-        assertTrue(users.size() > 0);
+        assertThat(users).isNotEmpty();
     }
 
     @Test(expected = NotAuthorizedException.class)
@@ -76,21 +73,21 @@ public class UserIntegrationTest {
     @Test
     public void userCanBeLoadedByIdByNonAdmin() throws RedmineException {
         User userById = getNonAdminManager().getUserManager().getUserById(nonAdminUserId);
-        assertEquals(nonAdminUserId, userById.getId());
+        assertThat(userById.getId()).isEqualTo(nonAdminUserId);
     }
 
     @Test
     public void testGetCurrentUser() throws RedmineException {
         User currentUser = userManager.getCurrentUser();
-        assertEquals(OUR_USER.getId(), currentUser.getId());
-        assertEquals(OUR_USER.getLogin(), currentUser.getLogin());
+        assertThat(currentUser.getId()).isEqualTo(OUR_USER.getId());
+        assertThat(currentUser.getLogin()).isEqualTo(OUR_USER.getLogin());
     }
 
     @Test
     public void testGetUserById() throws RedmineException {
         User loadedUser = userManager.getUserById(OUR_USER.getId());
-        assertEquals(OUR_USER.getId(), loadedUser.getId());
-        assertEquals(OUR_USER.getLogin(), loadedUser.getLogin());
+        assertThat(loadedUser.getId()).isEqualTo(OUR_USER.getId());
+        assertThat(loadedUser.getLogin()).isEqualTo(OUR_USER.getLogin());
     }
 
     @Test
@@ -129,16 +126,12 @@ public class UserIntegrationTest {
             User userToCreate = UserGenerator.generateRandomUser();
             createdUser = userManager.createUser(userToCreate);
 
-            assertNotNull(
-                    "checking that a non-null user is returned", createdUser);
+            assertThat(createdUser).isNotNull();
 
-            assertEquals(userToCreate.getLogin(), createdUser.getLogin());
-            assertEquals(userToCreate.getFirstName(),
-                    createdUser.getFirstName());
-            assertEquals(userToCreate.getLastName(),
-                    createdUser.getLastName());
-            Integer id = createdUser.getId();
-            assertNotNull(id);
+            assertThat(createdUser.getLogin()).isEqualTo(userToCreate.getLogin());
+            assertThat(createdUser.getFirstName()).isEqualTo(userToCreate.getFirstName());
+            assertThat(createdUser.getLastName()).isEqualTo(userToCreate.getLastName());
+            assertThat(createdUser.getId()).isNotNull();
         } finally {
             if (createdUser != null) {
                 userManager.deleteUser(createdUser.getId());
@@ -154,11 +147,8 @@ public class UserIntegrationTest {
             userToCreate.setAuthSourceId(1);
             createdUser = userManager.createUser(userToCreate);
 
-            assertNotNull("checking that a non-null user is returned", createdUser);
-            
-//            Redmine doesn't return it, so let's consider a non-exceptional return as success for now. 
-//            assertNotNull("checking that a non-null auth_source_id is returned", createdUser.getAuthSourceId());
-//            assertEquals(1, createdUser.getAuthSourceId().intValue());
+            // Redmine doesn't return it, so let's consider a non-exceptional return as success for now.
+            assertThat(createdUser).isNotNull();
         } finally {
             if (createdUser != null) {
                 userManager.deleteUser(createdUser.getId());
@@ -178,9 +168,6 @@ public class UserIntegrationTest {
         User createdUser = userManager.createUser(userToCreate);
         Integer userId = createdUser.getId();
         try {
-            assertNotNull(
-                    "checking that a non-null project is returned", createdUser);
-
             String newFirstName = "fnameNEW";
             String newLastName = "lnameNEW";
             String newMail = "newmail" + randomNumber + "@asd.com";
@@ -192,10 +179,10 @@ public class UserIntegrationTest {
 
             User updatedUser = userManager.getUserById(userId);
 
-            assertEquals(newFirstName, updatedUser.getFirstName());
-            assertEquals(newLastName, updatedUser.getLastName());
-            assertEquals(newMail, updatedUser.getMail());
-            assertEquals(userId, updatedUser.getId());
+            assertThat(updatedUser.getFirstName()).isEqualTo(newFirstName);
+            assertThat(updatedUser.getLastName()).isEqualTo(newLastName);
+            assertThat(updatedUser.getMail()).isEqualTo(newMail);
+            assertThat(updatedUser.getId()).isEqualTo(userId);
         } finally {
             userManager.deleteUser(userId);
         }
@@ -237,8 +224,8 @@ public class UserIntegrationTest {
             try {
                 userManager.addUserToGroup(newUser, group);
                 final Collection<Group> userGroups = userManager.getUserById(newUser.getId()).getGroups();
-                assertTrue(userGroups.size() == 1);
-                assertTrue(group.getName().equals(userGroups.iterator().next().getName()));
+                assertThat(userGroups).hasSize(1);
+                assertThat(userGroups.iterator().next().getName()).isEqualTo(group.getName());
             } finally {
                 userManager.deleteUser(newUser.getId());
             }
@@ -263,7 +250,8 @@ public class UserIntegrationTest {
             try {
                 userManager.addUserToGroup(newUser, group);
                 userManager.addUserToGroup(newUser, group);
-                assertTrue(userManager.getUserById(newUser.getId()).getGroups().size() == 1);
+                final User userById = userManager.getUserById(newUser.getId());
+                assertThat(userById.getGroups()).hasSize(1);
             } finally {
                 userManager.deleteUser(newUser.getId());
             }
@@ -278,9 +266,9 @@ public class UserIntegrationTest {
         final Group created = userManager.createGroup(template);
 
         try {
-            assertEquals(template.getName(), created.getName());
+            assertThat(created.getName()).isEqualTo(template.getName());
             final Group loaded = userManager.getGroupById(created.getId());
-            assertEquals(template.getName(), loaded.getName());
+            assertThat(created.getName()).isEqualTo(loaded.getName());
 
             final Group update = GroupFactory.create(loaded.getId());
             update.setName("Group update " + System.currentTimeMillis());
@@ -288,7 +276,7 @@ public class UserIntegrationTest {
             userManager.update(update);
 
             final Group loaded2 = userManager.getGroupById(created.getId());
-            assertEquals(update.getName(), loaded2.getName());
+            assertThat(loaded2.getName()).isEqualTo(update.getName());
         } finally {
             userManager.deleteGroup(created);
         }
@@ -306,8 +294,8 @@ public class UserIntegrationTest {
         final Collection<Role> roles = userManager.getRoles();
         for (Role r : roles) {
             final Role loaded = userManager.getRoleById(r.getId());
-            assertEquals(r.getName(), loaded.getName());
-            assertEquals(r.getInherited(), loaded.getInherited());
+            assertThat(loaded.getName()).isEqualTo(r.getName());
+            assertThat(loaded.getInherited()).isEqualTo(r.getInherited());
         }
     }
 
@@ -325,7 +313,7 @@ public class UserIntegrationTest {
 
     @Test
     public void testGetRoles() throws RedmineException {
-        assertTrue(userManager.getRoles().size() > 0);
+        assertThat(userManager.getRoles()).isNotEmpty();
     }
 
     @Test
