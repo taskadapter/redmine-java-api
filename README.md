@@ -22,7 +22,7 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
 ## Get list of issues
 
     String uri = "https://www.hostedredmine.com";
-    String apiAccessKey = "a3221bfcef5750219bd0a2df69519416dba17fc9";
+    String apiAccessKey = "somekey";
     String projectKey = "taskconnector-test";
     Integer queryId = null; // any
 
@@ -59,7 +59,7 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
     List<Project> projects = mgr.getProjectManager().getProjects();
 
 ## Free-form search for users
-    Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> params = new HashMap<>();
     params.put("name", name);
     List<User> list = userManager.getUsers(params);
 
