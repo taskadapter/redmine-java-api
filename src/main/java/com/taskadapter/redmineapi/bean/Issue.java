@@ -43,6 +43,7 @@ public class Issue implements Identifiable {
     private String statusName;
     private Version targetVersion;
     private IssueCategory category;
+    private Boolean isPrivate;
 
     /**
      * Some comment describing the issue update
@@ -364,7 +365,7 @@ public class Issue implements Identifiable {
         return null;
     }
 
-
+    
     @Override
     public String toString() {
         return "Issue [id=" + id + ", subject=" + subject + "]";
@@ -433,5 +434,13 @@ public class Issue implements Identifiable {
 
     public void setCategory(IssueCategory category) {
         this.category = category;
+    }
+
+    public Boolean getIsPrivate() {
+        return isPrivate;
+    }
+
+    public void setIsPrivate(Boolean isPrivate) {
+        this.isPrivate = isPrivate;
     }
 }
