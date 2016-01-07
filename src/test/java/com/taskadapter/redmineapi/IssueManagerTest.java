@@ -86,11 +86,11 @@ public class IssueManagerTest {
         projectKey2 = project2.getIdentifier();
     }
 
-    //@AfterClass
-    //public static void oneTimeTearDown() {
-    //    IntegrationTestHelper.deleteProject(mgr, project.getIdentifier());
-    //    IntegrationTestHelper.deleteProject(mgr, project2.getIdentifier());
-    //}
+    @AfterClass
+    public static void oneTimeTearDown() {
+        IntegrationTestHelper.deleteProject(mgr, project.getIdentifier());
+        IntegrationTestHelper.deleteProject(mgr, project2.getIdentifier());
+    }
 
     @Test
     public void issueCreated() throws RedmineException {
@@ -126,8 +126,6 @@ public class IssueManagerTest {
         Issue newIssue = issueManager.createIssue(issueToCreate);
         
         assertNotNull("Checking is_private", newIssue.getIsPrivate());
-        
-        System.out.println(newIssue.getIsPrivate());
         
         assertNotNull("Checking returned result", newIssue);
         assertNotNull("New issue must have some ID", newIssue.getId());
