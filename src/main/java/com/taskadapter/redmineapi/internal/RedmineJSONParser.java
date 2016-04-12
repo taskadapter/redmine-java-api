@@ -185,6 +185,7 @@ public final class RedmineJSONParser {
 		final Project result = ProjectFactory.create(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
+		result.setProjectPublic(JsonInput.getOptionalBool(content, "is_public"));
 		result.setDescription(JsonInput
 				.getStringOrEmpty(content, "description"));
 		result.setHomepage(JsonInput.getStringOrEmpty(content, "homepage"));
