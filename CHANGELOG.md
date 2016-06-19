@@ -1,6 +1,8 @@
 # Version 3.0.0 (...)
 
-
+* Code compiled for Java 8. From now on this library requires Java 8.
+* Support for "is public" field for Projects https://github.com/taskadapter/redmine-java-api/pull/246
+* Bug fix: download attachment using Access Key https://github.com/taskadapter/redmine-java-api/pull/202
 
 * Issue #121. Bug fixed: download attachments using API access key
 
@@ -18,12 +20,6 @@ IssueManager class:
 * Method deleted: createIssue(String projectKey, Issue issue).
  Use createIssue(Issue issue) instead. The old method had ambiguity in it: not clear which project key value
  to use when it is also set in the Issue itself.
-
-# Version 2.7.0 (June 19, 2016)
-
-* Code compiled for Java 8. From now on this library requires Java 8.
-* Support for "is public" field for Projects https://github.com/taskadapter/redmine-java-api/pull/246
-* Bug fix: download attachment using Access Key https://github.com/taskadapter/redmine-java-api/pull/202
 
 # Version 2.6.0 (November 11, 2015)
   
