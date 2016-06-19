@@ -232,6 +232,7 @@ public final class RedmineJSONParser {
 				.getStringOrEmpty(content, "description"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
+		result.setClosedOn(getDateOrNull(content, "closed_on"));
 		final JSONObject statusObject = JsonInput.getObjectOrNull(content,
 				"status");
 		if (statusObject != null) {
