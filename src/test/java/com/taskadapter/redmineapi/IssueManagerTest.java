@@ -61,7 +61,7 @@ public class IssueManagerTest {
 
     // TODO We don't know activities' IDs!
     // see feature request http://www.redmine.org/issues/7506
-    private static final Integer ACTIVITY_ID = 8;
+    private static final Integer ACTIVITY_ID = 1;
 
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
@@ -119,8 +119,14 @@ public class IssueManagerTest {
 
         float estimatedHours = 44;
         issueToCreate.setEstimatedHours(estimatedHours);
+        
+        issueToCreate.setIsPrivate(Boolean.TRUE);
+        
 
         Issue newIssue = issueManager.createIssue(issueToCreate);
+        
+        assertNotNull("Checking is_private", newIssue.getIsPrivate());
+        
         assertNotNull("Checking returned result", newIssue);
         assertNotNull("New issue must have some ID", newIssue.getId());
 
