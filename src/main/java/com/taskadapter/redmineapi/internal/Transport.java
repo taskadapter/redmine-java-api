@@ -162,7 +162,9 @@ public final class Transport {
 
         OBJECT_CONFIGS.put(
                 WikiPageDetail.class,
-                config("wiki_page", null, null, RedmineJSONParser::parseWikiPageDetail)
+                config("wiki_page", null,
+		                RedmineJSONBuilder::writeWikiPageDetail,
+		                RedmineJSONParser::parseWikiPageDetail)
         );
         OBJECT_CONFIGS.put(
                 CustomFieldDefinition.class,
@@ -205,7 +207,7 @@ public final class Transport {
 
 	/**
 	 * Performs an "add object" request.
-	 * 
+	 *
 	 * @param object
 	 *            object to use.
 	 * @param params
@@ -231,7 +233,7 @@ public final class Transport {
 
 	/**
 	 * Performs an "add child object" request.
-	 * 
+	 *
 	 * @param parentClass
 	 *            parent object id.
 	 * @param object
@@ -259,7 +261,7 @@ public final class Transport {
 	/*
 	 * note: This method cannot return the updated object from Redmine because
 	 * the server does not provide any XML in response.
-	 * 
+	 *
 	 * @since 1.8.0
 	 */
 	public <T extends Identifiable> void updateObject(T obj,
@@ -279,9 +281,28 @@ public final class Transport {
 		send(http);
 	}
 
+	/*
+	 * note: This method cannot return the updated object from Redmine because
+	 * the server does not provide any XML in response.
+	 */
+	public <T> void updateChildEntry(
+			Class<?> parentClass, String parentId,
+			T obj, String objId, NameValuePair... params) throws RedmineException {
+		final EntityConfig<T> config = getConfig(obj.getClass());
+		URI uri = getURIConfigurator().getChildIdURI(
+				parentClass, parentId,
+				obj.getClass(), objId,
+				params);
+		final HttpPut http = new HttpPut(uri);
+		final String body = RedmineJSONBuilder.toSimpleJSON(
+				config.singleObjectName, obj, config.writer);
+		setEntity(http, body);
+		send(http);
+	}
+
 	/**
 	 * Performs "delete child Id" request.
-	 * 
+	 *
 	 * @param parentClass
 	 *            parent object id.
 	 * @param object
@@ -300,7 +321,7 @@ public final class Transport {
 
 	/**
 	 * Deletes an object.
-	 * 
+	 *
 	 * @param classs
 	 *            object class.
 	 * @param id
@@ -341,7 +362,7 @@ public final class Transport {
 
 	/**
 	 * Downloads redmine content.
-	 * 
+	 *
 	 * @param uri
 	 *            target uri.
 	 * @param handler
@@ -363,7 +384,7 @@ public final class Transport {
 
 	/**
 	 * UPloads content on a server.
-	 * 
+	 *
 	 * @param content
 	 *            content stream.
 	 * @return uploaded item token.
@@ -408,7 +429,7 @@ public final class Transport {
 	 * Returns all objects found using the provided parameters.
 	 * This method IGNORES "limit" and "offset" parameters and handles paging AUTOMATICALLY for you.
 	 * Please use getObjectsListNoPaging() method if you want to control paging yourself with "limit" and "offset" parameters.
-	 * 
+	 *
 	 * @return objects list, never NULL
 	 *
 	 * @see #getObjectsListNoPaging(Class, Collection)
@@ -498,7 +519,7 @@ public final class Transport {
 
 	/**
 	 * Delivers a list of a child entries.
-	 * 
+	 *
 	 * @param classs
 	 *            target class.
 	 */
@@ -541,7 +562,7 @@ public final class Transport {
 		}
 		this.objectsPerPage = pageSize;
 	}
-	
+
 	public void addUserToGroup(int userId, int groupId) throws RedmineException {
 		logger.debug("adding user " + userId + " to group " + groupId + "...");
 		URI uri = getURIConfigurator().getChildObjectsURI(Group.class, Integer.toString(groupId), User.class);

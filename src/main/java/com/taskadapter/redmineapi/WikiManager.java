@@ -53,4 +53,13 @@ public class WikiManager {
     public WikiPageDetail getWikiPageDetailByProjectAndTitle(String projectKey, String pageTitle) throws RedmineException {
         return transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, pageTitle, new BasicNameValuePair("include", "attachments"));
     }
+
+	/**
+	 * @param projectKey the key of the project (like "TEST-12") we want the wiki page from
+	 * @param detail the WikiPageDetail with its text and comment updated.
+	 *               Version must be set to the latest version of the document.
+	 */
+	public void update(String projectKey, WikiPageDetail detail) throws RedmineException {
+		transport.updateChildEntry(Project.class, projectKey, detail, detail.getTitle());
+	}
 }
