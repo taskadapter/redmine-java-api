@@ -846,31 +846,33 @@ public class IssueManagerTest {
         return issueManager.createTimeEntry(entry);
     }
 
-    /**
-     * this test is ignored because: 1) we can't create Versions. see
-     * http://www.redmine.org/issues/9088 2) we don't currently set versions
-     * when creating issues.
-     * <p/>
-     * 3) setting "fixed_version_id" does not work on creating issue.
-     */
-    @Ignore
     @Test
-    public void issueFixVersionIsSet() throws Exception {
+    public void issueTargetVersionIsSetWhenCreatingOrUpdatingIssues() throws Exception {
+        final String version1Name = "1.0";
+        final String version2Name = "2.0";
 
-        final String versionName = "1.0";
         final Issue issueToCreate = IssueHelper.generateRandomIssue(projectId);
-        final Version version = VersionFactory.create(1);
-        version.setName(versionName);
-        Project project = mgr.getProjectManager().getProjectByKey(projectKey);
-        version.setProject(project);
-        final Version createdVersion = mgr.getProjectManager().createVersion(version);
-        issueToCreate.setTargetVersion(createdVersion);
+        Version version1 = createVersion(version1Name);
+        issueToCreate.setTargetVersion(version1);
         issueToCreate.setProject(project);
         final Issue createdIssue = issueManager.createIssue(issueToCreate);
 
         assertNotNull(createdIssue.getTargetVersion());
-        assertEquals(createdIssue.getTargetVersion().getName(),
-                versionName);
+        assertEquals(createdIssue.getTargetVersion().getName(), version1Name);
+
+        Version version2 = createVersion(version2Name);
+        createdIssue.setTargetVersion(version2);
+        issueManager.update(createdIssue);
+        Issue updatedIssue = issueManager.getIssueById(createdIssue.getId());
+        assertThat(updatedIssue.getTargetVersion().getName()).isEqualTo(version2Name);
+    }
+
+    private Version createVersion(String versionName) throws RedmineException {
+        final Version version = VersionFactory.create(1);
+        version.setName(versionName);
+        Project project = mgr.getProjectManager().getProjectByKey(projectKey);
+        version.setProject(project);
+        return mgr.getProjectManager().createVersion(version);
     }
 
     @Test(expected = IllegalArgumentException.class)
