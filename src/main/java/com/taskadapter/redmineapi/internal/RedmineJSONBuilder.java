@@ -207,6 +207,7 @@ public class RedmineJSONBuilder {
 					.getAssignee().getId());
 		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
 		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
+		JsonOutput.addIfNotNull(writer, "is_private", issue.isPrivateIssue());
         if (issue.getProject() != null) {
             // Checked in Redmine 2.6.0: updating issues based on
             // identifier fails and only using the project id works.

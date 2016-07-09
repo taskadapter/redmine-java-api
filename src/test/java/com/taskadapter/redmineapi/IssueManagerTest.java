@@ -277,6 +277,24 @@ public class IssueManagerTest {
         assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
     }
 
+    @Test
+    public void privateFlagIsRespectedWhenCreatingIssues() throws RedmineException {
+
+        Issue privateIssueToCreate = IssueFactory.create(projectId, "private issue");
+        privateIssueToCreate.setPrivateIssue(true);
+        Issue newIssue = issueManager.createIssue(privateIssueToCreate);
+        assertThat(newIssue.isPrivateIssue()).isTrue();
+
+        Issue publicIssueToCreate = IssueFactory.create(projectId, "public issue");
+        publicIssueToCreate.setPrivateIssue(false);
+        Issue newPublicIssue = issueManager.createIssue(publicIssueToCreate);
+        assertThat(newPublicIssue.isPrivateIssue()).isFalse();
+
+        // default value for "is private" should be false
+        Issue newDefaultIssue = issueManager.createIssue(IssueFactory.create(projectId, "default public issue"));
+        assertThat(newDefaultIssue.isPrivateIssue()).isFalse();
+    }
+
     /* this test fails with Redmine 3.0.0-3.0.3 because Redmine 3.0.x started
      * returning "not authorized" instead of "not found" for projects with unknown Ids.
      * This worked differently with Redmine 2.6.x.

@@ -241,7 +241,7 @@ public final class RedmineJSONParser {
 			result.setStatusId(JsonInput.getIntOrNull(statusObject, "id"));
 		}
 
-		result.setPrivateIssue(JsonInput.getOptionalBool(statusObject, "is_private"));
+		result.setPrivateIssue(JsonInput.getOptionalBool(content, "is_private"));
 
 		result.addCustomFields(JsonInput.getListOrEmpty(content,
 				"custom_fields", RedmineJSONParser::parseCustomField));

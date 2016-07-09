@@ -44,7 +44,7 @@ public class Issue implements Identifiable {
     private String statusName;
     private Version targetVersion;
     private IssueCategory category;
-    private boolean privateIssue;
+    private boolean privateIssue = false;
 
     /**
      * Some comment describing the issue update
@@ -462,6 +462,9 @@ public class Issue implements Identifiable {
         this.category = category;
     }
 
+    /**
+     * Default value is FALSE if not explicitly set.
+     */
     public boolean isPrivateIssue() {
         return privateIssue;
     }
