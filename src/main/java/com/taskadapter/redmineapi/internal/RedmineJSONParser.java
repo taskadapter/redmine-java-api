@@ -254,6 +254,7 @@ public final class RedmineJSONParser {
 				RedmineJSONParser::parseCategory));
 		result.addChangesets(JsonInput.getListOrEmpty(content, "changesets", RedmineJSONParser::parseChangeset));
 		result.addWatchers(JsonInput.getListOrEmpty(content, "watchers", RedmineJSONParser::parseWatcher));
+		result.addChildren(JsonInput.getListOrEmpty(content, "children", RedmineJSONParser::parseIssue));
 		return result;
 	}
 

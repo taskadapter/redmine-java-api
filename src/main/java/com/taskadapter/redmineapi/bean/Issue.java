@@ -60,6 +60,7 @@ public class Issue implements Identifiable {
     private final Set<Attachment> attachments = new HashSet<>();
     private final Set<Changeset> changesets = new HashSet<>();
     private final Set<Watcher> watchers = new HashSet<>();
+    private final Set<Issue> children = new HashSet<>();
 
     /**
      * @param id database ID.
@@ -330,6 +331,22 @@ public class Issue implements Identifiable {
 
     public void addWatchers(Collection<Watcher> watchers) {
         this.watchers.addAll(watchers);
+    }
+
+    /**
+      * Don't forget to use Include.children flag when loading issue from Redmine server:
+      * <pre>
+      *     Issue issue = issueManager.getIssueById(3205, Include.children);
+      * </pre>
+      * @return Collection of entries or empty collection if no objects found.
+      * @see com.taskadapter.redmineapi.Include#children
+      */
+    public Collection<Issue> getChildren() {
+        return Collections.unmodifiableCollection(children);
+    }
+
+    public void addChildren(Collection<Issue> children) {
+        this.children.addAll(children);
     }
 
     @Override
