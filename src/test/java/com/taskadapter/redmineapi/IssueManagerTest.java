@@ -815,12 +815,16 @@ public class IssueManagerTest {
         assertEquals(totalHoursExpected, totalTime);
     }
 
-    private TimeEntry createTimeEntry(Integer issueId, float hours)
+    private TimeEntry createTimeEntry(Integer issueId, float hours) throws RedmineException {
+        return createTimeEntry(issueId, hours, ACTIVITY_ID);
+    }
+
+    private TimeEntry createTimeEntry(Integer issueId, float hours, int activityId)
             throws RedmineException {
         TimeEntry entry = TimeEntryFactory.create();
         entry.setHours(hours);
         entry.setIssueId(issueId);
-        entry.setActivityId(ACTIVITY_ID);
+        entry.setActivityId(activityId);
         return issueManager.createTimeEntry(entry);
     }
 
@@ -1336,6 +1340,41 @@ public class IssueManagerTest {
             assertThat(issues.size()).isEqualTo(1);
             final Issue loaded = issues.get(0);
             assertThat(loaded.getSubject()).isEqualTo(subject);
+        } finally {
+            issueManager.deleteIssue(createdIssueId);
+        }
+    }
+
+    /**
+     * This integration test requires activities with ids 8 and 9 to be present on
+     * the redmine server. we cannot detect Ids of existing activities -
+     * see Redmine feature request http://www.redmine.org/issues/7506
+     */
+    @Test
+    public void timeEntriesAreFoundByFreeFormSearch() throws RedmineException {
+        // create some random issues in the project
+        Issue createdIssue = createIssue(issueManager, projectId);
+
+        // TODO We don't know activities' IDs
+        // see feature request http://www.redmine.org/issues/7506
+        Integer createdIssueId = createdIssue.getId();
+        createTimeEntry(createdIssueId, 2, 8);
+        createTimeEntry(createdIssueId, 6, 8);
+        createTimeEntry(createdIssueId, 10, 8);
+        createTimeEntry(createdIssueId, 30, 9);
+
+        try {
+            Map<String, String> paramsForActivity8 = new HashMap<>();
+            paramsForActivity8.put("issue_id", Integer.toString(createdIssueId));
+            paramsForActivity8.put("activity_id", "8");
+            List<TimeEntry> timeEntriesForActivity8 = issueManager.getTimeEntries(paramsForActivity8);
+            assertThat(timeEntriesForActivity8.size()).isEqualTo(3);
+
+            Map<String, String> paramsForActivity9 = new HashMap<>();
+            paramsForActivity9.put("issue_id", Integer.toString(createdIssueId));
+            paramsForActivity9.put("activity_id", "9");
+            List<TimeEntry> timeEntriesForActivity9 = issueManager.getTimeEntries(paramsForActivity9);
+            assertThat(timeEntriesForActivity9.size()).isEqualTo(1);
         } finally {
             issueManager.deleteIssue(createdIssueId);
         }

@@ -227,6 +227,32 @@ public class IssueManager {
                 new BasicNameValuePair("issue_id", Integer.toString(issueId)));
     }
 
+    /**
+     * Direct method to search for objects using any Redmine REST API parameters you want.
+     * <p>Unlike other getXXXObjects() methods in this library, this one does NOT handle paging for you so
+     * you have to provide "offset" and "limit" parameters if you want to control paging.
+     *
+     * <p>Sample usage:
+     <pre>
+     final Map<String, String> params = new HashMap<String, String>();
+     params.put("project_id", projectId);
+     params.put("activity_id", activityId);
+     final List<TimeEntry> elements = issueManager.getTimeEntries(params);
+     </pre>
+
+     * see other possible parameters on Redmine REST doc page:
+     * http://www.redmine.org/projects/redmine/wiki/Rest_TimeEntries#Listing-time-entries
+     *
+     * @param parameters the http parameters key/value pairs to append to the rest api request
+     * @return empty list if no elements found matching given parameters
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws RedmineException
+     */
+    public List<TimeEntry> getTimeEntries(Map<String, String> parameters) throws RedmineException {
+        return DirectObjectsSearcher.getObjectsListNoPaging(transport, parameters, TimeEntry.class);
+    }
+
     public TimeEntry createTimeEntry(TimeEntry obj) throws RedmineException {
         validate(obj);
         return transport.addObject(obj);
