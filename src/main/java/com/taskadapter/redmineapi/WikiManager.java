@@ -6,6 +6,9 @@ import com.taskadapter.redmineapi.bean.WikiPageDetail;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -51,7 +54,8 @@ public class WikiManager {
      * @since Redmine 2.2
      */
     public WikiPageDetail getWikiPageDetailByProjectAndTitle(String projectKey, String pageTitle) throws RedmineException {
-        return transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, pageTitle, new BasicNameValuePair("include", "attachments"));
+        String urlSafeString = getUrlSafeString(pageTitle);
+        return transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, urlSafeString, new BasicNameValuePair("include", "attachments"));
     }
 
     /**
@@ -60,6 +64,17 @@ public class WikiManager {
  	 *               Version must be set to the latest version of the document.
  	 */
  	public void update(String projectKey, WikiPageDetail detail) throws RedmineException {
- 		transport.updateChildEntry(Project.class, projectKey, detail, detail.getTitle());
+        String urlSafeTitle = getUrlSafeString(detail.getTitle());
+        transport.updateChildEntry(Project.class, projectKey, detail, urlSafeTitle);
  	}
+
+    private static String getUrlSafeString(String string) {
+        String urlSafeTitle;
+        try {
+            urlSafeTitle = URLEncoder.encode(string, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("UnsupportedEncodingException when converting the page title to url: " + e.toString(), e);
+        }
+        return urlSafeTitle;
+    }
 }
