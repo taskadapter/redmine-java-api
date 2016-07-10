@@ -162,7 +162,7 @@ public final class Transport {
 
         OBJECT_CONFIGS.put(
                 WikiPageDetail.class,
-                config("wiki_page", null, null, RedmineJSONParser::parseWikiPageDetail)
+                config("wiki_page", null, RedmineJSONBuilder::writeWikiPageDetail, RedmineJSONParser::parseWikiPageDetail)
         );
         OBJECT_CONFIGS.put(
                 CustomFieldDefinition.class,
@@ -275,6 +275,20 @@ public final class Transport {
 		final HttpPut http = new HttpPut(uri);
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
+		setEntity(http, body);
+		send(http);
+	}
+
+	/*
+	 * note: This method cannot return the updated object from Redmine because
+	 * the server does not provide anything in response.
+	 */
+	public <T> void updateChildEntry(Class<?> parentClass, String parentId,
+			T obj, String objId, NameValuePair... params) throws RedmineException {
+		final EntityConfig<T> config = getConfig(obj.getClass());
+		URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, obj.getClass(), objId, params);
+		final HttpPut http = new HttpPut(uri);
+		final String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName, obj, config.writer);
 		setEntity(http, body);
 		send(http);
 	}

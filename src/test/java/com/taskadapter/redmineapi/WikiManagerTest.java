@@ -55,4 +55,23 @@ public class WikiManagerTest {
         assertThat(attachment.getAuthor().getFullName()).isEqualTo("Redmine Admin");
         assertThat(attachment.getContentURL()).isEqualTo("http://76.126.10.142/redmine/attachments/download/8/happy_penguin.jpg");
     }
+
+    @Ignore("requires manual configuration, plus it edits a shared wiki page and thus is Non-Deterministic (ND)")
+    @Test
+    public void wikiPageIsUpdated() throws Exception {
+        WikiPageDetail specificPage = manager.getWikiPageDetailByProjectAndTitle("test", "Wiki");
+        assertThat(specificPage.getText()).contains("start page");
+        String newText = "- updated";
+        assertThat(specificPage.getText()).doesNotContain(newText);
+
+        specificPage.setText("start page" + newText);
+        manager.update("test", specificPage);
+
+        WikiPageDetail updatedPage = manager.getWikiPageDetailByProjectAndTitle("test", "Wiki");
+        assertThat(updatedPage.getText()).contains(newText);
+
+        // set it back
+        updatedPage.setText("start page");
+        manager.update("test", updatedPage);
+    }
 }

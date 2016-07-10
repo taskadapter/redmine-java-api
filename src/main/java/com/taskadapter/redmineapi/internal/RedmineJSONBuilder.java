@@ -15,6 +15,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.WikiPageDetail;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 import com.taskadapter.redmineapi.internal.json.JsonOutput;
 import org.json.JSONException;
@@ -319,6 +320,12 @@ public class RedmineJSONBuilder {
                 }
             }
             writer.endArray();
+	}
+
+	public static void writeWikiPageDetail(JSONWriter writer, WikiPageDetail detail) throws JSONException {
+		JsonOutput.addIfNotNull(writer, "text", detail.getText());
+		JsonOutput.addIfNotNull(writer, "comments", detail.getComments());
+		JsonOutput.addIfNotNull(writer, "version", detail.getVersion());
 	}
 
 	/**
