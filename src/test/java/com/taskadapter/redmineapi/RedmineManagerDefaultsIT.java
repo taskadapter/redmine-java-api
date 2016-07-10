@@ -24,10 +24,10 @@ import java.util.Calendar;
  * Tests default redmine manager values in a response. Tries to provides
  * behavior compatible with an XML version.
  */
-public class RedmineManagerDefaultsTest {
+public class RedmineManagerDefaultsIT {
 	private static final Integer ACTIVITY_ID = 8;
 
-	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerIT.class);
 
     private static String projectKey;
     private static int projectId;
