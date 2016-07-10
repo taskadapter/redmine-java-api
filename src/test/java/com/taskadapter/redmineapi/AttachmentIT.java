@@ -20,6 +20,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 public class AttachmentIT {
 
@@ -220,6 +221,28 @@ public class AttachmentIT {
             if (newIssue != null) {
                 issueManager.deleteIssue(newIssue.getId());
             }
+        }
+    }
+
+    /**
+     * Requires Redmine 3.3.0+ because "delete attachment" feature is only added in 3.3.0.
+     */
+    @Test
+    public void attachmentIsDeleted() throws Exception {
+        final Issue issue = IssueFactory.create(projectId, "task with attachment");
+        final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final Attachment attachment = attachmentManager.uploadAttachment("test.bin", "application/ternary", content);
+        issue.addAttachment(attachment);
+        final Issue createdIssue = issueManager.createIssue(issue);
+        Collection<Attachment> attachments = createdIssue.getAttachments();
+        Attachment attachment1 = attachments.iterator().next();
+        int attachmentId = attachment1.getId();
+        attachmentManager.delete(attachmentId);
+        try {
+            attachmentManager.getAttachmentById(attachmentId);
+            fail("must have failed with NotFoundException");
+        } catch (NotFoundException e) {
+            System.out.println("got expected exception for deleted attachment");
         }
     }
 }

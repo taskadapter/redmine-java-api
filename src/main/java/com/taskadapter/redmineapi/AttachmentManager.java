@@ -181,6 +181,15 @@ public class AttachmentManager {
     }
 
     /**
+     * see http://www.redmine.org/issues/14828
+     *
+     * @since Redmine 3.3.0
+     */
+    public void delete(int attachmentId) throws RedmineException {
+        transport.deleteObject(Attachment.class, Integer.toString(attachmentId));
+    }
+
+    /**
      * @param exception
      *            exception to unwrap.
      * @param tag
