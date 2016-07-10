@@ -1391,12 +1391,12 @@ public class IssueManagerTest {
         issue.setAssignee(IntegrationTestHelper.getOurUser());
         issueManager.update(issue);
         Issue retrievedIssue = issueManager.getIssueById(issue.getId());
-        // User assignement succeeded
+        // User assignment succeeded
         assertEquals(retrievedIssue.getAssignee(), IntegrationTestHelper.getOurUser());
         issue.setAssignee(demoGroup);
         issueManager.update(issue);
         retrievedIssue = issueManager.getIssueById(issue.getId());
-        // Group assignement succeeded
+        // Group assignment succeeded
         assertEquals(retrievedIssue.getAssignee(), demoGroup);
         deleteIssueIfNotNull(issue);
     }

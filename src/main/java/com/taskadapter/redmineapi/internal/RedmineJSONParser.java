@@ -10,7 +10,7 @@ import java.util.Set;
 import com.taskadapter.redmineapi.bean.Assignee;
 import com.taskadapter.redmineapi.bean.AttachmentFactory;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
-import com.taskadapter.redmineapi.bean.GenericAssigneeFactory;
+import com.taskadapter.redmineapi.bean.GenericAssignee;
 import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueFactory;
@@ -460,7 +460,7 @@ public final class RedmineJSONParser {
             return null;
         } else {
             String name = JsonInput.getStringOrNull(content, "name");
-            return GenericAssigneeFactory.createGenericAssignee(id, name);
+            return new GenericAssignee(id, name);
         }
     }
 
