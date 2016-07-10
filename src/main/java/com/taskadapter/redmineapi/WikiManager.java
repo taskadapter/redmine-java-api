@@ -59,6 +59,13 @@ public class WikiManager {
     }
 
     /**
+     * At this moment create() simply calls update(). There are no differences between these two functions.
+     */
+    public void create(String projectKey, WikiPageDetail detail) throws RedmineException {
+        update(projectKey, detail);
+    }
+
+    /**
  	 * @param projectKey the key of the project (like "TEST-12") we want the wiki page from
  	 * @param detail the WikiPageDetail with its text and comment updated.
  	 *               Version must be set to the latest version of the document.
