@@ -49,6 +49,8 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.GenericAssignee;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.GroupFactory;
+import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.RoleFactory;
 import java.util.Arrays;
 import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,6 +71,7 @@ public class IssueManagerTest {
 
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
+    private static MembershipManager membershipManager;
     private static Project project;
     private static int projectId;
     private static String projectKey;
@@ -84,6 +87,7 @@ public class IssueManagerTest {
         userManager = mgr.getUserManager();
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
+        membershipManager = mgr.getMembershipManager();
         project = IntegrationTestHelper.createProject(mgr);
         projectId = project.getId();
         projectKey = project.getIdentifier();
@@ -92,6 +96,14 @@ public class IssueManagerTest {
         Group g = GroupFactory.create();
         g.setName("DemoGroup");
         demoGroup = userManager.createGroup(g);
+        // Add membership of group for the demo projects
+        Collection<Role> allRoles = Arrays.asList(new Role[] {
+            RoleFactory.create(3), // Manager
+            RoleFactory.create(4), // Developer
+            RoleFactory.create(5)  // Reporter
+        });
+        membershipManager.createMembershipForGroup(project.getId(), demoGroup.getId(), allRoles);
+        membershipManager.createMembershipForGroup(project2.getId(), demoGroup.getId(), allRoles);
     }
 
     @AfterClass
