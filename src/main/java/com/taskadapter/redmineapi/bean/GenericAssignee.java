@@ -10,7 +10,7 @@ public class GenericAssignee implements Assignee {
     GenericAssignee() {
     }
 
-    GenericAssignee(int id, String name) {
+    public GenericAssignee(int id, String name) {
         this.id = id;
         this.name = name;
     }
