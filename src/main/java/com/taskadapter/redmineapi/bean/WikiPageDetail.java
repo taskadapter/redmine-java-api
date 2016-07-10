@@ -10,6 +10,9 @@ public class WikiPageDetail extends WikiPage {
     private String comments;
     private List<Attachment> attachments;
 
+    /**
+     * @return the comment entered when the wiki page was last edited
+     */
     public String getComments() {
         return comments;
     }

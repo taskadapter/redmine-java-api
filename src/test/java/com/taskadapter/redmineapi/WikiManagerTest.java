@@ -34,9 +34,9 @@ public class WikiManagerTest {
     @Ignore("requires manual configuration, see the source code.")
     @Test
     public void getSpecificWikiPageByProject() throws Exception {
-        WikiPageDetail specificPage = manager.getWikiPageDetailByProjectAndTitle("projkey1410979585758", "Another");
+        WikiPageDetail specificPage = manager.getWikiPageDetailByProjectAndTitle("test", "Wiki");
 
-        assertThat(specificPage.getTitle()).isEqualTo("Another");
+        assertThat(specificPage.getTitle()).isEqualTo("Wiki");
 
         assertThat(specificPage.getText()).isEqualTo("this is a page too");
         assertThat(specificPage.getParent().getTitle()).isEqualTo("Wiki");
