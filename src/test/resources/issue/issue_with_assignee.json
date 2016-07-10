@@ -1,0 +1,35 @@
+{
+    "id": 239,
+    "project": {
+        "name": "test",
+        "id": 1
+    },
+    "tracker": {
+        "name": "Bug",
+        "id": 1
+    },
+    "status": {
+        "name": "New",
+        "id": 1
+    },
+    "priority": {
+        "name": "High",
+        "id": 5
+    },
+    "author": {
+        "name": "Redmine Admin",
+        "id": 1
+    },
+    "assigned_to": {
+        "name": "Dina TheDog",
+        "id": 3
+    },
+    "subject": "task 239",
+    "description": "",
+    "start_date": "2011/01/12",
+    "due_date": "2011/01/30",
+    "done_ratio": 0,
+    "estimated_hours": 20.0,
+    "created_on": "2011/01/12 16:00:31 -0800",
+    "updated_on": "2011/01/17 21:28:45 -0800"
+}

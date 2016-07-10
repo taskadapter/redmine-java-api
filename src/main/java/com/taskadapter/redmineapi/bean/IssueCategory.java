@@ -15,7 +15,7 @@ public class IssueCategory implements Identifiable, Serializable {
 
     private String name;
     private Project project;
-    private User assignee;
+    private Assignee assignee;
 
     /**
      * @param id database ID.
@@ -44,11 +44,11 @@ public class IssueCategory implements Identifiable, Serializable {
         this.project = project;
     }
 
-    public User getAssignee() {
+    public Assignee getAssignee() {
         return assignee;
     }
 
-    public void setAssignee(User assignee) {
+    public void setAssignee(Assignee assignee) {
         this.assignee = assignee;
     }
 

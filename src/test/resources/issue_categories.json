@@ -1,0 +1,22 @@
+{
+    "issue_categories": [{
+            "id": 112,
+            "project": {
+                "id": 2096,
+                "name": "test project"
+            },
+            "name": "test",
+            "assigned_to": {
+                "id": 1,
+                "name": "Redmine Admin"
+            }
+        }, {
+            "id": 113,
+            "project": {
+                "id": 2096,
+                "name": "test project"
+            },
+            "name": "test2"
+        }],
+    "total_count": 2
+}
