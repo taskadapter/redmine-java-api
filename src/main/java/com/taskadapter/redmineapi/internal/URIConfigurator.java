@@ -25,8 +25,6 @@ import com.taskadapter.redmineapi.bean.WikiPageDetail;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.client.utils.URIUtils;
-import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
 import java.net.MalformedURLException;
@@ -104,20 +102,20 @@ public class URIConfigurator {
         if (apiAccessKey != null) {
             params.add(new BasicNameValuePair("key", apiAccessKey));
         }
-        URI uri;
         try {
-            URL url = baseURL;
-            String path = url.getPath();
-            if (!query.isEmpty()) {
-                path += "/" + query;
+            final URIBuilder builder = new URIBuilder(baseURL.toURI());
+            builder.addParameters(new ArrayList<>(origParams));
+            //extra List creation needed because addParameters doesn't accept Collection<? extends NameValuePair>
+            if (apiAccessKey != null) {
+                builder.addParameter("key", apiAccessKey);
             }
-            uri = URIUtils.createURI(url.getProtocol(), url.getHost(),
-                    url.getPort(), path,
-                    URLEncodedUtils.format(params, "UTF-8"), null);
+            if (!query.isEmpty()) {
+                builder.setPath(builder.getPath() + "/" + query);
+            }
+            return builder.build();
         } catch (URISyntaxException e) {
             throw new RedmineInternalError(e);
         }
-        return uri;
     }
 
     public URI getChildObjectsURI(Class<?> parent, String parentId,
