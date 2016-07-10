@@ -16,7 +16,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class WikiManagerTest {
+public class WikiManagerIT {
 
     private static RedmineManager redmineManager;
     private static Project project;

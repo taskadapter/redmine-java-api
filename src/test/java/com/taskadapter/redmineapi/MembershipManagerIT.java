@@ -19,7 +19,7 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MembershipManagerTest {
+public class MembershipManagerIT {
     private static RedmineManager mgr;
     private static UserManager userManager;
     private static MembershipManager membershipManager;

@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *   - id: 3, customized_type: issue, name: custom_multi_list, type: list, 
  *            multiple: true, possible_values: V1, V2, V3, default: V2
  */
-public class CustomFieldDefinitionsTest {
+public class CustomFieldDefinitionsIT {
     private static final String CUSTOM_FIELDS_FILE = "custom_fields_redmine_2.3.json";
     private static RedmineManager mgr;
     private static CustomFieldManager customFieldManager;

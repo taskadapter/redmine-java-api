@@ -18,9 +18,9 @@ import static org.junit.Assert.assertTrue;
  * <p>
  * It is better to use a redmine account with access to at least 1 public and 1 private project.
  */
-public final class HttpBasicAuthTest {
+public final class HttpBasicAuthIT {
 
-    private final Logger logger = LoggerFactory.getLogger(HttpBasicAuthTest.class);
+    private final Logger logger = LoggerFactory.getLogger(HttpBasicAuthIT.class);
 
     private static RedmineManager mgrKey;
     private static RedmineManager mgrHttpBasicAuth;

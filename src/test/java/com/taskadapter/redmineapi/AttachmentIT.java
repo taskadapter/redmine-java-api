@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class AttachmentIntegrationTest {
+public class AttachmentIT {
 
     private static RedmineManager mgr;
     private static int projectId;

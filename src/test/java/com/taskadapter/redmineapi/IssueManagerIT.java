@@ -61,9 +61,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class IssueManagerTest {
+public class IssueManagerIT {
 
-    private static final Logger logger = LoggerFactory.getLogger(IssueManagerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(IssueManagerIT.class);
 
     // TODO We don't know activities' IDs!
     // see feature request http://www.redmine.org/issues/7506

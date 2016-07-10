@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for RedmineManager.
  */
-public class RedmineManagerTest {
+public class RedmineManagerIT {
 
     @Test
     public void unknownHostGivesException() throws RedmineException, IOException {

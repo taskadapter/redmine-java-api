@@ -21,7 +21,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
-public class UserIntegrationTest {
+public class UserIT {
     private static final User OUR_USER = IntegrationTestHelper.getOurUser();
 
     private static UserManager userManager;

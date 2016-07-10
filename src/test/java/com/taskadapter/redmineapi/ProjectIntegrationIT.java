@@ -28,7 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class ProjectIntegrationTest {
+public class ProjectIntegrationIT {
     private static RedmineManager mgr;
     private static ProjectManager projectManager;
     private static String projectKey;

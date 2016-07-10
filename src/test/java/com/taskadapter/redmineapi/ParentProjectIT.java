@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ParentProjectTest {
+public class ParentProjectIT {
 
     private static ProjectManager projectManager;
 
