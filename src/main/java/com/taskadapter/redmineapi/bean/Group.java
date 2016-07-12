@@ -1,8 +1,6 @@
 package com.taskadapter.redmineapi.bean;
 
-import java.util.Objects;
-
-public class Group implements Identifiable, Assignee {
+public class Group implements Identifiable {
 	
     private final Integer id;
     private String name;
@@ -21,7 +19,6 @@ public class Group implements Identifiable, Assignee {
         return id;
     }
 
-    @Override
     public String getName() {
         return name;
     }
@@ -40,17 +37,13 @@ public class Group implements Identifiable, Assignee {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        
-        if (o == null || (! (o instanceof Assignee)))  {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        Assignee assignee = (Assignee) o;
-        
-        return Objects.equals(getId(), assignee.getId());
+        Group group = (Group) o;
+
+        return id != null ? id.equals(group.id) : group.id == null;
+
     }
 
     @Override

@@ -23,7 +23,6 @@ import org.junit.Test;
 import com.taskadapter.redmineapi.DateComparator;
 import com.taskadapter.redmineapi.MyIOUtils;
 import com.taskadapter.redmineapi.RedmineTestUtils;
-import com.taskadapter.redmineapi.bean.GenericAssignee;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueStatus;
@@ -438,9 +437,8 @@ public class RedmineJSONParserTest {
         String json = MyIOUtils
 			.getResourceAsString("issue/issue_with_assignee.json");
         Issue issue = RedmineJSONParser.parseIssue(RedmineJSONParser.getResponse(json));
-        assertThat(issue.getAssignee()).isInstanceOf(GenericAssignee.class);
-        assertThat(issue.getAssignee().getId()).isEqualTo(3);
-        assertThat(issue.getAssignee().getName()).isEqualTo("Dina TheDog");
+        assertThat(issue.getAssigneeId()).isEqualTo(3);
+        assertThat(issue.getAssigneeName()).isEqualTo("Dina TheDog");
     }
     
     @Test
@@ -459,11 +457,10 @@ public class RedmineJSONParserTest {
         assertThat(categories.get(1).getName()).isEqualTo("test2");
         
         // First category has assigne with id 1 and name "Redmine Admin"
-        assertNotNull(categories.get(0).getAssignee());
-        assertThat(categories.get(0).getAssignee().getId()).isEqualTo(1);
-        assertThat(categories.get(0).getAssignee().getName()).isEqualTo("Redmine Admin");
+        assertThat(categories.get(0).getAssigneeId()).isEqualTo(1);
+        assertThat(categories.get(0).getAssigneeName()).isEqualTo("Redmine Admin");
         
-        // Second categorie has no assignee
-        assertNull(categories.get(1).getAssignee());
+        // Second category has no assignee
+        assertNull(categories.get(1).getAssigneeId());
     }
 }

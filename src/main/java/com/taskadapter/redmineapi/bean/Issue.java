@@ -27,7 +27,8 @@ public class Issue implements Identifiable {
     private Integer parentId;
     private Float estimatedHours;
     private Float spentHours;
-    private Assignee assignee;
+    private Integer assigneeId;
+    private String assigneeName;
     private String priorityText;
     private Integer priorityId;
     private Integer doneRatio;
@@ -102,12 +103,26 @@ public class Issue implements Identifiable {
         this.priorityText = priority;
     }
 
-    public Assignee getAssignee() {
-        return assignee;
+    /**
+     * Redmine can be configured to allow group assignments for issues:
+     * Configuration option: Settings -> Issue Tracking -> Allow issue assignment to groups
+     *
+     * <p>An assignee can be a user or a group</p>
+     */
+    public Integer getAssigneeId() {
+        return assigneeId;
     }
 
-    public void setAssignee(Assignee assignee) {
-        this.assignee = assignee;
+    public void setAssigneeId(Integer assigneeId) {
+        this.assigneeId = assigneeId;
+    }
+
+    public String getAssigneeName() {
+        return assigneeName;
+    }
+
+    public void setAssigneeName(String assigneeName) {
+        this.assigneeName = assigneeName;
     }
 
     public Float getEstimatedHours() {

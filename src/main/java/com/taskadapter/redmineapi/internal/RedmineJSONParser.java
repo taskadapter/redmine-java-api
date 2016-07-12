@@ -7,10 +7,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.taskadapter.redmineapi.bean.Assignee;
 import com.taskadapter.redmineapi.bean.AttachmentFactory;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
-import com.taskadapter.redmineapi.bean.GenericAssignee;
 import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueFactory;
@@ -212,7 +210,11 @@ public final class RedmineJSONParser {
 		result.setEstimatedHours(JsonInput.getFloatOrNull(content,
 				"estimated_hours"));
 		result.setSpentHours(JsonInput.getFloatOrNull(content, "spent_hours"));
-		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to", RedmineJSONParser::parseAssignee));
+		JSONObject assignedToObject = JsonInput.getObjectOrNull(content, "assigned_to");
+		if (assignedToObject != null) {
+			result.setAssigneeId(JsonInput.getIntOrNull(assignedToObject, "id"));
+			result.setAssigneeName(JsonInput.getStringNotNull(assignedToObject, "name"));
+		}
 
 		final JSONObject priorityObject = JsonInput.getObjectOrNull(content,
 				"priority");
@@ -267,8 +269,11 @@ public final class RedmineJSONParser {
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				RedmineJSONParser::parseMinimalProject));
-		result.setAssignee(JsonInput.getObjectOrNull(content, "assigned_to",
-				RedmineJSONParser::parseAssignee));
+		JSONObject assignedToObject = JsonInput.getObjectOrNull(content, "assigned_to");
+		if (assignedToObject != null) {
+			result.setAssigneeId(JsonInput.getIntOrNull(assignedToObject, "id"));
+			result.setAssigneeName(JsonInput.getStringOrNull(assignedToObject, "name"));
+		}
 		return result;
 	}
 
@@ -452,18 +457,6 @@ public final class RedmineJSONParser {
 		return result;
 	}
         
-    public static Assignee parseAssignee(JSONObject content) throws JSONException {
-        // Generid assignee has to contain an id - else it can't be a returned
-        // assignee
-        final Integer id = JsonInput.getIntOrNull(content, "id");
-        if(id == null) {
-            return null;
-        } else {
-            String name = JsonInput.getStringOrNull(content, "name");
-            return new GenericAssignee(id, name);
-        }
-    }
-
     public static WikiPage parseWikiPage(JSONObject object) throws JSONException {
         WikiPage wikiPage = WikiPageFactory.create(JsonInput.getStringNotNull(object, "title"));
         wikiPage.setVersion(JsonInput.getIntOrNull(object, "version"));

@@ -107,7 +107,7 @@ public class RedmineManagerDefaultsIT {
 			*     assertThat()...
 			* }
 			*/
-			Assert.assertNull(result.getAssignee());
+			Assert.assertNull(result.getAssigneeId());
 			Assert.assertNotNull(result.getPriorityText());
 			Assert.assertNotNull(result.getPriorityId());
 			Assert.assertEquals(Integer.valueOf(0), result.getDoneRatio());
@@ -217,7 +217,7 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(category.getId());
 			Assert.assertEquals("test name", category.getName());
 			Assert.assertNotNull(category.getProject());
-			Assert.assertNull(category.getAssignee());
+			Assert.assertNull(category.getAssigneeId());
 		} finally {
 			issueManager.deleteCategory(category);
 		}

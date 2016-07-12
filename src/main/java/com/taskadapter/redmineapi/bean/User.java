@@ -4,13 +4,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 /**
  * Redmine's User.
  */
-public class User implements Identifiable, Assignee {
+public class User implements Identifiable {
 
     public static final Integer STATUS_LOCKED = 3;
 
@@ -137,17 +136,12 @@ public class User implements Identifiable, Assignee {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        
-        if (o == null || (! (o instanceof Assignee)))  {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        Assignee assignee = (Assignee) o;
-        
-        return Objects.equals(getId(), assignee.getId());
+        User user = (User) o;
+
+        return id != null ? id.equals(user.id) : user.id == null;
     }
 
     @Override
@@ -161,13 +155,6 @@ public class User implements Identifiable, Assignee {
     public String getFullName() {
         return firstName + " " + lastName;
     }
-
-    @Override
-    public String getName() {
-        return getFullName();
-    }
-
-    // TODO add junit test
 
     /**
      * This is a BIG HACK just to workaround the crappy Redmine REST API limitation.

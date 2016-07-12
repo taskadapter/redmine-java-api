@@ -166,12 +166,10 @@ public class RedmineJSONBuilder {
 		writer.key("id");
 		writer.value(category.getId());
 		JsonOutput.addIfNotNull(writer, "name", category.getName());
-		if (category.getProject() != null)
-			JsonOutput.addIfNotNull(writer, "project_id", category.getProject()
-					.getId());
-		if (category.getAssignee() != null)
-			JsonOutput.addIfNotNull(writer, "assigned_to_id", category
-					.getAssignee().getId());
+		if (category.getProject() != null) {
+			JsonOutput.addIfNotNull(writer, "project_id", category.getProject().getId());
+		}
+		JsonOutput.addIfNotNull(writer, "assigned_to_id", category.getAssigneeId());
 	}
 
 	public static void writeUser(final JSONWriter writer, User user)
@@ -203,9 +201,7 @@ public class RedmineJSONBuilder {
 		JsonOutput.addIfNotNull(writer, "estimated_hours",
 				issue.getEstimatedHours());
 		JsonOutput.addIfNotNull(writer, "spent_hours", issue.getSpentHours());
-		if (issue.getAssignee() != null)
-			JsonOutput.addIfNotNull(writer, "assigned_to_id", issue
-					.getAssignee().getId());
+		JsonOutput.addIfNotNull(writer, "assigned_to_id", issue.getAssigneeId());
 		JsonOutput.addIfNotNull(writer, "priority_id", issue.getPriorityId());
 		JsonOutput.addIfNotNull(writer, "done_ratio", issue.getDoneRatio());
 		JsonOutput.addIfNotNull(writer, "is_private", issue.isPrivateIssue());
