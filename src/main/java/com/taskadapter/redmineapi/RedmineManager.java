@@ -44,6 +44,7 @@ public class RedmineManager {
     private final MembershipManager membershipManager;
     private final CustomFieldManager customFieldManager;
     private final WikiManager wikiManager;
+    private final TimeEntryManager timeEntryManager;
 
     RedmineManager(Transport transport) {
         this.transport = transport;
@@ -54,6 +55,7 @@ public class RedmineManager {
         membershipManager = new MembershipManager(transport);
         wikiManager = new WikiManager(transport);
         customFieldManager = new CustomFieldManager(transport);
+        timeEntryManager = new TimeEntryManager(transport);
     }
 
     public WikiManager getWikiManager() {
@@ -82,6 +84,10 @@ public class RedmineManager {
 
     public CustomFieldManager getCustomFieldManager() {
         return customFieldManager;
+    }
+
+    public TimeEntryManager getTimeEntryManager() {
+        return timeEntryManager;
     }
 
     /**

@@ -7,8 +7,6 @@ import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import org.junit.AfterClass;
@@ -25,7 +23,6 @@ import java.util.Calendar;
  * behavior compatible with an XML version.
  */
 public class RedmineManagerDefaultsIT {
-	private static final Integer ACTIVITY_ID = 8;
 
 	private static final Logger logger = LoggerFactory.getLogger(RedmineManagerIT.class);
 
@@ -130,39 +127,6 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(result.getAttachments());
 		} finally {
             issueManager.deleteIssue(result.getId());
-		}
-	}
-
-	@Test
-	public void testTimeEntryDefaults() throws RedmineException {
-		final TimeEntry template = TimeEntryFactory.create();
-
-		final Issue tmp = IssueFactory.create(projectId, "aaabbbccc");
-		final Issue tmpIssue = issueManager.createIssue(tmp);
-		try {
-			template.setHours(123.f);
-			template.setActivityId(ACTIVITY_ID);
-			template.setIssueId(tmpIssue.getId());
-			final TimeEntry result = issueManager.createTimeEntry(template);
-			try {
-				Assert.assertNotNull(result.getId());
-				Assert.assertNotNull(result.getIssueId());
-				Assert.assertNotNull(result.getProjectId());
-				Assert.assertNotNull(result.getProjectName());
-				Assert.assertNotNull(result.getUserName());
-				Assert.assertNotNull(result.getUserId());
-				Assert.assertNotNull(result.getActivityName());
-				Assert.assertNotNull(result.getActivityId());
-				Assert.assertEquals(Float.valueOf(123.0f), result.getHours());
-				Assert.assertEquals("", result.getComment());
-				Assert.assertNotNull(result.getSpentOn());
-				Assert.assertNotNull(result.getCreatedOn());
-				Assert.assertNotNull(result.getUpdatedOn());
-			} finally {
-				issueManager.deleteTimeEntry(result.getId());
-			}
-		} finally {
-            issueManager.deleteIssue(tmpIssue.getId());
 		}
 	}
 

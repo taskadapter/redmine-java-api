@@ -14,8 +14,6 @@ import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -27,8 +25,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -60,12 +56,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class IssueManagerIT {
-
-    private static final Logger logger = LoggerFactory.getLogger(IssueManagerIT.class);
-
-    // TODO We don't know activities' IDs!
-    // see feature request http://www.redmine.org/issues/7506
-    private static final Integer ACTIVITY_ID = 8;
 
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
@@ -742,125 +732,9 @@ public class IssueManagerIT {
         assertEquals("Original description", iss3.getDescription());
     }
 
-    /**
-     * Test for issue 64 (time entry format)
-     */
-    @Test
-    public void testTimeEntryComments() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
-        Integer issueId = issue.getId();
-
-        TimeEntry entry = TimeEntryFactory.create();
-        Float hours = 11f;
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        final String comment = "This is a comment although it may not look like it";
-        entry.setComment(comment);
-        // TODO We don't know activities IDs!
-        // see feature request http://www.redmine.org/issues/7506
-        entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = issueManager.createTimeEntry(entry);
-
-        assertNotNull(createdEntry);
-        assertEquals(comment, createdEntry.getComment());
-
-        createdEntry.setComment("New comment");
-        issueManager.update(createdEntry);
-        final TimeEntry updatedEntry = issueManager.getTimeEntry(createdEntry.getId());
-        assertEquals("New comment", updatedEntry.getComment());
-    }
-
     @Test
     public void testIssuePriorities() throws RedmineException {
         assertTrue(issueManager.getIssuePriorities().size() > 0);
-    }
-
-    @Test
-    public void testTimeEntryActivities() throws RedmineException {
-        assertTrue(issueManager.getTimeEntryActivities().size() > 0);
-    }
-    @Test
-    public void testGetTimeEntries() throws RedmineException {
-        List<TimeEntry> list = issueManager.getTimeEntries();
-        assertNotNull(list);
-    }
-
-    @Test
-    public void testCreateGetTimeEntry() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
-        Integer issueId = issue.getId();
-
-        TimeEntry entry = TimeEntryFactory.create();
-        Float hours = 11f;
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        // TODO We don't know activities IDs!
-        // see feature request http://www.redmine.org/issues/7506
-        entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = issueManager.createTimeEntry(entry);
-
-        assertNotNull(createdEntry);
-        logger.debug("Created time entry " + createdEntry);
-        assertEquals(hours, createdEntry.getHours());
-
-        Float newHours = 22f;
-        createdEntry.setHours(newHours);
-
-        issueManager.update(createdEntry);
-
-        TimeEntry updatedEntry = issueManager.getTimeEntry(createdEntry.getId());
-        assertEquals(newHours, updatedEntry.getHours());
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void testCreateDeleteTimeEntry() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
-        Integer issueId = issue.getId();
-
-        TimeEntry entry = TimeEntryFactory.create();
-        Float hours = 4f;
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = issueManager.createTimeEntry(entry);
-        assertNotNull(createdEntry);
-
-        issueManager.deleteTimeEntry(createdEntry.getId());
-        issueManager.getTimeEntry(createdEntry.getId());
-    }
-
-    @Test
-    public void testGetTimeEntriesForIssue() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
-        Integer issueId = issue.getId();
-        Float hours1 = 2f;
-        Float hours2 = 7f;
-        Float totalHoursExpected = hours1 + hours2;
-        TimeEntry createdEntry1 = createTimeEntry(issueId, hours1);
-        TimeEntry createdEntry2 = createTimeEntry(issueId, hours2);
-        assertNotNull(createdEntry1);
-        assertNotNull(createdEntry2);
-
-        List<TimeEntry> entries = issueManager.getTimeEntriesForIssue(issueId);
-        assertEquals(2, entries.size());
-        Float totalTime = 0f;
-        for (TimeEntry timeEntry : entries) {
-            totalTime += timeEntry.getHours();
-        }
-        assertEquals(totalHoursExpected, totalTime);
-    }
-
-    private TimeEntry createTimeEntry(Integer issueId, float hours) throws RedmineException {
-        return createTimeEntry(issueId, hours, ACTIVITY_ID);
-    }
-
-    private TimeEntry createTimeEntry(Integer issueId, float hours, int activityId)
-            throws RedmineException {
-        TimeEntry entry = TimeEntryFactory.create();
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        entry.setActivityId(activityId);
-        return issueManager.createTimeEntry(entry);
     }
 
     @Test
@@ -890,33 +764,6 @@ public class IssueManagerIT {
         Project project = mgr.getProjectManager().getProjectByKey(projectKey);
         version.setProject(project);
         return mgr.getProjectManager().createVersion(version);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidTimeEntryFailsWithIAEOnCreate() throws RedmineException {
-        issueManager.createTimeEntry(createIncompleteTimeEntry());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidTimeEntryFailsWithIAEOnUpdate() throws RedmineException {
-        issueManager.update(createIncompleteTimeEntry());
-    }
-
-    private TimeEntry createIncompleteTimeEntry() {
-        TimeEntry timeEntry = TimeEntryFactory.create();
-        timeEntry.setActivityId(ACTIVITY_ID);
-        timeEntry.setSpentOn(new Date());
-        timeEntry.setHours(1.5f);
-        return timeEntry;
-    }
-
-    @Test
-    public void testViolateTimeEntryConstraint_ProjectOrIssueID() throws RedmineException {
-        TimeEntry timeEntry = createIncompleteTimeEntry();
-        int projectId = mgr.getProjectManager().getProjects().get(0).getId();
-        timeEntry.setProjectId(projectId);
-        issueManager.createTimeEntry(timeEntry);
-        // no exceptions - good.
     }
 
     @Test
@@ -1431,41 +1278,6 @@ public class IssueManagerIT {
             assertThat(issues.size()).isEqualTo(1);
             final Issue loaded = issues.get(0);
             assertThat(loaded.getSubject()).isEqualTo(subject);
-        } finally {
-            issueManager.deleteIssue(createdIssueId);
-        }
-    }
-
-    /**
-     * This integration test requires activities with ids 8 and 9 to be present on
-     * the redmine server. we cannot detect Ids of existing activities -
-     * see Redmine feature request http://www.redmine.org/issues/7506
-     */
-    @Test
-    public void timeEntriesAreFoundByFreeFormSearch() throws RedmineException {
-        // create some random issues in the project
-        Issue createdIssue = createIssue(issueManager, projectId);
-
-        // TODO We don't know activities' IDs
-        // see feature request http://www.redmine.org/issues/7506
-        Integer createdIssueId = createdIssue.getId();
-        createTimeEntry(createdIssueId, 2, 8);
-        createTimeEntry(createdIssueId, 6, 8);
-        createTimeEntry(createdIssueId, 10, 8);
-        createTimeEntry(createdIssueId, 30, 9);
-
-        try {
-            Map<String, String> paramsForActivity8 = new HashMap<>();
-            paramsForActivity8.put("issue_id", Integer.toString(createdIssueId));
-            paramsForActivity8.put("activity_id", "8");
-            List<TimeEntry> timeEntriesForActivity8 = issueManager.getTimeEntries(paramsForActivity8);
-            assertThat(timeEntriesForActivity8.size()).isEqualTo(3);
-
-            Map<String, String> paramsForActivity9 = new HashMap<>();
-            paramsForActivity9.put("issue_id", Integer.toString(createdIssueId));
-            paramsForActivity9.put("activity_id", "9");
-            List<TimeEntry> timeEntriesForActivity9 = issueManager.getTimeEntries(paramsForActivity9);
-            assertThat(timeEntriesForActivity9.size()).isEqualTo(1);
         } finally {
             issueManager.deleteIssue(createdIssueId);
         }

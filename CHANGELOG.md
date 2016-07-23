@@ -6,7 +6,7 @@
 
 * Issue #121. Bug fixed: download attachments using API access key
 
- Migration guide:
+### Migration guide for version 3.0.0:
 
 Issue class:
 * Method deleted:    public String getCustomField(String fieldName).
@@ -21,6 +21,8 @@ IssueManager class:
  Use createIssue(Issue issue) instead. The old method had ambiguity in it: not clear which project key value
  to use when it is also set in the Issue itself.
 
+A new TimeEntryManager is introduced. Its methods were extacted from IssueManager.
+ 
 # Version 2.6.0 (November 11, 2015)
   
 ## ! This version has breaking API changes to address issue #222!

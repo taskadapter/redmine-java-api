@@ -77,7 +77,8 @@ You can also use some legacy system like Maven if you can't upgrade to Gradle fo
     userManager.deleteUser(123);
 
 ## Get time entries
+    TimeEntryManager timeEntryManager = redmineManager.getTimeEntryManager();
     final Map<String, String> params = new HashMap<>();
     params.put("project_id", projectId);
     params.put("activity_id", activityId);
-    final List<TimeEntry> elements = issueManager.getTimeEntries(params);
+    final List<TimeEntry> elements = timeEntryManager.getTimeEntries(params);
