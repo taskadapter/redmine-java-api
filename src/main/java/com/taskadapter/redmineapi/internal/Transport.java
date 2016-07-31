@@ -74,6 +74,8 @@ public final class Transport {
 	private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
 	private static final String KEY_TOTAL_COUNT = "total_count";
+	private static final String KEY_LIMIT = "limit";
+	private static final String KEY_OFFSET = "offset";
 
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 	private final SimpleCommunicator<String> communicator;
@@ -489,7 +491,9 @@ public final class Transport {
 			final JSONObject responseObject = RedmineJSONParser.getResponse(response);
 			List<T> results = JsonInput.getListOrNull(responseObject, config.multiObjectName, config.parser);
 			Integer totalFoundOnServer = JsonInput.getIntOrNull(responseObject, KEY_TOTAL_COUNT);
-			return new ResultsWrapper<>(totalFoundOnServer, results);
+			Integer limitOnServer = JsonInput.getIntOrNull(responseObject, KEY_LIMIT);
+			Integer offsetOnServer = JsonInput.getIntOrNull(responseObject, KEY_OFFSET);
+			return new ResultsWrapper<>(totalFoundOnServer, limitOnServer, offsetOnServer, results);
 		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}

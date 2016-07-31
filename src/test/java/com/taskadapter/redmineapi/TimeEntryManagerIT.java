@@ -262,13 +262,13 @@ public class TimeEntryManagerIT {
             Map<String, String> paramsForActivity8 = new HashMap<>();
             paramsForActivity8.put("issue_id", Integer.toString(createdIssueId));
             paramsForActivity8.put("activity_id", ACTIVITY_ID + "");
-            List<TimeEntry> timeEntriesForActivity8 = timeEntryManager.getTimeEntries(paramsForActivity8);
+            List<TimeEntry> timeEntriesForActivity8 = timeEntryManager.getTimeEntries(paramsForActivity8).getResults();
             assertThat(timeEntriesForActivity8.size()).isEqualTo(3);
 
             Map<String, String> paramsForActivity9 = new HashMap<>();
             paramsForActivity9.put("issue_id", Integer.toString(createdIssueId));
             paramsForActivity9.put("activity_id", "9");
-            List<TimeEntry> timeEntriesForActivity9 = timeEntryManager.getTimeEntries(paramsForActivity9);
+            List<TimeEntry> timeEntriesForActivity9 = timeEntryManager.getTimeEntries(paramsForActivity9).getResults();
             assertThat(timeEntriesForActivity9.size()).isEqualTo(1);
         } finally {
             issueManager.deleteIssue(createdIssueId);

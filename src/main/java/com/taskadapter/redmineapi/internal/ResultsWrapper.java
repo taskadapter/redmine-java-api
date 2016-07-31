@@ -2,17 +2,21 @@ package com.taskadapter.redmineapi.internal;
 
 import java.util.List;
 
-public class ResultsWrapper<T> {
-    final private Integer totalFoundOnServer;
-    final private List<T> results;
+public final class ResultsWrapper<T> {
+    private final Integer totalFoundOnServer;
+    private final Integer limitOnServer;
+    private final Integer offsetOnServer;
+    private final List<T> results;
 
-    public ResultsWrapper(Integer totalFoundOnServer, List<T> results) {
+    public ResultsWrapper(Integer totalFoundOnServer, Integer limitOnServer, Integer offsetOnServer, List<T> results) {
         this.totalFoundOnServer = totalFoundOnServer;
+        this.limitOnServer = limitOnServer;
+        this.offsetOnServer = offsetOnServer;
         this.results = results;
     }
 
     public boolean hasSomeResults() {
-        return !results.isEmpty();
+        return results != null && !results.isEmpty();
     }
 
     public List<T> getResults() {
@@ -20,10 +24,18 @@ public class ResultsWrapper<T> {
     }
 
     public int getResultsNumber() {
-        return results.size();
+        return results != null ? results.size() : 0;
     }
 
     public Integer getTotalFoundOnServer() {
         return totalFoundOnServer;
+    }
+
+    public Integer getLimitOnServer() {
+        return limitOnServer;
+    }
+
+    public Integer getOffsetOnServer() {
+        return offsetOnServer;
     }
 }
