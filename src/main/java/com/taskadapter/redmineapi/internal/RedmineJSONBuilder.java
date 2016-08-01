@@ -150,17 +150,17 @@ public class RedmineJSONBuilder {
 
 	public static void writeProject(Project project, final JSONWriter writer)
 			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", project.getId());
-		JsonOutput.addIfNotNull(writer, "identifier", project.getIdentifier());
-		JsonOutput.addIfNotNull(writer, "name", project.getName());
-		JsonOutput
-				.addIfNotNull(writer, "description", project.getDescription());
-		JsonOutput.addIfNotNull(writer, "homepage", project.getHomepage());
+		PropertyStorage storage = project.getStorage();
+		addIfSet(writer, "id", storage, Project.DATABASE_ID);
+		addIfSet(writer, "identifier", storage, Project.STRING_IDENTIFIER);
+		addIfSet(writer, "name", storage, Project.NAME);
+		addIfSet(writer, "description", storage, Project.DESCRIPTION);
+		addIfSet(writer, "homepage", storage, Project.HOMEPAGE);
 		addIfNotNullFull(writer, "created_on", project.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
 		writeCustomFields(writer, project.getCustomFields());
-		JsonOutput.addIfNotNull(writer, "parent_id", project.getParentId());
-                JsonOutput.addIfNotNull(writer, "is_public", project.getProjectPublic());
+		addIfSet(writer, "parent_id", storage, Project.PARENT_DATABASE_ID);
+		addIfSet(writer, "is_public", storage, Project.PUBLIC);
 		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(), RedmineJSONBuilder::writeTracker);
 	}
 
