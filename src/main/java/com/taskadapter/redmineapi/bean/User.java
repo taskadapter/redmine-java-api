@@ -17,22 +17,21 @@ public class User implements Identifiable {
 
     private final PropertyStorage storage;
 
-    public final static Property<Integer> ID = new Property<Integer>(Integer.class, "id");
-    public final static Property<String> LOGIN = new Property<String>(String.class, "login");
-    public final static Property<String> PASSWORD = new Property<String>(String.class, "password");
-    public final static Property<String> FIRST_NAME = new Property<String>(String.class, "firstName");
-    public final static Property<String> LAST_NAME = new Property<String>(String.class, "lastName");
-    public final static Property<String> MAIL = new Property<String>(String.class, "mail");
-    public final static Property<String> API_KEY = new Property<String>(String.class, "apiKey");
-    public final static Property<Date> CREATED_ON = new Property<Date>(Date.class, "createdOn");
-    public final static Property<Date> LAST_LOGIN_ON = new Property<Date>(Date.class, "lastLoginOn");
-    public final static Property<Integer> AUTH_SOURCE_ID = new Property<Integer>(Integer.class, "authSourceId");
-    public final static Property<Integer> STATUS = new Property<Integer>(Integer.class, "status");
+    public final static Property<Integer> ID = new Property<>(Integer.class, "id");
+    public final static Property<String> LOGIN = new Property<>(String.class, "login");
+    public final static Property<String> PASSWORD = new Property<>(String.class, "password");
+    public final static Property<String> FIRST_NAME = new Property<>(String.class, "firstName");
+    public final static Property<String> LAST_NAME = new Property<>(String.class, "lastName");
+    public final static Property<String> MAIL = new Property<>(String.class, "mail");
+    public final static Property<String> API_KEY = new Property<>(String.class, "apiKey");
+    public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<Date> LAST_LOGIN_ON = new Property<>(Date.class, "lastLoginOn");
+    public final static Property<Integer> AUTH_SOURCE_ID = new Property<>(Integer.class, "authSourceId");
+    public final static Property<Integer> STATUS = new Property<>(Integer.class, "status");
 
-    private final Set<CustomField> customFields = new HashSet<CustomField>();
-	private final Set<Membership> memberships = new HashSet<Membership>();
-
-    public final static Property<Collection> GROUPS = new SetProperty("groups");
+    public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
+    public final static Property<Set<Membership>> MEMBERSHIP = (Property<Set<Membership>>) new Property(Set.class, "membership");
+    public final static Property<Set<Group>> GROUPS = (Property<Set<Group>>) new Property(Set.class, "groups");
 
     /**
      * Use UserFactory to create instances of this class.
@@ -42,12 +41,19 @@ public class User implements Identifiable {
      * @see UserFactory
      */
     User(Integer id) {
-        storage = new PropertyStorage();
+        this(new PropertyStorage());
+        initCollections();
         storage.set(ID, id);
     }
 
     User(PropertyStorage storage) {
         this.storage = storage;
+    }
+
+    private void initCollections() {
+        this.storage.set(CUSTOM_FIELDS, new HashSet<>());
+        this.storage.set(MEMBERSHIP, new HashSet<>());
+        this.storage.set(GROUPS, new HashSet<>());
     }
 
     @Override
@@ -186,7 +192,7 @@ public class User implements Identifiable {
      * @return the value or NULL if the field is not found
      */
     public String getCustomField(String fieldName) {
-        for (CustomField f : customFields) {
+        for (CustomField f : getCustomFields()) {
             if (f.getName().equals(fieldName)) {
                 return f.getValue();
             }
@@ -198,11 +204,11 @@ public class User implements Identifiable {
      * @return Custom Fields, NEVER NULL.
      */
     public Collection<CustomField> getCustomFields() {
-        return Collections.unmodifiableCollection(customFields);
+        return Collections.unmodifiableCollection(storage.get(CUSTOM_FIELDS));
     }
 
     public void clearCustomFields() {
-        customFields.clear();
+        storage.set(CUSTOM_FIELDS, new HashSet<>());
     }
 
     /**
@@ -210,7 +216,7 @@ public class User implements Identifiable {
      * ID can be seen in database or in Redmine administration when editing the custom field (number is part of the URL!).
      */
     public void addCustomFields(Collection<CustomField> customFields) {
-        this.customFields.addAll(customFields);
+        storage.get(CUSTOM_FIELDS).addAll(customFields);
     }
 
     /**
@@ -220,15 +226,15 @@ public class User implements Identifiable {
      * @param customField the field to add.
      */
     public void addCustomField(CustomField customField) {
-        customFields.add(customField);
+        storage.get(CUSTOM_FIELDS).add(customField);
     }
 
 	public Collection<Membership> getMemberships() {
-		return Collections.unmodifiableCollection(memberships);
+		return Collections.unmodifiableCollection(storage.get(MEMBERSHIP));
 	}
 
 	public void addMemberships(Collection<Membership> memberships) {
-		this.memberships.addAll(memberships);
+		storage.get(MEMBERSHIP).addAll(memberships);
 	}
 
 	public Collection<Group> getGroups() {

@@ -67,15 +67,20 @@ public class Issue implements Identifiable {
      */
     Issue(Integer id) {
         this(new PropertyStorage());
+        initCollections(storage);
         storage.set(DATABASE_ID, id);
     }
 
     public Issue() {
         this(new PropertyStorage());
+        initCollections(storage);
     }
 
     Issue(PropertyStorage storage) {
         this.storage = storage;
+    }
+
+    private void initCollections(PropertyStorage storage) {
         storage.set(CUSTOM_FIELDS, new HashSet<>());
         storage.set(CHILDREN, new HashSet<>());
         storage.set(WATCHERS, new HashSet<>());
