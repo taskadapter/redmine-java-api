@@ -39,27 +39,4 @@ public class UserTest {
         user2.setLastName("last");
         assertThat(user1).isNotEqualTo(user2);
     }
-
-    @Test
-    public void userCloneIsDeep() {
-        final User user = UserFactory.create(33);
-        String originalLogin = "login1";
-        String originalMail = "mail";
-        user.setLogin(originalLogin);
-        user.setMail(originalMail);
-
-        Group group = new Group(66);
-        String originalGroupName = "original group name";
-        group.setName(originalGroupName);
-        user.addGroups(Arrays.asList(group));
-
-        final User cloned = user.cloneDeep();
-
-        Collection<Group> groupsOfClonedUser = cloned.getGroups();
-        assertThat(groupsOfClonedUser.size()).isEqualTo(1);
-
-        group.setName("updated");
-
-        assertThat(groupsOfClonedUser.iterator().next().getName()).isEqualTo(originalGroupName);
-    }
 }

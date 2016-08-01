@@ -17,15 +17,4 @@ public final class PropertyStorage {
     public final boolean isPropertySet(Property<?> property) {
         return map.containsKey(property);
     }
-
-    final PropertyStorage deepClone() {
-        PropertyStorage newStorage = new PropertyStorage();
-        for (Map.Entry<Property<?>, Object> entry : map.entrySet()) {
-            Property<?> property = entry.getKey();
-
-            Object clonedValue = property.cloneDeep(property.getType().cast(entry.getValue()));
-            newStorage.set(property, clonedValue);
-        }
-        return newStorage;
-    }
 }

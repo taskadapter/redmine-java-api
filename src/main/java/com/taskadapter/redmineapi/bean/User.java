@@ -40,14 +40,14 @@ public class User implements Identifiable {
      *
      * @see UserFactory
      */
-    User(Integer id) {
-        this(new PropertyStorage());
-        initCollections();
+    public User(Integer id) {
+        this();
         storage.set(ID, id);
     }
 
-    User(PropertyStorage storage) {
-        this.storage = storage;
+    public User() {
+        this.storage = new PropertyStorage();
+        initCollections();
     }
 
     private void initCollections() {
@@ -268,10 +268,6 @@ public class User implements Identifiable {
      */
     public void setStatus(Integer status) {
         storage.set(STATUS, status);
-    }
-
-    public User cloneDeep() {
-        return new User(storage.deepClone());
     }
 
     public PropertyStorage getStorage() {

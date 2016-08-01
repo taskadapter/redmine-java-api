@@ -1,14 +1,18 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CustomField {
 
-    private final Integer id;
-    private String name;
-    private String value;
-    private boolean multiple = false;
-	private List<String> values;
+    private final PropertyStorage storage;
+
+    public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
+    public final static Property<String> NAME = new Property<>(String.class, "name");
+    public final static Property<String> VALUE = new Property<>(String.class, "value");
+    public final static Property<Boolean> MULTIPLE = new Property<>(Boolean.class, "multiple");
+    public final static Property<List<String>> VALUES = (Property<List<String>>) new Property(List.class, "values");
 
     /**
      * Use CustomFieldFactory to create instances of this class.
@@ -16,52 +20,58 @@ public class CustomField {
      * @param id database ID.
      */
     CustomField(Integer id) {
-        this.id = id;
+        this.storage = new PropertyStorage();
+        initCollections(storage);
+        storage.set(DATABASE_ID, id);
     }
 
-    public int getId() {
-        return id;
+    private void initCollections(PropertyStorage storage) {
+        storage.set(VALUE, new ArrayList<>());
+    }
+
+    public Integer getId() {
+        return storage.get(DATABASE_ID);
     }
 
     public String getName() {
-        return name;
+        return storage.get(NAME);
     }
 
     public void setName(String name) {
-        this.name = name;
+        storage.set(NAME, name);
     }
 
     public String getValue() {
-		return !isMultiple() || values.size() == 0 ? value : values.get(0);
+		return storage.get(VALUE);
     }
 
     public void setValue(String value) {
-        this.value = value;
-		this.values = null;
-		this.multiple = false;
+        storage.set(VALUE, value);
+		storage.set(VALUES, new ArrayList<>());
+		storage.set(MULTIPLE, false);
     }
     
 	/**
 	 * @return values list if this is a multi-line field, NULL otherwise.
 	 */
 	public List<String> getValues() {
-		return values;
+		return storage.get(VALUES);
 	}
 
 	/**
 	 * @param values the values for multi-line custom field.
 	 */
 	public void setValues(List<String> values) {
-		this.values = values;
-		this.value = null;
-		this.multiple = true;
+		storage.set(VALUES, values);
+		storage.set(VALUE, null);
+        storage.set(MULTIPLE, true);
 	}
 
 	/**
 	 * @return the multiple
 	 */
 	public boolean isMultiple() {
-		return multiple;
+		return storage.get(MULTIPLE);
 	}
 
     @Override
@@ -71,19 +81,21 @@ public class CustomField {
 
         CustomField that = (CustomField) o;
 
-        if (id != that.id) return false;
+        if (Objects.equals(getId(), that.getId())) {
+            return true;
+        }
 
-        return true;
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
     @Override
     public String toString() {
-        return "CustomField{" + "id=" + id + ", name='" + name + '\''
-				+ ", value='" + value + '\'' + ", values=" + values + '}';
+        return "CustomField{" + "id=" + getId() + ", name='" + getName() + '\''
+				+ ", value='" + getValue() + '\'' + ", values=" + getValues() + '}';
     }
 }

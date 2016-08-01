@@ -66,18 +66,13 @@ public class Issue implements Identifiable {
      * @param id database ID.
      */
     Issue(Integer id) {
-        this(new PropertyStorage());
-        initCollections(storage);
+        this();
         storage.set(DATABASE_ID, id);
     }
 
     public Issue() {
-        this(new PropertyStorage());
+        this.storage = new PropertyStorage();
         initCollections(storage);
-    }
-
-    Issue(PropertyStorage storage) {
-        this.storage = storage;
     }
 
     private void initCollections(PropertyStorage storage) {
@@ -504,11 +499,6 @@ public class Issue implements Identifiable {
 
     public void setPrivateIssue(boolean privateIssue) {
         storage.set(PRIVATE_ISSUE, privateIssue);
-    }
-
-    public Issue cloneDeep() {
-        PropertyStorage clonedStorage = storage.deepClone();
-        return new Issue(clonedStorage);
     }
 
     public PropertyStorage getStorage() {

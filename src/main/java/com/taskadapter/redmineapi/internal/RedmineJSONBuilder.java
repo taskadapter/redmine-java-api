@@ -301,8 +301,7 @@ public class RedmineJSONBuilder {
 		}
 	}
 
-	private static void writeCustomFields(JSONWriter writer,
-			Collection<CustomField> customFields) throws JSONException {
+	private static void writeCustomFields(JSONWriter writer, Collection<CustomField> customFields) throws JSONException {
 		if (customFields == null || customFields.isEmpty()) {
             return;
         }
