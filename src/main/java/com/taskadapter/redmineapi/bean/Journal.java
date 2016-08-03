@@ -11,16 +11,16 @@ import java.util.List;
  */
 public class Journal {
 
+    private final PropertyStorage storage;
+
     /**
-     * database ID.
+     * database numeric ID.
      */
-    private final Integer id;
-
-    private String notes;
-    private User user;
-    private Date createdOn;
-
-    private final List<JournalDetail> details = new ArrayList<>();
+    public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
+    public final static Property<String> NOTES = new Property<String>(String.class, "notes");
+    public final static Property<User> USER = new Property<>(User.class, "user");
+    public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<List<JournalDetail>> DETAILS = (Property<List<JournalDetail>>) new Property(List.class, "details");
 
     /**
      * Use JournalFactory to create instances of this class.
@@ -28,43 +28,45 @@ public class Journal {
      * @param id database ID.
      */
     Journal(Integer id) {
-        this.id = id;
+        storage = new PropertyStorage();
+        storage.set(DETAILS, new ArrayList<>());
+        storage.set(DATABASE_ID, id);
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return storage.get(CREATED_ON);
     }
 
     public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+        storage.set(CREATED_ON, createdOn);
     }
 
-    public int getId() {
-        return id;
+    public Integer getId() {
+        return storage.get(DATABASE_ID);
     }
 
     public String getNotes() {
-        return notes;
+        return storage.get(NOTES);
     }
 
     public void setNotes(String notes) {
-        this.notes = notes;
+        storage.set(NOTES, notes);
     }
 
     public User getUser() {
-        return user;
+        return storage.get(USER);
     }
 
     public void setUser(User user) {
-        this.user = user;
+        storage.set(USER, user);
     }
 
     public List<JournalDetail> getDetails() {
-        return Collections.unmodifiableList(details);
+        return Collections.unmodifiableList(storage.get(DETAILS));
     }
 
     public void addDetails(Collection<JournalDetail> details) {
-        this.details.addAll(details);
+        storage.get(DETAILS).addAll(details);
     }
 
     @Override
@@ -74,19 +76,18 @@ public class Journal {
 
         Journal journal = (Journal) o;
 
-        if (id != journal.id) return false;
+        return getId() != null ? getId().equals(journal.getId()) : journal.getId() == null;
 
-        return true;
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
     @Override
     public String toString() {
-        return "Journal{" + "id=" + id + " notes=" + notes + " user=" + user + " createdOn=" + createdOn + " details=" + details + '}';
+        return "Journal{" + "id=" + getId() + " notes=" + getNotes() + " user=" + getUser() + " createdOn=" + getCreatedOn() + " details=" + getDetails() + '}';
     }
 
 }

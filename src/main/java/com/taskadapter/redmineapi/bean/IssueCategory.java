@@ -8,41 +8,43 @@ import java.io.Serializable;
 public class IssueCategory implements Identifiable, Serializable {
 	private static final long serialVersionUID = -109010410391968475L;
 
-    /**
-     * database ID.
-     */
-	private final Integer id;
+    private final PropertyStorage storage;
 
-    private String name;
-    private Project project;
-    private Integer assigneeId;
-    private String assigneeName;
+    /**
+     * database numeric ID.
+     */
+    public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
+    public final static Property<String> NAME = new Property<>(String.class, "name");
+    public final static Property<Project> PROJECT = new Property<>(Project.class, "project");
+    public final static Property<Integer> ASSIGNEE_ID = new Property<>(Integer.class, "assigneeId");
+    public final static Property<String> ASSIGNEE_NAME = new Property<>(String.class, "assigneeName");
 
     /**
      * @param id database ID.
      */
     IssueCategory(Integer id) {
-        this.id = id;
+        storage = new PropertyStorage();
+        storage.set(DATABASE_ID, id);
     }
 
     public Integer getId() {
-        return id;
+        return storage.get(DATABASE_ID);
     }
 
     public String getName() {
-        return name;
+        return storage.get(NAME);
     }
 
     public void setName(String name) {
-        this.name = name;
+        storage.set(NAME, name);
     }
 
     public Project getProject() {
-        return project;
+        return storage.get(PROJECT);
     }
 
     public void setProject(Project project) {
-        this.project = project;
+        storage.set(PROJECT, project);
     }
 
     /**
@@ -52,19 +54,19 @@ public class IssueCategory implements Identifiable, Serializable {
      * <p>An assignee can be a user or a group</p>
      */
     public Integer getAssigneeId() {
-        return assigneeId;
+        return storage.get(ASSIGNEE_ID);
     }
 
     public void setAssigneeId(Integer assigneeId) {
-        this.assigneeId = assigneeId;
+        storage.set(ASSIGNEE_ID, assigneeId);
     }
 
     public String getAssigneeName() {
-        return assigneeName;
+        return storage.get(ASSIGNEE_NAME);
     }
 
     public void setAssigneeName(String assigneeName) {
-        this.assigneeName = assigneeName;
+        storage.set(ASSIGNEE_NAME, assigneeName);
     }
 
     @Override
@@ -74,24 +76,24 @@ public class IssueCategory implements Identifiable, Serializable {
 
         IssueCategory that = (IssueCategory) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "IssueCategory{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", project=" + project +
-                ", assigneeId=" + assigneeId +
-                ", assigneeName='" + assigneeName + '\'' +
+                "id=" + getId() +
+                ", name='" + getName() + '\'' +
+                ", project=" + getProject() +
+                ", assigneeId=" + getAssigneeId() +
+                ", assigneeName='" + getAssigneeName() + '\'' +
                 '}';
     }
 }

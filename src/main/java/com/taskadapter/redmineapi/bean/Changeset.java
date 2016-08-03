@@ -6,41 +6,48 @@ import java.util.Date;
  * Repository Change for a Redmine issue
  */
 public class Changeset {
-    private String revision;
-    private User user;
-    private String comments;
-    private Date committedOn;
+
+    private final PropertyStorage storage;
+
+    public final static Property<String> REVISION = new Property<>(String.class, "revision");
+    public final static Property<User> USER = new Property<>(User.class, "user");
+    public final static Property<String> COMMENTS = new Property<>(String.class, "comments");
+    public final static Property<Date> COMMITTED_ON = new Property<>(Date.class, "committedOn");
+
+    public Changeset() {
+        storage = new PropertyStorage();
+    }
 
     public String getRevision() {
-        return revision;
+        return storage.get(REVISION);
     }
 
     public void setRevision(String revision) {
-        this.revision = revision;
+        storage.set(REVISION, revision);
     }
 
     public User getUser() {
-        return user;
+        return storage.get(USER);
     }
 
     public void setUser(User user) {
-        this.user = user;
+        storage.set(USER, user);
     }
 
     public String getComments() {
-        return comments;
+        return storage.get(COMMENTS);
     }
 
     public void setComments(String comments) {
-        this.comments = comments;
+        storage.set(COMMENTS, comments);
     }
 
     public Date getCommittedOn() {
-        return committedOn;
+        return storage.get(COMMITTED_ON);
     }
 
     public void setCommittedOn(Date committedOn) {
-        this.committedOn = committedOn;
+        storage.set(COMMITTED_ON, committedOn);
     }
 
     @Override
@@ -50,23 +57,23 @@ public class Changeset {
 
         Changeset changeset = (Changeset) o;
 
-        if (revision != null ? !revision.equals(changeset.revision) : changeset.revision != null) return false;
+        if (getRevision() != null ? !getRevision().equals(changeset.getRevision()) : changeset.getRevision() != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return revision != null ? revision.hashCode() : 0;
+        return getRevision() != null ? getRevision().hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "Changeset{" +
-                "comments='" + comments + '\'' +
-                ", revision='" + revision + '\'' +
-                ", user=" + user +
-                ", committedOn=" + committedOn +
+                "comments='" + getComments() + '\'' +
+                ", revision='" + getRevision() + '\'' +
+                ", user=" + getUser() +
+                ", committedOn=" + getCommittedOn() +
                 '}';
     }
 
