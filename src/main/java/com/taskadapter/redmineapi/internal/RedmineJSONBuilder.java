@@ -234,10 +234,9 @@ public class RedmineJSONBuilder {
 
 		addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
 		addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
-		JsonOutput.addIfNotNull(writer, "status_id", issue.getStatusId());
+		addIfSet(writer, "status_id", storage, Issue.STATUS_ID);
         if (issue.getTargetVersion() != null)
-            JsonOutput.addIfNotNull(writer, "fixed_version_id", issue
-                    .getTargetVersion().getId());
+            JsonOutput.addIfNotNull(writer, "fixed_version_id", issue.getTargetVersion().getId());
         if (issue.getCategory() != null)
             JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory().getId());
         addIfSet(writer, "notes", storage, Issue.NOTES);
