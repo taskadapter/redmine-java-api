@@ -96,4 +96,8 @@ public class IssueCategory implements Identifiable, Serializable {
                 ", assigneeName='" + getAssigneeName() + '\'' +
                 '}';
     }
+
+    public PropertyStorage getStorage() {
+        return storage;
+    }
 }

@@ -17,6 +17,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.WikiPage;
 import com.taskadapter.redmineapi.bean.WikiPageDetail;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 import com.taskadapter.redmineapi.internal.json.JsonOutput;
@@ -62,17 +63,17 @@ public class RedmineJSONBuilder {
 
 	static void writeTimeEntry(JSONWriter writer, TimeEntry timeEntry)
 			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", timeEntry.getId());
-		JsonOutput.addIfNotNull(writer, "project_id", timeEntry.getProjectId());
-		JsonOutput.addIfNotNull(writer, "issue_id", timeEntry.getIssueId());
-		JsonOutput.addIfNotNull(writer, "user_id", timeEntry.getUserId());
-		JsonOutput.addIfNotNull(writer, "activity_id",
-				timeEntry.getActivityId());
-		JsonOutput.addIfNotNull(writer, "hours", timeEntry.getHours());
-		JsonOutput.addIfNotNull(writer, "comments", timeEntry.getComment());
-		addIfNotNullShort2(writer, "spent_on", timeEntry.getSpentOn());
-		addIfNotNullFull(writer, "created_on", timeEntry.getSpentOn());
-		addIfNotNullFull(writer, "updated_on", timeEntry.getSpentOn());
+		PropertyStorage storage = timeEntry.getStorage();
+		addIfSet(writer, "id", storage, TimeEntry.DATABASE_ID);
+		addIfSet(writer, "project_id", storage, TimeEntry.PROJECT_ID);
+		addIfSet(writer, "issue_id", storage, TimeEntry.ISSUE_ID);
+		addIfSet(writer, "user_id", storage, TimeEntry.USER_ID);
+		addIfSet(writer, "activity_id",storage, TimeEntry.ACTIVITY_ID);
+		addIfSet(writer, "hours", storage, TimeEntry.HOURS);
+		addIfSet(writer, "comments", storage, TimeEntry.COMMENT);
+		addIfSetShort2(writer, "spent_on", storage, TimeEntry.SPENT_ON);
+		addIfSetFullDate(writer, "created_on", storage, TimeEntry.SPENT_ON);
+		addIfSetFullDate(writer, "updated_on", storage, TimeEntry.SPENT_ON);
 	}
 
 	/**
@@ -95,25 +96,27 @@ public class RedmineJSONBuilder {
 
 	static void writeRelation(JSONWriter writer, IssueRelation relation)
 			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "issue_to_id", relation.getIssueToId());
-		JsonOutput.addIfNotNull(writer, "relation_type", relation.getType());
-		JsonOutput.addIfNotNull(writer, "delay", relation.getDelay());
+		PropertyStorage storage = relation.getStorage();
+		addIfSet(writer, "issue_to_id", storage, IssueRelation.ISSUE_TO_ID);
+		addIfSet(writer, "relation_type", storage, IssueRelation.RELATION_TYPE);
+		addIfSet(writer, "delay", storage, IssueRelation.DELAY);
 	}
 
 	static void writeVersion(JSONWriter writer, Version version)
 			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "id", version.getId());
-		if (version.getProject() != null)
-			JsonOutput.addIfNotNull(writer, "project_id", version.getProject()
-					.getId());
-		JsonOutput.addIfNotNull(writer, "name", version.getName());
-		JsonOutput
-				.addIfNotNull(writer, "description", version.getDescription());
-		JsonOutput.addIfNotNull(writer, "sharing", version.getSharing());
-		JsonOutput.addIfNotNull(writer, "status", version.getStatus());
-		addIfNotNullShort2(writer, "due_date", version.getDueDate());
-		addIfNotNullFull(writer, "created_on", version.getCreatedOn());
-		addIfNotNullFull(writer, "updated_on", version.getUpdatedOn());
+		PropertyStorage storage = version.getStorage();
+		addIfSet(writer, "id", storage, Version.DATABASE_ID);
+		if (version.getProject() != null) {
+			writer.key("project_id");
+			writer.value(version.getProject().getId());
+		}
+		addIfSet(writer, "name", storage, Version.NAME);
+		addIfSet(writer, "description", storage, Version.DESCRIPTION);
+		addIfSet(writer, "sharing", storage, Version.SHARING);
+		addIfSet(writer, "status", storage, Version.STATUS);
+		addIfSetShort2(writer, "due_date", storage, Version.DUE_DATE);
+		addIfSetFullDate(writer, "created_on", storage, Version.CREATED_ON);
+		addIfSetFullDate(writer, "updated_on", storage, Version.UPDATED_ON);
 		writeCustomFields(writer, version.getCustomFields());
 	}
 
@@ -156,8 +159,8 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "name", storage, Project.NAME);
 		addIfSet(writer, "description", storage, Project.DESCRIPTION);
 		addIfSet(writer, "homepage", storage, Project.HOMEPAGE);
-		addIfNotNullFull(writer, "created_on", project.getCreatedOn());
-		addIfNotNullFull(writer, "updated_on", project.getUpdatedOn());
+		addIfSetFullDate(writer, "created_on", storage, Project.CREATED_ON);
+		addIfSetFullDate(writer, "updated_on", storage, Project.UPDATED_ON);
 		writeCustomFields(writer, project.getCustomFields());
 		addIfSet(writer, "parent_id", storage, Project.PARENT_DATABASE_ID);
 		addIfSet(writer, "is_public", storage, Project.PUBLIC);
@@ -165,13 +168,15 @@ public class RedmineJSONBuilder {
 	}
 
 	public static void writeCategory(final JSONWriter writer, IssueCategory category) throws JSONException {
+		PropertyStorage storage = category.getStorage();
 		writer.key("id");
 		writer.value(category.getId());
-		JsonOutput.addIfNotNull(writer, "name", category.getName());
+		addIfSet(writer, "name", storage, IssueCategory.NAME);
 		if (category.getProject() != null) {
-			JsonOutput.addIfNotNull(writer, "project_id", category.getProject().getId());
+			writer.key("project_id");
+			writer.value(category.getProject().getId());
 		}
-		JsonOutput.addIfNotNull(writer, "assigned_to_id", category.getAssigneeId());
+		addIfSet(writer, "assigned_to_id", storage, IssueCategory.ASSIGNEE_ID);
 	}
 
 	public static void writeUser(final JSONWriter writer, User user)
@@ -187,8 +192,8 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "mail", storage, User.MAIL);
 		addIfSet(writer, "auth_source_id", storage, User.AUTH_SOURCE_ID);
 		addIfSet(writer, "status", storage, User.STATUS);
-		addIfNotNullFull(writer, "created_on", user.getCreatedOn());
-		addIfNotNullFull(writer, "last_login_on", user.getLastLoginOn());
+		addIfSetFullDate(writer, "created_on", storage, User.CREATED_ON);
+		addIfSetFullDate(writer, "last_login_on", storage, User.LAST_LOGIN_ON);
 		writeCustomFields(writer, user.getCustomFields());
 
 	}
@@ -217,28 +222,36 @@ public class RedmineJSONBuilder {
             // case selection is introduced. The identifier is
             // used, if no real ID is provided
             if (issue.getProject().getId() != null) {
-                JsonOutput.addIfNotNull(writer, "project_id", issue.getProject()
-                        .getId());
+                writer.key("project_id");
+				writer.value(issue.getProject().getId());
             } else {
 				throw new IllegalArgumentException("Project ID must be set on issue. " +
 						"You can use a factory method to create Issue object in memory: IssueFactory.create(projectId, subject)");
             }
         }
-        if (issue.getAuthor() != null)
-			JsonOutput.addIfNotNull(writer, "author_id", issue.getAuthor().getId());
+        if (issue.getAuthor() != null) {
+			writer.key("author_id");
+			writer.value(issue.getAuthor().getId());
+		}
 		addIfSet(writer, "start_date", storage, Issue.START_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
 		addIfSet(writer, "due_date", storage, Issue.DUE_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
-		if (issue.getTracker() != null)
-			JsonOutput.addIfNotNull(writer, "tracker_id", issue.getTracker().getId());
+		if (issue.getTracker() != null) {
+			writer.key("tracker_id");
+			writer.value(issue.getTracker().getId());
+		}
 		addIfSet(writer, "description", storage, Issue.DESCRIPTION);
 
-		addIfNotNullFull(writer, "created_on", issue.getCreatedOn());
-		addIfNotNullFull(writer, "updated_on", issue.getUpdatedOn());
+		addIfSetFullDate(writer, "created_on", storage, Issue.CREATED_ON);
+		addIfSetFullDate(writer, "updated_on", storage, Issue.UPDATED_ON);
 		addIfSet(writer, "status_id", storage, Issue.STATUS_ID);
-        if (issue.getTargetVersion() != null)
-            JsonOutput.addIfNotNull(writer, "fixed_version_id", issue.getTargetVersion().getId());
-        if (issue.getCategory() != null)
-            JsonOutput.addIfNotNull(writer, "category_id", issue.getCategory().getId());
+        if (issue.getTargetVersion() != null) {
+        	writer.key("fixed_version_id");
+			writer.value(issue.getTargetVersion().getId());
+		}
+        if (issue.getCategory() != null) {
+			writer.key("category_id");
+			writer.value(issue.getCategory().getId());
+		}
         addIfSet(writer, "notes", storage, Issue.NOTES);
 		writeCustomFields(writer, issue.getCustomFields());
 
@@ -267,28 +280,39 @@ public class RedmineJSONBuilder {
 		}
 	}
 
+	public static void addIfSetShort2(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<Date> property) throws JSONException {
+		final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT_V2.get();
+		addIfSet(writer, jsonKeyName, storage, property, format);
+	}
+
+	private static void addIfSetFullDate(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<Date> property) throws JSONException {
+		final SimpleDateFormat format = RedmineDateParser.FULL_DATE_FORMAT.get();
+		addIfSet(writer, jsonKeyName, storage, property, format);
+	}
+
 	private static void addIfSet(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<Date> property, SimpleDateFormat format) throws JSONException {
 		if (storage.isPropertySet(property)) {
 			JsonOutput.add(writer, jsonKeyName, storage.get(property), format);
 		}
 	}
 
-	public static void writeUpload(JSONWriter writer, Attachment attachment)
-			throws JSONException {
-		JsonOutput.addIfNotNull(writer, "token", attachment.getToken());
-		JsonOutput.addIfNotNull(writer, "filename", attachment.getFileName());
-		JsonOutput.addIfNotNull(writer, "content_type",
-				attachment.getContentType());
-		JsonOutput.addIfNotNull(writer, "description", attachment.getDescription());
+	public static void writeUpload(JSONWriter writer, Attachment attachment) throws JSONException {
+		PropertyStorage storage = attachment.getStorage();
+		addIfSet(writer, "token", storage, Attachment.TOKEN);
+		addIfSet(writer, "filename", storage, Attachment.FILE_NAME);
+		addIfSet(writer, "content_type", storage, Attachment.CONTENT_TYPE);
+		addIfSet(writer, "description", storage, Attachment.DESCRIPTION);
 	}
 
 	public static void writeMembership(JSONWriter writer, Membership membership)
 			throws JSONException {
 		if (membership.getUser() != null) {
-            JsonOutput.addIfNotNull(writer, "user_id", membership.getUser().getId());
+			writer.key("user_id");
+			writer.value(membership.getUser().getId());
         }
         if (membership.getGroup() != null) {
-            JsonOutput.addIfNotNull(writer, "group_id", membership.getGroup().getId());
+			writer.key("group_id");
+			writer.value(membership.getGroup().getId());
         }
 		if (membership.getRoles() != null) {
 			writer.key("role_ids");
@@ -318,7 +342,7 @@ public class RedmineJSONBuilder {
 		writer.endObject();
 	}
 
-        public static void writeWatchers(JSONWriter writer, Collection<Watcher> watchers)
+	public static void writeWatchers(JSONWriter writer, Collection<Watcher> watchers)
 			throws JSONException {
             if (watchers == null || watchers.isEmpty()) {
                 return;
@@ -335,100 +359,9 @@ public class RedmineJSONBuilder {
 	}
 
 	public static void writeWikiPageDetail(JSONWriter writer, WikiPageDetail detail) throws JSONException {
-		JsonOutput.addIfNotNull(writer, "text", detail.getText());
-		JsonOutput.addIfNotNull(writer, "comments", detail.getComments());
-		JsonOutput.addIfNotNull(writer, "version", detail.getVersion());
+		PropertyStorage storage = detail.getStorage();
+		addIfSet(writer, "text", storage, WikiPageDetail.TEXT);
+		addIfSet(writer, "comments", storage, WikiPageDetail.COMMENTS);
+		addIfSet(writer, "version", storage, WikiPage.VERSION);
 	}
-
-	/**
-	 * Adds a value to a writer if value is not <code>null</code>.
-	 * 
-	 * @param writer
-	 *            writer to add object to.
-	 * @param field
-	 *            field name to set.
-	 * @param value
-	 *            field value.
-	 * @throws JSONException
-	 *             if io error occurs.
-	 */
-	public static void addIfNotNullFull(JSONWriter writer, String field,
-			Date value) throws JSONException {
-		final SimpleDateFormat format = RedmineDateParser.FULL_DATE_FORMAT.get();
-		JsonOutput.addIfNotNull(writer, field, value, format);
-	}
-
-	/**
-	 * Adds a value to a writer.
-	 * 
-	 * @param writer
-	 *            writer to add object to.
-	 * @param field
-	 *            field name to set.
-	 * @param value
-	 *            field value.
-	 * @throws JSONException
-	 *             if io error occurs.
-	 */
-	public static void addFull(JSONWriter writer, String field, Date value)
-			throws JSONException {
-		final SimpleDateFormat format = RedmineDateParser.FULL_DATE_FORMAT.get();
-		JsonOutput.add(writer, field, value, format);
-	}
-
-	/**
-	 * Adds a value to a writer if value is not <code>null</code>.
-	 * 
-	 * @param writer
-	 *            writer to add object to.
-	 * @param field
-	 *            field name to set.
-	 * @param value
-	 *            field value.
-	 * @throws JSONException
-	 *             if io error occurs.
-	 */
-	public static void addIfNotNullShort(JSONWriter writer, String field,
-			Date value) throws JSONException {
-		final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT
-				.get();
-		JsonOutput.addIfNotNull(writer, field, value, format);
-	}
-	
-	/**
-     * Adds a value to a writer if value is not <code>null</code>.
-     * 
-     * @param writer
-     *            writer to add object to.
-     * @param field
-     *            field name to set.
-     * @param value
-     *            field value.
-     * @throws JSONException
-     *             if io error occurs.
-     */
-    public static void addIfNotNullShort2(JSONWriter writer, String field,
-            Date value) throws JSONException {
-        final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT_V2
-                .get();
-        JsonOutput.addIfNotNull(writer, field, value, format);
-    }
-
-    /**
-     * Adds a value to a writer.
-     * 
-     * @param writer
-     *            writer to add object to.
-     * @param field
-     *            field name to set.
-     * @param value
-     *            field value.
-     * @throws JSONException
-     *             if io error occurs.
-     */
-    public static void addShort2(JSONWriter writer, String field, Date value)
-            throws JSONException {
-        final SimpleDateFormat format = RedmineDateParser.SHORT_DATE_FORMAT_V2.get();
-        JsonOutput.add(writer, field, value, format);
-    }
 }

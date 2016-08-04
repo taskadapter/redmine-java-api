@@ -16,7 +16,7 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import java.util.Collections;
 
-public class RedmineJSONGeneratorTest {
+public class RedmineJSONBuilderTest {
 
 	@Test
 	public void priorityIdIsAddedToJsonIfProvided() {

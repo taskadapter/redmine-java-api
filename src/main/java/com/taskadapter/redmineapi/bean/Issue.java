@@ -212,9 +212,6 @@ public class Issue implements Identifiable {
         storage.set(TRACKER, tracker);
     }
 
-    /**
-     * Description is empty by default, not NULL.
-     */
     public String getDescription() {
         return storage.get(DESCRIPTION);
     }
