@@ -82,7 +82,7 @@ public class IssueManagerIT {
         project2 = IntegrationTestHelper.createProject(mgr);
         projectKey2 = project2.getIdentifier();
         Group g = GroupFactory.create();
-        g.setName("DemoGroup");
+        g.setName("Group" + System.currentTimeMillis());
         demoGroup = userManager.createGroup(g);
         // Add membership of group for the demo projects
         Collection<Role> allRoles = Arrays.asList(new Role[] {
@@ -633,7 +633,7 @@ public class IssueManagerIT {
         String descr = "Some description";
         issue.setSubject(subject);
         issue.setDescription(descr);
-        issue.setProject(ProjectFactory.create(projectId));
+        issue.setProjectId(projectId);
 
         Issue createdIssue = issueManager.createIssue(issue);
         assertThat(createdIssue.getDescription()).isEqualTo(descr);
@@ -651,7 +651,7 @@ public class IssueManagerIT {
         // create at least 1 issue
         Issue issueToCreate = new Issue();
         issueToCreate.setSubject("testGetIssues: " + new Date());
-        issueToCreate.setProject(ProjectFactory.create(projectId));
+        issueToCreate.setProjectId(projectId);
         Issue newIssue = issueManager.createIssue(issueToCreate);
 
         Issue loadedIssueWithJournals = issueManager.getIssueById(newIssue.getId(),
@@ -693,7 +693,7 @@ public class IssueManagerIT {
         Issue issue = IssueFactory.create(projectId, "test123");
         final Issue iss1 = issueManager.createIssue(issue);
         final Issue iss2 = IssueFactory.create(iss1.getId());
-        iss2.setProject(ProjectFactory.create(projectId));
+        iss2.setProjectId(projectId);
         iss2.setDescription("This is a test");
         issueManager.update(iss2);
         final Issue iss3 = issueManager.getIssueById(iss2.getId());
@@ -708,7 +708,7 @@ public class IssueManagerIT {
         final Issue iss1 = issueManager.createIssue(issue);
         final Issue iss2 = IssueFactory.create(iss1.getId());
         iss2.setSubject("New subject");
-        iss2.setProject(ProjectFactory.create(projectId));
+        iss2.setProjectId(projectId);
         issueManager.update(iss2);
         final Issue iss3 = issueManager.getIssueById(iss2.getId());
         assertEquals("New subject", iss3.getSubject());
@@ -728,7 +728,7 @@ public class IssueManagerIT {
         final Issue issueToCreate = IssueHelper.generateRandomIssue(projectId);
         Version version1 = createVersion(version1Name);
         issueToCreate.setTargetVersion(version1);
-        issueToCreate.setProject(project);
+        issueToCreate.setProjectId(project.getId());
         final Issue createdIssue = issueManager.createIssue(issueToCreate);
 
         assertNotNull(createdIssue.getTargetVersion());
@@ -798,13 +798,12 @@ public class IssueManagerIT {
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
-        IssueCategory category = IssueCategoryFactory.create(project, "Category" + new Date().getTime());
+        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
         category.setAssigneeId(IntegrationTestHelper.getOurUser().getId());
         IssueCategory newIssueCategory = issueManager.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
-        assertNotNull("Expected project of new category not to be null", newIssueCategory.getProject());
-        assertNotNull("Expected assignee of new category not to be null",
-                newIssueCategory.getAssigneeId());
+        assertNotNull("Expected projectId of new category not to be null", newIssueCategory.getProjectId());
+        assertNotNull("Expected assignee of new category not to be null", newIssueCategory.getAssigneeId());
 
         assertThat(newIssueCategory.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser().getId());
 
@@ -830,11 +829,11 @@ public class IssueManagerIT {
     @Test
     public void testCreateAndDeleteIssueCategoryGroupAssignee() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
-        IssueCategory category = IssueCategoryFactory.create(project, "Category" + new Date().getTime());
+        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
         category.setAssigneeId(demoGroup.getId());
         IssueCategory newIssueCategory = issueManager.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
-        assertNotNull("Expected project of new category not to be null", newIssueCategory.getProject());
+        assertNotNull("Expected projectId of new category not to be null", newIssueCategory.getProjectId());
         assertNotNull("Expected assignee of new category not to be null",
                 newIssueCategory.getAssigneeId());
 
@@ -863,13 +862,11 @@ public class IssueManagerIT {
     public void testGetIssueCategories() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
         // create some categories
-        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project,
-                "Category" + new Date().getTime());
+        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
         Integer ourUserId = IntegrationTestHelper.getOurUser().getId();
         testIssueCategory1.setAssigneeId(ourUserId);
         IssueCategory newIssueCategory1 = issueManager.createCategory(testIssueCategory1);
-        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project,
-                "Category" + new Date().getTime());
+        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
         testIssueCategory2.setAssigneeId(ourUserId);
         IssueCategory newIssueCategory2 = issueManager.createCategory(testIssueCategory2);
         try {
@@ -883,8 +880,7 @@ public class IssueManagerIT {
                         category.getId());
                 assertNotNull("Name of category must not be null",
                         category.getName());
-                assertNotNull("Project of category must not be null",
-                        category.getProject());
+                assertNotNull("ProjectId must not be null", category.getProjectId());
                 assertNotNull("Assignee of category must not be null",
                         category.getAssigneeId());
             }
@@ -952,8 +948,7 @@ public class IssueManagerIT {
         try {
             Project project = projectManager.getProjectByKey(projectKey);
             // create an issue category
-            IssueCategory category = IssueCategoryFactory.create(project, "Category_"
-                    + new Date().getTime());
+            IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category_" + new Date().getTime());
             category.setAssigneeId(IntegrationTestHelper.getOurUser().getId());
             newIssueCategory = issueManager.createCategory(category);
             // create an issue
@@ -1201,11 +1196,11 @@ public class IssueManagerIT {
         Project project2 = mgr.getProjectManager().getProjectByKey(projectKey2);
         Issue issue = createIssue(issueManager, projectId);
         Issue retrievedIssue = issueManager.getIssueById(issue.getId());
-        assertEquals(retrievedIssue.getProject(), project1);
-        issue.setProject(project2);
+        assertThat(retrievedIssue.getProjectId()).isEqualTo(project1.getId());
+        issue.setProjectId(project2.getId());
         issueManager.update(issue);
         retrievedIssue = issueManager.getIssueById(issue.getId());
-        assertEquals(retrievedIssue.getProject(), project2);
+        assertThat(retrievedIssue.getProjectId()).isEqualTo(project2.getId());
         deleteIssueIfNotNull(issue);
     }
     

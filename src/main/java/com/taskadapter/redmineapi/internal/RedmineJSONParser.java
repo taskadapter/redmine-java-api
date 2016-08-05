@@ -225,8 +225,11 @@ public final class RedmineJSONParser {
 		}
 
 		result.setDoneRatio(JsonInput.getIntOrNull(content, "done_ratio"));
-		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				RedmineJSONParser::parseMinimalProject));
+		final Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
+		if (project != null) {
+			result.setProjectId(project.getId());
+			result.setProjectName(project.getName());
+		}
 		result.setAuthor(JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser));
 		result.setStartDate(getDateOrNull(content, "start_date"));
 		result.setDueDate(getDateOrNull(content, "due_date"));
@@ -266,8 +269,10 @@ public final class RedmineJSONParser {
 			throws JSONException {
 		final IssueCategory result = IssueCategoryFactory.create(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
-		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				RedmineJSONParser::parseMinimalProject));
+		final Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
+		if (project != null) {
+			result.setProjectId(project.getId());
+		}
 		JSONObject assignedToObject = JsonInput.getObjectOrNull(content, "assigned_to");
 		if (assignedToObject != null) {
 			result.setAssigneeId(JsonInput.getIntOrNull(assignedToObject, "id"));

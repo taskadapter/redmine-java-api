@@ -69,7 +69,7 @@ public class Simple {
 		final Issue testIssue = new Issue();
 		testIssue.setSubject("This is upload ticket!");
 		testIssue.addAttachment(attach1);
-		testIssue.setProject(project);
+		testIssue.setProjectId(project.getId());
 		try {
 			final Issue createdIssue = issueManager.createIssue(testIssue);
 			try {
@@ -158,7 +158,7 @@ public class Simple {
 
         ProjectManager projectManager = manager.getProjectManager();
         Project projectByKey = projectManager.getProjectByKey("testid");
-        issue.setProject(projectByKey);
+        issue.setProjectId(projectByKey.getId());
         manager.getIssueManager().createIssue(issue);
 	}
 

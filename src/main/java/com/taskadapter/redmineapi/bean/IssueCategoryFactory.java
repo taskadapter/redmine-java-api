@@ -9,9 +9,9 @@ public class IssueCategoryFactory {
         return new IssueCategory(id);
     }
 
-    public static IssueCategory create(Project project, String name) {
+    public static IssueCategory create(Integer projectId, String name) {
         IssueCategory issueCategory = new IssueCategory(null);
-        issueCategory.setProject(project);
+        issueCategory.setProjectId(projectId);
         issueCategory.setName(name);
         return issueCategory;
     }

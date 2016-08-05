@@ -39,7 +39,8 @@ public class Issue implements Identifiable {
      */
     public final static Property<String> NOTES = new Property<String>(String.class, "notes");
     public final static Property<String> PRIORITY_TEXT = new Property<>(String.class, "priorityText");
-    public final static Property<Project> PROJECT = new Property<>(Project.class, "project");
+    public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
+    public final static Property<String> PROJECT_NAME = new Property<>(String.class, "projectName");
     public final static Property<User> AUTHOR = new Property<>(User.class, "author");
     public final static Property<Tracker> TRACKER = new Property<>(Tracker.class, "tracker");
     public final static Property<String> DESCRIPTION = new Property<>(String.class, "description");
@@ -85,12 +86,20 @@ public class Issue implements Identifiable {
         storage.set(JOURNALS, new HashSet<>());
     }
 
-    public Project getProject() {
-        return storage.get(PROJECT);
+    public Integer getProjectId() {
+        return storage.get(PROJECT_ID);
     }
 
-    public void setProject(Project project) {
-        storage.set(PROJECT, project);
+    public void setProjectId(Integer projectId) {
+        storage.set(PROJECT_ID, projectId);
+    }
+
+    public String getProjectName() {
+        return storage.get(PROJECT_NAME);
+    }
+
+    public void setProjectName(String name) {
+        storage.set(PROJECT_NAME, name);
     }
 
     public Integer getDoneRatio() {

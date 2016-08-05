@@ -15,7 +15,7 @@ public class IssueCategory implements Identifiable, Serializable {
      */
     public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
     public final static Property<String> NAME = new Property<>(String.class, "name");
-    public final static Property<Project> PROJECT = new Property<>(Project.class, "project");
+    public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
     public final static Property<Integer> ASSIGNEE_ID = new Property<>(Integer.class, "assigneeId");
     public final static Property<String> ASSIGNEE_NAME = new Property<>(String.class, "assigneeName");
 
@@ -39,12 +39,12 @@ public class IssueCategory implements Identifiable, Serializable {
         storage.set(NAME, name);
     }
 
-    public Project getProject() {
-        return storage.get(PROJECT);
+    public Integer getProjectId() {
+        return storage.get(PROJECT_ID);
     }
 
-    public void setProject(Project project) {
-        storage.set(PROJECT, project);
+    public void setProjectId(Integer projectId) {
+        storage.set(PROJECT_ID, projectId);
     }
 
     /**
@@ -91,7 +91,7 @@ public class IssueCategory implements Identifiable, Serializable {
         return "IssueCategory{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
-                ", project=" + getProject() +
+                ", projectId=" + getProjectId() +
                 ", assigneeId=" + getAssigneeId() +
                 ", assigneeName='" + getAssigneeName() + '\'' +
                 '}';

@@ -172,10 +172,7 @@ public class RedmineJSONBuilder {
 		writer.key("id");
 		writer.value(category.getId());
 		addIfSet(writer, "name", storage, IssueCategory.NAME);
-		if (category.getProject() != null) {
-			writer.key("project_id");
-			writer.value(category.getProject().getId());
-		}
+		addIfSet(writer, "project_id", storage, IssueCategory.PROJECT_ID);
 		addIfSet(writer, "assigned_to_id", storage, IssueCategory.ASSIGNEE_ID);
 	}
 
@@ -215,20 +212,8 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "priority_id", storage, Issue.PRIORITY_ID);
         addIfSet(writer, "done_ratio", storage, Issue.DONE_RATIO);
 		addIfSet(writer, "is_private", storage, Issue.PRIVATE_ISSUE);
-        if (issue.getProject() != null) {
-            // Checked in Redmine 2.6.0: updating issues based on
-            // identifier fails and only using the project id works.
-            // As the identifier usage is used in several places, this
-            // case selection is introduced. The identifier is
-            // used, if no real ID is provided
-            if (issue.getProject().getId() != null) {
-                writer.key("project_id");
-				writer.value(issue.getProject().getId());
-            } else {
-				throw new IllegalArgumentException("Project ID must be set on issue. " +
-						"You can use a factory method to create Issue object in memory: IssueFactory.create(projectId, subject)");
-            }
-        }
+		addIfSet(writer, "project_id", storage, Issue.PROJECT_ID);
+
         if (issue.getAuthor() != null) {
 			writer.key("author_id");
 			writer.value(issue.getAuthor().getId());

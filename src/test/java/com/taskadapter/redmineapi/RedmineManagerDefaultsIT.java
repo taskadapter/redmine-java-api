@@ -89,7 +89,7 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testIssueDefaults() throws RedmineException {
-		final Issue template = IssueFactory.createWithSubject(projectId, "This is a subject");
+		final Issue template = IssueFactory.create(projectId, "This is a subject");
 		template.setStartDate(null);
 		final Issue result = issueManager.createIssue(template);
 		
@@ -111,7 +111,7 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(result.getPriorityText());
 			Assert.assertNotNull(result.getPriorityId());
 			Assert.assertEquals(Integer.valueOf(0), result.getDoneRatio());
-			Assert.assertNotNull(result.getProject());
+			Assert.assertNotNull(result.getProjectId());
 			Assert.assertNotNull(result.getAuthor());
 			Assert.assertNull(result.getStartDate());
 			Assert.assertNull(result.getDueDate());
@@ -135,7 +135,7 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void issueWithStartDateNotSetGetsDefaultValue() throws RedmineException {
-		final Issue template = IssueFactory.createWithSubject(projectId, "Issue with no start date set in code");
+		final Issue template = IssueFactory.create(projectId, "Issue with no start date set in code");
 		final Issue result = issueManager.createIssue(template);
 		try {
 			Assert.assertNotNull(result.getStartDate());
@@ -146,7 +146,7 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void issueWithStartDateSetToNullDoesNotGetDefaultValueForStartDate() throws RedmineException {
-		final Issue template = IssueFactory.createWithSubject(projectId, "Issue with NULL start date");
+		final Issue template = IssueFactory.create(projectId, "Issue with NULL start date");
 		template.setStartDate(null);
 		final Issue result = issueManager.createIssue(template);
 		try {
@@ -201,12 +201,13 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testCategoryDefaults() throws RedmineException {
-		final IssueCategory template = IssueCategoryFactory.create(projectManager.getProjectByKey(projectKey), "test name");
+		final Project projectByKey = projectManager.getProjectByKey(projectKey);
+		final IssueCategory template = IssueCategoryFactory.create(projectByKey.getId(), "test name");
 		final IssueCategory category = issueManager.createCategory(template);
 		try {
 			Assert.assertNotNull(category.getId());
 			Assert.assertEquals("test name", category.getName());
-			Assert.assertNotNull(category.getProject());
+			Assert.assertNotNull(category.getProjectId());
 			Assert.assertNull(category.getAssigneeId());
 		} finally {
 			issueManager.deleteCategory(category);

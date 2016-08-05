@@ -22,7 +22,7 @@ public class IssueHelper {
 
     public static Issue createIssue(IssueManager issueManager, int projectId) throws RedmineException {
         Issue issue = generateRandomIssue(projectId);
-        issue.setProject(ProjectFactory.create(projectId));
+        issue.setProjectId(projectId);
         return issueManager.createIssue(issue);
     }
 
