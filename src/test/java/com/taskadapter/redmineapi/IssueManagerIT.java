@@ -190,6 +190,27 @@ public class IssueManagerIT {
         assertEquals("Checking parent ID of the child issue", parentId, newChildIssue.getParentId());
     }
 
+    /**
+     * Regression test for https://github.com/taskadapter/redmine-java-api/issues/117
+     */
+    @Test
+    public void parentIdCanBeErased() throws RedmineException {
+        Issue parentIssue = IssueFactory.create(projectId, "parent task");
+        Issue newParentIssue = issueManager.createIssue(parentIssue);
+        Integer parentId = newParentIssue.getId();
+
+        Issue childIssue = IssueFactory.create(projectId, "child task");
+        childIssue.setParentId(parentId);
+        Issue newChildIssue = issueManager.createIssue(childIssue);
+        assertThat(newChildIssue.getParentId()).isEqualTo(parentId);
+
+        newChildIssue.setParentId(null);
+        issueManager.update(newChildIssue);
+
+        final Issue reloadedIssue = issueManager.getIssueById(newChildIssue.getId());
+        assertThat(reloadedIssue.getParentId()).isNull();
+    }
+
     @Test
     public void testUpdateIssue() throws RedmineException {
         String originalSubject = "Issue " + new Date();
