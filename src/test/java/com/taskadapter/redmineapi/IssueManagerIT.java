@@ -12,7 +12,6 @@ import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
@@ -154,7 +153,7 @@ public class IssueManagerIT {
 
         // check AUTHOR
         Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser().getId();
-        assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
+        assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthorId());
 
         // check ESTIMATED TIME
         assertEquals((Float) estimatedHours,
@@ -281,7 +280,7 @@ public class IssueManagerIT {
 
         // check AUTHOR
         Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser().getId();
-        assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthor().getId());
+        assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthorId());
     }
 
     @Test
@@ -744,8 +743,7 @@ public class IssueManagerIT {
     private Version createVersion(String versionName) throws RedmineException {
         final Version version = VersionFactory.create(1);
         version.setName(versionName);
-        Project project = mgr.getProjectManager().getProjectByKey(projectKey);
-        version.setProject(project);
+        version.setProjectId(projectId);
         return mgr.getProjectManager().createVersion(version);
     }
 
@@ -1230,8 +1228,7 @@ public class IssueManagerIT {
             managerOnBehalfOfUser.setOnBehalfOfUser(newUser.getLogin());
 
             issue = createIssue(managerOnBehalfOfUser.getIssueManager(), projectId);
-            assertThat(issue.getAuthor().getFirstName()).isEqualTo(newUser.getFirstName());
-            assertThat(issue.getAuthor().getLastName()).isEqualTo(newUser.getLastName());
+            assertThat(issue.getAuthorName()).isEqualTo(newUser.getFullName());
         } finally {
             userManager.deleteUser(newUser.getId());
             deleteIssueIfNotNull(issue);

@@ -58,7 +58,7 @@ public class MembershipManager {
         if (project == null) {
             throw new IllegalArgumentException("Project must be set");
         }
-        if (membership.getUser() == null && membership.getRoles().isEmpty()) {
+        if (membership.getUserId() == null && membership.getRoles().isEmpty()) {
             throw new IllegalArgumentException("Either User or Roles field must be set");
         }
         return transport.addChildEntry(Project.class, project.getId()+"", membership);
@@ -88,7 +88,7 @@ public class MembershipManager {
         // to work:
         // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
         // http://www.redmine.org/issues/17904
-        membership.setUser(UserFactory.create(groupId));
+        membership.setUserId(groupId);
         membership.addRoles(roles);
 
         return addMembership(membership);
@@ -98,7 +98,7 @@ public class MembershipManager {
         final Membership membership = MembershipFactory.create();
         final Project project = ProjectFactory.create(projectId);
         membership.setProject(project);
-        membership.setUser(UserFactory.create(userId));
+        membership.setUserId(userId);
         membership.addRoles(roles);
         return addMembership(membership);
     }

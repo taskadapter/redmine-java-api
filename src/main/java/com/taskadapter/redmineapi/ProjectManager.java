@@ -146,13 +146,11 @@ public class ProjectManager {
      */
     public Version createVersion(Version version) throws RedmineException {
         // check project
-        if (version.getProject() == null
-                || version.getProject().getId() == null) {
+        if (version.getProjectId() == null) {
             throw new IllegalArgumentException(
-                    "Version must contain an existing project");
+                    "Version must contain projectId");
         }
-        return transport.addChildEntry(Project.class, version.getProject()
-                .getId().toString(), version);
+        return transport.addChildEntry(Project.class, version.getProjectId().toString(), version);
     }
 
     /**

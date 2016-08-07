@@ -9,9 +9,9 @@ public class VersionFactory {
         return new Version(id);
     }
 
-    public static Version create(Project project, String versionName) {
+    public static Version create(Integer projectId, String versionName) {
         Version version = new Version(null);
-        version.setProject(project);
+        version.setProjectId(projectId);
         version.setName(versionName);
         return version;
     }

@@ -230,7 +230,11 @@ public final class RedmineJSONParser {
 			result.setProjectId(project.getId());
 			result.setProjectName(project.getName());
 		}
-		result.setAuthor(JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser));
+		final User author = JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser);
+		if (author != null) {
+			result.setAuthorId(author.getId());
+			result.setAuthorName(author.getFullName());
+		}
 		result.setStartDate(getDateOrNull(content, "start_date"));
 		result.setDueDate(getDateOrNull(content, "due_date"));
 		result.setTracker(JsonInput.getObjectOrNull(content, "tracker", RedmineJSONParser::parseTracker));
@@ -283,8 +287,11 @@ public final class RedmineJSONParser {
 
 	public static Version parseVersion(JSONObject content) throws JSONException {
 		final Version result = VersionFactory.create(JsonInput.getIntOrNull(content, "id"));
-		result.setProject(JsonInput.getObjectOrNull(content, "project",
-				RedmineJSONParser::parseMinimalProject));
+		final Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
+		if (project != null) {
+			result.setProjectId(project.getId());
+			result.setProjectName(project.getName());
+		}
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		result.setDescription(JsonInput.getStringOrNull(content, "description"));
 		result.setSharing(JsonInput.getStringOrNull(content, "sharing"));
@@ -402,7 +409,7 @@ public final class RedmineJSONParser {
 				RedmineJSONParser::parseGroup));
 		/* Fix user for membership */
 		for (Membership m : result.getMemberships())
-			m.setUser(result);
+			m.setUserId(result.getId());
 
 		return result;
 	}
@@ -433,8 +440,14 @@ public final class RedmineJSONParser {
 		final Membership result = MembershipFactory.create(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				RedmineJSONParser::parseMinimalProject));
-		result.setUser(JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser));
-                result.setGroup(JsonInput.getObjectOrNull(content, "group", RedmineJSONParser::parseGroup));
+		final User user = JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser);
+		if (user != null) {
+			result.setUserId(user.getId());
+		}
+		final Group group = JsonInput.getObjectOrNull(content, "group", RedmineJSONParser::parseGroup);
+		if (group != null) {
+			result.setGroupId(group.getId());
+		}
 		result.addRoles(JsonInput.getListOrEmpty(content, "roles", RedmineJSONParser::parseRole));
 		return result;
 	}

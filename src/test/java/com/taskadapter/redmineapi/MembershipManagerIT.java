@@ -69,9 +69,9 @@ public class MembershipManagerIT {
                     .createMembershipForGroup(project.getId(), createdGroup.getId(), rolesToSet);
             List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
             assertThat(memberships).contains(newMembership);
-            Group memberGroup = newMembership.getGroup();
-            assertThat(memberGroup).isNotNull();
-            assertThat(memberGroup.getId()).isEqualTo(createdGroup.getId());
+            Integer memberGroupId = newMembership.getGroupId();
+            assertThat(memberGroupId).isNotNull();
+            assertThat(memberGroupId).isEqualTo(createdGroup.getId());
         } finally {
             mgr.getUserManager().deleteGroup(createdGroup);
         }
@@ -89,7 +89,7 @@ public class MembershipManagerIT {
 
         final Membership membershipWithOnlyOneRole = MembershipFactory.create(membership.getId());
         membershipWithOnlyOneRole.setProject(membership.getProject());
-        membershipWithOnlyOneRole.setUser(membership.getUser());
+        membershipWithOnlyOneRole.setUserId(membership.getUserId());
         membershipWithOnlyOneRole.addRoles(Collections.singletonList(roles.get(0)));
 
         membershipManager.update(membershipWithOnlyOneRole);
@@ -124,7 +124,7 @@ public class MembershipManagerIT {
     private void verifyMemberships(List<Role> roles, User currentUser, List<Membership> memberships) throws RedmineException {
         assertThat(memberships.size()).isEqualTo(1);
         final Membership membership = memberships.get(0);
-        assertThat(membership.getUser().getId()).isEqualTo(currentUser.getId());
+        assertThat(membership.getUserId()).isEqualTo(currentUser.getId());
         assertThat(membership.getRoles().size()).isEqualTo(roles.size());
 
         final Membership membershipById = membershipManager.getMembership(membership.getId());

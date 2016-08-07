@@ -37,7 +37,8 @@ public class Version implements Identifiable {
      */
     public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
 
-    public final static Property<Project> PROJECT = new Property<>(Project.class, "project");
+    public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
+    public final static Property<String> PROJECT_NAME = new Property<>(String.class, "projectName");
     public final static Property<String> NAME = new Property<>(String.class, "name");
     public final static Property<String> DESCRIPTION = new Property<>(String.class, "description");
     public final static Property<String> STATUS = new Property<>(String.class, "status");
@@ -98,12 +99,24 @@ public class Version implements Identifiable {
         return storage.get(DATABASE_ID);
     }
 
-    public String getName() {
-        return storage.get(NAME);
+    public Integer getProjectId() {
+        return storage.get(PROJECT_ID);
     }
 
-    public Project getProject() {
-        return storage.get(PROJECT);
+    public void setProjectId(Integer projectId) {
+        storage.set(PROJECT_ID, projectId);
+    }
+
+    public String getProjectName() {
+        return storage.get(PROJECT_NAME);
+    }
+
+    public void setProjectName(String name) {
+        storage.set(PROJECT_NAME, name);
+    }
+
+    public String getName() {
+        return storage.get(NAME);
     }
 
     public String getSharing() {
@@ -132,10 +145,6 @@ public class Version implements Identifiable {
 
     public void setName(String name) {
         storage.set(NAME, name);
-    }
-
-    public void setProject(Project project) {
-        storage.set(PROJECT, project);
     }
 
     public void setSharing(String sharing) {

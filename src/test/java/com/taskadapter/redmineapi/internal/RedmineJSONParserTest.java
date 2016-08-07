@@ -247,10 +247,7 @@ public class RedmineJSONParserTest {
 		Assert.assertEquals(statusId, issue68.getStatusId());
 		Assert.assertEquals("New", issue68.getStatusName());
 
-		User author = issue68.getAuthor();
-		Assert.assertNotNull(author);
-		Integer userId = 1;
-		Assert.assertEquals(userId, author.getId());
+		assertThat(issue68.getAuthorId()).isEqualTo(1);
 	}
 
 	@Test

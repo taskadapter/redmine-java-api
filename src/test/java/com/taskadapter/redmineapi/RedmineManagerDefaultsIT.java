@@ -112,7 +112,8 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(result.getPriorityId());
 			Assert.assertEquals(Integer.valueOf(0), result.getDoneRatio());
 			Assert.assertNotNull(result.getProjectId());
-			Assert.assertNotNull(result.getAuthor());
+			Assert.assertNotNull(result.getAuthorId());
+			Assert.assertNotNull(result.getAuthorName());
 			Assert.assertNull(result.getStartDate());
 			Assert.assertNull(result.getDueDate());
 			Assert.assertNotNull(result.getTracker());
@@ -182,12 +183,12 @@ public class RedmineManagerDefaultsIT {
 	@Test
 	public void testVersionDefaults() throws RedmineException {
 		final Version template = VersionFactory.create();
-		template.setProject(projectManager.getProjectByKey(projectKey));
+		template.setProjectId(projectId);
 		template.setName("2.3.4.5");
 		final Version version = projectManager.createVersion(template);
 		try {
 			Assert.assertNotNull(version.getId());
-			Assert.assertNotNull(version.getProject());
+			Assert.assertNotNull(version.getProjectId());
 			Assert.assertEquals("2.3.4.5", version.getName());
 			Assert.assertEquals("", version.getDescription());
 			Assert.assertNotNull(version.getStatus());

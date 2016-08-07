@@ -20,8 +20,8 @@ public class Membership implements Identifiable {
 	/**
 	 * User. Not set for "group" membership.
 	 */
-	public final static Property<User> USER = new Property<>(User.class, "user");
-	public final static Property<Group> GROUP = new Property<>(Group.class, "group");
+	public final static Property<Integer> USER_ID = new Property<>(Integer.class, "userId");
+	public final static Property<Integer> GROUP_ID = new Property<>(Integer.class, "groupId");
 	public final static Property<Set<Role>> ROLES = (Property<Set<Role>>) new Property(Set.class, "roles");
 
     /**
@@ -50,20 +50,20 @@ public class Membership implements Identifiable {
 		storage.set(PROJECT, project);
 	}
 
-	public User getUser() {
-		return storage.get(USER);
+	public Integer getUserId() {
+		return storage.get(USER_ID);
 	}
 
-	public void setUser(User user) {
-		storage.set(USER, user);
+	public void setUserId(Integer id) {
+		storage.set(USER_ID, id);
 	}
 
-    public Group getGroup() {
-        return storage.get(GROUP);
+    public Integer getGroupId() {
+        return storage.get(GROUP_ID);
     }
 
-    public void setGroup(Group group) {
-		storage.set(GROUP, group);
+    public void setGroupId(Integer id) {
+		storage.set(GROUP_ID, id);
     }
 
     public Collection<Role> getRoles() {
@@ -93,7 +93,11 @@ public class Membership implements Identifiable {
 
     @Override
 	public String toString() {
-		return "Membership [id=" + getId() + ", project=" + getProject() + ", user="
-				+ getUser() + ", group=" + getGroup() + ", roles=" + getRoles() + "]";
+		return "Membership [id=" + getId() + ", project=" + getProject() + ", userId="
+				+ getUserId() + ", groupId=" + getGroupId() + ", roles=" + getRoles() + "]";
+	}
+
+	public PropertyStorage getStorage() {
+		return storage;
 	}
 }

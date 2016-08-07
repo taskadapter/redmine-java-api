@@ -106,10 +106,7 @@ public class RedmineJSONBuilder {
 			throws JSONException {
 		PropertyStorage storage = version.getStorage();
 		addIfSet(writer, "id", storage, Version.DATABASE_ID);
-		if (version.getProject() != null) {
-			writer.key("project_id");
-			writer.value(version.getProject().getId());
-		}
+		addIfSet(writer, "project_id", storage, Version.PROJECT_ID);
 		addIfSet(writer, "name", storage, Version.NAME);
 		addIfSet(writer, "description", storage, Version.DESCRIPTION);
 		addIfSet(writer, "sharing", storage, Version.SHARING);
@@ -213,11 +210,7 @@ public class RedmineJSONBuilder {
         addIfSet(writer, "done_ratio", storage, Issue.DONE_RATIO);
 		addIfSet(writer, "is_private", storage, Issue.PRIVATE_ISSUE);
 		addIfSet(writer, "project_id", storage, Issue.PROJECT_ID);
-
-        if (issue.getAuthor() != null) {
-			writer.key("author_id");
-			writer.value(issue.getAuthor().getId());
-		}
+		addIfSet(writer, "author_id", storage, Issue.AUTHOR_ID);
 		addIfSet(writer, "start_date", storage, Issue.START_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
 		addIfSet(writer, "due_date", storage, Issue.DUE_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
 		if (issue.getTracker() != null) {
@@ -291,14 +284,9 @@ public class RedmineJSONBuilder {
 
 	public static void writeMembership(JSONWriter writer, Membership membership)
 			throws JSONException {
-		if (membership.getUser() != null) {
-			writer.key("user_id");
-			writer.value(membership.getUser().getId());
-        }
-        if (membership.getGroup() != null) {
-			writer.key("group_id");
-			writer.value(membership.getGroup().getId());
-        }
+		final PropertyStorage storage = membership.getStorage();
+		addIfSet(writer, "user_id", storage, Membership.USER_ID);
+		addIfSet(writer, "group_id", storage, Membership.GROUP_ID);
 		if (membership.getRoles() != null) {
 			writer.key("role_ids");
 			writer.array();

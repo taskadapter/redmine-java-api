@@ -41,7 +41,8 @@ public class Issue implements Identifiable {
     public final static Property<String> PRIORITY_TEXT = new Property<>(String.class, "priorityText");
     public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
     public final static Property<String> PROJECT_NAME = new Property<>(String.class, "projectName");
-    public final static Property<User> AUTHOR = new Property<>(User.class, "author");
+    public final static Property<Integer> AUTHOR_ID = new Property<>(Integer.class, "authorId");
+    public final static Property<String> AUTHOR_NAME = new Property<>(String.class, "authorName");
     public final static Property<Tracker> TRACKER = new Property<>(Tracker.class, "tracker");
     public final static Property<String> DESCRIPTION = new Property<>(String.class, "description");
     public final static Property<Date> CLOSED_ON = new Property<>(Date.class, "closedOn");
@@ -205,12 +206,20 @@ public class Issue implements Identifiable {
         storage.set(DUE_DATE, dueDate);
     }
 
-    public User getAuthor() {
-        return storage.get(AUTHOR);
+    public Integer getAuthorId() {
+        return storage.get(AUTHOR_ID);
     }
 
-    public void setAuthor(User author) {
-        storage.set(AUTHOR, author);
+    public void setAuthorId(Integer id) {
+        storage.set(AUTHOR_ID, id);
+    }
+
+    public String getAuthorName() {
+        return storage.get(AUTHOR_NAME);
+    }
+
+    public void setAuthorName(String name) {
+        storage.set(AUTHOR_NAME, name);
     }
 
     public Tracker getTracker() {
