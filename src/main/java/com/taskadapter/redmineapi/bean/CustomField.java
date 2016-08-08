@@ -26,7 +26,7 @@ public class CustomField {
     }
 
     private void initCollections(PropertyStorage storage) {
-        storage.set(VALUE, new ArrayList<>());
+        storage.set(VALUES, new ArrayList<>());
     }
 
     public Integer getId() {

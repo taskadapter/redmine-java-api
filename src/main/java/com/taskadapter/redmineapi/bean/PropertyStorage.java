@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class PropertyStorage {
-    private final Map<Property<?>, Object> map = new HashMap<Property<?>, Object>();
+    private final Map<Property<?>, Object> map = new HashMap<>();
 
     public final <T> T get(Property<T> prop) {
         return prop.getType().cast(map.get(prop));
     }
 
-    final void set(Property<?> prop, Object value) {
+    final <T> void set(Property<T> prop, T value) {
         map.put(prop, value);
     }
 
