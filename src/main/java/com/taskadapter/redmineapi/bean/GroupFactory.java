@@ -5,7 +5,7 @@ public class GroupFactory {
      * For new objects not added to Redmine yet. the ID field will be initialized to NULL.
      */
     public static Group create() {
-        return new Group(null);
+        return new Group(new PropertyStorage());
     }
 
     public static Group create(Integer id) {
@@ -13,7 +13,7 @@ public class GroupFactory {
     }
 
     public static Group create(String name) {
-        final Group group = new Group(null);
+        final Group group = new Group(new PropertyStorage());
         group.setName(name);
         return group;
     }

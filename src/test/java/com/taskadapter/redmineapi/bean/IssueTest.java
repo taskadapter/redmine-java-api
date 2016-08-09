@@ -3,6 +3,9 @@ package com.taskadapter.redmineapi.bean;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
 
 public class IssueTest {
     @Test

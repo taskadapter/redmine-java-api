@@ -239,14 +239,12 @@ public class IssueManager {
      * @throws NotFoundException        thrown in case an object can not be found
      */
     public IssueCategory createCategory(IssueCategory category) throws RedmineException {
-        if (category.getProject() == null
-                || category.getProject().getId() == null) {
+        if (category.getProjectId() == null) {
             throw new IllegalArgumentException(
-                    "IssueCategory must contain an existing project");
+                    "IssueCategory must contain projectId");
         }
 
-        return transport.addChildEntry(Project.class, category.getProject()
-                .getId().toString(), category);
+        return transport.addChildEntry(Project.class, category.getProjectId().toString(), category);
     }
 
     /**

@@ -18,81 +18,101 @@ import java.util.Set;
  */
 public class Issue implements Identifiable {
 
-    /**
-     * database ID.
-     */
-    private final Integer id;
+    private final PropertyStorage storage;
 
-    private String subject;
-    private Integer parentId;
-    private Float estimatedHours;
-    private Float spentHours;
-    private Integer assigneeId;
-    private String assigneeName;
-    private String priorityText;
-    private Integer priorityId;
-    private Integer doneRatio;
-    private Project project;
-    private User author;
-    private Date startDate;
-    private Date dueDate;
-    private Tracker tracker;
-    private String description;
-    private Date createdOn;
-    private Date updatedOn;
-    private Date closedOn;
-    private Integer statusId;
-    private String statusName;
-    private Version targetVersion;
-    private IssueCategory category;
-    private boolean privateIssue = false;
+    public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
+    public final static Property<String> SUBJECT = new Property<>(String.class, "subject");
+    public final static Property<Date> START_DATE = new Property<>(Date.class, "startDate");
+    public final static Property<Date> DUE_DATE = new Property<>(Date.class, "dueDate");
+    public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
+    public final static Property<Integer> DONE_RATIO = new Property<>(Integer.class, "doneRatio");
+    public final static Property<Integer> PARENT_ID = new Property<>(Integer.class, "parentId");
+    public final static Property<Integer> PRIORITY_ID = new Property<>(Integer.class, "priorityId");
+    public final static Property<Float> ESTIMATED_HOURS = new Property<>(Float.class, "estimatedHours");
+    public final static Property<Float> SPENT_HOURS = new Property<>(Float.class, "spentHours");
+    public final static Property<Integer> ASSIGNEE_ID = new Property<>(Integer.class, "assigneeId");
+    public final static Property<String> ASSIGNEE_NAME = new Property<>(String.class, "assigneeName");
 
     /**
-     * Some comment describing the issue update
+     * Some comment describing an issue update.
      */
-    private String notes;
+    public final static Property<String> NOTES = new Property<String>(String.class, "notes");
+    public final static Property<String> PRIORITY_TEXT = new Property<>(String.class, "priorityText");
+    public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
+    public final static Property<String> PROJECT_NAME = new Property<>(String.class, "projectName");
+    public final static Property<Integer> AUTHOR_ID = new Property<>(Integer.class, "authorId");
+    public final static Property<String> AUTHOR_NAME = new Property<>(String.class, "authorName");
+    public final static Property<Tracker> TRACKER = new Property<>(Tracker.class, "tracker");
+    public final static Property<String> DESCRIPTION = new Property<>(String.class, "description");
+    public final static Property<Date> CLOSED_ON = new Property<>(Date.class, "closedOn");
+    public final static Property<Integer> STATUS_ID = new Property<>(Integer.class, "statusId");
+    public final static Property<String> STATUS_NAME = new Property<>(String.class, "statusName");
+    public final static Property<Version> TARGET_VERSION = new Property<>(Version.class, "targetVersion");
+    public final static Property<IssueCategory> ISSUE_CATEGORY = new Property<>(IssueCategory.class, "issueCategory");
+    public final static Property<Boolean> PRIVATE_ISSUE = new Property<>(Boolean.class, "privateIssue");
 
     /**
      * can't have two custom fields with the same ID in the collection, that's why it is declared
      * as a Set, not a List.
      */
-    private final Set<CustomField> customFields = new HashSet<>();
-    private final Set<Journal> journals = new HashSet<>();
-    private final Set<IssueRelation> relations = new HashSet<>();
-    private final Set<Attachment> attachments = new HashSet<>();
-    private final Set<Changeset> changesets = new HashSet<>();
-    private final Set<Watcher> watchers = new HashSet<>();
-    private final Set<Issue> children = new HashSet<>();
+    public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
+    public final static Property<Set<Journal>> JOURNALS = (Property<Set<Journal>>) new Property(Set.class, "journals");
+    public final static Property<Set<IssueRelation>> RELATIONS = (Property<Set<IssueRelation>>) new Property(Set.class, "relations");
+    public final static Property<Set<Attachment>> ATTACHMENTS = (Property<Set<Attachment>>) new Property(Set.class, "attachments");
+    public final static Property<Set<Changeset>> CHANGESETS = (Property<Set<Changeset>>) new Property(Set.class, "changesets");
+    public final static Property<Set<Watcher>> WATCHERS = (Property<Set<Watcher>>) new Property(Set.class, "watchers");
+    public final static Property<Set<Issue>> CHILDREN = (Property<Set<Issue>>) new Property(Set.class, "children");
 
     /**
      * @param id database ID.
      */
     Issue(Integer id) {
-        this.id = id;
+        this();
+        storage.set(DATABASE_ID, id);
     }
 
     public Issue() {
-        this.id = null;
+        this.storage = new PropertyStorage();
+        initCollections(storage);
     }
 
-    public Project getProject() {
-        return project;
+    private void initCollections(PropertyStorage storage) {
+        storage.set(CUSTOM_FIELDS, new HashSet<>());
+        storage.set(CHILDREN, new HashSet<>());
+        storage.set(WATCHERS, new HashSet<>());
+        storage.set(CHANGESETS, new HashSet<>());
+        storage.set(ATTACHMENTS, new HashSet<>());
+        storage.set(RELATIONS, new HashSet<>());
+        storage.set(JOURNALS, new HashSet<>());
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public Integer getProjectId() {
+        return storage.get(PROJECT_ID);
+    }
+
+    public void setProjectId(Integer projectId) {
+        storage.set(PROJECT_ID, projectId);
+    }
+
+    public String getProjectName() {
+        return storage.get(PROJECT_NAME);
+    }
+
+    public void setProjectName(String name) {
+        storage.set(PROJECT_NAME, name);
     }
 
     public Integer getDoneRatio() {
-        return doneRatio;
+        return storage.get(DONE_RATIO);
     }
 
     public void setDoneRatio(Integer doneRatio) {
-        this.doneRatio = doneRatio;
+        storage.set(DONE_RATIO, doneRatio);
     }
 
     public String getPriorityText() {
-        return priorityText;
+        return storage.get(PRIORITY_TEXT);
     }
 
     /**
@@ -100,7 +120,7 @@ public class Issue implements Identifiable {
      * in the future releases.
      */
     public void setPriorityText(String priority) {
-        this.priorityText = priority;
+        storage.set(PRIORITY_TEXT, priority);
     }
 
     /**
@@ -110,35 +130,35 @@ public class Issue implements Identifiable {
      * <p>An assignee can be a user or a group</p>
      */
     public Integer getAssigneeId() {
-        return assigneeId;
+        return storage.get(ASSIGNEE_ID);
     }
 
     public void setAssigneeId(Integer assigneeId) {
-        this.assigneeId = assigneeId;
+        storage.set(ASSIGNEE_ID, assigneeId);
     }
 
     public String getAssigneeName() {
-        return assigneeName;
+        return storage.get(ASSIGNEE_NAME);
     }
 
     public void setAssigneeName(String assigneeName) {
-        this.assigneeName = assigneeName;
+        storage.set(ASSIGNEE_NAME, assigneeName);
     }
 
     public Float getEstimatedHours() {
-        return estimatedHours;
+        return storage.get(ESTIMATED_HOURS);
     }
 
     public void setEstimatedHours(Float estimatedTime) {
-        this.estimatedHours = estimatedTime;
+        storage.set(ESTIMATED_HOURS, estimatedTime);
     }
 
     public Float getSpentHours() {
-        return spentHours;
+        return storage.get(SPENT_HOURS);
     }
 
     public void setSpentHours(Float spentHours) {
-         this.spentHours = spentHours;
+        storage.set(SPENT_HOURS, spentHours);
     }
 
   /**
@@ -147,128 +167,133 @@ public class Issue implements Identifiable {
      * @return NULL, if there's no parent
      */
     public Integer getParentId() {
-        return parentId;
+        return storage.get(PARENT_ID);
     }
 
     public void setParentId(Integer parentId) {
-        this.parentId = parentId;
+        storage.set(PARENT_ID, parentId);
     }
 
-    @Override
     /**
-     * @return id. can be NULL for Issues not added to Redmine yet
+     * @return database id for this object. can be NULL for Issues not added to Redmine yet
      */
+    @Override
     public Integer getId() {
-        return id;
+        return storage.get(DATABASE_ID);
     }
 
     public String getSubject() {
-        return subject;
+        return storage.get(SUBJECT);
     }
 
     public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
+        storage.set(SUBJECT, subject);
     }
 
     public Date getStartDate() {
-        return startDate;
+        return storage.get(START_DATE);
     }
 
     public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+        storage.set(START_DATE, startDate);
     }
 
     public Date getDueDate() {
-        return dueDate;
+        return storage.get(DUE_DATE);
     }
 
     public void setDueDate(Date dueDate) {
-        this.dueDate = dueDate;
+        storage.set(DUE_DATE, dueDate);
+    }
+
+    public Integer getAuthorId() {
+        return storage.get(AUTHOR_ID);
+    }
+
+    public void setAuthorId(Integer id) {
+        storage.set(AUTHOR_ID, id);
+    }
+
+    public String getAuthorName() {
+        return storage.get(AUTHOR_NAME);
+    }
+
+    public void setAuthorName(String name) {
+        storage.set(AUTHOR_NAME, name);
     }
 
     public Tracker getTracker() {
-        return tracker;
+        return storage.get(TRACKER);
     }
 
     public void setTracker(Tracker tracker) {
-        this.tracker = tracker;
+        storage.set(TRACKER, tracker);
     }
 
-    /**
-     * Description is empty by default, not NULL.
-     */
     public String getDescription() {
-        return description;
+        return storage.get(DESCRIPTION);
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        storage.set(DESCRIPTION, description);
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return storage.get(CREATED_ON);
     }
 
     public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+        storage.set(CREATED_ON, createdOn);
     }
 
     public Date getUpdatedOn() {
-        return updatedOn;
+        return storage.get(UPDATED_ON);
     }
 
     public void setUpdatedOn(Date updatedOn) {
-        this.updatedOn = updatedOn;
+        storage.set(UPDATED_ON, updatedOn);
     }
 
     public Date getClosedOn() {
-        return closedOn;
+        return storage.get(CLOSED_ON);
     }
 
     public void setClosedOn(Date closedOn) {
-        this.closedOn = closedOn;
+        storage.set(CLOSED_ON, closedOn);
     }
 
     public Integer getStatusId() {
-        return statusId;
+        return storage.get(STATUS_ID);
     }
 
     public void setStatusId(Integer statusId) {
-        this.statusId = statusId;
+        storage.set(STATUS_ID, statusId);
     }
 
     public String getStatusName() {
-        return statusName;
+        return storage.get(STATUS_NAME);
     }
 
     public void setStatusName(String statusName) {
-        this.statusName = statusName;
+        storage.set(STATUS_NAME, statusName);
     }
 
     /**
      * @return unmodifiable collection of Custom Field objects. the collection may be empty, but it is never NULL.
      */
     public Collection<CustomField> getCustomFields() {
-        return Collections.unmodifiableCollection(customFields);
+        return Collections.unmodifiableCollection(storage.get(CUSTOM_FIELDS));
     }
 
     public void clearCustomFields() {
-        customFields.clear();
+        storage.set(CUSTOM_FIELDS, new HashSet<>());
     }
 
     /**
      * NOTE: The custom field(s) <strong>must have correct database ID set</strong> to be saved to Redmine. This is Redmine REST API's limitation.
      */
     public void addCustomFields(Collection<CustomField> customFields) {
-        this.customFields.addAll(customFields);
+        storage.get(CUSTOM_FIELDS).addAll(customFields);
     }
 
     /**
@@ -278,18 +303,18 @@ public class Issue implements Identifiable {
      * @param customField the field to add to the issue.
      */
     public void addCustomField(CustomField customField) {
-        customFields.add(customField);
+        storage.get(CUSTOM_FIELDS).add(customField);
     }
 
     public String getNotes() {
-        return notes;
+        return storage.get(NOTES);
     }
 
     /**
      * @param notes Some comment describing the issue update
      */
     public void setNotes(String notes) {
-        this.notes = notes;
+        storage.set(NOTES, notes);
     }
 
     /**
@@ -301,7 +326,7 @@ public class Issue implements Identifiable {
      * @see com.taskadapter.redmineapi.Include#journals
      */
     public Collection<Journal> getJournals() {
-        return Collections.unmodifiableCollection(journals);
+        return Collections.unmodifiableCollection(storage.get(JOURNALS));
     }
 
     /**
@@ -314,7 +339,7 @@ public class Issue implements Identifiable {
      * TODO hide this method. https://github.com/taskadapter/redmine-java-api/issues/199
      */
     public void addJournals(Collection<Journal> journals) {
-        this.journals.addAll(journals);
+        storage.get(JOURNALS).addAll(journals);
     }
 
     /**
@@ -326,11 +351,11 @@ public class Issue implements Identifiable {
      * @see com.taskadapter.redmineapi.Include#changesets
      */
     public Collection<Changeset> getChangesets() {
-        return Collections.unmodifiableCollection(changesets);
+        return Collections.unmodifiableCollection(storage.get(CHANGESETS));
     }
 
     public void addChangesets(Collection<Changeset> changesets) {
-        this.changesets.addAll(changesets);
+        storage.get(CHANGESETS).addAll(changesets);
     }
 
     /**
@@ -342,11 +367,11 @@ public class Issue implements Identifiable {
      * @see com.taskadapter.redmineapi.Include#watchers
      */
     public Collection<Watcher> getWatchers() {
-        return Collections.unmodifiableCollection(watchers);
+        return Collections.unmodifiableCollection(storage.get(WATCHERS));
     }
 
     public void addWatchers(Collection<Watcher> watchers) {
-        this.watchers.addAll(watchers);
+        storage.get(WATCHERS).addAll(watchers);
     }
 
     /**
@@ -358,13 +383,16 @@ public class Issue implements Identifiable {
       * @see com.taskadapter.redmineapi.Include#children
       */
     public Collection<Issue> getChildren() {
-        return Collections.unmodifiableCollection(children);
+        return Collections.unmodifiableCollection(storage.get(CHILDREN));
     }
 
     public void addChildren(Collection<Issue> children) {
-        this.children.addAll(children);
+        storage.get(CHILDREN).addAll(children);
     }
 
+    /**
+     * Issues are considered equal if their IDs are equal. what about two issues with null ids?
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -372,21 +400,21 @@ public class Issue implements Identifiable {
 
         Issue issue = (Issue) o;
 
-        if (id != null ? !id.equals(issue.id) : issue.id != null) return false;
+        if (getId() != null ? !getId().equals(issue.getId()) : issue.getId() != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
     /**
      * @return the custom field with given Id or NULL if the field is not found
      */
     public CustomField getCustomFieldById(int customFieldId) {
-        for (CustomField customField : customFields) {
+        for (CustomField customField : storage.get(CUSTOM_FIELDS)) {
             if (customFieldId == customField.getId()) {
                 return customField;
             }
@@ -398,7 +426,7 @@ public class Issue implements Identifiable {
      * @return the custom field with given name or NULL if the field is not found
      */
     public CustomField getCustomFieldByName(String customFieldName) {
-        for (CustomField customField : customFields) {
+        for (CustomField customField : storage.get(CUSTOM_FIELDS)) {
             if (customFieldName.equals(customField.getName())) {
                 return customField;
             }
@@ -409,7 +437,7 @@ public class Issue implements Identifiable {
 
     @Override
     public String toString() {
-        return "Issue [id=" + id + ", subject=" + subject + "]";
+        return "Issue [id=" + getId() + ", subject=" + getSubject() + "]";
     }
 
     /**
@@ -426,23 +454,23 @@ public class Issue implements Identifiable {
      * @see com.taskadapter.redmineapi.Include#relations
      */
     public Collection<IssueRelation> getRelations() {
-        return Collections.unmodifiableCollection(relations);
+        return Collections.unmodifiableCollection(storage.get(RELATIONS));
     }
 
     public void addRelations(Collection<IssueRelation> collection) {
-        relations.addAll(collection);
+        storage.get(RELATIONS).addAll(collection);
     }
 
     public Integer getPriorityId() {
-        return priorityId;
+        return storage.get(PRIORITY_ID);
     }
 
     public void setPriorityId(Integer priorityId) {
-        this.priorityId = priorityId;
+        storage.set(PRIORITY_ID, priorityId);
     }
 
     public Version getTargetVersion() {
-        return targetVersion;
+        return storage.get(TARGET_VERSION);
     }
 
     /**
@@ -454,37 +482,41 @@ public class Issue implements Identifiable {
      * @see com.taskadapter.redmineapi.Include#attachments
      */
     public Collection<Attachment> getAttachments() {
-        return Collections.unmodifiableCollection(attachments);
+        return Collections.unmodifiableCollection(storage.get(ATTACHMENTS));
     }
 
     public void addAttachments(Collection<Attachment> collection) {
-        attachments.addAll(collection);
+        storage.get(ATTACHMENTS).addAll(collection);
     }
 
     public void addAttachment(Attachment attachment) {
-        attachments.add(attachment);
+        storage.get(ATTACHMENTS).add(attachment);
     }
 
     public void setTargetVersion(Version version) {
-        this.targetVersion = version;
+        storage.set(TARGET_VERSION, version);
     }
 
     public IssueCategory getCategory() {
-        return category;
+        return storage.get(ISSUE_CATEGORY);
     }
 
     public void setCategory(IssueCategory category) {
-        this.category = category;
+        storage.set(ISSUE_CATEGORY, category);
     }
 
     /**
-     * Default value is FALSE if not explicitly set.
+     * Default value is not determines. it's up to the server what it thinks the default value is if not set.
      */
     public boolean isPrivateIssue() {
-        return privateIssue;
+        return storage.get(PRIVATE_ISSUE);
     }
 
     public void setPrivateIssue(boolean privateIssue) {
-        this.privateIssue = privateIssue;
+        storage.set(PRIVATE_ISSUE, privateIssue);
+    }
+
+    public PropertyStorage getStorage() {
+        return storage;
     }
 }

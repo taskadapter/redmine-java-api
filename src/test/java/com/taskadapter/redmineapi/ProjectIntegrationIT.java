@@ -33,6 +33,7 @@ public class ProjectIntegrationIT {
     private static ProjectManager projectManager;
     private static String projectKey;
     private static Project project;
+    private static Integer projectId;
 
     @BeforeClass
     public static void oneTimeSetup() {
@@ -41,6 +42,7 @@ public class ProjectIntegrationIT {
         try {
             project = IntegrationTestHelper.createProject(mgr);
             projectKey = project.getIdentifier();
+            projectId = project.getId();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -334,7 +336,7 @@ public class ProjectIntegrationIT {
         Project project = createProject();
         try {
             String name = "Test version " + UUID.randomUUID().toString();
-            Version version = VersionFactory.create(project, name);
+            Version version = VersionFactory.create(project.getId(), name);
             version.setDescription("A test version created by " + this.getClass());
             version.setStatus("open");
             Version newVersion = projectManager.createVersion(version);
@@ -362,8 +364,8 @@ public class ProjectIntegrationIT {
         Version testVersion1 = null;
         Version testVersion2 = null;
         try {
-            testVersion1 = projectManager.createVersion(VersionFactory.create(project, "Version" + UUID.randomUUID()));
-            testVersion2 = projectManager.createVersion(VersionFactory.create(project, "Version" + UUID.randomUUID()));
+            testVersion1 = projectManager.createVersion(VersionFactory.create(project.getId(), "Version" + UUID.randomUUID()));
+            testVersion2 = projectManager.createVersion(VersionFactory.create(project.getId(), "Version" + UUID.randomUUID()));
             List<Version> versions = projectManager.getVersions(project.getId());
             assertEquals("Wrong number of versions for project "
                             + project.getName() + " delivered by Redmine Java API", 2,
@@ -372,7 +374,7 @@ public class ProjectIntegrationIT {
                 // assert version
                 assertNotNull("ID of version must not be null", version.getId());
                 assertNotNull("Name of version must not be null", version.getName());
-                assertNotNull("Project of version must not be null", version.getProject());
+                assertNotNull("ProjectId of version must not be null", version.getProjectId());
             }
         } finally {
             if (testVersion1 != null) {
@@ -387,18 +389,14 @@ public class ProjectIntegrationIT {
 
     @Test
     public void versionIsRetrievedById() throws RedmineException {
-        Project project = projectManager.getProjectByKey(projectKey);
-        Version createdVersion = projectManager.createVersion(VersionFactory.create(project,
-                "Version_1_" + UUID.randomUUID()));
+        Version createdVersion = projectManager.createVersion(VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID()));
         Version versionById = projectManager.getVersionById(createdVersion.getId());
         assertEquals(createdVersion, versionById);
     }
 
     @Test
     public void versionIsUpdated() throws RedmineException {
-        Project project = projectManager.getProjectByKey(projectKey);
-        Version createdVersion = projectManager.createVersion(VersionFactory.create(project,
-                "Version_1_" + UUID.randomUUID()));
+        Version createdVersion = projectManager.createVersion(VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID()));
         String description = "new description";
         createdVersion.setDescription(description);
         projectManager.update(createdVersion);
@@ -408,9 +406,7 @@ public class ProjectIntegrationIT {
 
     @Test
     public void versionIsUpdatedIncludingDueDate() throws RedmineException {
-        Project project = projectManager.getProjectByKey(projectKey);
-        Version createdVersion = projectManager.createVersion(VersionFactory.create(project,
-                "Version_1_" + UUID.randomUUID()));
+        Version createdVersion = projectManager.createVersion(VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID()));
         String description = "new description";
         createdVersion.setDescription(description);
         createdVersion.setDueDate(new Date());
@@ -421,14 +417,13 @@ public class ProjectIntegrationIT {
 
     @Test
     public void versionSharingParameterIsSaved() throws RedmineException {
-        Project project = projectManager.getProjectByKey(projectKey);
-        Version version = VersionFactory.create(project, "Version_1_" + UUID.randomUUID());
+        Version version = VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID());
         version.setSharing(Version.SHARING_NONE);
         Version createdVersion = projectManager.createVersion(version);
         Version versionById = projectManager.getVersionById(createdVersion.getId());
         assertEquals(Version.SHARING_NONE, versionById.getSharing());
 
-        Version versionShared = VersionFactory.create(project, "Version_2_" + UUID.randomUUID());
+        Version versionShared = VersionFactory.create(projectId, "Version_2_" + UUID.randomUUID());
         versionShared.setSharing(Version.SHARING_HIERARCHY);
         Version createdVersion2 = projectManager.createVersion(versionShared);
         Version version2ById = projectManager.getVersionById(createdVersion2.getId());

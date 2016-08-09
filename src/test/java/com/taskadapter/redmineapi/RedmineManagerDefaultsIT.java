@@ -18,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+
 /**
  * Tests default redmine manager values in a response. Tries to provides
  * behavior compatible with an XML version.
@@ -88,6 +90,7 @@ public class RedmineManagerDefaultsIT {
 	@Test
 	public void testIssueDefaults() throws RedmineException {
 		final Issue template = IssueFactory.create(projectId, "This is a subject");
+		template.setStartDate(null);
 		final Issue result = issueManager.createIssue(template);
 		
 		try {
@@ -108,12 +111,13 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(result.getPriorityText());
 			Assert.assertNotNull(result.getPriorityId());
 			Assert.assertEquals(Integer.valueOf(0), result.getDoneRatio());
-			Assert.assertNotNull(result.getProject());
-			Assert.assertNotNull(result.getAuthor());
+			Assert.assertNotNull(result.getProjectId());
+			Assert.assertNotNull(result.getAuthorId());
+			Assert.assertNotNull(result.getAuthorName());
 			Assert.assertNull(result.getStartDate());
 			Assert.assertNull(result.getDueDate());
 			Assert.assertNotNull(result.getTracker());
-			Assert.assertEquals("", result.getDescription());
+			assertThat(result.getDescription()).isNull();
 			Assert.assertNotNull(result.getCreatedOn());
 			Assert.assertNotNull(result.getUpdatedOn());
 			Assert.assertNotNull(result.getStatusId());
@@ -127,6 +131,29 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(result.getAttachments());
 		} finally {
             issueManager.deleteIssue(result.getId());
+		}
+	}
+
+	@Test
+	public void issueWithStartDateNotSetGetsDefaultValue() throws RedmineException {
+		final Issue template = IssueFactory.create(projectId, "Issue with no start date set in code");
+		final Issue result = issueManager.createIssue(template);
+		try {
+			Assert.assertNotNull(result.getStartDate());
+		} finally {
+			issueManager.deleteIssue(result.getId());
+		}
+	}
+
+	@Test
+	public void issueWithStartDateSetToNullDoesNotGetDefaultValueForStartDate() throws RedmineException {
+		final Issue template = IssueFactory.create(projectId, "Issue with NULL start date");
+		template.setStartDate(null);
+		final Issue result = issueManager.createIssue(template);
+		try {
+			Assert.assertNull(result.getStartDate());
+		} finally {
+			issueManager.deleteIssue(result.getId());
 		}
 	}
 
@@ -156,12 +183,12 @@ public class RedmineManagerDefaultsIT {
 	@Test
 	public void testVersionDefaults() throws RedmineException {
 		final Version template = VersionFactory.create();
-		template.setProject(projectManager.getProjectByKey(projectKey));
+		template.setProjectId(projectId);
 		template.setName("2.3.4.5");
 		final Version version = projectManager.createVersion(template);
 		try {
 			Assert.assertNotNull(version.getId());
-			Assert.assertNotNull(version.getProject());
+			Assert.assertNotNull(version.getProjectId());
 			Assert.assertEquals("2.3.4.5", version.getName());
 			Assert.assertEquals("", version.getDescription());
 			Assert.assertNotNull(version.getStatus());
@@ -175,12 +202,13 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testCategoryDefaults() throws RedmineException {
-		final IssueCategory template = IssueCategoryFactory.create(projectManager.getProjectByKey(projectKey), "test name");
+		final Project projectByKey = projectManager.getProjectByKey(projectKey);
+		final IssueCategory template = IssueCategoryFactory.create(projectByKey.getId(), "test name");
 		final IssueCategory category = issueManager.createCategory(template);
 		try {
 			Assert.assertNotNull(category.getId());
 			Assert.assertEquals("test name", category.getName());
-			Assert.assertNotNull(category.getProject());
+			Assert.assertNotNull(category.getProjectId());
 			Assert.assertNull(category.getAssigneeId());
 		} finally {
 			issueManager.deleteCategory(category);

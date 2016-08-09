@@ -247,10 +247,7 @@ public class RedmineJSONParserTest {
 		Assert.assertEquals(statusId, issue68.getStatusId());
 		Assert.assertEquals("New", issue68.getStatusName());
 
-		User author = issue68.getAuthor();
-		Assert.assertNotNull(author);
-		Integer userId = 1;
-		Assert.assertEquals(userId, author.getId());
+		assertThat(issue68.getAuthorId()).isEqualTo(1);
 	}
 
 	@Test
@@ -392,7 +389,8 @@ public class RedmineJSONParserTest {
 			assertEquals(2, news.size());
 
 			News anyItem = news.get(0);
-			assertEquals("rest last", anyItem.getUser().getFullName());
+			assertThat(anyItem.getUser().getFirstName()).isEqualTo("rest");
+			assertThat(anyItem.getUser().getLastName()).isEqualTo("last");
 		} catch (Exception e) {
 			fail("Error:" + e);
 		}

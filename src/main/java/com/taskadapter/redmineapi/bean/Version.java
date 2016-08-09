@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Redmine's project version
@@ -29,24 +30,36 @@ public class Version implements Identifiable {
     public static final String SHARING_TREE = "tree";
     public static final String SHARING_SYSTEM = "system";
 
-    private final Integer id;
-    private Project project;
-    private String name;
-    private String description;
-    private String status;
-    private Date dueDate;
-    private String sharing;
-    private Date createdOn;
-    private Date updatedOn;
+    private final PropertyStorage storage;
 
-    private final Collection<CustomField> customFields = new HashSet<>();
+    /**
+     * database numeric Id
+     */
+    public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
+
+    public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
+    public final static Property<String> PROJECT_NAME = new Property<>(String.class, "projectName");
+    public final static Property<String> NAME = new Property<>(String.class, "name");
+    public final static Property<String> DESCRIPTION = new Property<>(String.class, "description");
+    public final static Property<String> STATUS = new Property<>(String.class, "status");
+    public final static Property<String> SHARING = new Property<>(String.class, "sharing");
+    public final static Property<Date> DUE_DATE = new Property<>(Date.class, "dueDate");
+    public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
+    public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
 
     /**
      * Use VersionFactory to create an instance of this class.
      * @see com.taskadapter.redmineapi.bean.VersionFactory
      */
     Version(Integer id) {
-        this.id = id;
+        storage = new PropertyStorage();
+        initCollections(storage);
+        storage.set(DATABASE_ID, id);
+    }
+
+    private void initCollections(PropertyStorage storage) {
+        storage.set(CUSTOM_FIELDS, new HashSet<>());
     }
 
     /**
@@ -59,98 +72,106 @@ public class Version implements Identifiable {
 
         Version version = (Version) o;
 
-        if (id != null ? !id.equals(version.id) : version.id != null) return false;
+        if (getId() != null ? !getId().equals(version.getId()) : version.getId() != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return getId() != null ? getId().hashCode() : 0;
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return storage.get(CREATED_ON);
     }
 
     public String getDescription() {
-        return description;
+        return storage.get(DESCRIPTION);
     }
 
     public Date getDueDate() {
-        return dueDate;
+        return storage.get(DUE_DATE);
     }
 
     @Override
     public Integer getId() {
-        return id;
+        return storage.get(DATABASE_ID);
+    }
+
+    public Integer getProjectId() {
+        return storage.get(PROJECT_ID);
+    }
+
+    public void setProjectId(Integer projectId) {
+        storage.set(PROJECT_ID, projectId);
+    }
+
+    public String getProjectName() {
+        return storage.get(PROJECT_NAME);
+    }
+
+    public void setProjectName(String name) {
+        storage.set(PROJECT_NAME, name);
     }
 
     public String getName() {
-        return name;
-    }
-
-    public Project getProject() {
-        return project;
+        return storage.get(NAME);
     }
 
     public String getSharing() {
-        return sharing;
+        return storage.get(SHARING);
     }
 
     public String getStatus() {
-        return status;
+        return storage.get(STATUS);
     }
 
     public Date getUpdatedOn() {
-        return updatedOn;
+        return storage.get(UPDATED_ON);
     }
 
     public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+        storage.set(CREATED_ON, createdOn);
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        storage.set(DESCRIPTION, description);
     }
 
     public void setDueDate(Date dueDate) {
-        this.dueDate = dueDate;
+        storage.set(DUE_DATE, dueDate);
     }
 
     public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
+        storage.set(NAME, name);
     }
 
     public void setSharing(String sharing) {
-        this.sharing = sharing;
+        storage.set(SHARING, sharing);
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        storage.set(STATUS, status);
     }
 
     public void setUpdatedOn(Date updatedOn) {
-        this.updatedOn = updatedOn;
+        storage.set(UPDATED_ON, updatedOn);
     }
 
     public Collection<CustomField> getCustomFields() {
-        return Collections.unmodifiableCollection(customFields);
+        return Collections.unmodifiableCollection(storage.get(CUSTOM_FIELDS));
     }
 
     public void addCustomFields(Collection<CustomField> customFields) {
-        this.customFields.addAll(customFields);
+        storage.get(CUSTOM_FIELDS).addAll(customFields);
     }
 
     /**
      * @return the field with the given ID or NULL if the field is not found.
      */
     public CustomField getCustomFieldById(int customFieldId) {
-        for (CustomField customField : customFields) {
+        for (CustomField customField : getCustomFields()) {
             if (customFieldId == customField.getId()) {
                 return customField;
             }
@@ -160,7 +181,10 @@ public class Version implements Identifiable {
 
     @Override
     public String toString() {
-        return "Version [id=" + id + ", name=" + name + "]";
+        return "Version [id=" + getId() + ", name=" + getName() + "]";
     }
 
+    public PropertyStorage getStorage() {
+        return storage;
+    }
 }

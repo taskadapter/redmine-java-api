@@ -10,7 +10,8 @@ import java.util.List;
  * <p>Obtain it via RedmineManager:
  * <pre>
  RedmineManager mgr = RedmineManagerFactory.createWithUserAuth(redmineURI, login, password);
- CustomFieldManager customFieldManager = mgr.getIssueManager();
+ CustomFieldManager customFieldManager = mgr.getCustomFieldManager();
+ List<CustomFieldDefinition> list = customFieldManager.getCustomFieldDefinitions();
  * </pre>
  *
  * The current version only allows loading custom fields definition from the server (Redmine v. 1 through 3).

@@ -7,7 +7,7 @@ public class IssueFactory {
      */
     public static Issue create(int projectId, String subject) {
         Issue issue = new Issue();
-        issue.setProject(new Project(projectId));
+        issue.setProjectId(projectId);
         issue.setSubject(subject);
         return issue;
     }

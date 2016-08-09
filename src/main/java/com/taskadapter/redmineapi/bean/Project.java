@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Redmine's Project.
@@ -12,100 +13,100 @@ import java.util.HashSet;
 public class Project implements Identifiable, Serializable {
 	private static final long serialVersionUID = 4529305420978716446L;
 
-	/**
-	 * database ID
-	 */
-    private final Integer id;
+    private final PropertyStorage storage;
+
+    /**
+     * database ID
+     */
+    public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
 
     /**
      * String "identifier" (human-readable name without spaces and other extra stuff)
      */
-    private String identifier;
+    public final static Property<String> STRING_IDENTIFIER = new Property<>(String.class, "identifier");
 
     /**
      * Can contain any symbols
      */
-    private String name;
-
-    private String description;
-
-    private String homepage;
-
-    private Date createdOn;
-
-    private Date updatedOn;
+    public final static Property<String> NAME = new Property<>(String.class, "name");
+    public final static Property<String> DESCRIPTION = new Property<>(String.class, "description");
+    public final static Property<String> HOMEPAGE = new Property<>(String.class, "homepage");
+    public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
 
     /**
      * This is the *database ID*, not a String-based key.
      */
-    private Integer parentId;
-    private Boolean projectPublic;
-
-    private final Collection<CustomField> customFields = new HashSet<>();
+    public final static Property<Integer> PARENT_DATABASE_ID = new Property<>(Integer.class, "parentId");
+    public final static Property<Boolean> PUBLIC = new Property<>(Boolean.class, "public");
+    public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
 
     /**
      * Trackers available for this project
      */
-    private final Collection<Tracker> trackers = new HashSet<>();
+    public final static Property<Set<Tracker>> TRACKERS = (Property<Set<Tracker>>) new Property(Set.class, "trackers");
 
     Project(Integer id) {
-        this.id = id;
+        storage = new PropertyStorage();
+        storage.set(DATABASE_ID, id);
+        storage.set(CUSTOM_FIELDS, new HashSet<>());
+        storage.set(TRACKERS, new HashSet<>());
     }
 
     public String getHomepage() {
-        return homepage;
+        return storage.get(HOMEPAGE);
     }
 
     public void setHomepage(String homepage) {
-        this.homepage = homepage;
+        storage.set(HOMEPAGE, homepage);
     }
 
     /**
      * @return project's string "key" (not a numeric database id!). Example: "project_ABC"
      */
     public String getIdentifier() {
-        return identifier;
+        return storage.get(STRING_IDENTIFIER);
     }
 
     public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+        storage.set(STRING_IDENTIFIER, identifier);
     }
 
-    @Override
     /**
      * @return numeric database ID
      */
+    @Override
     public Integer getId() {
-        return id;
+        return storage.get(DATABASE_ID);
     }
 
     /**
      * @return project name
      */
     public String getName() {
-        return name;
+        return storage.get(NAME);
     }
 
     /**
      * @param name the project name
      */
     public void setName(String name) {
-        this.name = name;
+        storage.set(NAME, name);
     }
 
     /**
      * @return Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
      */
     public Collection<Tracker> getTrackers() {
-        return Collections.unmodifiableCollection(trackers);
+        return Collections.unmodifiableCollection(storage.get(TRACKERS));
     }
 
     public void addTrackers(Collection<Tracker> trackers) {
-        this.trackers.addAll(trackers);
+        storage.get(TRACKERS).addAll(trackers);
     }
 
     public Tracker getTrackerByName(String trackerName) {
-        for (Tracker t : this.trackers) {
+        for (Tracker t : getTrackers()) {
             if (t.getName().equals(trackerName)) return t;
         }
         return null;
@@ -114,34 +115,34 @@ public class Project implements Identifiable, Serializable {
     @Override
     public String toString() {
         return "Project{" +
-                "id=" + id +
-                ", identifier='" + identifier + '\'' +
-                ", name='" + name + '\'' +
+                "id=" + getId() +
+                ", identifier='" + getIdentifier() + '\'' +
+                ", name='" + getName() + '\'' +
                 '}';
     }
 
     public String getDescription() {
-        return description;
+        return storage.get(DESCRIPTION);
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        storage.set(DESCRIPTION, description);
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return storage.get(CREATED_ON);
     }
 
     public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+        storage.set(CREATED_ON, createdOn);
     }
 
     public Date getUpdatedOn() {
-        return updatedOn;
+        return storage.get(UPDATED_ON);
     }
 
     public void setUpdatedOn(Date updatedOn) {
-        this.updatedOn = updatedOn;
+        storage.set(UPDATED_ON, updatedOn);
     }
 
     /**
@@ -155,11 +156,11 @@ public class Project implements Identifiable, Serializable {
      * @return the parent project Id if it was set programmatically or NULL (!!!) if the project was loaded from the server.
      */
     public Integer getParentId() {
-        return parentId;
+        return storage.get(PARENT_DATABASE_ID);
     }
 
     public void setParentId(Integer parentId) {
-        this.parentId = parentId;
+        storage.set(PARENT_DATABASE_ID, parentId);
     }
 
     /**
@@ -172,23 +173,23 @@ public class Project implements Identifiable, Serializable {
      */
     @Deprecated
     public Boolean getProjectPublic() {
-        return projectPublic;
+        return storage.get(PUBLIC);
     }
     
     public void setProjectPublic(Boolean projectPublic) {
-        this.projectPublic = projectPublic;
+        storage.set(PUBLIC, projectPublic);
     }
     
     public Collection<CustomField> getCustomFields() {
-        return customFields;
+        return storage.get(CUSTOM_FIELDS);
     }
 
     public void addCustomFields(Collection<CustomField> customFields) {
-        this.customFields.addAll(customFields);
+        storage.get(CUSTOM_FIELDS).addAll(customFields);
     }
 
     public CustomField getCustomFieldById(int customFieldId) {
-        for (CustomField customField : customFields) {
+        for (CustomField customField : getCustomFields()) {
             if (customFieldId == customField.getId()) {
                 return customField;
             }
@@ -203,13 +204,17 @@ public class Project implements Identifiable, Serializable {
 
         Project project = (Project) o;
 
-        if (id != null ? !id.equals(project.id) : project.id != null) return false;
+        if (getId() != null ? !getId().equals(project.getId()) : project.getId() != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return id != null ? id.hashCode() : 0;
+        return getId() != null ? getId().hashCode() : 0;
+    }
+
+    public PropertyStorage getStorage() {
+        return storage;
     }
 }

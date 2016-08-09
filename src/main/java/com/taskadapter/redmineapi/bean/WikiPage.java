@@ -3,54 +3,56 @@ package com.taskadapter.redmineapi.bean;
 import java.util.Date;
 
 public class WikiPage {
+    protected final PropertyStorage storage;
 
-    private String title;
-    private Integer version;
-    private Date createdOn;
-    private Date updatedOn;
+    public final static Property<String> TITLE = new Property<>(String.class, "title");
+    public final static Property<Integer> VERSION = new Property<>(Integer.class, "version");
+    public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
 
     WikiPage() {
+        storage = new PropertyStorage();
     }
 
     public String getTitle() {
-        return title;
+        return storage.get(TITLE);
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        storage.set(TITLE, title);
     }
 
     public Integer getVersion() {
-        return version;
+        return storage.get(VERSION);
     }
 
     public void setVersion(Integer version) {
-        this.version = version;
+        storage.set(VERSION, version);
     }
 
     public Date getCreatedOn() {
-        return createdOn;
+        return storage.get(CREATED_ON);
     }
 
     public void setCreatedOn(Date createdOn) {
-        this.createdOn = createdOn;
+        storage.set(CREATED_ON, createdOn);
     }
 
     public Date getUpdatedOn() {
-        return updatedOn;
+        return storage.get(UPDATED_ON);
     }
 
     public void setUpdatedOn(Date updatedOn) {
-        this.updatedOn = updatedOn;
+        storage.set(UPDATED_ON, updatedOn);
     }
 
     @Override
     public String toString() {
         return "WikiPage{" +
-                "title='" + title + '\'' +
-                ", version=" + version +
-                ", createdOn=" + createdOn +
-                ", updatedOn=" + updatedOn +
+                "title='" + getTitle() + '\'' +
+                ", version=" + getVersion() +
+                ", createdOn=" + getCreatedOn() +
+                ", updatedOn=" + getUpdatedOn() +
                 '}';
     }
 }
