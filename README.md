@@ -57,6 +57,16 @@ You can also use some legacy system like Maven if you can't upgrade to Gradle fo
 ## Get issue by Id
     Issue retrievedIssue = issueManager.getIssueById(123);
 
+## Set custom field value on issue 
+    Issue issue = ...
+    List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();
+    // sample implementation for getCustomFieldByName() is in CustomFieldResolver (test class).
+    // in prod code you would typically know the custom field name or id already 
+    CustomFieldDefinition customField1 = getCustomFieldByName(customFieldDefinitions, "my_custom_1");
+    String custom1Value = "some value 123";
+    issue.addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value));
+    issueManager.update(issue);
+
 ## Get all projects
 
     List<Project> projects = mgr.getProjectManager().getProjects();
