@@ -70,6 +70,26 @@ public class AttachmentManagerIT {
         }
     }
 
+    /**
+     * Regression test for https://github.com/taskadapter/redmine-java-api/issues/194
+     */
+    @Test
+    public void severalAttachmentsAreAddedToIssue() throws Exception {
+        final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        final Attachment attach1 = attachmentManager.uploadAttachment("test1.bin", "application/ternary", content);
+        final Attachment attach2 = attachmentManager.uploadAttachment("test2.bin", "application/ternary", content);
+        final Issue issue = IssueFactory.create(projectId, "This is upload ticket!");
+        issue.addAttachment(attach1);
+        issue.addAttachment(attach2);
+        final Issue createdIssue = issueManager.createIssue(issue);
+        try {
+            final Collection<Attachment> attachments = createdIssue.getAttachments();
+            assertThat(attachments.size()).isEqualTo(2);
+        } finally {
+            issueManager.deleteIssue(createdIssue.getId());
+        }
+    }
+
     @Test
     public void addAttachment() throws RedmineException, IOException {
         String attachmentContent = "some text";

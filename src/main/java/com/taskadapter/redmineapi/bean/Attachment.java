@@ -116,13 +116,17 @@ public class Attachment implements Identifiable {
         Attachment that = (Attachment) o;
 
         if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null) return false;
+        if (getToken() != null ? !getToken().equals(that.getToken()) : that.getToken() != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return getId() != null ? getId().hashCode() : 0;
+        int hash = 5;
+        hash = 3 * hash + (getId() != null ? getId().hashCode() : 0);
+        hash = 3 * hash + (getToken() != null ? getToken().hashCode() : 0);
+        return hash;
     }
 
     @Override
