@@ -22,7 +22,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
-public class AttachmentIT {
+public class AttachmentManagerIT {
 
     private static RedmineManager mgr;
     private static int projectId;
@@ -72,11 +72,8 @@ public class AttachmentIT {
 
     @Test
     public void addAttachment() throws RedmineException, IOException {
-        File tempFile = File.createTempFile("redmine_test_", ".tmp");
-        FileWriter fileWriter = new FileWriter(tempFile.getAbsolutePath());
         String attachmentContent = "some text";
-        fileWriter.write(attachmentContent);
-        fileWriter.close();
+        File tempFile = createTempFile(attachmentContent);
 
         final Issue issue = IssueFactory.create(projectId, "task with attachment");
         final Issue createdIssue = issueManager.createIssue(issue);
@@ -244,5 +241,13 @@ public class AttachmentIT {
         } catch (NotFoundException e) {
             System.out.println("got expected exception for deleted attachment");
         }
+    }
+
+    private static File createTempFile(String content) throws IOException {
+        File tempFile = File.createTempFile("redmine_test_", ".tmp");
+        FileWriter fileWriter = new FileWriter(tempFile.getAbsolutePath());
+        fileWriter.write(content);
+        fileWriter.close();
+        return tempFile;
     }
 }
