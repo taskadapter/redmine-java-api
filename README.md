@@ -34,7 +34,21 @@ You can also use some legacy system like Maven if you can't upgrade to Gradle fo
     for (Issue issue : issues) {
         System.out.println(issue.toString());
     }
-    
+
+## Multi-values search for issues
+
+
+    Params params = new Params()
+                .add("set_filter", "1")
+                .add("f[]", "summary")
+                .add("op[summary]", "~")
+                .add("v[summary]", "another")
+                .add("f[]", "description")
+                .add("op[description]", "~")
+                .add("v[description][]", "abc");
+
+    result = issueManager.getIssues(params);
+
 ## Get related objects when retrieving issues
     
     issue = issueManager.getIssueById(123, Include.journals, Include.relations, Include.attachments, 
