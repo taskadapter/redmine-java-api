@@ -495,32 +495,6 @@ public final class Transport {
 		}
 	}
 
-	public static class ResultsWrapper<T> {
-		final private Integer totalFoundOnServer;
-		final private List<T> results;
-
-		public ResultsWrapper(Integer totalFoundOnServer, List<T> results) {
-			this.totalFoundOnServer = totalFoundOnServer;
-			this.results = results;
-		}
-
-		public boolean hasSomeResults() {
-			return !results.isEmpty();
-		}
-
-		public List<T> getResults() {
-			return results;
-		}
-
-		public int getResultsNumber() {
-			return results.size();
-		}
-
-		public Integer getTotalFoundOnServer() {
-			return totalFoundOnServer;
-		}
-	}
-
 	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId, Class<T> classs) throws RedmineException {
 		return getChildEntries(parentClass, parentId + "", classs);
 	}

@@ -16,7 +16,7 @@ public final class DirectObjectsSearcher {
                 .map(param -> new BasicNameValuePair(param.getKey(), param.getValue()))
                 .collect(Collectors.toSet());
 
-        final Transport.ResultsWrapper<T> wrapper = transport.getObjectsListNoPaging(classRef, set);
+        final ResultsWrapper<T> wrapper = transport.getObjectsListNoPaging(classRef, set);
         return wrapper.getResults();
     }
 }

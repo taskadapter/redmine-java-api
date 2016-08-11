@@ -12,6 +12,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
 import com.taskadapter.redmineapi.internal.Joiner;
+import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -86,6 +87,30 @@ public class IssueManager {
      */
     public List<Issue> getIssues(Map<String, String> parameters) throws RedmineException {
         return DirectObjectsSearcher.getObjectsListNoPaging(transport, parameters, Issue.class);
+    }
+
+    /**
+     * Free-form search that does not do any paging for you. Btw, where is Redmine free-form search documentation??
+     * <p>
+     * Sample usage:
+     * <pre>
+
+     Params params = new Params()
+     .add("set_filter", "1")
+     .add("f[]", "summary")
+     .add("op[summary]", "~")
+     .add("v[summary]", "another")
+     .add("f[]", "description")
+     .add("op[description]", "~")
+     .add("v[description][]", "abc");
+
+     list = issueManager.getIssues(params);
+
+     * </pre>
+     * @param parameters
+     */
+    public ResultsWrapper<Issue> getIssues(Params parameters) throws RedmineException {
+        return transport.getObjectsListNoPaging(Issue.class, parameters.getList());
     }
 
     /**
