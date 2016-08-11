@@ -13,4 +13,4 @@ Note: this can only be done by someone who has both "gpg key" to sign artifacts 
 * Run "gradle upload" to upload the artifacts to OSS Sonatype Nexus.
 * Open https://oss.sonatype.org/index.html#stagingRepositories (use proper credentials), find "com.taskadapter" group and the required artifact, use "close" button and then "release".
 * That's it. Once "released", the artifact will be synced from OSS Sonatype Nexus repository to Maven Central in a few hours.
-* Update Release notes page.
+* Update CHANGELOG file.
