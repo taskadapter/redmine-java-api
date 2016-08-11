@@ -443,10 +443,12 @@ public final class RedmineJSONParser {
 		final User user = JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser);
 		if (user != null) {
 			result.setUserId(user.getId());
+                        result.setUserName(user.getFullName());
 		}
 		final Group group = JsonInput.getObjectOrNull(content, "group", RedmineJSONParser::parseGroup);
 		if (group != null) {
 			result.setGroupId(group.getId());
+                        result.setGroupName(group.getName());
 		}
 		result.addRoles(JsonInput.getListOrEmpty(content, "roles", RedmineJSONParser::parseRole));
 		return result;

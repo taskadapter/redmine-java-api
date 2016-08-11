@@ -21,7 +21,12 @@ public class Membership implements Identifiable {
 	 * User. Not set for "group" membership.
 	 */
 	public final static Property<Integer> USER_ID = new Property<>(Integer.class, "userId");
+        public final static Property<String> USER_NAME = new Property<>(String.class, "userName");
+        /**
+         * Group. Not set for "user" membership.
+         */
 	public final static Property<Integer> GROUP_ID = new Property<>(Integer.class, "groupId");
+        public final static Property<String> GROUP_NAME = new Property<>(String.class, "groupName");
 	public final static Property<Set<Role>> ROLES = (Property<Set<Role>>) new Property(Set.class, "roles");
 
     /**
@@ -64,6 +69,22 @@ public class Membership implements Identifiable {
 
     public void setGroupId(Integer id) {
 		storage.set(GROUP_ID, id);
+    }
+    
+	public String getUserName() {
+		return storage.get(USER_NAME);
+	}
+
+	public void setUserName(String id) {
+		storage.set(USER_NAME, id);
+	}
+
+    public String getGroupName() {
+        return storage.get(GROUP_NAME);
+    }
+
+    public void setGroupName(String id) {
+		storage.set(GROUP_NAME, id);
     }
 
     public Collection<Role> getRoles() {
