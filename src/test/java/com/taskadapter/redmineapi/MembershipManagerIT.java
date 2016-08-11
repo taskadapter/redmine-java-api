@@ -121,6 +121,34 @@ public class MembershipManagerIT {
         membershipManager.delete(membershipForUser);
     }
 
+    @Test
+    public void membershipsContainUserName() throws RedmineException {
+        final List<Role> roles = mgr.getUserManager().getRoles();
+        final User currentUser = mgr.getUserManager().getCurrentUser();
+
+        final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
+        final List<Membership> memberships = membershipManager.getMemberships(project.getId());
+        assertThat(memberships.get(0).getUserName()).isEqualTo(currentUser.getFullName());
+        membershipManager.delete(membershipForUser);
+    }
+    
+    @Test
+    public void membershipsContainGoupName() throws RedmineException {
+        final List<Role> roles = mgr.getUserManager().getRoles();
+        final Group group = GroupFactory.create("group" + new Random().nextDouble());
+        Group createdGroup = null;
+        try {
+            createdGroup = mgr.getUserManager().createGroup(group);
+
+            Membership newMembership = membershipManager
+                    .createMembershipForGroup(project.getId(), createdGroup.getId(), roles);
+            List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
+            assertThat(memberships.get(0).getGroupName()).isEqualTo(createdGroup.getName());
+        } finally {
+            mgr.getUserManager().deleteGroup(createdGroup);
+        }
+    }
+    
     private void verifyMemberships(List<Role> roles, User currentUser, List<Membership> memberships) throws RedmineException {
         assertThat(memberships.size()).isEqualTo(1);
         final Membership membership = memberships.get(0);
