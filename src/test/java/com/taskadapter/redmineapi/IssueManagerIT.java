@@ -369,7 +369,7 @@ public class IssueManagerIT {
         params.put("limit", "3");
         params.put("offset", "0");
         params.put("project_id", projectId + "");
-        List<Issue> issues = issueManager.getIssues(params);
+        List<Issue> issues = issueManager.getIssues(params).getResults();
         // only the requested number of issues is loaded, not all result pages.
         assertThat(issues.size()).isEqualTo(3);
     }
@@ -1270,7 +1270,7 @@ public class IssueManagerIT {
             Map<String, String> params = new HashMap<>();
             params.put("project_id", Integer.toString(projectId));
             params.put("subject", "~free_form_search");
-            List<Issue> issues = issueManager.getIssues(params);
+            List<Issue> issues = issueManager.getIssues(params).getResults();
             assertThat(issues.size()).isEqualTo(1);
             final Issue loaded = issues.get(0);
             assertThat(loaded.getSubject()).isEqualTo(subject);

@@ -105,7 +105,7 @@ public class UserIT {
 
             Map<String, String> params = new HashMap<>();
             params.put("name", name);
-            List<User> list = userManager.getUsers(params);
+            List<User> list = userManager.getUsers(params).getResults();
             assertThat(list.size()).isEqualTo(1);
             final User loaded = list.get(0);
             assertThat(loaded.getFirstName()).isEqualTo(name);

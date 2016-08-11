@@ -80,12 +80,12 @@ public class IssueManager {
      </pre>
 
      * @param parameters the http parameters key/value pairs to append to the rest api request
-     * @return empty list if no issues found matching given parameters
+     * @return resultsWrapper with raw response from Redmine REST API
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws RedmineException
      */
-    public List<Issue> getIssues(Map<String, String> parameters) throws RedmineException {
+    public ResultsWrapper<Issue> getIssues(Map<String, String> parameters) throws RedmineException {
         return DirectObjectsSearcher.getObjectsListNoPaging(transport, parameters, Issue.class);
     }
 

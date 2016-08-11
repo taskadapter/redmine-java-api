@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class DirectObjectsSearcher {
-    public static <T> List<T> getObjectsListNoPaging(Transport transport, Map<String, String> map, Class<T> classRef) throws RedmineException {
+
+    public static <T> ResultsWrapper<T> getObjectsListNoPaging(Transport transport, Map<String, String> map, Class<T> classRef) throws RedmineException {
         final Set<NameValuePair> set = map.entrySet()
                 .stream()
                 .map(param -> new BasicNameValuePair(param.getKey(), param.getValue()))
                 .collect(Collectors.toSet());
 
-        final ResultsWrapper<T> wrapper = transport.getObjectsListNoPaging(classRef, set);
-        return wrapper.getResults();
+        return transport.getObjectsListNoPaging(classRef, set);
     }
 }
