@@ -376,18 +376,33 @@ public final class Transport {
     }
 
 	/**
-	 * UPloads content on a server.
+	 * Deprecated because Redmine server can return invalid string depending on its configuration.
+	 * See https://github.com/taskadapter/redmine-java-api/issues/78 .
+	 * <p>Use {@link #upload(InputStream, long)} instead.
+	 *
+	 * <p>
+	 * Uploads content on a server. This method calls {@link #upload(InputStream, long)} with -1 as content length.
 	 * 
-	 * @param content
-	 *            content stream.
+	 * @param content the content stream.
 	 * @return uploaded item token.
-	 * @throws RedmineException
-	 *             if something goes wrong.
+	 * @throws RedmineException if something goes wrong.
 	 */
+	@Deprecated
 	public String upload(InputStream content) throws RedmineException {
+		return upload(content, -1);
+	}
+
+	/**
+	 * @param content the content
+	 * @param contentLength the length of the content in bytes. you can provide -1 but be aware that some
+	 *                      users reported Redmine configuration problems that prevent it from processing -1 correctly.
+	 *                      See https://github.com/taskadapter/redmine-java-api/issues/78 for details.
+	 * @return the string token of the uploaded item. see {@link Attachment#getToken()}
+	 */
+	public String upload(InputStream content, long contentLength) throws RedmineException {
 		final URI uploadURI = getURIConfigurator().getUploadURI();
 		final HttpPost request = new HttpPost(uploadURI);
-		final AbstractHttpEntity entity = new InputStreamEntity(content, -1);
+		final AbstractHttpEntity entity = new InputStreamEntity(content, contentLength);
 		/* Content type required by a Redmine */
 		entity.setContentType("application/octet-stream");
 		request.setEntity(entity);
