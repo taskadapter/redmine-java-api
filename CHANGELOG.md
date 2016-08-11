@@ -1,12 +1,18 @@
-# Version 3.0.0 (...)
+# Version 3.0.0-RC1 (August 10, 2016)
 
 * Code compiled for Java 8. From now on this library requires Java 8.
+* Issue #61. Support for removing fields: internal storage in "beans" is completely rewritten to support https://github.com/taskadapter/redmine-java-api/issues/61
 * Support for "is public" field for Projects https://github.com/taskadapter/redmine-java-api/pull/246
 * Bug fix: download attachment using Access Key https://github.com/taskadapter/redmine-java-api/pull/202
-
+* Support for creating issues with multiple attachments. https://github.com/taskadapter/redmine-java-api/issues/194
+* Support for attachment uploads with explicitly set length. https://github.com/taskadapter/redmine-java-api/issues/78
+* Flattened dependency graphs for User, Issue, etc. (e.g. User assignee instance is replaced with assigneeId and assigneeName) 
 * Issue #121. Bug fixed: download attachments using API access key
+* Support for deleting attachments. https://github.com/taskadapter/redmine-java-api/issues/106
 
-### Migration guide for version 3.0.0:
+See full list here: https://github.com/taskadapter/redmine-java-api/milestone/27 
+
+#### Migration guide for version 3.0.0:
 
 Issue class:
 * Method deleted:    public String getCustomField(String fieldName).
