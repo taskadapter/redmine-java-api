@@ -759,6 +759,11 @@ public class IssueManagerIT {
         issueManager.update(createdIssue);
         Issue updatedIssue = issueManager.getIssueById(createdIssue.getId());
         assertThat(updatedIssue.getTargetVersion().getName()).isEqualTo(version2Name);
+        
+        createdIssue.setTargetVersion(null);
+        issueManager.update(createdIssue);
+        updatedIssue = issueManager.getIssueById(createdIssue.getId());
+        assertThat(updatedIssue.getTargetVersion()).isNull();
     }
 
     private Version createVersion(String versionName) throws RedmineException {
@@ -986,6 +991,11 @@ public class IssueManagerIT {
             assertEquals("Name of category retrieved for issue "
                             + newIssue.getId() + " is wrong",
                     newIssueCategory.getName(), retrievedCategory.getName());
+            
+            retrievedIssue.setCategory(null);
+            issueManager.update(retrievedIssue);
+            Issue updatedIssue = issueManager.getIssueById(newIssue.getId());
+            assertThat(updatedIssue.getCategory()).isNull();
         } finally {
             if (newIssue != null) {
                 issueManager.deleteIssue(newIssue.getId());

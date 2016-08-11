@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -207,30 +208,21 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "spent_hours", storage, Issue.SPENT_HOURS);
 		addIfSet(writer, "assigned_to_id", storage, Issue.ASSIGNEE_ID);
 		addIfSet(writer, "priority_id", storage, Issue.PRIORITY_ID);
-        addIfSet(writer, "done_ratio", storage, Issue.DONE_RATIO);
+                addIfSet(writer, "done_ratio", storage, Issue.DONE_RATIO);
 		addIfSet(writer, "is_private", storage, Issue.PRIVATE_ISSUE);
 		addIfSet(writer, "project_id", storage, Issue.PROJECT_ID);
 		addIfSet(writer, "author_id", storage, Issue.AUTHOR_ID);
 		addIfSet(writer, "start_date", storage, Issue.START_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
 		addIfSet(writer, "due_date", storage, Issue.DUE_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
-		if (issue.getTracker() != null) {
-			writer.key("tracker_id");
-			writer.value(issue.getTracker().getId());
-		}
+                addIfSetIdentifiable(writer, "tracker_id", storage, Issue.TRACKER);
 		addIfSet(writer, "description", storage, Issue.DESCRIPTION);
 
 		addIfSetFullDate(writer, "created_on", storage, Issue.CREATED_ON);
 		addIfSetFullDate(writer, "updated_on", storage, Issue.UPDATED_ON);
 		addIfSet(writer, "status_id", storage, Issue.STATUS_ID);
-        if (issue.getTargetVersion() != null) {
-        	writer.key("fixed_version_id");
-			writer.value(issue.getTargetVersion().getId());
-		}
-        if (issue.getCategory() != null) {
-			writer.key("category_id");
-			writer.value(issue.getCategory().getId());
-		}
-        addIfSet(writer, "notes", storage, Issue.NOTES);
+                addIfSetIdentifiable(writer, "fixed_version_id", storage, Issue.TARGET_VERSION);
+                addIfSetIdentifiable(writer, "category_id", storage, Issue.ISSUE_CATEGORY);
+                addIfSet(writer, "notes", storage, Issue.NOTES);
 		writeCustomFields(writer, issue.getCustomFields());
 
         Collection<Watcher> issueWatchers = issue.getWatchers();
@@ -267,6 +259,18 @@ public class RedmineJSONBuilder {
 		final SimpleDateFormat format = RedmineDateParser.FULL_DATE_FORMAT.get();
 		addIfSet(writer, jsonKeyName, storage, property, format);
 	}
+        
+        private static void addIfSetIdentifiable(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<? extends Identifiable> property) throws JSONException {
+                if (storage.isPropertySet(property)) {
+                        final Identifiable propertyValue = storage.get(property);
+                        writer.key(jsonKeyName);
+                        if(propertyValue != null) {
+                            writer.value(propertyValue.getId());
+                        } else {
+                            writer.value(null);
+                        }
+                } 
+        }
 
 	private static void addIfSet(JSONWriter writer, String jsonKeyName, PropertyStorage storage, Property<Date> property, SimpleDateFormat format) throws JSONException {
 		if (storage.isPropertySet(property)) {
