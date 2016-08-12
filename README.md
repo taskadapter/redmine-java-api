@@ -1,6 +1,3 @@
-[![Build Status](https://travis-ci.org/taskadapter/redmine-java-api.svg?branch=master)](https://travis-ci.org/taskadapter/redmine-java-api.svg?branch=master)
-
-
 # Redmine/Chiliproject Java API.
 
 * Uses Redmine's REST API (don't forget to enable it in Redmine server settings).
