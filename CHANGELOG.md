@@ -1,3 +1,9 @@
+# Version 3.0.0-RC2 (August ..., 2016)
+
+* Issue #262 Support 'inherit_members' when creating projects
+* Issue #260 Wrap direct search results in ResultsWrapper to allow access to paging ginfo
+* some minor bugfixes
+
 # Version 3.0.0-RC1 (August 10, 2016)
 
 * Code compiled for Java 8. From now on this library requires Java 8.
