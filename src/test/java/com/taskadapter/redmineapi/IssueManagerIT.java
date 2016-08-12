@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -1300,7 +1301,10 @@ public class IssueManagerIT {
         issueManager.createIssue(issue1);
         final Issue issue2 = IssueFactory.create(projectId, "summary 2 here");
         issueManager.createIssue(issue2);
-        final Issue issue3 = IssueFactory.create(projectId, "another");
+
+        // have some random subject to avoid collisions with other tests
+        String subject = "another" + new Random().nextInt();
+        final Issue issue3 = IssueFactory.create(projectId, subject);
         issueManager.createIssue(issue3);
 
         final User currentUser = userManager.getCurrentUser();
@@ -1308,7 +1312,7 @@ public class IssueManagerIT {
                 .add("set_filter", "1")
                 .add("f[]", "subject")
                 .add("op[subject]", "~")
-                .add("v[subject][]", "another")
+                .add("v[subject][]", subject)
                 .add("f[]", "author_id")
                 .add("op[author_id]", "~")
                 .add("v[author_id][]", currentUser.getId()+"");
