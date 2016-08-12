@@ -19,6 +19,7 @@ import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.bean.WatcherFactory;
+import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import org.apache.http.client.HttpClient;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -1287,6 +1288,33 @@ public class IssueManagerIT {
         } finally {
             issueManager.deleteIssue(createdIssueId);
         }
+    }
+
+    /**
+     * regression test for https://github.com/taskadapter/redmine-java-api/issues/12 and
+     * https://github.com/taskadapter/redmine-java-api/issues/215
+     */
+    @Test
+    public void issuesCanBeFoundByMultiQuerySearch() throws RedmineException {
+        final Issue issue1 = IssueFactory.create(projectId, "summary 1 here");
+        issueManager.createIssue(issue1);
+        final Issue issue2 = IssueFactory.create(projectId, "summary 2 here");
+        issueManager.createIssue(issue2);
+        final Issue issue3 = IssueFactory.create(projectId, "another");
+        issueManager.createIssue(issue3);
+
+        final User currentUser = userManager.getCurrentUser();
+        Params params = new Params()
+                .add("set_filter", "1")
+                .add("f[]", "subject")
+                .add("op[subject]", "~")
+                .add("v[subject][]", "another")
+                .add("f[]", "author_id")
+                .add("op[author_id]", "~")
+                .add("v[author_id][]", currentUser.getId()+"");
+        final ResultsWrapper<Issue> list = issueManager.getIssues(params);
+        // only 1 issue must be found
+        assertThat(list.getResults()).hasSize(1);
     }
 
     private void deleteIssueIfNotNull(Issue issue) throws RedmineException {
