@@ -24,12 +24,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class CustomFieldDefinitionsIT {
     private static final String CUSTOM_FIELDS_FILE = "custom_fields_redmine_2.3.json";
-    private static RedmineManager mgr;
     private static CustomFieldManager customFieldManager;
 
     @BeforeClass
     public static void oneTimeSetup() {
-        mgr = IntegrationTestHelper.createRedmineManager();
+        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
         customFieldManager = mgr.getCustomFieldManager();
     }
 
