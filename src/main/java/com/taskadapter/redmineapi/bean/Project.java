@@ -39,6 +39,7 @@ public class Project implements Identifiable, Serializable {
      */
     public final static Property<Integer> PARENT_DATABASE_ID = new Property<>(Integer.class, "parentId");
     public final static Property<Boolean> PUBLIC = new Property<>(Boolean.class, "public");
+    public final static Property<Boolean> INHERIT_MEMBERS = new Property<>(Boolean.class, "inheritMembers");
     public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
 
     /**
@@ -176,10 +177,18 @@ public class Project implements Identifiable, Serializable {
         return storage.get(PUBLIC);
     }
     
+    public void setInheritMembers(Boolean inheritMembers) {
+        storage.set(INHERIT_MEMBERS, inheritMembers);
+    }
+
+    public Boolean getInheritMembers() {
+        return storage.get(INHERIT_MEMBERS);
+    }
+
     public void setProjectPublic(Boolean projectPublic) {
         storage.set(PUBLIC, projectPublic);
     }
-    
+
     public Collection<CustomField> getCustomFields() {
         return storage.get(CUSTOM_FIELDS);
     }

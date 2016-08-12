@@ -162,6 +162,7 @@ public class RedmineJSONBuilder {
 		writeCustomFields(writer, project.getCustomFields());
 		addIfSet(writer, "parent_id", storage, Project.PARENT_DATABASE_ID);
 		addIfSet(writer, "is_public", storage, Project.PUBLIC);
+		addIfSet(writer, "inherit_members", storage, Project.INHERIT_MEMBERS);
 		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(), RedmineJSONBuilder::writeTracker);
 	}
 
