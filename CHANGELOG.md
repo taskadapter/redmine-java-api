@@ -1,4 +1,9 @@
-# Version 3.0.0-RC2 (August ..., 2016)
+# Version 3.0.0 (August 15, 2016)
+
+No functional changes since 3.0.0-RC2. Just a small test fix.
+See changes list for v. 3.0.0-RC1 and 3.0.0-RC2.
+
+# Version 3.0.0-RC2 (August 13, 2016)
 
 * Issue #262 Support 'inherit_members' when creating projects
 * Issue #260 Wrap direct search results in ResultsWrapper to allow access to paging ginfo
