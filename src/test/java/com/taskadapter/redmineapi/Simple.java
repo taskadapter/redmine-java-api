@@ -26,15 +26,13 @@ public class Simple {
 	private static final Integer queryId = null; // any
 
 	public static void main(String[] args) {
-		String uri = "http://76.126.10.142:8080/redmine";
-		String apiAccessKey = "3f907ae90b8ce8d5de4c0c5ea9fbc9c678092cfe";
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
+        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
 		try {
 //            getUsersAsNotAdmin(mgr);
 			// getIssueWithRelations(mgr);
 //			tryCreateIssue(mgr);
 			// tryGetIssues(mgr);
-			 tryGetIssue(mgr.getIssueManager());
+			getIssueById(mgr.getIssueManager());
 			// tryGetAllIssues(mgr);
 			// printCurrentUser(mgr);
 			// generateXMLForUser();
@@ -170,9 +168,8 @@ public class Simple {
 		}
 	}
 
-	@SuppressWarnings("unused")
-	private static void tryGetIssue(IssueManager issueManager) throws Exception {
-		Issue issue = issueManager.getIssueById(3205, Include.journals, Include.relations, Include.attachments);
+	private static void getIssueById(IssueManager issueManager) throws Exception {
+		Issue issue = issueManager.getIssueById(12275, Include.journals, Include.relations, Include.attachments);
 		System.out.println(issue.getJournals());
 	}
 

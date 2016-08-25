@@ -306,6 +306,14 @@ public class Issue implements Identifiable {
         storage.get(CUSTOM_FIELDS).add(customField);
     }
 
+    @Deprecated
+    /**
+     * This method should not be used by clients. "notes" only makes sense when creating/updating an issue - that is the
+     * string value added along with the update.
+     * <p>
+     * use {@link #getJournals()} if you want to access previously saved notes. feel free to submit an enhancement
+     * request to Redmine developers if you think this "notes - journals" separation looks weird...
+     */
     public String getNotes() {
         return storage.get(NOTES);
     }
