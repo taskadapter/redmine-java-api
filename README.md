@@ -9,7 +9,7 @@
 * [Supported Redmine versions] (https://github.com/taskadapter/redmine-java-api/wiki/Redmine-versions-compatibility)
 * Available in Maven Central (binary plus sources).
 
-We recommend using a modern build system like Gradle to build this library locally.
+We recommend using a modern build system like Gradle if you want to build this library from source.
 Gradle dependency:
 
     dependencies {
@@ -17,8 +17,6 @@ Gradle dependency:
     }
 
 Check the [latest release version in Maven Central](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.taskadapter%22%20AND%20a%3A%22redmine-java-api%22)
-
-You can also use some legacy system like Maven if you can't upgrade to Gradle for some reason.
 
 # Sample code.
 
