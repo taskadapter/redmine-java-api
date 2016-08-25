@@ -234,7 +234,6 @@ public class TimeEntryManagerIT {
     @Test
     public void testViolateTimeEntryConstraint_ProjectOrIssueID() throws RedmineException {
         TimeEntry timeEntry = createIncompleteTimeEntry();
-        int projectId = projectManager.getProjects().get(0).getId();
         timeEntry.setProjectId(projectId);
         timeEntryManager.createTimeEntry(timeEntry);
         // no exceptions - good.
