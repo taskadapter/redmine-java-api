@@ -224,6 +224,7 @@ public class RedmineJSONBuilder {
                 addIfSetIdentifiable(writer, "fixed_version_id", storage, Issue.TARGET_VERSION);
                 addIfSetIdentifiable(writer, "category_id", storage, Issue.ISSUE_CATEGORY);
                 addIfSet(writer, "notes", storage, Issue.NOTES);
+		addIfSet(writer, "private_notes", storage, Issue.PRIVATE_NOTES);
 		writeCustomFields(writer, issue.getCustomFields());
 
         Collection<Watcher> issueWatchers = issue.getWatchers();

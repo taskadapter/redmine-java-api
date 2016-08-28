@@ -15,6 +15,8 @@ import java.util.Set;
  * <pre>
  *     issue.addRelations(Collections.singletonList(relation));
  * </pre>
+ * 
+ * @see <a href="http://www.redmine.org/projects/redmine/wiki/Rest_Issues">http://www.redmine.org/projects/redmine/wiki/Rest_Issues</a> 
  */
 public class Issue implements Identifiable {
 
@@ -38,6 +40,7 @@ public class Issue implements Identifiable {
      * Some comment describing an issue update.
      */
     public final static Property<String> NOTES = new Property<String>(String.class, "notes");
+    public final static Property<Boolean> PRIVATE_NOTES = new Property<>(Boolean.class, "notes");
     public final static Property<String> PRIORITY_TEXT = new Property<>(String.class, "priorityText");
     public final static Property<Integer> PROJECT_ID = new Property<>(Integer.class, "projectId");
     public final static Property<String> PROJECT_NAME = new Property<>(String.class, "projectName");
@@ -323,6 +326,17 @@ public class Issue implements Identifiable {
      */
     public void setNotes(String notes) {
         storage.set(NOTES, notes);
+    }
+
+    public boolean isPrivateNotes() {
+        return storage.get(PRIVATE_NOTES);
+    }
+
+    /**
+     * @param privateNotes mark note as private
+     */
+    public void setPrivateNotes(boolean privateNotes) {
+        storage.set(PRIVATE_NOTES, privateNotes);
     }
 
     /**
