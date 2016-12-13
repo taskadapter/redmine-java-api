@@ -107,7 +107,41 @@ public class AttachmentManager {
         }
     }
 
+/**
+	 * Uploads an attachment.
+	 * 
+	 * @param fileName
+	 *            file name of the attachment.
+	 * @param contentType
+	 *            content type of the attachment.
+	 * @param content
+	 *            attachment content stream.
+	 * @return attachment content.
+	 * @throws RedmineException
+	 *             if something goes wrong.
+	 * @throws IOException
+	 *             if input cannot be read. This exception cannot be thrown yet (I am not sure if http client can distinguish "network" errors and local errors) but is will be good to distinguish
+	 *             reading errors and transport errors.
+	 */
+	public Attachment uploadAttachment(File file, String contentType) throws RedmineException, IOException {
+		final String token;
+		try {
+			token = transport.upload(file);
+			final Attachment result = AttachmentFactory.create();
+			result.setToken(token);
+			result.setContentType(contentType);
+			result.setFileName(file.getName());
+			return result;
+		} catch (RedmineException e) {
+			unwrapException(e, "uploadStream");
+			throw e;
+		}
+	}
+
     /**
+     * 
+     * @decrepated
+     * 
      * Uploads an attachment.
      *
      * @param fileName
