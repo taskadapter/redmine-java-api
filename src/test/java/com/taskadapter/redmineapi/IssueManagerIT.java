@@ -1314,7 +1314,7 @@ public class IssueManagerIT {
                 .add("op[subject]", "~")
                 .add("v[subject][]", subject)
                 .add("f[]", "author_id")
-                .add("op[author_id]", "~")
+                .add("op[author_id]", "=")
                 .add("v[author_id][]", currentUser.getId()+"");
         final ResultsWrapper<Issue> list = issueManager.getIssues(params);
         // only 1 issue must be found
