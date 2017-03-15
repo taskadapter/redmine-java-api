@@ -99,7 +99,7 @@ public class IntegrationTestHelper {
         } catch (Exception e) {
             throw new RuntimeException("cannot create connection manager: " + e, e);
         }
-        return RedmineManagerFactory.getNewHttpClient(connectionManager);
+        return RedmineManagerFactory.getNewHttpClient(getTestConfig().getURI(), connectionManager);
     }
 
     private static ClientConnectionManager createConnectionManagerWithOurDevKeystore() throws KeyManagementException, KeyStoreException {
