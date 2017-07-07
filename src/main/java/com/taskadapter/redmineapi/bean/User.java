@@ -160,10 +160,11 @@ public class User implements Identifiable {
     }
 
     /**
-     * @return firstName + space + lastName
+     * @return `firstName` + space + `lastName` if `lastName` is not null. otherwise returns value of `firstName`
      */
     public String getFullName() {
-        return getFirstName() + " " + getLastName();
+        String lastNameOrEmpty = getLastName() == null ? "" : " " + getLastName();
+        return getFirstName() + lastNameOrEmpty;
     }
 
     /**
