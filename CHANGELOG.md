@@ -1,3 +1,8 @@
+# Version 3.0.1 (July 7, 2017)
+
+* Issue #275 getAuthorName returns firstname + NULL when last name is null bug
+* Issue #273 Allow private notes
+ 
 # Version 3.0.0 (August 15, 2016)
 
 No functional changes since 3.0.0-RC2. Just a small test fix.
