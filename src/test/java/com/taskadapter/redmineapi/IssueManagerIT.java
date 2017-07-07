@@ -1052,9 +1052,6 @@ public class IssueManagerIT {
         CustomFieldDefinition customField1 = getCustomFieldByName(customFieldDefinitions, "my_custom_1");
         CustomFieldDefinition customField2 = getCustomFieldByName(customFieldDefinitions, "custom_boolean_1");
 
-        // default empty values
-        assertThat(issue.getCustomFields().size()).isEqualTo(3);
-        
         issue.clearCustomFields();
 
         String custom1Value = "some value 123";
@@ -1064,7 +1061,6 @@ public class IssueManagerIT {
         issueManager.update(issue);
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
-        assertThat(updatedIssue.getCustomFields().size()).isEqualTo(3);
         assertThat(updatedIssue.getCustomFieldByName(customField1.getName()).getValue()).isEqualTo(custom1Value);
         assertThat(updatedIssue.getCustomFieldByName(customField2.getName()).getValue()).isEqualTo(custom2Value);
     }
