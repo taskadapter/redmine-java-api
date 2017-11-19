@@ -1,6 +1,9 @@
 package com.taskadapter.redmineapi.bean;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 public class TimeEntry implements Identifiable {
 
@@ -31,6 +34,7 @@ public class TimeEntry implements Identifiable {
     public final static Property<Date> SPENT_ON = new Property<>(Date.class, "spentOn");
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
     public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
+	public static final Property<List> CUSTOM_FIELDS = new Property<>(List.class, "custom_fields");
 
     /**
      * @param id database Id
@@ -139,12 +143,24 @@ public class TimeEntry implements Identifiable {
     public void setUserName(String userName) {
         storage.set(USER_NAME, userName);
     }
+    
+    public CustomField getCustomField(String name) {
+    		return 	((List<CustomField>)storage.get(CUSTOM_FIELDS)).stream().filter(a -> a.getName().equals(name)).findFirst().get();
+    }
 
     @Override
     public String toString() {
         return "User \"" + getUserName() + "\" spent " + getHours()
                 + " hours on task " + getIssueId() + " (project \"" + getProjectName()
                 + "\") doing " + getActivityName();
+    }
+    
+    public List<CustomField> getCustomFields() {
+    		return storage.get(CUSTOM_FIELDS);
+    }
+
+    public void setCustomFields(List<CustomField> customFields) {
+    		storage.set(CUSTOM_FIELDS, customFields);
     }
 
     @Override

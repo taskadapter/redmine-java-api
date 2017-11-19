@@ -155,6 +155,8 @@ public final class RedmineJSONParser {
 		result.setSpentOn(getDateOrNull(object, "spent_on"));
 		result.setCreatedOn(getDateOrNull(object, "created_on"));
 		result.setUpdatedOn(getDateOrNull(object, "updated_on"));
+		final JSONArray custom_fields = JsonInput.getArrayOrNull(object, "custom_fields");
+		result.setCustomFields(parseCustomFields(custom_fields));
 		return result;
 	}
 
@@ -356,6 +358,19 @@ public final class RedmineJSONParser {
 		}
 
 		return result;
+	}
+	public static List<CustomField> parseCustomFields(JSONArray content)
+			throws JSONException {
+		final List<CustomField> results = new ArrayList<>();
+		for(int i = 0; i < content.length(); i++)
+		{
+			JSONObject object = content.getJSONObject(i);
+			results.add(CustomFieldFactory.create(JsonInput.getInt(object, "id"),
+					JsonInput.getStringOrEmpty(object, "name"),
+					JsonInput.getStringOrEmpty(object, "value")));
+		}
+			
+		return results;
 	}
 
 	public static Journal parseJournal(JSONObject content) throws JSONException {
