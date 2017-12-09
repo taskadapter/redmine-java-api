@@ -1,3 +1,7 @@
+# Version 3.0.2 (not released yet)
+
+* Support custom fields for TimeEntry class
+
 # Version 3.0.1 (July 7, 2017)
 
 * Issue #275 getAuthorName returns firstname + NULL when last name is null bug
