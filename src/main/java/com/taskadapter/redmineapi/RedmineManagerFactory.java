@@ -2,12 +2,8 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
-
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.util.Collection;
-
+import com.taskadapter.redmineapi.internal.comm.betterssl.BetterSSLFactory;
+import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -25,8 +21,15 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 
-import com.taskadapter.redmineapi.internal.comm.betterssl.BetterSSLFactory;
-import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
+import java.net.Proxy;
+import java.net.ProxySelector;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <strong>Entry point</strong> for the API. Use this class to communicate with Redmine servers.
@@ -59,7 +62,7 @@ public final class RedmineManagerFactory {
      * @param uri redmine manager URI.
      */
     public static RedmineManager createUnauthenticated(String uri) {
-        return createUnauthenticated(uri, createDefaultHttpClient());
+        return createUnauthenticated(uri, createDefaultHttpClient(uri));
     }
 
     /**
@@ -89,7 +92,7 @@ public final class RedmineManagerFactory {
     public static RedmineManager createWithApiKey(String uri,
                                                   String apiAccessKey) {
         return createWithApiKey(uri, apiAccessKey,
-                createDefaultHttpClient());
+                createDefaultHttpClient(uri));
     }
 
     /**
@@ -122,7 +125,7 @@ public final class RedmineManagerFactory {
     public static RedmineManager createWithUserAuth(String uri, String login,
                                                     String password) {
         return createWithUserAuth(uri, login, password,
-                createDefaultHttpClient());
+                createDefaultHttpClient(uri));
     }
 
     /**
@@ -188,9 +191,9 @@ public final class RedmineManagerFactory {
         return new BasicClientConnectionManager(registry);
     }
 
-    public static HttpClient createDefaultHttpClient() {
+    public static HttpClient createDefaultHttpClient(String uri) {
         try {
-            return getNewHttpClient(createSystemDefaultConnectionManager());
+            return getNewHttpClient(uri, createSystemDefaultConnectionManager());
         } catch (Exception e) {
             e.printStackTrace();
             return new DefaultHttpClient();
@@ -201,7 +204,7 @@ public final class RedmineManagerFactory {
      * Helper method to create an http client from connection manager. This new
      * client is configured to use system proxy (if any).
      */
-    public static HttpClient getNewHttpClient(ClientConnectionManager connectionManager) {
+    public static HttpClient getNewHttpClient(String uri, ClientConnectionManager connectionManager) {
         try {
 
             HttpParams params = new BasicHttpParams();
@@ -210,7 +213,7 @@ public final class RedmineManagerFactory {
 
             final DefaultHttpClient result = new DefaultHttpClient(
                     connectionManager, params);
-            configureProxy(result);
+            configureProxy(uri, result);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -218,10 +221,24 @@ public final class RedmineManagerFactory {
         }
     }
 
-    private static void configureProxy(DefaultHttpClient httpclient) {
+    private static void configureProxy(String uri, DefaultHttpClient httpclient) {
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
         if (proxyHost != null && proxyPort != null) {
+
+            //check standard java nonProxyHost
+            List<Proxy> proxyList= null;
+            try {
+                proxyList = ProxySelector.getDefault().select(new URI(uri));
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+
+            if( proxyList != null && proxyList.get(0) == Proxy.NO_PROXY ){
+                //use no proxy for this host
+                return;
+            }
+
             int port;
             try {
                 port = Integer.parseInt(proxyPort);
