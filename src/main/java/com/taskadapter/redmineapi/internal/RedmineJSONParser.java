@@ -155,6 +155,7 @@ public final class RedmineJSONParser {
 		result.setSpentOn(getDateOrNull(object, "spent_on"));
 		result.setCreatedOn(getDateOrNull(object, "created_on"));
 		result.setUpdatedOn(getDateOrNull(object, "updated_on"));
+		result.addCustomFields(JsonInput.getListOrEmpty(object, "custom_fields", RedmineJSONParser::parseCustomField));
 		return result;
 	}
 

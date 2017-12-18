@@ -46,6 +46,10 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
                 .add("v[description][]", "abc");
 
     result = issueManager.getIssues(params);
+    
+Redmine searches for "Open" issues by default. You can specify "all" in your Map if you want:
+
+    params.put("status_id", "*");    
 
 ## Get related objects when retrieving issues
     

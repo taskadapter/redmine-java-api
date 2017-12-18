@@ -127,7 +127,8 @@ public class IntegrationTestHelper {
         }
         try {
             final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-            ks.load(extStore, "changeit".toCharArray());
+            // "123456" is the password for this custom keystore
+            ks.load(extStore, "123456".toCharArray());
             return ks;
         } catch (Exception e) {
             e.printStackTrace();

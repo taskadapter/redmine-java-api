@@ -75,6 +75,7 @@ public class RedmineJSONBuilder {
 		addIfSetShort2(writer, "spent_on", storage, TimeEntry.SPENT_ON);
 		addIfSetFullDate(writer, "created_on", storage, TimeEntry.SPENT_ON);
 		addIfSetFullDate(writer, "updated_on", storage, TimeEntry.SPENT_ON);
+		writeCustomFields(writer, timeEntry.getCustomFields());
 	}
 
 	/**
