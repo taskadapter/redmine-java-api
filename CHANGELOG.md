@@ -1,4 +1,10 @@
-# Version 3.0.2 (not released yet)
+# Version 3.1.0 (2017-12-18)
+
+* new method in Transport class to expose some Json results
+* Added support for nonProxy host (using standard java.net.ProxySelector) 
+* Explicitly specify content length when uploading an attachment
+
+# Version 3.0.2 (2017-12-15)
 
 * Support custom fields for TimeEntry class
 
