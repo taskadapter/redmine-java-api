@@ -73,6 +73,8 @@ public class UserManager {
     /**
      * Load list of users from the server.
      * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
+     * <p>
+     * This method calls Redmine with "include = memberships,groups" parameter.
      *
      * @return list of User objects
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
