@@ -482,13 +482,8 @@ public final class Transport {
 	public <T> ResultsWrapper<T> getObjectsListNoPaging(Class<T> objectClass,
 											  Collection<? extends NameValuePair> params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(objectClass);
-		final List<NameValuePair> newParams = new ArrayList<>(params);
-		List<NameValuePair> paramsList = new ArrayList<>(newParams);
-		final URI uri = getURIConfigurator().getObjectsURI(objectClass, paramsList);
-		final HttpGet http = new HttpGet(uri);
-		final String response = send(http);
 		try {
-			final JSONObject responseObject = RedmineJSONParser.getResponse(response);
+			final JSONObject responseObject = getJsonResponseFromGet(objectClass, params);
 			List<T> results = JsonInput.getListOrNull(responseObject, config.multiObjectName, config.parser);
 			Integer totalFoundOnServer = JsonInput.getIntOrNull(responseObject, KEY_TOTAL_COUNT);
 			Integer limitOnServer = JsonInput.getIntOrNull(responseObject, KEY_LIMIT);
@@ -497,6 +492,25 @@ public final class Transport {
 		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}
+	}
+
+	/**
+	 * Use this method if you need direct access to Json results.
+	 <pre>
+	 Params params = new Params()
+	   .add(...)
+     getJsonResponseFromGet(Issue.class, params);
+	 </pre>
+	 */
+	public <T> JSONObject getJsonResponseFromGet(Class<T> objectClass,
+												 Collection<? extends NameValuePair> params) throws RedmineException, JSONException {
+		final List<NameValuePair> newParams = new ArrayList<>(params);
+		List<NameValuePair> paramsList = new ArrayList<>(newParams);
+		final URI uri = getURIConfigurator().getObjectsURI(objectClass, paramsList);
+		final HttpGet http = new HttpGet(uri);
+		final String response = send(http);
+		final JSONObject responseObject = RedmineJSONParser.getResponse(response);
+		return responseObject;
 	}
 
 	public <T> List<T> getChildEntries(Class<?> parentClass, int parentId, Class<T> classs) throws RedmineException {
