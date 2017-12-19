@@ -108,3 +108,12 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
     params.put("project_id", projectId);
     params.put("activity_id", activityId);
     final List<TimeEntry> elements = timeEntryManager.getTimeEntries(params);
+
+## Using a custom (e.g. self-signed) SSL certificate
+See IntegrationTestHelper class:
+
+    final Optional<KeyStore> builtInExtension = getExtensionKeystore();
+    if (builtInExtension.isPresent()) {
+        return RedmineManagerFactory.createConnectionManagerWithExtraTrust(
+                Collections.singletonList(builtInExtension.get()));
+    }

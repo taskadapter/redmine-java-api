@@ -14,9 +14,9 @@ import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 
 public class IntegrationTestHelper {
     private static final Logger logger = LoggerFactory.getLogger(IntegrationTestHelper.class);
@@ -103,13 +103,10 @@ public class IntegrationTestHelper {
     }
 
     private static ClientConnectionManager createConnectionManagerWithOurDevKeystore() throws KeyManagementException, KeyStoreException {
-        final Collection<KeyStore> extraStores = new ArrayList<>();
-        final KeyStore builtInExtension = getExtensionKeystore();
-        if (builtInExtension != null) {
-            extraStores.add(builtInExtension);
-        }
-        if (!extraStores.isEmpty()) {
-            return RedmineManagerFactory.createConnectionManagerWithExtraTrust(extraStores);
+        final Optional<KeyStore> builtInExtension = getExtensionKeystore();
+        if (builtInExtension.isPresent()) {
+            return RedmineManagerFactory.createConnectionManagerWithExtraTrust(
+                    Collections.singletonList(builtInExtension.get()));
         }
         return RedmineManagerFactory.createDefaultConnectionManager();
     }
@@ -119,20 +116,20 @@ public class IntegrationTestHelper {
      * this is how we provide the self-signed SSL certificate for our
      * Redmine dev server.
      */
-    private static KeyStore getExtensionKeystore() {
+    private static Optional<KeyStore> getExtensionKeystore() {
         final InputStream extStore =
                 IntegrationTestHelper.class.getClassLoader().getResourceAsStream("ta-dev-cacerts");
         if (extStore == null) {
-            return null;
+            return Optional.empty();
         }
         try {
             final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
             // "123456" is the password for this custom keystore
             ks.load(extStore, "123456".toCharArray());
-            return ks;
+            return Optional.of(ks);
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return Optional.empty();
         } finally {
             try {
                 extStore.close();
