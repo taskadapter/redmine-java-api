@@ -77,7 +77,7 @@ public class AttachmentManager {
                                        byte[] content) throws RedmineException, IOException {
         final InputStream is = new ByteArrayInputStream(content);
         try {
-            return uploadAttachment(fileName, contentType, is);
+            return uploadAttachment(fileName, contentType, is, content.length);
         } finally {
             try {
                 is.close();
@@ -103,7 +103,7 @@ public class AttachmentManager {
     public Attachment uploadAttachment(String contentType, File content)
             throws RedmineException, IOException {
         try (InputStream is = new FileInputStream(content)) {
-            return uploadAttachment(content.getName(), contentType, is);
+            return uploadAttachment(content.getName(), contentType, is, content.length());
         }
     }
 
@@ -129,6 +129,26 @@ public class AttachmentManager {
         return uploadAttachment(fileName, contentType, content, -1);
     }
 
+    /**
+     * Uploads an attachment passing total length.
+     *
+     * @param fileName
+     *            file name of the attachment.
+     * @param contentType
+     *            content type of the attachment.
+     * @param content
+     *            attachment content stream.
+     * @param contentLength
+     *            attachment length. Use -1 to enable Transfer-encoding: chunked. Pass exact length to avoid that
+     *            as some web servers (like lighthttpd do not support it)
+     * @return attachment content.
+     * @throws RedmineException if something goes wrong.
+     * @throws IOException
+     *             if input cannot be read. This exception cannot be thrown yet
+     *             (I am not sure if http client can distinguish "network"
+     *             errors and local errors) but is will be good to distinguish
+     *             reading errors and transport errors.
+     */
     public Attachment uploadAttachment(String fileName, String contentType, InputStream content, long contentLength) throws RedmineException, IOException {
         final InputStream wrapper = new MarkedInputStream(content,
                 "uploadStream");
