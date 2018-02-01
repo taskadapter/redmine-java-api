@@ -46,6 +46,11 @@ public class MembershipManager {
         return transport.getChildEntries(Project.class, projectId, Membership.class);
     }
 
+    public List<Membership> getMemberships(int projectId, int countOfMembers) throws RedmineException {
+        transport.setObjectsPerPage(countOfMembers);
+        return transport.getChildEntries(Project.class, projectId, Membership.class);
+    }
+
     /**
      * Add a membership.
      *
