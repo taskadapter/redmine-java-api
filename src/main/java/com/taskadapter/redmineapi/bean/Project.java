@@ -33,6 +33,7 @@ public class Project implements Identifiable, Serializable {
     public final static Property<String> HOMEPAGE = new Property<>(String.class, "homepage");
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
     public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
+    public final static Property<Integer> STATUS = new Property<>(Integer.class, "status");
 
     /**
      * This is the *database ID*, not a String-based key.
@@ -144,6 +145,14 @@ public class Project implements Identifiable, Serializable {
 
     public void setUpdatedOn(Date updatedOn) {
         storage.set(UPDATED_ON, updatedOn);
+    }
+
+    public int getStatus(){
+        return storage.get(STATUS);
+    }
+
+    public void setStatus(int status){
+        storage.set(STATUS,status);
     }
 
     /**

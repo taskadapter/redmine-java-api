@@ -191,6 +191,7 @@ public final class RedmineJSONParser {
 		result.setHomepage(JsonInput.getStringOrEmpty(content, "homepage"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setUpdatedOn(getDateOrNull(content, "updated_on"));
+		result.setStatus(JsonInput.getInt(content, "status"));
 		final JSONObject parentProject = JsonInput.getObjectOrNull(content,
 				"parent");
 		if (parentProject != null)
