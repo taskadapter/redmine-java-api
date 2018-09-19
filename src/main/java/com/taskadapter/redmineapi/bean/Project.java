@@ -147,10 +147,18 @@ public class Project implements Identifiable, Serializable {
         storage.set(UPDATED_ON, updatedOn);
     }
 
+    /***
+     *
+     * @return 1 if the project is open ,5 if the project is close
+     */
     public int getStatus(){
         return storage.get(STATUS);
     }
 
+    /**
+     *
+     * @param status 1 open, 5 close
+     */
     public void setStatus(int status){
         storage.set(STATUS,status);
     }
