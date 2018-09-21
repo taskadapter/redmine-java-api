@@ -1231,6 +1231,9 @@ public class IssueManagerIT {
         deleteIssueIfNotNull(issue);
     }
     
+    /** This test requires one-time Redmine server configuration: 
+     * "Settings" -> "Issue Tracking" -> "allow issue assignment to groups" : ON
+     */
     @Test
     public void issueAssignmentUserAndGroup() throws RedmineException {
         Issue issue = createIssue(issueManager, projectId);
