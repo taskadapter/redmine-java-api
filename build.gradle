@@ -36,12 +36,12 @@ repositories {
 dependencies {
     compile ('org.apache.httpcomponents:httpclient:4.5.1',
             'org.json:json:20090211',
-            'org.slf4j:slf4j-api:1.7.12')
+            'org.slf4j:slf4j-api:1.7.25')
 
     testCompile(
             'junit:junit:4.12',
             'org.assertj:assertj-core:3.2.0',
-            'org.slf4j:slf4j-jdk14:1.7.12'
+            'org.slf4j:slf4j-jdk14:1.7.25'
     )
 }
 
