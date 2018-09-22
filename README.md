@@ -27,6 +27,8 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
     Integer queryId = null; // any
 
     RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
+    // override default page size if needed
+    mgr.setObjectsPerPage(100);
     List<Issue> issues = mgr.getIssueManager().getIssues(projectKey, queryId);
     for (Issue issue : issues) {
         System.out.println(issue.toString());
