@@ -1,3 +1,10 @@
+# 3.1.1
+* integrated project membership methods from MembershipManager into ProjectManager
+(MembershipManager is now deprecated)
+* use newer version of apache httpclient: 4.5.1 -> 4.5.6
+* use newer version of slf4j-api: 1.7.12 -> 1.7.25
+* use slf4j 1.7.12 instead of 1.7.1
+
 # Version 3.1.0 (2017-12-18)
 
 * new method in Transport class to expose some Json results
