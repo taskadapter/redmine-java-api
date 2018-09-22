@@ -19,16 +19,16 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MembershipManagerIT {
+public class MembershipIT {
     private static RedmineManager mgr;
     private static UserManager userManager;
-    private static MembershipManager membershipManager;
     private static Project project;
+    private static ProjectManager projectManager;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
-        membershipManager = mgr.getMembershipManager();
+        projectManager = mgr.getProjectManager();
         userManager = mgr.getUserManager();
         try {
             project = IntegrationTestHelper.createAndReturnProject(mgr.getProjectManager());
@@ -48,7 +48,7 @@ public class MembershipManagerIT {
         final User user = UserGenerator.generateRandomUser();
         User createdUser = mgr.getUserManager().createUser(user);
         try {
-            membershipManager.createMembershipForUser(project.getId(), createdUser.getId(), roles);
+            projectManager.addUserToProject(project.getId(), createdUser.getId(), roles);
             final User userWithMembership = userManager.getUserById(createdUser.getId());
             assertThat(userWithMembership.getMemberships()).isNotEmpty();
         } finally {
@@ -65,9 +65,9 @@ public class MembershipManagerIT {
         try {
             createdGroup = mgr.getUserManager().createGroup(group);
 
-            Membership newMembership = membershipManager
-                    .createMembershipForGroup(project.getId(), createdGroup.getId(), rolesToSet);
-            List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
+            Membership newMembership = projectManager
+                    .addGroupToProject(project.getId(), createdGroup.getId(), rolesToSet);
+            List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
             assertThat(memberships).contains(newMembership);
             Integer memberGroupId = newMembership.getGroupId();
             assertThat(memberGroupId).isNotNull();
@@ -83,7 +83,7 @@ public class MembershipManagerIT {
         final User currentUser = mgr.getUserManager().getCurrentUser();
         final int totalRoles = roles.size();
 
-        final Membership membership = membershipManager.createMembershipForUser(project.getId(),
+        final Membership membership = projectManager.addUserToProject(project.getId(),
                                         currentUser.getId(), roles);
         assertThat(membership.getRoles().size()).isEqualTo(totalRoles);
 
@@ -92,11 +92,11 @@ public class MembershipManagerIT {
         membershipWithOnlyOneRole.setUserId(membership.getUserId());
         membershipWithOnlyOneRole.addRoles(Collections.singletonList(roles.get(0)));
 
-        membershipManager.update(membershipWithOnlyOneRole);
-        final Membership updatedEmptyMembership = membershipManager.getMembership(membership.getId());
+        projectManager.updateProjectMembership(membershipWithOnlyOneRole);
+        final Membership updatedEmptyMembership = projectManager.getProjectMember(membership.getId());
 
         assertThat(updatedEmptyMembership.getRoles().size()).isEqualTo(1);
-        membershipManager.delete(membership);
+        projectManager.deleteProjectMembership(membership);
     }
 
     @Test
@@ -104,10 +104,10 @@ public class MembershipManagerIT {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
-        final List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
+        final Membership membershipForUser = projectManager.addUserToProject(project.getId(), currentUser.getId(), roles);
+        final List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
         verifyMemberships(roles, currentUser, memberships);
-        membershipManager.delete(membershipForUser);
+        projectManager.deleteProjectMembership(membershipForUser);
     }
 
     @Test
@@ -115,10 +115,10 @@ public class MembershipManagerIT {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
-        final List<Membership> memberships = membershipManager.getMemberships(project.getId());
+        final Membership membershipForUser = projectManager.addUserToProject(project.getId(), currentUser.getId(), roles);
+        final List<Membership> memberships = projectManager.getProjectMembers(project.getId());
         verifyMemberships(roles, currentUser, memberships);
-        membershipManager.delete(membershipForUser);
+        projectManager.deleteProjectMembership(membershipForUser);
     }
 
     @Test
@@ -126,10 +126,10 @@ public class MembershipManagerIT {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        final Membership membershipForUser = membershipManager.createMembershipForUser(project.getId(), currentUser.getId(), roles);
-        final List<Membership> memberships = membershipManager.getMemberships(project.getId());
+        final Membership membershipForUser = projectManager.addUserToProject(project.getId(), currentUser.getId(), roles);
+        final List<Membership> memberships = projectManager.getProjectMembers(project.getId());
         assertThat(memberships.get(0).getUserName()).isEqualTo(currentUser.getFullName());
-        membershipManager.delete(membershipForUser);
+        projectManager.deleteProjectMembership(membershipForUser);
     }
     
     @Test
@@ -140,9 +140,8 @@ public class MembershipManagerIT {
         try {
             createdGroup = mgr.getUserManager().createGroup(group);
 
-            Membership newMembership = membershipManager
-                    .createMembershipForGroup(project.getId(), createdGroup.getId(), roles);
-            List<Membership> memberships = membershipManager.getMemberships(project.getIdentifier());
+            projectManager.addGroupToProject(project.getId(), createdGroup.getId(), roles);
+            List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
             assertThat(memberships.get(0).getGroupName()).isEqualTo(createdGroup.getName());
         } finally {
             mgr.getUserManager().deleteGroup(createdGroup);
@@ -155,7 +154,7 @@ public class MembershipManagerIT {
         assertThat(membership.getUserId()).isEqualTo(currentUser.getId());
         assertThat(membership.getRoles().size()).isEqualTo(roles.size());
 
-        final Membership membershipById = membershipManager.getMembership(membership.getId());
+        final Membership membershipById = projectManager.getProjectMember(membership.getId());
         assertThat(membershipById).isEqualTo(membership);
     }
 }

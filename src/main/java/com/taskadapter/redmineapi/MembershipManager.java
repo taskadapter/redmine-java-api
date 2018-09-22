@@ -5,13 +5,14 @@ import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.UserFactory;
 import com.taskadapter.redmineapi.internal.Transport;
 
 import java.util.Collection;
 import java.util.List;
 
 /**
+ * Deprecated - methods from this class were integrated into ProjectManager class.
+ *
  * Works with User-Project Memberships.
  * <p>Obtain it via RedmineManager:
  * <pre>
@@ -30,6 +31,7 @@ import java.util.List;
  *
  * @see RedmineManager
  */
+@Deprecated
 public class MembershipManager {
     private final Transport transport;
 
@@ -37,22 +39,23 @@ public class MembershipManager {
         this.transport = transport;
     }
 
+    /**
+     * Use {@link ProjectManager#getProjectMembers(String)} instead.
+     */
+    @Deprecated
     public List<Membership> getMemberships(String projectKey)
             throws RedmineException {
         return transport.getChildEntries(Project.class, projectKey, Membership.class);
     }
 
+    /**
+     * Use {@link ProjectManager#getProjectMembers(int)} instead.
+     */
+    @Deprecated
     public List<Membership> getMemberships(int projectId) throws RedmineException {
         return transport.getChildEntries(Project.class, projectId, Membership.class);
     }
 
-    /**
-     * Add a membership.
-     *
-     * @param membership
-     *            membership.
-     * @throws RedmineException
-     */
     private Membership addMembership(Membership membership) throws RedmineException {
         final Project project = membership.getProject();
         if (project == null) {
@@ -80,6 +83,11 @@ public class MembershipManager {
         transport.updateObject(membership);
     }
 
+
+    /**
+     * Use {@link ProjectManager#addGroupToProject(int, int, Collection)} instead.
+     */
+    @Deprecated
     public Membership createMembershipForGroup(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
         final Membership membership = MembershipFactory.create();
         final Project project = ProjectFactory.create(projectId);
@@ -94,6 +102,10 @@ public class MembershipManager {
         return addMembership(membership);
     }
 
+    /**
+     * Use {@link ProjectManager#addUserToProject(int, int, Collection)} instead.
+     */
+    @Deprecated
     public Membership createMembershipForUser(int projectId, int userId, Collection<Role> roles) throws RedmineException {
         final Membership membership = MembershipFactory.create();
         final Project project = ProjectFactory.create(projectId);

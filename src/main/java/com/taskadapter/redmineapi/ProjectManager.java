@@ -1,12 +1,17 @@
 package com.taskadapter.redmineapi;
 
+import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -204,5 +209,77 @@ public class ProjectManager {
             params.add(new BasicNameValuePair("project_id", projectKey));
         }
         return transport.getObjectsList(News.class, params);
+    }
+
+    public Membership addUserToProject(int projectId, int userId, Collection<Role> roles) throws RedmineException {
+        Membership membership = MembershipFactory.create();
+        Project project = ProjectFactory.create(projectId);
+        membership.setProject(project);
+        membership.setUserId(userId);
+        membership.addRoles(roles);
+        return addMembership(membership);
+    }
+
+    public Membership addGroupToProject(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
+        Membership membership = MembershipFactory.create();
+        Project project = ProjectFactory.create(projectId);
+        membership.setProject(project);
+        // This is nuts, but according to the documentation the way it is supposed
+        // to work:
+        // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
+        // http://www.redmine.org/issues/17904
+        membership.setUserId(groupId);
+        membership.addRoles(roles);
+
+        return addMembership(membership);
+    }
+
+    /**
+     * @param projectKey string-based project key (like "TEST")
+     *
+     * @return list of project members (users or groups)
+     */
+    public List<Membership> getProjectMembers(String projectKey) throws RedmineException {
+        return transport.getChildEntries(Project.class, projectKey, Membership.class);
+    }
+
+    /**
+     * @param projectId database ID of the project (like 123)
+     * @return list of project members (users or groups)
+     */
+    public List<Membership> getProjectMembers(int projectId) throws RedmineException {
+        return transport.getChildEntries(Project.class, projectId, Membership.class);
+    }
+
+    public Membership getProjectMember(int membershipId) throws RedmineException {
+        return transport.getObject(Membership.class, membershipId);
+    }
+
+    /**
+     * Remove the project member from the project. This does not delete the user/group itself.
+     *
+     * @param membershipId id of the "membership" relation
+     */
+    public void deleteProjectMembership(int membershipId) throws RedmineException {
+        transport.deleteObject(Membership.class, Integer.toString(membershipId));
+    }
+
+    public void deleteProjectMembership(Membership membership) throws RedmineException {
+        transport.deleteObject(Membership.class, membership.getId().toString());
+    }
+
+    public void updateProjectMembership(Membership membership) throws RedmineException {
+        transport.updateObject(membership);
+    }
+
+    private Membership addMembership(Membership membership) throws RedmineException {
+        final Project project = membership.getProject();
+        if (project == null) {
+            throw new IllegalArgumentException("Project must be set");
+        }
+        if (membership.getUserId() == null && membership.getRoles().isEmpty()) {
+            throw new IllegalArgumentException("Either User or Roles field must be set");
+        }
+        return transport.addChildEntry(Project.class, project.getId() + "", membership);
     }
 }

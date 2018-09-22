@@ -60,7 +60,6 @@ public class IssueManagerIT {
 
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
-    private static MembershipManager membershipManager;
     private static Project project;
     private static int projectId;
     private static String projectKey;
@@ -76,7 +75,6 @@ public class IssueManagerIT {
         userManager = mgr.getUserManager();
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
-        membershipManager = mgr.getMembershipManager();
         project = IntegrationTestHelper.createProject(mgr);
         projectId = project.getId();
         projectKey = project.getIdentifier();
@@ -91,8 +89,8 @@ public class IssueManagerIT {
             RoleFactory.create(4), // Developer
             RoleFactory.create(5)  // Reporter
         });
-        membershipManager.createMembershipForGroup(project.getId(), demoGroup.getId(), allRoles);
-        membershipManager.createMembershipForGroup(project2.getId(), demoGroup.getId(), allRoles);
+        projectManager.addGroupToProject(project.getId(), demoGroup.getId(), allRoles);
+        projectManager.addGroupToProject(project2.getId(), demoGroup.getId(), allRoles);
     }
 
     @AfterClass

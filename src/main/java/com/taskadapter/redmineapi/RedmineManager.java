@@ -78,6 +78,10 @@ public class RedmineManager {
         return projectManager;
     }
 
+    /**
+     * DEPRECATED - all methods from MembershipManager were migrated to ProjectManager class
+     */
+    @Deprecated
     public MembershipManager getMembershipManager() {
         return membershipManager;
     }
