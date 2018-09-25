@@ -50,19 +50,4 @@ public class ParentProjectIT {
         return projectManager.getProjectByKey(key);
     }
 
-    /***
-     * test project status
-     * @throws RedmineException
-     */
-    public void testProject4Status() throws RedmineException {
-        final int OPEN = 1;
-        final int CLOSE = 5;
-        List<Project> projects = projectManager.getProjects();
-        if (projects != null) {
-            for (Project project : projects) {
-                project.setStatus(CLOSE);
-            }
-        }
-    }
-
 }

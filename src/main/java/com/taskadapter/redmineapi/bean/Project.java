@@ -55,6 +55,8 @@ public class Project implements Identifiable, Serializable {
         storage.set(TRACKERS, new HashSet<>());
     }
 
+
+
     public String getHomepage() {
         return storage.get(HOMEPAGE);
     }
@@ -148,19 +150,33 @@ public class Project implements Identifiable, Serializable {
     }
 
     /***
-     *
-     * @return 1 if the project is open ,5 if the project is close
-     */
-    public int getStatus(){
-        return storage.get(STATUS);
-    }
-
-    /**
-     *
-     * @param status 1 open, 5 close
+     * set project status
+     * @param status the project status
      */
     public void setStatus(int status){
         storage.set(STATUS,status);
+    }
+
+    /***
+     *
+     * @return project status is open
+     */
+    public boolean isOpenStatus(){
+        return storage.get(STATUS) == ProjectStatusService.getOpenStatusVal();
+    }
+
+    /***
+     * set status to open
+     */
+    public void toOpenStatus(){
+        setStatus(ProjectStatusService.getOpenStatusVal());
+    }
+
+    /****
+     * set status to close
+     */
+    public void toCloseStatus(){
+        setStatus(ProjectStatusService.getCloseStatusVal());
     }
 
     /**
