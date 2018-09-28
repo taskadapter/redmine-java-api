@@ -11,9 +11,13 @@ import java.util.Set;
  */
 public class User implements Identifiable {
 
-    public static final Integer STATUS_LOCKED = 3;
+    public static final Integer STATUS_ANONYMOUS = 0;
 
     public static final Integer STATUS_ACTIVE = 1;
+
+    public static final Integer STATUS_REGISTERED = 2;
+
+    public static final Integer STATUS_LOCKED = 3;
 
     private final PropertyStorage storage;
 
@@ -250,13 +254,21 @@ public class User implements Identifiable {
 	}
 
     /**
-     * Returns the user status. As defined in Redmine:
+     * This field is visible to Admin only.
+     * <p>
+     * Returns the user status. This number can theoretically be different for different Redmine versions,
+     * But the **current Redmine version in 2018** defines these numbers as:
      * <ul>
-     *   <li>1: status active ({@link #STATUS_ACTIVE})</li>
-     *   <li>3: status locked ({@link #STATUS_LOCKED})</li>
+     *   <li>0: status anonymous</li>
+     *   <li>1: status active</li>
+     *   <li>2: status registered</li>
+     *   <li>3: status locked</li>
      * </ul>
+     *
+     * <p>see http://www.redmine.org/projects/redmine/repository/entry/trunk/app/models/principal.rb#L22-25
      * 
-     * @return User status
+     * @return possibly Redmine-version-specific number that represents user status (active/locked/etc)
+     * @since Redmine REST API 2.4.0
      */
     public Integer getStatus() {
         return storage.get(STATUS);
@@ -265,7 +277,7 @@ public class User implements Identifiable {
     /**
      * Sets the user status.
      * 
-     * @param status must be one of {@link #STATUS_ACTIVE} or {@link #STATUS_LOCKED}
+     * @param status {@link #STATUS_ACTIVE}, {@link #STATUS_LOCKED}, etc...
      */
     public void setStatus(Integer status) {
         storage.set(STATUS, status);
