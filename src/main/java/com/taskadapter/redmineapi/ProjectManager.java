@@ -7,6 +7,8 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
+import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -14,6 +16,7 @@ import org.apache.http.message.BasicNameValuePair;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -249,6 +252,24 @@ public class ProjectManager {
      */
     public List<Membership> getProjectMembers(int projectId) throws RedmineException {
         return transport.getChildEntries(Project.class, projectId, Membership.class);
+    }
+
+    /**
+     * @param projectId database ID of the project (like 123)
+     * @param params Parameters to include in HTTP GET request
+     * @return ResultsWrapper containing response from API
+     */
+    public ResultsWrapper<Membership> getProjectMembers(int projectId, Map<String, String> params) throws RedmineException {
+        return DirectObjectsSearcher.getChildObjectsListNoPaging(transport, params, Project.class, projectId + "", Membership.class);
+    }
+
+    /**
+     * @param projectId database ID of the project (like 123)
+     * @param params Parameters to include in HTTP GET request
+     * @return ResultsWrapper containing response from API
+     */
+    public ResultsWrapper<Membership> getProjectMembers(int projectId, Params params) throws RedmineException {
+        return transport.getChildObjectsListNoPaging(Project.class, projectId + "", Membership.class, params.getList());
     }
 
     public Membership getProjectMember(int membershipId) throws RedmineException {

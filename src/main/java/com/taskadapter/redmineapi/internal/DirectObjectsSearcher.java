@@ -12,11 +12,18 @@ import java.util.stream.Collectors;
 public final class DirectObjectsSearcher {
 
     public static <T> ResultsWrapper<T> getObjectsListNoPaging(Transport transport, Map<String, String> map, Class<T> classRef) throws RedmineException {
-        final Set<NameValuePair> set = map.entrySet()
+        return transport.getObjectsListNoPaging(classRef, toNameValuePairs(map));
+    }
+
+    public static <T> ResultsWrapper<T> getChildObjectsListNoPaging(Transport transport, Map<String, String> map,
+                                                                    Class<?> parentClass, String parentId, Class<T> classRef) throws RedmineException {
+        return transport.getChildObjectsListNoPaging(parentClass, parentId, classRef, toNameValuePairs(map));
+    }
+
+    private static Set<NameValuePair> toNameValuePairs(Map<String, String> map) {
+        return map.entrySet()
                 .stream()
                 .map(param -> new BasicNameValuePair(param.getKey(), param.getValue()))
                 .collect(Collectors.toSet());
-
-        return transport.getObjectsListNoPaging(classRef, set);
     }
 }

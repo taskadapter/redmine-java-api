@@ -484,14 +484,36 @@ public final class Transport {
 		final EntityConfig<T> config = getConfig(objectClass);
 		try {
 			final JSONObject responseObject = getJsonResponseFromGet(objectClass, params);
-			List<T> results = JsonInput.getListOrNull(responseObject, config.multiObjectName, config.parser);
-			Integer totalFoundOnServer = JsonInput.getIntOrNull(responseObject, KEY_TOTAL_COUNT);
-			Integer limitOnServer = JsonInput.getIntOrNull(responseObject, KEY_LIMIT);
-			Integer offsetOnServer = JsonInput.getIntOrNull(responseObject, KEY_OFFSET);
-			return new ResultsWrapper<>(totalFoundOnServer, limitOnServer, offsetOnServer, results);
+			return wrapResponse(config, responseObject);
 		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}
+	}
+
+	/**
+	 * Returns an object list of children belonging to a specified parent object. Provide your own "limit" and "offset"
+	 * parameters if you need those, otherwise this method will return the first page of some default size only (this
+	 * default is controlled by your Redmine configuration).
+	 *
+	 * @return objects list, never NULL
+	 */
+	public <T> ResultsWrapper<T> getChildObjectsListNoPaging(Class<?> parentClass, String parentId, Class<T> objectClass,
+															 Collection<? extends NameValuePair> params) throws RedmineException {
+		final EntityConfig<T> config = getConfig(objectClass);
+		try {
+			final JSONObject responseObject = getJsonResponseFromGet(parentClass, parentId, objectClass, params);
+			return wrapResponse(config, responseObject);
+		} catch (JSONException e) {
+			throw new RedmineFormatException(e);
+		}
+	}
+
+	private <T> ResultsWrapper<T> wrapResponse(EntityConfig<T> config, JSONObject responseObject) throws JSONException {
+		List<T> results = JsonInput.getListOrNull(responseObject, config.multiObjectName, config.parser);
+		Integer totalFoundOnServer = JsonInput.getIntOrNull(responseObject, KEY_TOTAL_COUNT);
+		Integer limitOnServer = JsonInput.getIntOrNull(responseObject, KEY_LIMIT);
+		Integer offsetOnServer = JsonInput.getIntOrNull(responseObject, KEY_OFFSET);
+		return new ResultsWrapper<>(totalFoundOnServer, limitOnServer, offsetOnServer, results);
 	}
 
 	/**
@@ -507,6 +529,21 @@ public final class Transport {
 		final List<NameValuePair> newParams = new ArrayList<>(params);
 		List<NameValuePair> paramsList = new ArrayList<>(newParams);
 		final URI uri = getURIConfigurator().getObjectsURI(objectClass, paramsList);
+		return jsonPerformGet(uri);
+	}
+
+	/**
+	 * Similar to {@link Transport#getJsonResponseFromGet(java.lang.Class, java.util.Collection)}, retrieves child objects
+	 * under specified parent object
+	 */
+	public <T> JSONObject getJsonResponseFromGet(Class<?> parentClass, String parentId, Class<T> objectClass,
+												 Collection<? extends NameValuePair> params) throws RedmineException, JSONException {
+		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass, parentId, objectClass,
+				params.toArray(new NameValuePair[]{}));
+		return jsonPerformGet(uri);
+	}
+
+	private JSONObject jsonPerformGet(URI uri) throws RedmineException, JSONException {
 		final HttpGet http = new HttpGet(uri);
 		final String response = send(http);
 		final JSONObject responseObject = RedmineJSONParser.getResponse(response);
