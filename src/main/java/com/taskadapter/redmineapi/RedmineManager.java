@@ -118,4 +118,7 @@ public class RedmineManager {
         transport.setOnBehalfOfUser(loginName);
     }
 
+    public Transport getTransport() {
+        return transport;
+    }
 }
