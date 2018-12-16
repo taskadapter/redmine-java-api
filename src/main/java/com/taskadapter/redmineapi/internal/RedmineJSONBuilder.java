@@ -191,6 +191,9 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "status", storage, User.STATUS);
 		addIfSetFullDate(writer, "created_on", storage, User.CREATED_ON);
 		addIfSetFullDate(writer, "last_login_on", storage, User.LAST_LOGIN_ON);
+		addIfSet(writer, "mail_notification", storage, User.MAIL_NOTIFICATION);
+		addIfSet(writer, "must_change_passwd", storage, User.MUST_CHANGE_PASSWD);
+		addIfSet(writer, "generate_password", storage, User.GENERATE_PASSWORD);
 		writeCustomFields(writer, user.getCustomFields());
 
 	}

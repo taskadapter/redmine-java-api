@@ -32,6 +32,9 @@ public class User implements Identifiable {
     public final static Property<Date> LAST_LOGIN_ON = new Property<>(Date.class, "lastLoginOn");
     public final static Property<Integer> AUTH_SOURCE_ID = new Property<>(Integer.class, "authSourceId");
     public final static Property<Integer> STATUS = new Property<>(Integer.class, "status");
+    public final static Property<String> MAIL_NOTIFICATION = new Property<>(String.class, "mail_notification");
+    public final static Property<Boolean> MUST_CHANGE_PASSWD = new Property<>(Boolean.class, "must_change_passwd");
+    public final static Property<Boolean> GENERATE_PASSWORD = new Property<>(Boolean.class, "generate_password");
 
     public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
     public final static Property<Set<Membership>> MEMBERSHIP = (Property<Set<Membership>>) new Property(Set.class, "membership");
@@ -281,6 +284,18 @@ public class User implements Identifiable {
      */
     public void setStatus(Integer status) {
         storage.set(STATUS, status);
+    }
+
+    public void setMailNotification(String mailNotification) {
+        storage.set(MAIL_NOTIFICATION, mailNotification);
+    }
+
+    public void setMustChangePasswd(Boolean mustChangePasswd) {
+        storage.set(MUST_CHANGE_PASSWD, mustChangePasswd);
+    }
+
+    public void setGeneratePassword(Boolean generatePassword) {
+        storage.set(GENERATE_PASSWORD, generatePassword);
     }
 
     public PropertyStorage getStorage() {
