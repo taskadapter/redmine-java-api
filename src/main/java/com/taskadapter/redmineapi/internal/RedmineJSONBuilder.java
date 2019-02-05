@@ -346,5 +346,6 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "text", storage, WikiPageDetail.TEXT);
 		addIfSet(writer, "comments", storage, WikiPageDetail.COMMENTS);
 		addIfSet(writer, "version", storage, WikiPage.VERSION);
+		JsonOutput.addArrayIfNotEmpty(writer, "uploads", detail.getAttachments(), RedmineJSONBuilder::writeUpload);
 	}
 }
