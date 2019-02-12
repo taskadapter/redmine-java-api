@@ -1,20 +1,24 @@
 package com.taskadapter.redmineapi;
 
-import com.taskadapter.redmineapi.bean.Attachment;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.WikiPage;
-import com.taskadapter.redmineapi.bean.WikiPageDetail;
+import com.taskadapter.redmineapi.bean.*;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class WikiManagerIT {
 
@@ -59,6 +63,30 @@ public class WikiManagerIT {
         createSomeWikiPage();
         List<WikiPage> wikiPages = manager.getWikiPagesByProject(projectKey);
         assertThat(wikiPages.size()).isGreaterThan(1);
+    }
+
+    @Test
+    public void wikiPageComplexTest() throws RedmineException, URISyntaxException, IOException {
+        Path attachmentPath = Paths.get(getClass().getResource("invalid_page.txt").toURI());
+        Attachment attachment = redmineManager.getAttachmentManager()
+                .uploadAttachment(Files.probeContentType(attachmentPath), attachmentPath.toFile());
+
+        WikiPageDetail expectedWikiPage = new WikiPageDetail();
+        String pageTitle = "title " + System.currentTimeMillis();
+        expectedWikiPage.setTitle(pageTitle);
+        expectedWikiPage.setText("some text here");
+        expectedWikiPage.setVersion(27);
+        expectedWikiPage.setCreatedOn(new Date());
+        expectedWikiPage.setAttachments(Arrays.asList(attachment));
+
+        manager.update(projectKey, expectedWikiPage);
+
+        WikiPageDetail actualWikiPage = manager.getWikiPageDetailByProjectAndTitle(projectKey, pageTitle);
+        assertEquals(expectedWikiPage.getTitle(), actualWikiPage.getTitle());
+        assertEquals(expectedWikiPage.getText(), actualWikiPage.getText());
+        assertEquals(expectedWikiPage.getVersion(), actualWikiPage.getVersion());
+        assertEquals(expectedWikiPage.getCreatedOn(), actualWikiPage.getCreatedOn());
+        assertEquals(expectedWikiPage.getAttachments().get(0), actualWikiPage.getAttachments().get(0));
     }
 
     @Ignore("requires manual configuration, see the source code.")
