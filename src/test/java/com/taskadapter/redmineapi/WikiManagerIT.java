@@ -72,21 +72,21 @@ public class WikiManagerIT {
         Attachment attachment = redmineManager.getAttachmentManager()
                 .uploadAttachment(Files.probeContentType(attachmentPath), attachmentPath.toFile());
 
-        WikiPageDetail expectedWikiPage = new WikiPageDetail();
         String pageTitle = "title " + System.currentTimeMillis();
-        expectedWikiPage.setTitle(pageTitle);
-        expectedWikiPage.setText("some text here");
-        expectedWikiPage.setVersion(1);
-        expectedWikiPage.setCreatedOn(new Date());
-        expectedWikiPage.setAttachments(Arrays.asList(attachment));
+        WikiPageDetail wikiPage = new WikiPageDetail()
+                .setTitle(pageTitle)
+                .setText("some text here")
+                .setVersion(1)
+                .setCreatedOn(new Date())
+                .setAttachments(Arrays.asList(attachment));
 
-        manager.update(projectKey, expectedWikiPage);
+        manager.update(projectKey, wikiPage);
 
         WikiPageDetail actualWikiPage = manager.getWikiPageDetailByProjectAndTitle(projectKey, pageTitle);
-        String urlSafeTitleIsExpected = URLEncoder.encode(expectedWikiPage.getTitle(), StandardCharsets.UTF_8.name());
+        String urlSafeTitleIsExpected = URLEncoder.encode(wikiPage.getTitle(), StandardCharsets.UTF_8.name());
         assertTrue(urlSafeTitleIsExpected.equalsIgnoreCase(actualWikiPage.getTitle()));
-        assertEquals(expectedWikiPage.getText(), actualWikiPage.getText());
-        assertEquals(expectedWikiPage.getVersion(), actualWikiPage.getVersion());
+        assertEquals(wikiPage.getText(), actualWikiPage.getText());
+        assertEquals(wikiPage.getVersion(), actualWikiPage.getVersion());
         assertThat(actualWikiPage.getCreatedOn()).isNotNull();
 
         Attachment actualAttachment = actualWikiPage.getAttachments().get(0);
@@ -125,11 +125,9 @@ public class WikiManagerIT {
     }
 
     private WikiPageDetail createSomeWikiPage() throws RedmineException {
-        WikiPageDetail wikiPageDetail = new WikiPageDetail();
-        String title = "title " + System.currentTimeMillis();
-        wikiPageDetail.setTitle(title);
-        String text = "some text here";
-        wikiPageDetail.setText(text);
+        WikiPageDetail wikiPageDetail = new WikiPageDetail()
+                .setTitle("title " + System.currentTimeMillis())
+                .setText("some text here");
         manager.update(projectKey, wikiPageDetail);
         return wikiPageDetail;
     }

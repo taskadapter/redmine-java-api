@@ -1,9 +1,10 @@
 package com.taskadapter.redmineapi.bean;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class WikiPageDetail extends WikiPage {
+public class WikiPageDetail {
 
     public final static Property<WikiPageDetail> PARENT = new Property<>(WikiPageDetail.class, "parent");
     public final static Property<String> TEXT = new Property<>(String.class, "text");
@@ -11,12 +12,10 @@ public class WikiPageDetail extends WikiPage {
     public final static Property<String> COMMENTS = new Property<>(String.class, "comments");
     public final static Property<List<Attachment>> ATTACHMENTS = (Property<List<Attachment>>) new Property(List.class, "uploads");
 
-    public WikiPageDetail() {
-        super();
-        initCollections();
-    }
+    private final PropertyStorage storage = new PropertyStorage();
+    private final WikiPage wikiPage = new WikiPage();
 
-    private void initCollections() {
+    public WikiPageDetail() {
         storage.set(ATTACHMENTS, new ArrayList<>());
     }
 
@@ -27,40 +26,64 @@ public class WikiPageDetail extends WikiPage {
         return storage.get(COMMENTS);
     }
 
-    public void setComments(String comments) {
+    public WikiPageDetail setComments(String comments) {
         storage.set(COMMENTS, comments);
+        return this;
     }
 
     public List<Attachment> getAttachments() {
         return storage.get(ATTACHMENTS);
     }
 
-    public void setAttachments(List<Attachment> attachments) {
+    public WikiPageDetail setAttachments(List<Attachment> attachments) {
         storage.set(ATTACHMENTS, attachments);
+        return this;
     }
 
     public WikiPageDetail getParent() {
         return storage.get(PARENT);
     }
 
-    public void setParent(WikiPageDetail parent) {
+    public WikiPageDetail setParent(WikiPageDetail parent) {
         storage.set(PARENT, parent);
+        return this;
     }
 
     public String getText() {
         return storage.get(TEXT);
     }
 
-    public void setText(String text) {
+    public WikiPageDetail setText(String text) {
         storage.set(TEXT, text);
+        return this;
     }
 
     public User getUser() {
         return storage.get(USER);
     }
 
-    public void setUser(User user) {
+    public Integer getVersion() {
+        return wikiPage.getVersion();
+    }
+
+    public WikiPageDetail setUser(User user) {
         storage.set(USER, user);
+        return this;
+    }
+
+    public WikiPageDetail setTitle(String title) {
+        wikiPage.setTitle(title);
+        return this;
+    }
+
+    public WikiPageDetail setVersion(Integer version) {
+        wikiPage.setVersion(version);
+        return this;
+    }
+
+    public WikiPageDetail setCreatedOn(Date createdOn) {
+        wikiPage.setCreatedOn(createdOn);
+        return this;
     }
 
     @Override
@@ -72,5 +95,22 @@ public class WikiPageDetail extends WikiPage {
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+    public String getTitle() {
+        return wikiPage.getTitle();
+    }
+
+    public Date getCreatedOn() {
+        return wikiPage.getCreatedOn();
+    }
+
+    public Date getUpdatedOn() {
+        return wikiPage.getUpdatedOn();
+    }
+
+    public WikiPageDetail setUpdatedOn(Date updatedOn) {
+        wikiPage.setUpdatedOn(updatedOn);
+        return this;
     }
 }
