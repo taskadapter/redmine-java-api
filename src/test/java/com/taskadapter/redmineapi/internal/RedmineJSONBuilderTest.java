@@ -65,10 +65,10 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void onlyExplicitlySetFieldsAreAddedToUserJSon() {
-		User user = UserFactory.create();
-		user.setLogin("login1");
-		user.setMail(null);
-		user.setStatus(null);
+		User user = UserFactory.create()
+				.setLogin("login1")
+				.setMail(null)
+				.setStatus(null);
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON("some_project_key", user, RedmineJSONBuilder::writeUser);
 		assertThat(generatedJSON).contains("\"login\":\"login1\",");
 		assertThat(generatedJSON).contains("\"mail\":null");

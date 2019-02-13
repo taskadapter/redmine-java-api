@@ -32,12 +32,11 @@ public class IntegrationTestHelper {
         String login = testConfig.getLogin();
         String fName = testConfig.getParam("userFName");
         String lName = testConfig.getParam("userLName");
-        User user = UserFactory.create(userId);
-        user.setLogin(login);
-        user.setFirstName(fName);
-        user.setLastName(lName);
-        user.setApiKey(testConfig.getParam("apikey"));
-        return user;
+        return UserFactory.create(userId)
+                .setLogin(login)
+                .setFirstName(fName)
+                .setLastName(lName)
+                .setApiKey(testConfig.getParam("apikey"));
     }
 
     public static RedmineManager createRedmineManager() {

@@ -77,24 +77,27 @@ public class User implements Identifiable {
         return storage.get(LOGIN);
     }
 
-    public void setLogin(String login) {
+    public User setLogin(String login) {
         storage.set(LOGIN, login);
+        return this;
     }
 
     public String getFirstName() {
         return storage.get(FIRST_NAME);
     }
 
-    public void setFirstName(String firstName) {
+    public User setFirstName(String firstName) {
         storage.set(FIRST_NAME, firstName);
+        return this;
     }
 
     public String getLastName() {
         return storage.get(LAST_NAME);
     }
 
-    public void setLastName(String lastName) {
+    public User setLastName(String lastName) {
         storage.set(LAST_NAME, lastName);
+        return this;
     }
 
     /**
@@ -104,24 +107,27 @@ public class User implements Identifiable {
         return storage.get(MAIL);
     }
 
-    public void setMail(String mail) {
+    public User setMail(String mail) {
         storage.set(MAIL, mail);
+        return this;
     }
 
     public Date getCreatedOn() {
         return storage.get(CREATED_ON);
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public User setCreatedOn(Date createdOn) {
         storage.set(CREATED_ON, createdOn);
+        return this;
     }
 
     public Date getLastLoginOn() {
         return storage.get(LAST_LOGIN_ON);
     }
 
-    public void setLastLoginOn(Date lastLoginOn) {
+    public User setLastLoginOn(Date lastLoginOn) {
         storage.set(LAST_LOGIN_ON, lastLoginOn);
+        return this;
     }
 
     public String getApiKey() {
@@ -133,8 +139,9 @@ public class User implements Identifiable {
      * The value you set using this method will be ignored by the server.
      */
     @Deprecated
-    public void setApiKey(String apiKey) {
+    public User setApiKey(String apiKey) {
         storage.set(API_KEY, apiKey);
+        return this;
     }
 
     /**
@@ -147,8 +154,9 @@ public class User implements Identifiable {
 		return storage.get(AUTH_SOURCE_ID);
 	}
 
-	public void setAuthSourceId(Integer authSource) {
+	public User setAuthSourceId(Integer authSource) {
         storage.set(AUTH_SOURCE_ID, authSource);
+        return this;
 	}
 
     @Override
@@ -175,10 +183,10 @@ public class User implements Identifiable {
     }
 
     /**
-     * This is a BIG HACK just to workaround the crappy Redmine REST API limitation.
+     * This is a BIG HACK just to workaround Redmine REST API limitation.
      * see http://www.redmine.org/issues/7487
      */
-    public void setFullName(String fullName) {
+    public User setFullName(String fullName) {
         int ind = fullName.indexOf(' ');
         if (ind != -1) {
             setFirstName(fullName.substring(0, ind));
@@ -186,14 +194,16 @@ public class User implements Identifiable {
         } else {
             setFirstName(fullName);
         }
+        return this;
     }
 
     public String getPassword() {
         return storage.get(PASSWORD);
     }
 
-    public void setPassword(String password) {
+    public User setPassword(String password) {
         storage.set(PASSWORD, password);
+        return this;
     }
 
     /**
@@ -223,8 +233,9 @@ public class User implements Identifiable {
      * NOTE: The custom field(s) <strong>must have correct database ID set</strong> to be saved to Redmine. This is Redmine REST API's limitation.
      * ID can be seen in database or in Redmine administration when editing the custom field (number is part of the URL!).
      */
-    public void addCustomFields(Collection<CustomField> customFields) {
+    public User addCustomFields(Collection<CustomField> customFields) {
         storage.get(CUSTOM_FIELDS).addAll(customFields);
+        return this;
     }
 
     /**
@@ -233,27 +244,30 @@ public class User implements Identifiable {
      *
      * @param customField the field to add.
      */
-    public void addCustomField(CustomField customField) {
+    public User addCustomField(CustomField customField) {
         storage.get(CUSTOM_FIELDS).add(customField);
+        return this;
     }
 
 	public Collection<Membership> getMemberships() {
 		return Collections.unmodifiableCollection(storage.get(MEMBERSHIP));
 	}
 
-	public void addMemberships(Collection<Membership> memberships) {
+	public User addMemberships(Collection<Membership> memberships) {
 		storage.get(MEMBERSHIP).addAll(memberships);
+        return this;
 	}
 
 	public Collection<Group> getGroups() {
         return Collections.unmodifiableCollection(storage.get(GROUPS));
     }
 
-	public void addGroups(Collection<Group> groups) {
+	public User addGroups(Collection<Group> groups) {
         if (!storage.isPropertySet(GROUPS)) {
             storage.set(GROUPS, new HashSet<Group>());
         }
         storage.get(GROUPS).addAll(groups);
+        return this;
 	}
 
     /**
@@ -282,20 +296,24 @@ public class User implements Identifiable {
      * 
      * @param status {@link #STATUS_ACTIVE}, {@link #STATUS_LOCKED}, etc...
      */
-    public void setStatus(Integer status) {
+    public User setStatus(Integer status) {
         storage.set(STATUS, status);
+        return this;
     }
 
-    public void setMailNotification(String mailNotification) {
+    public User setMailNotification(String mailNotification) {
         storage.set(MAIL_NOTIFICATION, mailNotification);
+        return this;
     }
 
-    public void setMustChangePasswd(Boolean mustChangePasswd) {
+    public User setMustChangePasswd(Boolean mustChangePasswd) {
         storage.set(MUST_CHANGE_PASSWD, mustChangePasswd);
+        return this;
     }
 
-    public void setGeneratePassword(Boolean generatePassword) {
+    public User setGeneratePassword(Boolean generatePassword) {
         storage.set(GENERATE_PASSWORD, generatePassword);
+        return this;
     }
 
     public PropertyStorage getStorage() {

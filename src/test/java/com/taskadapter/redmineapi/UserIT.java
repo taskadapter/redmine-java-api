@@ -92,12 +92,12 @@ public class UserIT {
 
     @Test
     public void userCanBeFoundByFreeFormSearch() throws RedmineException {
-        final User user = UserFactory.create();
-        user.setLogin("login" + System.currentTimeMillis());
-        final String name = "UniqueName";
-        user.setFirstName(name);
-        user.setLastName("LName");
-        user.setMail("aa@aaa.ccc");
+        String name = "UniqueName";
+        User user = UserFactory.create()
+                .setLogin("login" + System.currentTimeMillis())
+                .setFirstName(name)
+                .setLastName("LName")
+                .setMail("aa@aaa.ccc");
         Integer id = null;
         try {
             final User created = userManager.createUser(user);
@@ -165,16 +165,15 @@ public class UserIT {
         userToCreate.setLogin("login33" + randomNumber);
         userToCreate.setMail("email" + randomNumber + "@somedomain.com");
         userToCreate.setPassword("1234asdf");
-        User createdUser = userManager.createUser(userToCreate);
+        String newFirstName = "fnameNEW";
+        String newLastName = "lnameNEW";
+        String newMail = "newmail" + randomNumber + "@asd.com";
+        User createdUser = userManager.createUser(userToCreate)
+                .setFirstName(newFirstName)
+                .setLastName(newLastName)
+                .setMail(newMail);
         Integer userId = createdUser.getId();
         try {
-            String newFirstName = "fnameNEW";
-            String newLastName = "lnameNEW";
-            String newMail = "newmail" + randomNumber + "@asd.com";
-            createdUser.setFirstName(newFirstName);
-            createdUser.setLastName(newLastName);
-            createdUser.setMail(newMail);
-
             userManager.update(createdUser);
 
             User updatedUser = userManager.getUserById(userId);
