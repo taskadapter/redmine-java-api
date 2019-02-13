@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WikiManagerIT {
 
@@ -67,7 +68,7 @@ public class WikiManagerIT {
 
     @Test
     public void wikiPageComplexTest() throws RedmineException, URISyntaxException, IOException {
-        Path attachmentPath = Paths.get(getClass().getResource("invalid_page.txt").toURI());
+        Path attachmentPath = Paths.get(getClass().getClassLoader().getResource("invalid_page.txt").toURI());
         Attachment attachment = redmineManager.getAttachmentManager()
                 .uploadAttachment(Files.probeContentType(attachmentPath), attachmentPath.toFile());
 
@@ -75,18 +76,23 @@ public class WikiManagerIT {
         String pageTitle = "title " + System.currentTimeMillis();
         expectedWikiPage.setTitle(pageTitle);
         expectedWikiPage.setText("some text here");
-        expectedWikiPage.setVersion(27);
+        expectedWikiPage.setVersion(1);
         expectedWikiPage.setCreatedOn(new Date());
         expectedWikiPage.setAttachments(Arrays.asList(attachment));
 
         manager.update(projectKey, expectedWikiPage);
 
         WikiPageDetail actualWikiPage = manager.getWikiPageDetailByProjectAndTitle(projectKey, pageTitle);
-        assertEquals(expectedWikiPage.getTitle(), actualWikiPage.getTitle());
+        String urlSafeTitleIsExpected = URLEncoder.encode(expectedWikiPage.getTitle(), StandardCharsets.UTF_8.name());
+        assertTrue(urlSafeTitleIsExpected.equalsIgnoreCase(actualWikiPage.getTitle()));
         assertEquals(expectedWikiPage.getText(), actualWikiPage.getText());
         assertEquals(expectedWikiPage.getVersion(), actualWikiPage.getVersion());
-        assertEquals(expectedWikiPage.getCreatedOn(), actualWikiPage.getCreatedOn());
-        assertEquals(expectedWikiPage.getAttachments().get(0), actualWikiPage.getAttachments().get(0));
+        assertThat(actualWikiPage.getCreatedOn()).isNotNull();
+
+        Attachment actualAttachment = actualWikiPage.getAttachments().get(0);
+        assertEquals(attachment.getFileName(), actualAttachment.getFileName());
+        assertEquals(attachment.getContentType(), actualAttachment.getContentType());
+        assertEquals(attachmentPath.toFile().length(), actualAttachment.getFileSize().longValue());
     }
 
     @Ignore("requires manual configuration, see the source code.")
