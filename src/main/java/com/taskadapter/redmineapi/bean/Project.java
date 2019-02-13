@@ -57,7 +57,6 @@ public class Project implements Identifiable, Serializable, FluentStyle {
     public Project(Transport transport) {
         this.transport = transport;
         storage.set(CUSTOM_FIELDS, new HashSet<>());
-        storage.set(TRACKERS, new HashSet<>());
     }
 
     public Project(Transport transport, String name, String key) {
@@ -119,11 +118,27 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * @return Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
      */
     public Collection<Tracker> getTrackers() {
+    	if (!storage.isPropertySet(TRACKERS)) //checks because trackers storage is not created for new projects
+    		return new HashSet<>();
         return Collections.unmodifiableCollection(storage.get(TRACKERS));
     }
 
+    /**
+     * Adds the specified trackers to this project.
+     * If this project is created or updated on the redmine server, 
+     * each tracker id must be a valid tracker on the server.
+     */
     public void addTrackers(Collection<Tracker> trackers) {
+    	if (!storage.isPropertySet(TRACKERS)) //checks because trackers storage is not created for new projects
+    		this.clearTrackers();
         storage.get(TRACKERS).addAll(trackers);
+    }
+
+    /**
+     * Removes all of the trackers from this project.
+     */
+    public void clearTrackers() {
+    	storage.set(TRACKERS, new HashSet<>());
     }
 
     public Tracker getTrackerByName(String trackerName) {
