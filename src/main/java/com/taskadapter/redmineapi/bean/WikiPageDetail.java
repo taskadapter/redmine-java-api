@@ -9,7 +9,7 @@ public class WikiPageDetail extends WikiPage {
     public final static Property<String> TEXT = new Property<>(String.class, "text");
     public final static Property<User> USER = new Property<>(User.class, "user");
     public final static Property<String> COMMENTS = new Property<>(String.class, "comments");
-    public final static Property<List<Attachment>> ATTACHMENTS = (Property<List<Attachment>>) new Property(List.class, "attachments");
+    public final static Property<List<Attachment>> ATTACHMENTS = (Property<List<Attachment>>) new Property(List.class, "uploads");
 
     public WikiPageDetail() {
         super();
