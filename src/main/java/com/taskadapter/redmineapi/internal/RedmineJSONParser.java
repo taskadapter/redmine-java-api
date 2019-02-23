@@ -202,8 +202,8 @@ public final class RedmineJSONParser {
 
 	@SuppressWarnings("deprecation")
 	public static Issue parseIssue(JSONObject content) throws JSONException {
-		final Issue result = IssueFactory.create(JsonInput.getIntOrNull(content, "id"));
-		result.setSubject(JsonInput.getStringOrNull(content, "subject"));
+		final Issue result = IssueFactory.create(JsonInput.getIntOrNull(content, "id"))
+			.setSubject(JsonInput.getStringOrNull(content, "subject"));
 		final JSONObject parentIssueObject = JsonInput.getObjectOrNull(content,
 				"parent");
 		if (parentIssueObject != null)

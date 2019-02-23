@@ -117,8 +117,8 @@ public class IssueManagerIT {
 
         Calendar due = Calendar.getInstance();
         due.add(Calendar.MONTH, 1);
-        issueToCreate.setDueDate(due.getTime());
         User ourUser = IntegrationTestHelper.getOurUser();
+        issueToCreate.setDueDate(due.getTime());
         issueToCreate.setAssigneeId(ourUser.getId());
 
         String description = "This is the description for the new task."
@@ -307,13 +307,13 @@ public class IssueManagerIT {
     @Test
     public void privateFlagIsRespectedWhenCreatingIssues() throws RedmineException {
 
-        Issue privateIssueToCreate = IssueFactory.create(projectId, "private issue");
-        privateIssueToCreate.setPrivateIssue(true);
+        Issue privateIssueToCreate = IssueFactory.create(projectId, "private issue")
+                .setPrivateIssue(true);
         Issue newIssue = issueManager.createIssue(privateIssueToCreate);
         assertThat(newIssue.isPrivateIssue()).isTrue();
 
-        Issue publicIssueToCreate = IssueFactory.create(projectId, "public issue");
-        publicIssueToCreate.setPrivateIssue(false);
+        Issue publicIssueToCreate = IssueFactory.create(projectId, "public issue")
+                .setPrivateIssue(false);
         Issue newPublicIssue = issueManager.createIssue(publicIssueToCreate);
         assertThat(newPublicIssue.isPrivateIssue()).isFalse();
 
@@ -745,11 +745,11 @@ public class IssueManagerIT {
         final String version1Name = "1.0";
         final String version2Name = "2.0";
 
-        final Issue issueToCreate = IssueHelper.generateRandomIssue(projectId);
         Version version1 = createVersion(version1Name);
-        issueToCreate.setTargetVersion(version1);
-        issueToCreate.setProjectId(project.getId());
-        final Issue createdIssue = issueManager.createIssue(issueToCreate);
+        Issue issueToCreate = IssueHelper.generateRandomIssue(projectId)
+                .setTargetVersion(version1)
+                .setProjectId(project.getId());
+        Issue createdIssue = issueManager.createIssue(issueToCreate);
 
         assertNotNull(createdIssue.getTargetVersion());
         assertEquals(createdIssue.getTargetVersion().getName(), version1Name);
@@ -822,8 +822,8 @@ public class IssueManagerIT {
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
-        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
-        category.setAssigneeId(IntegrationTestHelper.getOurUser().getId());
+        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
+            .setAssigneeId(IntegrationTestHelper.getOurUser().getId());
         IssueCategory newIssueCategory = issueManager.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
         assertNotNull("Expected projectId of new category not to be null", newIssueCategory.getProjectId());
@@ -853,8 +853,8 @@ public class IssueManagerIT {
     @Test
     public void testCreateAndDeleteIssueCategoryGroupAssignee() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
-        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
-        category.setAssigneeId(demoGroup.getId());
+        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
+            .setAssigneeId(demoGroup.getId());
         IssueCategory newIssueCategory = issueManager.createCategory(category);
         assertNotNull("Expected new category not to be null", newIssueCategory);
         assertNotNull("Expected projectId of new category not to be null", newIssueCategory.getProjectId());
@@ -886,12 +886,12 @@ public class IssueManagerIT {
     public void testGetIssueCategories() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
         // create some categories
-        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
         Integer ourUserId = IntegrationTestHelper.getOurUser().getId();
-        testIssueCategory1.setAssigneeId(ourUserId);
+        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
+            .setAssigneeId(ourUserId);
         IssueCategory newIssueCategory1 = issueManager.createCategory(testIssueCategory1);
-        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime());
-        testIssueCategory2.setAssigneeId(ourUserId);
+        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
+            .setAssigneeId(ourUserId);
         IssueCategory newIssueCategory2 = issueManager.createCategory(testIssueCategory2);
         try {
             List<IssueCategory> categories = issueManager.getCategories(project.getId());
@@ -972,12 +972,12 @@ public class IssueManagerIT {
         try {
             Project project = projectManager.getProjectByKey(projectKey);
             // create an issue category
-            IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category_" + new Date().getTime());
-            category.setAssigneeId(IntegrationTestHelper.getOurUser().getId());
+            IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category_" + new Date().getTime())
+                .setAssigneeId(IntegrationTestHelper.getOurUser().getId());
             newIssueCategory = issueManager.createCategory(category);
             // create an issue
-            Issue issueToCreate = IssueFactory.create(projectId, "getIssueWithCategory_" + UUID.randomUUID());
-            issueToCreate.setCategory(newIssueCategory);
+            Issue issueToCreate = IssueFactory.create(projectId, "getIssueWithCategory_" + UUID.randomUUID())
+                .setCategory(newIssueCategory);
             newIssue = issueManager.createIssue(issueToCreate);
             // retrieve issue
             Issue retrievedIssue = issueManager.getIssueById(newIssue.getId());
@@ -1008,8 +1008,8 @@ public class IssueManagerIT {
 
     @Test
     public void nullStartDateIsPreserved() throws RedmineException {
-        Issue issue = IssueFactory.create(projectId, "test start date");
-        issue.setStartDate(null);
+        Issue issue = IssueFactory.create(projectId, "test start date")
+            .setStartDate(null);
         Issue newIssue = issueManager.createIssue(issue);
         Issue loadedIssue = issueManager.getIssueById(newIssue.getId());
         assertNull(loadedIssue.getStartDate());
@@ -1050,12 +1050,12 @@ public class IssueManagerIT {
         CustomFieldDefinition customField1 = getCustomFieldByName(customFieldDefinitions, "my_custom_1");
         CustomFieldDefinition customField2 = getCustomFieldByName(customFieldDefinitions, "custom_boolean_1");
 
-        issue.clearCustomFields();
-
         String custom1Value = "some value 123";
         String custom2Value = "true";
-        issue.addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value));
-        issue.addCustomField(CustomFieldFactory.create(customField2.getId(), customField2.getName(), custom2Value));
+
+        issue.clearCustomFields()
+            .addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value))
+            .addCustomField(CustomFieldFactory.create(customField2.getId(), customField2.getName(), custom2Value));
         issueManager.update(issue);
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
@@ -1103,8 +1103,8 @@ public class IssueManagerIT {
     public void setMultiValuesForMultiLineCustomField() throws Exception {
         Issue issue = IssueFactory.create(projectId, "test for custom multi fields - set multiple values");
         CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
-        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId());
-        customField.setValues(Arrays.asList("V1", "V3"));
+        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId())
+            .setValues(Arrays.asList("V1", "V3"));
         issue.addCustomField(customField);
         Issue createdIssue = issueManager.createIssue(issue);
 
@@ -1125,8 +1125,8 @@ public class IssueManagerIT {
     public void createIssueWithEmptyListInMultilineCustomFields() throws Exception {
         Issue newIssue = IssueFactory.create(projectId, "test for custom multi fields - set multiple values");
         CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
-        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId());
-        customField.setValues(Collections.EMPTY_LIST);
+        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId())
+            .setValues(Collections.EMPTY_LIST);
         newIssue.addCustomField(customField);
         Issue createdIssue = issueManager.createIssue(newIssue);
         customField = createdIssue.getCustomFieldByName("custom_multi_list");

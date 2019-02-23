@@ -45,10 +45,11 @@ public class CustomField {
 		return storage.get(VALUE);
     }
 
-    public void setValue(String value) {
+    public CustomField setValue(String value) {
         storage.set(VALUE, value);
 		storage.set(VALUES, new ArrayList<>());
 		storage.set(MULTIPLE, false);
+        return this;
     }
     
 	/**
@@ -59,12 +60,13 @@ public class CustomField {
 	}
 
 	/**
-	 * @param values the values for multi-line custom field.
-	 */
-	public void setValues(List<String> values) {
+     * @param values the values for multi-line custom field.
+     */
+	public CustomField setValues(List<String> values) {
 		storage.set(VALUES, values);
 		storage.set(VALUE, null);
         storage.set(MULTIPLE, true);
+        return this;
 	}
 
 	/**

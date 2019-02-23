@@ -57,8 +57,9 @@ public class IssueCategory implements Identifiable, Serializable {
         return storage.get(ASSIGNEE_ID);
     }
 
-    public void setAssigneeId(Integer assigneeId) {
+    public IssueCategory setAssigneeId(Integer assigneeId) {
         storage.set(ASSIGNEE_ID, assigneeId);
+        return this;
     }
 
     public String getAssigneeName() {

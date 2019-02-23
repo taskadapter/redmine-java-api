@@ -21,8 +21,8 @@ public class IssueHelper {
     }
 
     public static Issue createIssue(IssueManager issueManager, int projectId) throws RedmineException {
-        Issue issue = generateRandomIssue(projectId);
-        issue.setProjectId(projectId);
+        Issue issue = generateRandomIssue(projectId)
+            .setProjectId(projectId);
         return issueManager.createIssue(issue);
     }
 
