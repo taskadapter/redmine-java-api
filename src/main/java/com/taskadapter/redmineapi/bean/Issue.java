@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class Issue implements Identifiable, FluentStyle {
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
     public final static Property<String> SUBJECT = new Property<>(String.class, "subject");
@@ -77,16 +77,7 @@ public class Issue implements Identifiable, FluentStyle {
 
     private Transport transport;
 
-    /**
-     * @param id database ID.
-     */
-    Issue(Integer id) {
-        this();
-        setId(id);
-    }
-
     public Issue() {
-        this.storage = new PropertyStorage();
         initCollections(storage);
     }
 

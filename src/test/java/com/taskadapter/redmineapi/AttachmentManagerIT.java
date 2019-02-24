@@ -24,7 +24,6 @@ import static org.junit.Assert.fail;
 
 public class AttachmentManagerIT {
 
-    private static RedmineManager mgr;
     private static int projectId;
     private static String projectKey;
     private static IssueManager issueManager;
@@ -33,7 +32,7 @@ public class AttachmentManagerIT {
 
     @BeforeClass
     public static void oneTimeSetup() {
-        mgr = IntegrationTestHelper.createRedmineManager();
+        RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
         transport = mgr.getTransport();
 
         issueManager = mgr.getIssueManager();
@@ -248,6 +247,8 @@ public class AttachmentManagerIT {
 
     /**
      * Requires Redmine 3.3.0+ because "delete attachment" feature was added in 3.3.0.
+     *
+     * @since Redmine 3.3.0
      */
     @Test
     public void attachmentIsDeleted() throws Exception {
@@ -258,10 +259,9 @@ public class AttachmentManagerIT {
                 .create();
         Collection<Attachment> attachments = createdIssue.getAttachments();
         Attachment attachment1 = attachments.iterator().next();
-        int attachmentId = attachment1.getId();
-        attachmentManager.delete(attachmentId);
+        attachment1.delete();
         try {
-            attachmentManager.getAttachmentById(attachmentId);
+            attachmentManager.getAttachmentById(attachment1.getId());
             fail("must have failed with NotFoundException");
         } catch (NotFoundException e) {
             System.out.println("got expected exception for deleted attachment");

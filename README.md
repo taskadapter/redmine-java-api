@@ -62,7 +62,7 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
 ## Create an issue
 
     RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);	
-	Version ver = VersionFactory.create(512);
+	Version ver = new Version().setId(512);
 	IssueCategory cat = IssueCategoryFactory.create(673);
     ProjectManager projectManager = manager.getProjectManager();
     Project projectByKey = projectManager.getProjectByKey("testid");

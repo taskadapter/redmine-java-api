@@ -1,17 +1,17 @@
 package com.taskadapter.redmineapi.internal;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.User;
-import org.junit.Test;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.Version;
+import org.junit.Test;
+
 import java.util.Collections;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class RedmineJSONBuilderTest {
 
@@ -29,7 +29,7 @@ public class RedmineJSONBuilderTest {
 	 */
 	@Test
 	public void customFieldsAreWrittenToVersionIfProvided() {
-		Version version = VersionFactory.create(1);
+		Version version = new Version().setId(1);
 		CustomField field = CustomFieldFactory.create(2, "myName", "myValue");
 		version.addCustomFields(Collections.singletonList(field));
 

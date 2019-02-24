@@ -6,7 +6,6 @@ import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -184,10 +183,7 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testVersionDefaults() throws RedmineException {
-		final Version template = VersionFactory.create();
-		template.setProjectId(projectId);
-		template.setName("2.3.4.5");
-		final Version version = projectManager.createVersion(template);
+		Version version = new Version(transport, projectId, "2.3.4.5").create();
 		try {
 			Assert.assertNotNull(version.getId());
 			Assert.assertNotNull(version.getProjectId());
@@ -198,7 +194,7 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(version.getCreatedOn());
 			Assert.assertNotNull(version.getUpdatedOn());
 		} finally {
-			projectManager.deleteVersion(version);
+			version.delete();
 		}
 	}
 

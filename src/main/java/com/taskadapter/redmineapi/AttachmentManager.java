@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Attachment;
-import com.taskadapter.redmineapi.bean.AttachmentFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.internal.CopyBytesHandler;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -155,11 +154,10 @@ public class AttachmentManager {
         final String token;
         try {
             token = transport.upload(wrapper, contentLength);
-            final Attachment result = AttachmentFactory.create();
-            result.setToken(token);
-            result.setContentType(contentType);
-            result.setFileName(fileName);
-            return result;
+            return new Attachment(transport)
+                    .setToken(token)
+                    .setContentType(contentType)
+                    .setFileName(fileName);
         } catch (RedmineException e) {
             unwrapException(e, "uploadStream");
             throw e;
@@ -204,13 +202,9 @@ public class AttachmentManager {
         return baos.toByteArray();
     }
 
-    /**
-     * see http://www.redmine.org/issues/14828
-     *
-     * @since Redmine 3.3.0
-     */
+    @Deprecated
     public void delete(int attachmentId) throws RedmineException {
-        transport.deleteObject(Attachment.class, Integer.toString(attachmentId));
+        new Attachment(transport).setId(attachmentId).delete();
     }
 
     /**

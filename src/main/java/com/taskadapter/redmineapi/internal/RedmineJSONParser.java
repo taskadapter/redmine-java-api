@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi.internal;
 
 import com.taskadapter.redmineapi.bean.Attachment;
-import com.taskadapter.redmineapi.bean.AttachmentFactory;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
@@ -24,11 +23,9 @@ import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.NewsFactory;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.RoleFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
-import com.taskadapter.redmineapi.bean.SavedQueryFactory;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.TimeEntryActivityFactory;
@@ -37,7 +34,6 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.TrackerFactory;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.bean.WatcherFactory;
 import com.taskadapter.redmineapi.bean.WikiPage;
@@ -95,11 +91,10 @@ public final class RedmineJSONParser {
 
 	public static SavedQuery parseSavedQuery(JSONObject object)
 			throws JSONException {
-		final SavedQuery result = SavedQueryFactory.create(JsonInput.getIntOrNull(object, "id"));
-		result.setName(JsonInput.getStringOrNull(object, "name"));
-		result.setPublicQuery(JsonInput.getOptionalBool(object, "is_public"));
-		result.setProjectId(JsonInput.getIntOrNull(object, "project_id"));
-		return result;
+		return new SavedQuery().setId(JsonInput.getIntOrNull(object, "id"))
+				.setName(JsonInput.getStringOrNull(object, "name"))
+				.setPublicQuery(JsonInput.getOptionalBool(object, "is_public"))
+				.setProjectId(JsonInput.getIntOrNull(object, "project_id"));
 	}
 
 	public static News parseNews(JSONObject object) throws JSONException {
@@ -282,8 +277,8 @@ public final class RedmineJSONParser {
 	}
 
 	public static Version parseVersion(JSONObject content) throws JSONException {
-		final Version result = VersionFactory.create(JsonInput.getIntOrNull(content, "id"));
-		final Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
+		Version result = new Version().setId(JsonInput.getIntOrNull(content, "id"));
+		Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
 		if (project != null) {
 			result.setProjectId(project.getId());
 			result.setProjectName(project.getName());
@@ -311,17 +306,14 @@ public final class RedmineJSONParser {
 
 	public static Attachment parseAttachments(JSONObject content)
 			throws JSONException {
-		final Attachment result = AttachmentFactory.create(JsonInput.getIntOrNull(content, "id"));
-		result.setFileName(JsonInput.getStringOrNull(content, "filename"));
-		result.setFileSize(JsonInput.getLong(content, "filesize"));
-		result.setContentType(JsonInput
-				.getStringOrNull(content, "content_type"));
-		result.setContentURL(JsonInput.getStringOrNull(content, "content_url"));
-		result.setDescription(JsonInput.getStringOrNull(content, "description"));
-		result.setCreatedOn(getDateOrNull(content, "created_on"));
-		result.setAuthor(JsonInput.getObjectOrNull(content, "author",
-				RedmineJSONParser::parseUser));
-		return result;
+		return new Attachment(null).setId(JsonInput.getIntOrNull(content, "id"))
+				.setFileName(JsonInput.getStringOrNull(content, "filename"))
+				.setFileSize(JsonInput.getLong(content, "filesize"))
+				.setContentType(JsonInput.getStringOrNull(content, "content_type"))
+				.setContentURL(JsonInput.getStringOrNull(content, "content_url"))
+				.setDescription(JsonInput.getStringOrNull(content, "description"))
+				.setCreatedOn(getDateOrNull(content, "created_on"))
+				.setAuthor(JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser));
 	}
 
 	public static CustomField parseCustomField(JSONObject content)

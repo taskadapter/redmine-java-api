@@ -114,34 +114,17 @@ public class ProjectManager {
     }
 
     /**
-     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br>
-     * Pre-condition: the attribute {@link Project} for the {@link com.taskadapter.redmineapi.bean.Version} must
-     * not be null!
-     *
-     * @param version the {@link com.taskadapter.redmineapi.bean.Version}. Must contain a {@link Project}.
-     * @return the new {@link com.taskadapter.redmineapi.bean.Version} created by Redmine
-     * @throws IllegalArgumentException thrown in case the version does not contain a project.
-     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
-     * @throws RedmineException         thrown in case something went wrong in Redmine
-     * @throws NotFoundException        thrown in case an object can not be found
+     * DEPRECATED. use version.create() instead.
      */
+    @Deprecated
     public Version createVersion(Version version) throws RedmineException {
-        // check project
-        if (version.getProjectId() == null) {
-            throw new IllegalArgumentException(
-                    "Version must contain projectId");
-        }
-        return transport.addChildEntry(Project.class, version.getProjectId().toString(), version);
+        return version.create();
     }
 
     /**
-     * deletes a new {@link Version} from the {@link Project} contained. <br>
-     *
-     * @param version the {@link Version}.
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws RedmineException        thrown in case something went wrong in Redmine
-     * @throws NotFoundException       thrown in case an object can not be found
+     * DEPRECATED. use version.create() instead.
      */
+    @Deprecated
     public void deleteVersion(Version version) throws RedmineException {
         transport
                 .deleteObject(Version.class, Integer.toString(version.getId()));
@@ -171,6 +154,7 @@ public class ProjectManager {
         transport.updateObject(object);
     }
 
+    @Deprecated
     public void update(Version object) throws RedmineException {
         transport.updateObject(object);
     }

@@ -18,7 +18,6 @@ import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
 import com.taskadapter.redmineapi.bean.WatcherFactory;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
@@ -760,10 +759,7 @@ public class IssueManagerIT {
     }
 
     private Version createVersion(String versionName) throws RedmineException {
-        final Version version = VersionFactory.create(1);
-        version.setName(versionName);
-        version.setProjectId(projectId);
-        return mgr.getProjectManager().createVersion(version);
+        return new Version(transport, projectId, versionName).create();
     }
 
     @Test

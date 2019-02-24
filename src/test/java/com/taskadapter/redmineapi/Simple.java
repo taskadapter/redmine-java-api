@@ -10,7 +10,6 @@ import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,7 +149,7 @@ public class Simple {
 		Project project = projectManager.getProjectByKey("testid");
 		Transport transport = manager.getTransport();
 		Issue issue = new Issue(transport, project.getId(), "test123")
-				.setTargetVersion(VersionFactory.create(512))
+				.setTargetVersion(new Version().setId(512))
 				.setCategory(new IssueCategory(transport).setId(673))
 				.create();
 	}

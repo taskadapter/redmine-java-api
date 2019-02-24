@@ -1,13 +1,16 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+
 import java.util.Date;
 
 /**
  * File Attachment for a Redmine issue
  */
-public class Attachment implements Identifiable {
+public class Attachment implements Identifiable, FluentStyle {
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     /**
      * database numeric Id
@@ -21,22 +24,21 @@ public class Attachment implements Identifiable {
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
     public final static Property<User> AUTHOR = new Property<>(User.class, "author");
     public final static Property<String> TOKEN = new Property<>(String.class, "token");
+    private Transport transport;
 
-    /**
-     * Use AttachmentFactory to create instances of this class.
-     *
-     * @param id database ID.
-     * @see com.taskadapter.redmineapi.bean.AttachmentFactory
-     */
-    Attachment(Integer id) {
-        storage = new PropertyStorage();
-        storage.set(DATABASE_ID, id);
+    public Attachment(Transport transport) {
+        setTransport(transport);
     }
 
-    @Override
+    public Attachment setId(Integer id) {
+        storage.set(DATABASE_ID, id);
+        return this;
+    }
+
     /**
      * @return id. NULL for attachments not added to Redmine yet.
      */
+    @Override
     public Integer getId() {
         return storage.get(DATABASE_ID);
     }
@@ -45,16 +47,18 @@ public class Attachment implements Identifiable {
         return storage.get(CONTENT_TYPE);
     }
 
-    public void setContentType(String contentType) {
+    public Attachment setContentType(String contentType) {
         storage.set(CONTENT_TYPE, contentType);
+        return this;
     }
 
     public String getContentURL() {
         return storage.get(CONTENT_URL);
     }
 
-    public void setContentURL(String contentURL) {
+    public Attachment setContentURL(String contentURL) {
         storage.set(CONTENT_URL, contentURL);
+        return this;
     }
 
     /**
@@ -64,48 +68,54 @@ public class Attachment implements Identifiable {
         return storage.get(DESCRIPTION);
     }
 
-    public void setDescription(String description) {
+    public Attachment setDescription(String description) {
         storage.set(DESCRIPTION, description);
+        return this;
     }
 
     public Date getCreatedOn() {
         return storage.get(CREATED_ON);
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public Attachment setCreatedOn(Date createdOn) {
         storage.set(CREATED_ON, createdOn);
+        return this;
     }
 
     public User getAuthor() {
         return storage.get(AUTHOR);
     }
 
-    public void setAuthor(User author) {
+    public Attachment setAuthor(User author) {
         storage.set(AUTHOR, author);
+        return this;
     }
 
     public String getFileName() {
         return storage.get(FILE_NAME);
     }
 
-    public void setFileName(String fileName) {
+    public Attachment setFileName(String fileName) {
         storage.set(FILE_NAME, fileName);
+        return this;
     }
 
     public Long getFileSize() {
         return storage.get(FILE_SIZE);
     }
 
-    public void setFileSize(Long fileSize) {
+    public Attachment setFileSize(Long fileSize) {
         storage.set(FILE_SIZE, fileSize);
+        return this;
     }
 
     public String getToken() {
         return storage.get(TOKEN);
     }
 
-    public void setToken(String token) {
+    public Attachment setToken(String token) {
         storage.set(TOKEN, token);
+        return this;
     }
 
     @Override
@@ -146,5 +156,21 @@ public class Attachment implements Identifiable {
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+    /**
+     * delete the attachment with pre-configured ID from the server.
+     * <br>
+     * see http://www.redmine.org/issues/14828
+     *
+     * @since Redmine 3.3.0
+     */
+    public void delete() throws RedmineException {
+        transport.deleteObject(Attachment.class, Integer.toString(getId()));
+    }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
     }
 }

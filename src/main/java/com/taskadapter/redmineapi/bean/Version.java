@@ -1,5 +1,10 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.NotFoundException;
+import com.taskadapter.redmineapi.RedmineAuthenticationException;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -11,7 +16,7 @@ import java.util.Set;
  * <p>
  * REMARK: currently this is only used with Issues, so only id and name are filled
  */
-public class Version implements Identifiable {
+public class Version implements Identifiable, FluentStyle {
     /*
       * <id>1</id> <project name="Redmine" id="1"/> <name>0.7</name>
       * <description/> <status>closed</status> <due_date>2008-04-28</due_date>
@@ -30,7 +35,7 @@ public class Version implements Identifiable {
     public static final String SHARING_TREE = "tree";
     public static final String SHARING_SYSTEM = "system";
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     /**
      * database numeric Id
@@ -47,15 +52,22 @@ public class Version implements Identifiable {
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
     public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
     public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
+    private Transport transport;
 
-    /**
-     * Use VersionFactory to create an instance of this class.
-     * @see com.taskadapter.redmineapi.bean.VersionFactory
-     */
-    Version(Integer id) {
-        storage = new PropertyStorage();
+    public Version() {
         initCollections(storage);
+    }
+
+    public Version(Transport transport, int projectId, String name) {
+        this();
+        setTransport(transport);
+        setProjectId(projectId);
+        setName(name);
+    }
+
+    public Version setId(Integer id) {
         storage.set(DATABASE_ID, id);
+        return this;
     }
 
     private void initCollections(PropertyStorage storage) {
@@ -103,16 +115,18 @@ public class Version implements Identifiable {
         return storage.get(PROJECT_ID);
     }
 
-    public void setProjectId(Integer projectId) {
+    public Version setProjectId(Integer projectId) {
         storage.set(PROJECT_ID, projectId);
+        return this;
     }
 
     public String getProjectName() {
         return storage.get(PROJECT_NAME);
     }
 
-    public void setProjectName(String name) {
+    public Version setProjectName(String name) {
         storage.set(PROJECT_NAME, name);
+        return this;
     }
 
     public String getName() {
@@ -131,28 +145,34 @@ public class Version implements Identifiable {
         return storage.get(UPDATED_ON);
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public Version setCreatedOn(Date createdOn) {
         storage.set(CREATED_ON, createdOn);
+        return this;
     }
 
-    public void setDescription(String description) {
+    public Version setDescription(String description) {
         storage.set(DESCRIPTION, description);
+        return this;
     }
 
-    public void setDueDate(Date dueDate) {
+    public Version setDueDate(Date dueDate) {
         storage.set(DUE_DATE, dueDate);
+        return this;
     }
 
-    public void setName(String name) {
+    public Version setName(String name) {
         storage.set(NAME, name);
+        return this;
     }
 
-    public void setSharing(String sharing) {
+    public Version setSharing(String sharing) {
         storage.set(SHARING, sharing);
+        return this;
     }
 
-    public void setStatus(String status) {
+    public Version setStatus(String status) {
         storage.set(STATUS, status);
+        return this;
     }
 
     public void setUpdatedOn(Date updatedOn) {
@@ -163,8 +183,9 @@ public class Version implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(CUSTOM_FIELDS));
     }
 
-    public void addCustomFields(Collection<CustomField> customFields) {
+    public Version addCustomFields(Collection<CustomField> customFields) {
         storage.get(CUSTOM_FIELDS).addAll(customFields);
+        return this;
     }
 
     /**
@@ -186,5 +207,48 @@ public class Version implements Identifiable {
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+
+    /**
+     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br>
+     * Pre-condition: attribute projectId must be set.
+     *
+     * @return the new {@link com.taskadapter.redmineapi.bean.Version} created by Redmine
+     * @throws IllegalArgumentException thrown in case the version does not contain a project.
+     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
+     * @throws RedmineException         thrown in case something went wrong in Redmine
+     * @throws NotFoundException        thrown in case an object can not be found
+     */
+    public Version create() throws RedmineException {
+        // check project
+        if (getProjectId() == null) {
+            throw new IllegalArgumentException(
+                    "Version must contain projectId");
+        }
+        return transport.addChildEntry(Project.class, getProjectId().toString(), this);
+    }
+
+    /**
+     * update this object on the server
+     */
+    public void update() throws RedmineException {
+        transport.updateObject(this);
+    }
+
+    /**
+     * deletes this {@link Version} from the referenced {@link Project}. <br>
+     *
+     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
+     * @throws RedmineException        thrown in case something went wrong in Redmine
+     * @throws NotFoundException       thrown in case an object can not be found
+     */
+    public void delete() throws RedmineException {
+        transport.deleteObject(Version.class, Integer.toString(getId()));
+    }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
     }
 }
