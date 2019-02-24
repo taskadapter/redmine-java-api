@@ -5,7 +5,6 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -82,9 +81,8 @@ public class IssueManagerIT {
         projectKey = project.getIdentifier();
         project2 = IntegrationTestHelper.createProject(mgr);
         projectKey2 = project2.getIdentifier();
-        Group g = GroupFactory.create();
-        g.setName("Group" + System.currentTimeMillis());
-        demoGroup = userManager.createGroup(g);
+        demoGroup = new Group(transport).setName("Group" + System.currentTimeMillis())
+                .create();
         // Add membership of group for the demo projects
         Collection<Role> allRoles = Arrays.asList(RoleFactory.create(3), // Manager
                 RoleFactory.create(4), // Developer
@@ -93,14 +91,14 @@ public class IssueManagerIT {
         projectManager.addGroupToProject(project.getId(), demoGroup.getId(), allRoles);
         projectManager.addGroupToProject(project2.getId(), demoGroup.getId(), allRoles);
 
-        ourUser = IntegrationTestHelper.getOurUser();
+        ourUser = IntegrationTestHelper.getOurUser(transport);
     }
 
     @AfterClass
     public static void oneTimeTearDown() throws RedmineException {
         IntegrationTestHelper.deleteProject(mgr, project.getIdentifier());
         IntegrationTestHelper.deleteProject(mgr, project2.getIdentifier());
-        userManager.deleteGroup(demoGroup);
+        demoGroup.delete();
     }
 
     @Test
@@ -154,7 +152,7 @@ public class IssueManagerIT {
         assertThat(ourUser.getId()).isEqualTo(newIssue.getAssigneeId());
 
         // check AUTHOR
-        Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser().getId();
+        Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser(transport).getId();
         assertEquals(EXPECTED_AUTHOR_ID, newIssue.getAuthorId());
 
         // check ESTIMATED TIME
@@ -298,7 +296,7 @@ public class IssueManagerIT {
         assertNotNull("New issue must have some ID", issue.getId());
 
         // check AUTHOR
-        Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser().getId();
+        Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser(transport).getId();
         assertEquals(EXPECTED_AUTHOR_ID, issue.getAuthorId());
     }
 
@@ -470,16 +468,16 @@ public class IssueManagerIT {
      */
     @Test
     public void testAddIssueWatcher() throws RedmineException {
-        final Issue issue = createIssues(transport, projectId, 1).get(0);
-        final Issue retrievedIssue = issueManager.getIssueById(issue.getId());
+        Issue issue = createIssues(transport, projectId, 1).get(0);
+        Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
-        final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+        User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
             Watcher watcher = WatcherFactory.create(newUser.getId());
             issueManager.addWatcherToIssue(watcher, issue);
         } finally {
-            userManager.deleteUser(newUser.getId());
+            newUser.delete();
         }
 
         issueManager.getIssueById(issue.getId());
@@ -494,13 +492,13 @@ public class IssueManagerIT {
         final Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
-        final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+        User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
             Watcher watcher = WatcherFactory.create(newUser.getId());
             issueManager.addWatcherToIssue(watcher, issue);
             issueManager.deleteWatcherFromIssue(watcher, issue);
         } finally {
-            userManager.deleteUser(newUser.getId());
+            newUser.delete();
         }
 
         issue.delete();
@@ -515,7 +513,7 @@ public class IssueManagerIT {
         final Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
-        final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+        User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
             Watcher watcher = WatcherFactory.create(newUser.getId());
             issueManager.addWatcherToIssue(watcher, issue);
@@ -526,7 +524,7 @@ public class IssueManagerIT {
                 assertThat(watcher1.getId()).isEqualTo(newUser.getId());
             }
         } finally {
-            userManager.deleteUser(newUser.getId());
+            newUser.delete();
         }
 
         issueManager.getIssueById(issue.getId());
@@ -534,7 +532,7 @@ public class IssueManagerIT {
 
     @Test
     public void testAddIssueWithWatchers() throws RedmineException {
-        User newUserWatcher = userManager.createUser(UserGenerator.generateRandomUser());
+        User newUserWatcher = UserGenerator.generateRandomUser(transport).create();
 
         try {
             List<Watcher> watchers = new ArrayList<>();
@@ -552,7 +550,7 @@ public class IssueManagerIT {
             assertEquals(watchers.size(), retrievedIssueWithWatchers.getWatchers().size());
             assertEquals(watcher.getId(), retrievedIssueWithWatchers.getWatchers().iterator().next().getId());
         } finally {
-            userManager.deleteUser(newUserWatcher.getId());
+            newUserWatcher.delete();
         }
     }
 
@@ -684,7 +682,7 @@ public class IssueManagerIT {
 
         Journal journalItem = loadedIssueWithJournals2.getJournals().iterator().next();
         assertEquals(commentDescribingTheUpdate, journalItem.getNotes());
-        User ourUser = IntegrationTestHelper.getOurUser();
+        User ourUser = IntegrationTestHelper.getOurUser(transport);
         // can't compare User objects because either of them is not
         // completely filled
         assertEquals(ourUser.getId(), journalItem.getUser().getId());
@@ -818,13 +816,13 @@ public class IssueManagerIT {
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
         IssueCategory category = new IssueCategory(transport, project.getId(), "Category" + new Date().getTime())
-                .setAssigneeId(IntegrationTestHelper.getOurUser().getId())
+                .setAssigneeId(IntegrationTestHelper.getOurUser(transport).getId())
                 .create();
         assertNotNull("Expected new category not to be null", category);
         assertNotNull("Expected projectId of new category not to be null", category.getProjectId());
         assertNotNull("Expected assignee of new category not to be null", category.getAssigneeId());
 
-        assertThat(category.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser().getId());
+        assertThat(category.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser(transport).getId());
 
         category.delete();
 
@@ -881,7 +879,7 @@ public class IssueManagerIT {
     public void testGetIssueCategories() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
         // create some categories
-        Integer ourUserId = IntegrationTestHelper.getOurUser().getId();
+        Integer ourUserId = IntegrationTestHelper.getOurUser(transport).getId();
         IssueCategory category1 = new IssueCategory(transport, project.getId(), "Category" + new Date().getTime())
                 .setAssigneeId(ourUserId)
                 .create();
@@ -943,7 +941,7 @@ public class IssueManagerIT {
             Project project = projectManager.getProjectByKey(projectKey);
             // create an issue category
             newIssueCategory = new IssueCategory(transport, project.getId(), "Category_" + new Date().getTime())
-                .setAssigneeId(IntegrationTestHelper.getOurUser().getId())
+                .setAssigneeId(IntegrationTestHelper.getOurUser(transport).getId())
                     .create();
 
             // create an issue
@@ -1209,11 +1207,11 @@ public class IssueManagerIT {
     public void issueAssignmentUserAndGroup() throws RedmineException {
         Issue issue = createIssue(transport, projectId);
         assertNull(issue.getAssigneeId());
-        issue.setAssigneeId(IntegrationTestHelper.getOurUser().getId());
+        issue.setAssigneeId(IntegrationTestHelper.getOurUser(transport).getId());
         issueManager.update(issue);
         Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         // User assignment succeeded
-        assertThat(retrievedIssue.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser().getId());
+        assertThat(retrievedIssue.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser(transport).getId());
         issue.setAssigneeId(demoGroup.getId());
         issueManager.update(issue);
         retrievedIssue = issueManager.getIssueById(issue.getId());
@@ -1224,7 +1222,7 @@ public class IssueManagerIT {
 
     @Test
     public void issueCanBeCreatedOnBehalfOfAnotherUser() throws RedmineException {
-        final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+        User newUser = UserGenerator.generateRandomUser(transport).create();
         Issue issue = null;
         try {
             RedmineManager managerOnBehalfOfUser = IntegrationTestHelper.createRedmineManager();
@@ -1233,7 +1231,7 @@ public class IssueManagerIT {
             issue = createIssue(managerOnBehalfOfUser.getTransport(), projectId);
             assertThat(issue.getAuthorName()).isEqualTo(newUser.getFullName());
         } finally {
-            userManager.deleteUser(newUser.getId());
+            newUser.delete();
             deleteIssueIfNotNull(issue);
         }
     }

@@ -98,7 +98,7 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
 
 ## Create a group and add user to it
 
-    Group template = GroupFactory.create("group " + System.currentTimeMillis());
+    Group template = new Group().setName("group " + System.currentTimeMillis());
     Group group = userManager.createGroup(template);
     User newUser = userManager.createUser(UserGenerator.generateRandomUser());
     userManager.addUserToGroup(newUser, group);

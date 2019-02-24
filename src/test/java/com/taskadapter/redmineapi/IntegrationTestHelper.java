@@ -3,7 +3,7 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.slf4j.Logger;
@@ -26,13 +26,13 @@ public class IntegrationTestHelper {
         return new TestConfig();
     }
 
-    public static User getOurUser() {
+    public static User getOurUser(Transport transport) {
         TestConfig testConfig = getTestConfig();
         Integer userId = Integer.parseInt(testConfig.getParam("createissue.userid"));
         String login = testConfig.getLogin();
         String fName = testConfig.getParam("userFName");
         String lName = testConfig.getParam("userLName");
-        return UserFactory.create(userId)
+        return new User(transport).setId(userId)
                 .setLogin(login)
                 .setFirstName(fName)
                 .setLastName(lName)

@@ -1,12 +1,12 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,10 +24,12 @@ public class MembershipIT {
     private static UserManager userManager;
     private static Project project;
     private static ProjectManager projectManager;
+    private static Transport transport;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
+        transport = mgr.getTransport();
         projectManager = mgr.getProjectManager();
         userManager = mgr.getUserManager();
         try {
@@ -44,15 +46,15 @@ public class MembershipIT {
 
     @Test
     public void membershipCanBeSetForUsers() throws RedmineException {
-        final List<Role> roles = userManager.getRoles();
-        final User user = UserGenerator.generateRandomUser();
-        User createdUser = mgr.getUserManager().createUser(user);
+        List<Role> roles = userManager.getRoles();
+        User user = UserGenerator.generateRandomUser(transport);
+        User createdUser = user.create();
         try {
             projectManager.addUserToProject(project.getId(), createdUser.getId(), roles);
             final User userWithMembership = userManager.getUserById(createdUser.getId());
             assertThat(userWithMembership.getMemberships()).isNotEmpty();
         } finally {
-            userManager.deleteUser(createdUser.getId());
+            createdUser.delete();
         }
     }
 
@@ -60,10 +62,10 @@ public class MembershipIT {
     public void membershipCanBeSetForGroups() throws RedmineException {
         final List<Role> roles = userManager.getRoles();
         final Collection<Role> rolesToSet = Arrays.asList(roles.get(0));
-        final Group group = GroupFactory.create("group" + new Random().nextDouble());
+        final Group group = new Group(transport).setName("group" + new Random().nextDouble());
         Group createdGroup = null;
         try {
-            createdGroup = mgr.getUserManager().createGroup(group);
+            createdGroup = group.create();
 
             Membership newMembership = projectManager
                     .addGroupToProject(project.getId(), createdGroup.getId(), rolesToSet);
@@ -73,7 +75,7 @@ public class MembershipIT {
             assertThat(memberGroupId).isNotNull();
             assertThat(memberGroupId).isEqualTo(createdGroup.getId());
         } finally {
-            mgr.getUserManager().deleteGroup(createdGroup);
+            createdGroup.delete();
         }
     }
 
@@ -135,16 +137,16 @@ public class MembershipIT {
     @Test
     public void membershipsContainGoupName() throws RedmineException {
         final List<Role> roles = mgr.getUserManager().getRoles();
-        final Group group = GroupFactory.create("group" + new Random().nextDouble());
+        final Group group = new Group(transport).setName("group" + new Random().nextDouble());
         Group createdGroup = null;
         try {
-            createdGroup = mgr.getUserManager().createGroup(group);
+            createdGroup = group.create();
 
             projectManager.addGroupToProject(project.getId(), createdGroup.getId(), roles);
             List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
             assertThat(memberships.get(0).getGroupName()).isEqualTo(createdGroup.getName());
         } finally {
-            mgr.getUserManager().deleteGroup(createdGroup);
+            createdGroup.delete();
         }
     }
     

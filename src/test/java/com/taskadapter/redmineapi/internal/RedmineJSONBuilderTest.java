@@ -4,9 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
 import org.junit.Test;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Version;
@@ -64,7 +62,7 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void onlyExplicitlySetFieldsAreAddedToUserJSon() {
-		User user = UserFactory.create()
+		User user = new User(null)
 				.setLogin("login1")
 				.setMail(null)
 				.setStatus(null);
@@ -77,11 +75,11 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void onlyExplicitlySetFieldsAreAddedToGroupJSon() {
-		Group groupWithoutName = GroupFactory.create(4);
+		Group groupWithoutName = new Group(null).setId(4);
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON("some_project_key", groupWithoutName, RedmineJSONBuilder::writeGroup);
 		assertThat(generatedJSON).doesNotContain("\"name\"");
 
-		Group groupWithName = GroupFactory.create(4);
+		Group groupWithName = new Group(null).setId(4);
 		groupWithName.setName("some name");
 		final String generatedJSONWithName = RedmineJSONBuilder.toSimpleJSON("some_project_key", groupWithName, RedmineJSONBuilder::writeGroup);
 		assertThat(generatedJSONWithName).contains("\"name\":\"some name\"");

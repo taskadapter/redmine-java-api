@@ -8,10 +8,8 @@ import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinitionFactory;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssuePriorityFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
@@ -38,7 +36,6 @@ import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.TrackerFactory;
 import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.Watcher;
@@ -386,7 +383,7 @@ public final class RedmineJSONParser {
 	}
 
 	public static User parseUser(JSONObject content) throws JSONException {
-		final User result = UserFactory.create(JsonInput.getIntOrNull(content, "id"));
+		final User result = new User(null).setId(JsonInput.getIntOrNull(content, "id"));
 		result.setLogin(JsonInput.getStringOrNull(content, "login"));
 		result.setPassword(JsonInput.getStringOrNull(content, "password"));
 		result.setFirstName(JsonInput.getStringOrNull(content, "firstname"));
@@ -414,7 +411,7 @@ public final class RedmineJSONParser {
 	}
 
 	public static Group parseGroup(JSONObject content) throws JSONException {
-		final Group result = GroupFactory.create(JsonInput.getIntOrNull(content, "id"));
+		final Group result = new Group(null).setId(JsonInput.getIntOrNull(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}

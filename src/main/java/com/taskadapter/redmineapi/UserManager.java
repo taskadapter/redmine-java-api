@@ -41,16 +41,23 @@ public class UserManager {
         return transport.getCurrentUser();
     }
 
+    /**
+     * DEPRECATED. use user.create() instead.
+     */
+    @Deprecated
     public User createUser(User user) throws RedmineException {
-        return transport.addObject(user);
+        return user.create();
     }
 
     /**
+     * DEPRECATED. use user.delete() instead
+     *
      * @param userId user identifier (numeric ID)
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       if the user with the given id is not found
      */
+    @Deprecated
     public void deleteUser(Integer userId) throws RedmineException {
         transport.deleteObject(User.class, Integer.toString(userId));
     }
@@ -157,11 +164,14 @@ public class UserManager {
     }
 
     /**
+     * DEPRECATED. use group.create()
+     *
      * Creates a new group.
      * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      * @return created group.
      * @throws RedmineException
      */
+    @Deprecated
     public Group createGroup(Group base) throws RedmineException {
         return transport.addObject(base);
     }
@@ -170,6 +180,7 @@ public class UserManager {
      * Deletes a group.
      * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      */
+    @Deprecated
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());
     }
@@ -182,10 +193,12 @@ public class UserManager {
         return transport.getObject(Role.class, id);
     }
 
+    @Deprecated
     public void update(User obj) throws RedmineException {
         transport.updateObject(obj);
     }
 
+    @Deprecated
     public void update(Group group) throws RedmineException {
         transport.updateObject(group);
     }
