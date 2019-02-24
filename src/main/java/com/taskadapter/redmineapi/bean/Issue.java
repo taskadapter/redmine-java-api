@@ -82,7 +82,7 @@ public class Issue implements Identifiable, FluentStyle {
      */
     Issue(Integer id) {
         this();
-        storage.set(DATABASE_ID, id);
+        setId(id);
     }
 
     public Issue() {
@@ -133,8 +133,17 @@ public class Issue implements Identifiable, FluentStyle {
         return storage.get(PROJECT_NAME);
     }
 
+
     public Issue setProjectName(String name) {
         storage.set(PROJECT_NAME, name);
+        return this;
+    }
+
+    /**
+     * @param id database ID.
+     */
+    public Issue setId(Integer id) {
+        storage.set(DATABASE_ID, id);
         return this;
     }
 

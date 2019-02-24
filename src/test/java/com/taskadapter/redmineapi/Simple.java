@@ -2,7 +2,6 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
@@ -59,21 +58,20 @@ public class Simple {
     @SuppressWarnings("unused")
 	private static void tryUpload(RedmineManager mgr, IssueManager issueManager, AttachmentManager attachmentManager) throws RedmineException,
 			IOException {
-		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+		final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
 				"application/ternary", content);
 		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
 		final Project project = mgr.getProjectManager().createProject(tmpProject);
-		final Issue testIssue = new Issue();
-		testIssue.setSubject("This is upload ticket!");
-		testIssue.addAttachment(attach1);
-		testIssue.setProjectId(project.getId());
 		try {
-			final Issue createdIssue = issueManager.createIssue(testIssue);
+			Issue issue = new Issue(mgr.getTransport(), project.getId(), "This is upload ticket!")
+					.addAttachment(attach1)
+					.create();
+
 			try {
-				System.out.println(createdIssue.getAttachments());
+				System.out.println(issue.getAttachments());
 			} finally {
-				issueManager.deleteIssue(createdIssue.getId());
+				issue.delete();
 			}
 		} finally {
 			mgr.getProjectManager().deleteProject(project.getIdentifier());
@@ -147,17 +145,13 @@ public class Simple {
 	@SuppressWarnings("unused")
 	private static void tryCreateIssue(RedmineManager manager)
 			throws RedmineException {
-		Issue issue = new Issue();
-		issue.setSubject("test123");
-		final Version ver = VersionFactory.create(512);
-		issue.setTargetVersion(ver);
-		final IssueCategory cat = IssueCategoryFactory.create(673);
-		issue.setCategory(cat);
+		ProjectManager projectManager = manager.getProjectManager();
+		Project project = projectManager.getProjectByKey("testid");
 
-        ProjectManager projectManager = manager.getProjectManager();
-        Project projectByKey = projectManager.getProjectByKey("testid");
-        issue.setProjectId(projectByKey.getId());
-        manager.getIssueManager().createIssue(issue);
+		Issue issue = new Issue(manager.getTransport(), project.getId(), "test123")
+				.setTargetVersion(VersionFactory.create(512))
+				.setCategory(IssueCategoryFactory.create(673))
+				.create();
 	}
 
 	@SuppressWarnings("unused")

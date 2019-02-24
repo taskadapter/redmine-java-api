@@ -69,7 +69,7 @@ public class AttachmentManagerIT {
             Issue issueById = issueManager.getIssueById(createdIssue.getId(), Include.attachments);
             assertThat(issueById.getAttachments().size()).isEqualTo(1);
         } finally {
-            issueManager.deleteIssue(createdIssue.getId());
+            createdIssue.delete();
         }
     }
 
@@ -111,7 +111,7 @@ public class AttachmentManagerIT {
             String contentAsString = new String(receivedContent);
             assertThat(contentAsString).isEqualTo(attachmentContent);
         } finally {
-            issueManager.deleteIssue(createdIssue.getId());
+            createdIssue.delete();
         }
     }
 

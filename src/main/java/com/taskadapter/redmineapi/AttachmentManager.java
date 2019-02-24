@@ -52,9 +52,10 @@ public class AttachmentManager {
      */
     public Attachment addAttachmentToIssue(Integer issueId, File attachmentFile, String contentType) throws RedmineException, IOException {
         final Attachment attach = uploadAttachment(contentType, attachmentFile);
-        final Issue issue = IssueFactory.create(issueId);
-        issue.addAttachment(attach);
-        transport.updateObject(issue);
+        new Issue(transport, -1).setId(issueId)
+                .addAttachment(attach)
+                .update();
+
         return attach;
     }
 

@@ -1,64 +1,62 @@
 package com.taskadapter.redmineapi.internal;
 
+import com.taskadapter.redmineapi.bean.Attachment;
+import com.taskadapter.redmineapi.bean.AttachmentFactory;
+import com.taskadapter.redmineapi.bean.Changeset;
+import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
+import com.taskadapter.redmineapi.bean.CustomFieldDefinitionFactory;
+import com.taskadapter.redmineapi.bean.CustomFieldFactory;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.GroupFactory;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
+import com.taskadapter.redmineapi.bean.IssuePriority;
+import com.taskadapter.redmineapi.bean.IssuePriorityFactory;
+import com.taskadapter.redmineapi.bean.IssueRelation;
+import com.taskadapter.redmineapi.bean.IssueRelationFactory;
+import com.taskadapter.redmineapi.bean.IssueStatus;
+import com.taskadapter.redmineapi.bean.IssueStatusFactory;
+import com.taskadapter.redmineapi.bean.Journal;
+import com.taskadapter.redmineapi.bean.JournalDetail;
+import com.taskadapter.redmineapi.bean.JournalFactory;
+import com.taskadapter.redmineapi.bean.Membership;
+import com.taskadapter.redmineapi.bean.MembershipFactory;
+import com.taskadapter.redmineapi.bean.News;
+import com.taskadapter.redmineapi.bean.NewsFactory;
+import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.bean.Role;
+import com.taskadapter.redmineapi.bean.RoleFactory;
+import com.taskadapter.redmineapi.bean.SavedQuery;
+import com.taskadapter.redmineapi.bean.SavedQueryFactory;
+import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.TimeEntryActivity;
+import com.taskadapter.redmineapi.bean.TimeEntryActivityFactory;
+import com.taskadapter.redmineapi.bean.TimeEntryFactory;
+import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.TrackerFactory;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.bean.WatcherFactory;
+import com.taskadapter.redmineapi.bean.WikiPage;
+import com.taskadapter.redmineapi.bean.WikiPageDetail;
+import com.taskadapter.redmineapi.bean.WikiPageFactory;
+import com.taskadapter.redmineapi.internal.json.JsonInput;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import com.taskadapter.redmineapi.bean.AttachmentFactory;
-import com.taskadapter.redmineapi.bean.CustomFieldFactory;
-import com.taskadapter.redmineapi.bean.GroupFactory;
-import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
-import com.taskadapter.redmineapi.bean.IssueFactory;
-import com.taskadapter.redmineapi.bean.IssuePriorityFactory;
-import com.taskadapter.redmineapi.bean.IssueRelationFactory;
-import com.taskadapter.redmineapi.bean.IssueStatusFactory;
-import com.taskadapter.redmineapi.bean.JournalFactory;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
-import com.taskadapter.redmineapi.bean.NewsFactory;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
-import com.taskadapter.redmineapi.bean.RoleFactory;
-import com.taskadapter.redmineapi.bean.SavedQueryFactory;
-import com.taskadapter.redmineapi.bean.TimeEntryActivityFactory;
-import com.taskadapter.redmineapi.bean.TimeEntryFactory;
-import com.taskadapter.redmineapi.bean.TrackerFactory;
-import com.taskadapter.redmineapi.bean.UserFactory;
-import com.taskadapter.redmineapi.bean.VersionFactory;
-import com.taskadapter.redmineapi.bean.WatcherFactory;
-import com.taskadapter.redmineapi.bean.WikiPage;
-import com.taskadapter.redmineapi.bean.WikiPageDetail;
-import com.taskadapter.redmineapi.bean.WikiPageFactory;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.taskadapter.redmineapi.bean.Attachment;
-import com.taskadapter.redmineapi.bean.Changeset;
-import com.taskadapter.redmineapi.bean.CustomField;
-import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
-import com.taskadapter.redmineapi.bean.CustomFieldDefinitionFactory;
-import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueStatus;
-import com.taskadapter.redmineapi.bean.Journal;
-import com.taskadapter.redmineapi.bean.JournalDetail;
-import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.IssuePriority;
-import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.SavedQuery;
-import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryActivity;
-import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.internal.json.JsonInput;
 
 /**
  * A parser for JSON items sent by Redmine.
@@ -202,7 +200,7 @@ public final class RedmineJSONParser {
 
 	@SuppressWarnings("deprecation")
 	public static Issue parseIssue(JSONObject content) throws JSONException {
-		final Issue result = IssueFactory.create(JsonInput.getIntOrNull(content, "id"))
+		final Issue result = new Issue().setId(JsonInput.getIntOrNull(content, "id"))
 			.setSubject(JsonInput.getStringOrNull(content, "subject"));
 		final JSONObject parentIssueObject = JsonInput.getObjectOrNull(content,
 				"parent");
@@ -228,8 +226,8 @@ public final class RedmineJSONParser {
 		result.setDoneRatio(JsonInput.getIntOrNull(content, "done_ratio"));
 		final Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
 		if (project != null) {
-			result.setProjectId(project.getId());
-			result.setProjectName(project.getName());
+			result.setProjectId(project.getId())
+					.setProjectName(project.getName());
 		}
 		final User author = JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser);
 		if (author != null) {

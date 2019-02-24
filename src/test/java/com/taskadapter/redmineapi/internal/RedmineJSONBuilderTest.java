@@ -42,15 +42,15 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void fieldsExplicitlySetToNullAreAddedToIssueJSonAsNull() {
-		Issue issue = IssueFactory.create(null);
-		issue.setSubject("subj1");
-		issue.setDescription(null);
-		issue.setDoneRatio(null);
-		issue.setParentId(null);
-		issue.setAssigneeId(null);
-		issue.setEstimatedHours(null);
-		issue.setSpentHours(null);
-		issue.setNotes(null);
+		Issue issue = new Issue().setId(null)
+				.setSubject("subj1")
+				.setDescription(null)
+				.setDoneRatio(null)
+				.setParentId(null)
+				.setAssigneeId(null)
+				.setEstimatedHours(null)
+				.setSpentHours(null)
+				.setNotes(null);
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON("some_project_key", issue, RedmineJSONBuilder::writeIssue);
 		assertThat(generatedJSON).contains("\"id\":null");
 		assertThat(generatedJSON).contains("\"subject\":\"subj1\"");

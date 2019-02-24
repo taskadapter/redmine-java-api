@@ -272,7 +272,7 @@ public class TimeEntryManagerIT {
             List<TimeEntry> timeEntriesForActivity9 = timeEntryManager.getTimeEntries(paramsForActivity9).getResults();
             assertThat(timeEntriesForActivity9.size()).isEqualTo(1);
         } finally {
-            issueManager.deleteIssue(createdIssueId);
+            createdIssue.delete();
         }
     }
 
