@@ -9,6 +9,7 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -32,12 +33,14 @@ public class RedmineManagerDefaultsIT {
     private static int projectId;
     private static IssueManager issueManager;
     private static ProjectManager projectManager;
+	private static Transport transport;
 
-    @BeforeClass
+	@BeforeClass
 	public static void oneTimeSetUp() {
         TestConfig testConfig = new TestConfig();
 		logger.info("Running redmine tests using: " + testConfig.getURI());
         RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
+        transport = mgr.getTransport();
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
 
@@ -89,9 +92,9 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testIssueDefaults() throws RedmineException {
-		final Issue template = IssueFactory.create(projectId, "This is a subject");
-		template.setStartDate(null);
-		final Issue result = issueManager.createIssue(template);
+		Issue result = new Issue(transport, projectId, "This is a subject")
+				.setStartDate(null)
+				.create();
 		
 		try {
 			Assert.assertNotNull(result.getId());
@@ -130,40 +133,41 @@ public class RedmineManagerDefaultsIT {
 			Assert.assertNotNull(result.getRelations());
 			Assert.assertNotNull(result.getAttachments());
 		} finally {
-            issueManager.deleteIssue(result.getId());
+            result.delete();
 		}
 	}
 
 	@Test
 	public void issueWithStartDateNotSetGetsDefaultValue() throws RedmineException {
-		final Issue template = IssueFactory.create(projectId, "Issue with no start date set in code");
-		final Issue result = issueManager.createIssue(template);
+		Issue issue = new Issue(transport, projectId).setSubject("Issue with no start date set in code")
+				.create();
 		try {
-			Assert.assertNotNull(result.getStartDate());
+			Assert.assertNotNull(issue.getStartDate());
 		} finally {
-			issueManager.deleteIssue(result.getId());
+			issue.delete();
 		}
 	}
 
 	@Test
 	public void issueWithStartDateSetToNullDoesNotGetDefaultValueForStartDate() throws RedmineException {
-		final Issue template = IssueFactory.create(projectId, "Issue with NULL start date");
-		template.setStartDate(null);
-		final Issue result = issueManager.createIssue(template);
+		Issue issue = new Issue(transport, projectId).setSubject("Issue with NULL start date")
+				.setStartDate(null)
+				.create();
 		try {
-			Assert.assertNull(result.getStartDate());
+			Assert.assertNull(issue.getStartDate());
 		} finally {
-			issueManager.deleteIssue(result.getId());
+			issue.delete();
 		}
 	}
 
 	@Test
 	public void testRelationDefaults() throws RedmineException {
-		final Issue tmp = IssueFactory.create(projectId, "this is a test");
+		Issue issue1 = new Issue(transport, projectId, "this is a test")
+				.create();
 		// TODO why is not everything inside TRY? fix!
-		final Issue issue1 = issueManager.createIssue(tmp);
 		try {
-			final Issue issue2 = issueManager.createIssue(tmp);
+			Issue issue2 = new Issue(transport, projectId, "this is a test")
+					.create();
 			try {
 				final IssueRelation relation = issueManager.createRelation(
 						issue1.getId(), issue2.getId(), "blocks");
@@ -173,10 +177,10 @@ public class RedmineManagerDefaultsIT {
 				Assert.assertEquals("blocks", relation.getType());
 				Assert.assertEquals(Integer.valueOf(0), relation.getDelay());
 			} finally {
-				issueManager.deleteIssue(issue2.getId());
+				issue2.delete();
 			}
 		} finally {
-			issueManager.deleteIssue(issue1.getId());
+			issue1.delete();
 		}
 	}
 

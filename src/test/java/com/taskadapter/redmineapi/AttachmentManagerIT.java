@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.Project;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.entity.ContentType;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -29,10 +30,12 @@ public class AttachmentManagerIT {
     private static String projectKey;
     private static IssueManager issueManager;
     private static AttachmentManager attachmentManager;
+    private static Transport transport;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
+        transport = mgr.getTransport();
 
         issueManager = mgr.getIssueManager();
         attachmentManager = mgr.getAttachmentManager();
@@ -48,12 +51,12 @@ public class AttachmentManagerIT {
 
     @Test
     public void uploadAttachment() throws RedmineException, IOException {
-        final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
+        byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
                 "application/ternary", content);
-        final Issue testIssue = IssueFactory.create(projectId, "This is upload ticket!");
-        testIssue.addAttachment(attach1);
-        final Issue createdIssue = issueManager.createIssue(testIssue);
+        Issue createdIssue = new Issue(transport, projectId).setSubject("This is upload ticket!")
+                .addAttachment(attach1)
+                .create();
         try {
             final Collection<Attachment> attachments = createdIssue.getAttachments();
             assertThat(attachments.size()).isEqualTo(1);
@@ -75,18 +78,18 @@ public class AttachmentManagerIT {
      */
     @Test
     public void severalAttachmentsAreAddedToIssue() throws Exception {
-        final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        final Attachment attach1 = attachmentManager.uploadAttachment("test1.bin", "application/ternary", content);
-        final Attachment attach2 = attachmentManager.uploadAttachment("test2.bin", "application/ternary", content);
-        final Issue issue = IssueFactory.create(projectId, "This is upload ticket!");
-        issue.addAttachment(attach1);
-        issue.addAttachment(attach2);
-        final Issue createdIssue = issueManager.createIssue(issue);
+        byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        Attachment attach1 = attachmentManager.uploadAttachment("test1.bin", "application/ternary", content);
+        Attachment attach2 = attachmentManager.uploadAttachment("test2.bin", "application/ternary", content);
+        Issue createdIssue = new Issue(transport, projectId).setSubject("This is upload ticket!")
+                .addAttachment(attach1)
+                .addAttachment(attach2)
+                .create();
         try {
-            final Collection<Attachment> attachments = createdIssue.getAttachments();
+            Collection<Attachment> attachments = createdIssue.getAttachments();
             assertThat(attachments.size()).isEqualTo(2);
         } finally {
-            issueManager.deleteIssue(createdIssue.getId());
+            createdIssue.delete();
         }
     }
 
@@ -95,8 +98,9 @@ public class AttachmentManagerIT {
         String attachmentContent = "some text";
         File tempFile = createTempFile(attachmentContent);
 
-        final Issue issue = IssueFactory.create(projectId, "task with attachment");
-        final Issue createdIssue = issueManager.createIssue(issue);
+        Issue createdIssue = new Issue(transport, projectId)
+                .setSubject("task with attachment")
+                .create();
         attachmentManager.addAttachmentToIssue(createdIssue.getId(), tempFile, ContentType.TEXT_PLAIN.getMimeType());
         try {
             Issue loadedIssue = issueManager.getIssueById(createdIssue.getId(), Include.attachments);
@@ -220,8 +224,10 @@ public class AttachmentManagerIT {
         Issue newIssue = null;
         try {
             // create at least 1 issue
-            Issue issueToCreate = IssueFactory.create(projectId, "testGetIssueAttachment_" + UUID.randomUUID());
-            newIssue = issueManager.createIssue(issueToCreate);
+            newIssue = new Issue(transport, projectId)
+                    .setSubject("testGetIssueAttachment_" + UUID.randomUUID())
+                    .create();
+
             // TODO create test attachments for the issue once the Redmine REST
             // API allows for it
             // retrieve issue attachments
@@ -236,21 +242,21 @@ public class AttachmentManagerIT {
         } finally {
             // scrub test issue
             if (newIssue != null) {
-                issueManager.deleteIssue(newIssue.getId());
+                newIssue.delete();
             }
         }
     }
 
     /**
-     * Requires Redmine 3.3.0+ because "delete attachment" feature is only added in 3.3.0.
+     * Requires Redmine 3.3.0+ because "delete attachment" feature was added in 3.3.0.
      */
     @Test
     public void attachmentIsDeleted() throws Exception {
-        final Issue issue = IssueFactory.create(projectId, "task with attachment");
         final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
         final Attachment attachment = attachmentManager.uploadAttachment("test.bin", "application/ternary", content);
-        issue.addAttachment(attachment);
-        final Issue createdIssue = issueManager.createIssue(issue);
+        Issue createdIssue = new Issue(transport, projectId, "task with attachment")
+                .addAttachment(attachment)
+                .create();
         Collection<Attachment> attachments = createdIssue.getAttachments();
         Attachment attachment1 = attachments.iterator().next();
         int attachmentId = attachment1.getId();

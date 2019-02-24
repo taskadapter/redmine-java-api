@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
+import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueRelationFactory;
@@ -136,13 +137,7 @@ public class IssueManager {
     }
 
     /**
-     * Sample usage:
-     * <pre>
-     * {@code
-     *   Issue issueToCreate = IssueFactory.create(projectDatabaseId, subject);
-     *   Issue newIssue = mgr.createIssue(issueToCreate);
-     * }
-     * </pre>
+     * Deprecated. Use the new fluent-style API: new Issue(...).create();
      *
      * @param issue      the Issue object to create on the server.
      * @return the newly created Issue.
@@ -151,11 +146,17 @@ public class IssueManager {
      * @throws NotFoundException       the project is not found
      * @throws RedmineException
      */
+    @Deprecated
     public Issue createIssue(Issue issue) throws RedmineException {
-        return transport.addObject(issue, new BasicNameValuePair("include",
-               Include.attachments.toString()));
+        return issue.create();
     }
 
+    /**
+     * Deprecated. use issue.delete() instead.
+     *
+     * @throws RedmineException
+     */
+    @Deprecated
     public void deleteIssue(Integer id) throws RedmineException {
         transport.deleteObject(Issue.class, Integer.toString(id));
     }
@@ -233,6 +234,10 @@ public class IssueManager {
         return transport.getObjectsList(IssuePriority.class);
     }
 
+    /**
+     * Deprecated. use issue.update() instead.
+     */
+    @Deprecated
     public void update(Issue obj) throws RedmineException {
         transport.updateObject(obj);
     }

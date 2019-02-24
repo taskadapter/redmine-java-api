@@ -1,5 +1,13 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.Include;
+import com.taskadapter.redmineapi.IssueManager;
+import com.taskadapter.redmineapi.NotFoundException;
+import com.taskadapter.redmineapi.RedmineAuthenticationException;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -18,7 +26,7 @@ import java.util.Set;
  * 
  * @see <a href="http://www.redmine.org/projects/redmine/wiki/Rest_Issues">http://www.redmine.org/projects/redmine/wiki/Rest_Issues</a> 
  */
-public class Issue implements Identifiable {
+public class Issue implements Identifiable, FluentStyle {
 
     private final PropertyStorage storage;
 
@@ -67,6 +75,8 @@ public class Issue implements Identifiable {
     public final static Property<Set<Watcher>> WATCHERS = (Property<Set<Watcher>>) new Property(Set.class, "watchers");
     public final static Property<Set<Issue>> CHILDREN = (Property<Set<Issue>>) new Property(Set.class, "children");
 
+    private Transport transport;
+
     /**
      * @param id database ID.
      */
@@ -78,6 +88,26 @@ public class Issue implements Identifiable {
     public Issue() {
         this.storage = new PropertyStorage();
         initCollections(storage);
+    }
+
+
+    /**
+     * Each Issue object must have project Id set in order for Redmine 3.x to accept it via REST API.
+     */
+    public Issue(Transport transport, int projectId) {
+        this();
+        this.transport = transport;
+        setProjectId(projectId);
+    }
+
+    /**
+     * @param projectId Each Issue object must have project Id set in order for Redmine 3.x to accept it via REST API.
+     */
+    public Issue(Transport transport, int projectId, String subject) {
+        this();
+        this.transport = transport;
+        setSubject(subject);
+        setProjectId(projectId);
     }
 
     private void initCollections(PropertyStorage storage) {
@@ -576,5 +606,31 @@ public class Issue implements Identifiable {
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+    /**
+     * @return the newly created Issue.
+     *
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       the required project is not found
+     * @throws RedmineException
+     */
+    public Issue create() throws RedmineException {
+        return transport.addObject(this, new BasicNameValuePair("include",
+                Include.attachments.toString()));
+    }
+
+    public void update() throws RedmineException {
+        transport.updateObject(this);
+    }
+
+    public void delete() throws RedmineException {
+        transport.deleteObject(Issue.class, Integer.toString(this.getId()));
+    }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
     }
 }

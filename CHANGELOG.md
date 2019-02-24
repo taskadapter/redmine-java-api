@@ -1,3 +1,6 @@
+# 4.0.0-SNAPSHOT
+* fluent-style API. see README for details
+
 # 3.1.1
 * integrated project membership methods from MembershipManager into ProjectManager
 (MembershipManager is now deprecated)

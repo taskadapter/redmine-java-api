@@ -8,6 +8,7 @@ import com.taskadapter.redmineapi.RedmineInternalError;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
+import com.taskadapter.redmineapi.bean.FluentStyle;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Identifiable;
 import com.taskadapter.redmineapi.bean.Issue;
@@ -604,10 +605,14 @@ public final class Transport {
         return communicator.sendRequest(http);
     }
 
-	private static <T> T parseResponse(String response, String tag,
+	private <T> T parseResponse(String response, String tag,
                                      JsonObjectParser<T> parser) throws RedmineFormatException {
 		try {
-			return parser.parse(RedmineJSONParser.getResponseSingleObject(response, tag));
+			T parse = parser.parse(RedmineJSONParser.getResponseSingleObject(response, tag));
+			if (parse instanceof FluentStyle) {
+				((FluentStyle) parse).setTransport(this);
+			}
+			return parse;
 		} catch (JSONException e) {
 			throw new RedmineFormatException(e);
 		}

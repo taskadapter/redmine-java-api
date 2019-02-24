@@ -2,7 +2,7 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueFactory;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,25 +10,23 @@ import java.util.List;
 import java.util.Random;
 
 public class IssueHelper {
-    public static List<Issue> createIssues(IssueManager issueManager, int projectId, int issuesNumber) throws RedmineException {
+    public static List<Issue> createIssues(Transport transport, int projectId, int issuesNumber) throws RedmineException {
         List<Issue> issues = new ArrayList<>(issuesNumber);
         for (int i = 0; i < issuesNumber; i++) {
-            Issue issueToCreate = IssueFactory.create(projectId, "some issue " + i + " " + new Date());
-            Issue issue = issueManager.createIssue(issueToCreate);
+            Issue issue = new Issue(transport, projectId).setSubject("some issue " + i + " " + new Date())
+                    .create();
             issues.add(issue);
         }
         return issues;
     }
 
-    public static Issue createIssue(IssueManager issueManager, int projectId) throws RedmineException {
-        Issue issue = generateRandomIssue(projectId)
-            .setProjectId(projectId);
-        return issueManager.createIssue(issue);
+    public static Issue createIssue(Transport transport, int projectId) throws RedmineException {
+        return generateRandomIssue(transport, projectId).create();
     }
 
-    public static Issue generateRandomIssue(int projectId) {
+    public static Issue generateRandomIssue(Transport transport, int projectId) {
         Random r = new Random();
-        return IssueFactory.create(projectId, "some issue " + r.nextInt() + " " + new Date());
+        return new Issue(transport, projectId).setSubject("some issue " + r.nextInt() + " " + new Date());
     }
 
 }
