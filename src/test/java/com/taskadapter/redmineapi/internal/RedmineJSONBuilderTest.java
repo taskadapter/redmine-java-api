@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.GroupFactory;
-import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.UserFactory;
 import org.junit.Test;

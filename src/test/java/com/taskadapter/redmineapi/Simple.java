@@ -2,7 +2,7 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
+import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
@@ -11,6 +11,7 @@ import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -147,10 +148,10 @@ public class Simple {
 			throws RedmineException {
 		ProjectManager projectManager = manager.getProjectManager();
 		Project project = projectManager.getProjectByKey("testid");
-
-		Issue issue = new Issue(manager.getTransport(), project.getId(), "test123")
+		Transport transport = manager.getTransport();
+		Issue issue = new Issue(transport, project.getId(), "test123")
 				.setTargetVersion(VersionFactory.create(512))
-				.setCategory(IssueCategoryFactory.create(673))
+				.setCategory(new IssueCategory(transport).setId(673))
 				.create();
 	}
 

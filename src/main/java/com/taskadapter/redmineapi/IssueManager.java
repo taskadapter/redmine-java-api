@@ -2,7 +2,6 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueRelationFactory;
@@ -257,6 +256,8 @@ public class IssueManager {
     }
 
     /**
+     * DEPRECATED. use category.create() instead.
+     *
      * creates a new {@link IssueCategory} for the {@link Project} contained. <br>
      * Pre-condition: the attribute {@link Project} for the {@link IssueCategory} must
      * not be null!
@@ -268,6 +269,7 @@ public class IssueManager {
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
+    @Deprecated
     public IssueCategory createCategory(IssueCategory category) throws RedmineException {
         if (category.getProjectId() == null) {
             throw new IllegalArgumentException(
@@ -278,6 +280,8 @@ public class IssueManager {
     }
 
     /**
+     * DEPRECATED. use category.delete() instead
+     *
      * deletes an {@link IssueCategory}. <br>
      *
      * @param category the {@link IssueCategory}.
@@ -285,6 +289,7 @@ public class IssueManager {
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
+    @Deprecated
     public void deleteCategory(IssueCategory category) throws RedmineException {
         transport.deleteObject(IssueCategory.class,
                 Integer.toString(category.getId()));

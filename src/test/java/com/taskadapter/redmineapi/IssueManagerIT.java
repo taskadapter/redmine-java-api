@@ -8,7 +8,6 @@ import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
@@ -818,17 +817,17 @@ public class IssueManagerIT {
     @Test
     public void testCreateAndDeleteIssueCategory() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
-        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
-            .setAssigneeId(IntegrationTestHelper.getOurUser().getId());
-        IssueCategory newIssueCategory = issueManager.createCategory(category);
-        assertNotNull("Expected new category not to be null", newIssueCategory);
-        assertNotNull("Expected projectId of new category not to be null", newIssueCategory.getProjectId());
-        assertNotNull("Expected assignee of new category not to be null", newIssueCategory.getAssigneeId());
+        IssueCategory category = new IssueCategory(transport, project.getId(), "Category" + new Date().getTime())
+                .setAssigneeId(IntegrationTestHelper.getOurUser().getId())
+                .create();
+        assertNotNull("Expected new category not to be null", category);
+        assertNotNull("Expected projectId of new category not to be null", category.getProjectId());
+        assertNotNull("Expected assignee of new category not to be null", category.getAssigneeId());
 
-        assertThat(newIssueCategory.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser().getId());
+        assertThat(category.getAssigneeId()).isEqualTo(IntegrationTestHelper.getOurUser().getId());
 
-        // now delete category
-        issueManager.deleteCategory(newIssueCategory);
+        category.delete();
+
         // assert that the category is gone
         List<IssueCategory> categories = issueManager.getCategories(project.getId());
         assertTrue(
@@ -849,19 +848,19 @@ public class IssueManagerIT {
     @Test
     public void testCreateAndDeleteIssueCategoryGroupAssignee() throws RedmineException {
         Project project = projectManager.getProjectByKey(projectKey);
-        IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
-            .setAssigneeId(demoGroup.getId());
-        IssueCategory newIssueCategory = issueManager.createCategory(category);
-        assertNotNull("Expected new category not to be null", newIssueCategory);
-        assertNotNull("Expected projectId of new category not to be null", newIssueCategory.getProjectId());
+        IssueCategory category = new IssueCategory(transport, project.getId(), "Category" + new Date().getTime())
+                .setAssigneeId(demoGroup.getId())
+                .create();
+        assertNotNull("Expected new category not to be null", category);
+        assertNotNull("Expected projectId of new category not to be null", category.getProjectId());
         assertNotNull("Expected assignee of new category not to be null",
-                newIssueCategory.getAssigneeId());
+                category.getAssigneeId());
 
-        assertThat(newIssueCategory.getAssigneeId()).isEqualTo(demoGroup.getId());
-        assertThat(newIssueCategory.getAssigneeName()).isEqualTo(demoGroup.getName());
+        assertThat(category.getAssigneeId()).isEqualTo(demoGroup.getId());
+        assertThat(category.getAssigneeName()).isEqualTo(demoGroup.getName());
 
-        // now delete category
-        issueManager.deleteCategory(newIssueCategory);
+        category.delete();
+
         // assert that the category is gone
         List<IssueCategory> categories = issueManager.getCategories(project.getId());
         assertTrue(
@@ -883,12 +882,12 @@ public class IssueManagerIT {
         Project project = projectManager.getProjectByKey(projectKey);
         // create some categories
         Integer ourUserId = IntegrationTestHelper.getOurUser().getId();
-        IssueCategory testIssueCategory1 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
-            .setAssigneeId(ourUserId);
-        IssueCategory newIssueCategory1 = issueManager.createCategory(testIssueCategory1);
-        IssueCategory testIssueCategory2 = IssueCategoryFactory.create(project.getId(), "Category" + new Date().getTime())
-            .setAssigneeId(ourUserId);
-        IssueCategory newIssueCategory2 = issueManager.createCategory(testIssueCategory2);
+        IssueCategory category1 = new IssueCategory(transport, project.getId(), "Category" + new Date().getTime())
+                .setAssigneeId(ourUserId)
+                .create();
+        IssueCategory category2 = new IssueCategory(transport, project.getId(), "Category" + new Date().getTime())
+                .setAssigneeId(ourUserId)
+                .create();
         try {
             List<IssueCategory> categories = issueManager.getCategories(project.getId());
             assertEquals("Wrong number of categories for project "
@@ -905,61 +904,36 @@ public class IssueManagerIT {
                         category.getAssigneeId());
             }
         } finally {
-            // scrub test categories
-            if (newIssueCategory1 != null) {
-                issueManager.deleteCategory(newIssueCategory1);
+            if (category1 != null) {
+                category1.delete();
             }
-            if (newIssueCategory2 != null) {
-                issueManager.deleteCategory(newIssueCategory2);
+            if (category2 != null) {
+                category2.delete();
             }
         }
     }
 
-    /**
-     * tests the creation of an invalid {@link IssueCategory}.
-     *
-     * @throws RedmineException               thrown in case something went wrong in Redmine
-     * @throws java.io.IOException                    thrown in case something went wrong while performing I/O
-     *                                        operations
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException              thrown in case the objects requested for could not be found
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreateInvalidIssueCategory() throws RedmineException {
-        IssueCategory category = IssueCategoryFactory.create(null, "InvalidCategory"
-                + new Date().getTime());
-        issueManager.createCategory(category);
+    @Test(expected = NotFoundException.class)
+    public void createIssueCategoryFailsWithInvalidProject() throws RedmineException {
+        new IssueCategory(transport, -1, "InvalidCategory" + new Date().getTime())
+                .create();
     }
 
     /**
-     * tests the deletion of an invalid {@link IssueCategory}. Expects a
-     * {@link NotFoundException} to be thrown.
-     *
-     * @throws RedmineException               thrown in case something went wrong in Redmine
-     * @throws java.io.IOException                    thrown in case something went wrong while performing I/O
-     *                                        operations
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException              thrown in case the objects requested for could not be found
+     * tests deletion of an invalid {@link IssueCategory}. Expects a {@link NotFoundException} to be thrown.
      */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidIssueCategory() throws RedmineException {
         // create new test category
-        IssueCategory category = IssueCategoryFactory.create(-1);
-        category.setName("InvalidCategory" + new Date().getTime());
-        // now try deleting the category
-        issueManager.deleteCategory(category);
+        new IssueCategory(transport).setId(-1)
+                .setName("InvalidCategory" + new Date().getTime())
+                .delete();
     }
 
     /**
      * Tests the creation and retrieval of an
      * {@link com.taskadapter.redmineapi.bean.Issue} with a
      * {@link IssueCategory}.
-     *
-     * @throws RedmineException               thrown in case something went wrong in Redmine
-     * @throws java.io.IOException                    thrown in case something went wrong while performing I/O
-     *                                        operations
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testCreateAndGetIssueWithCategory() throws RedmineException {
@@ -968,9 +942,10 @@ public class IssueManagerIT {
         try {
             Project project = projectManager.getProjectByKey(projectKey);
             // create an issue category
-            IssueCategory category = IssueCategoryFactory.create(project.getId(), "Category_" + new Date().getTime())
-                .setAssigneeId(IntegrationTestHelper.getOurUser().getId());
-            newIssueCategory = issueManager.createCategory(category);
+            newIssueCategory = new IssueCategory(transport, project.getId(), "Category_" + new Date().getTime())
+                .setAssigneeId(IntegrationTestHelper.getOurUser().getId())
+                    .create();
+
             // create an issue
             newIssue = new Issue(transport, projectId).setSubject("getIssueWithCategory_" + UUID.randomUUID())
                     .setCategory(newIssueCategory)
@@ -997,7 +972,7 @@ public class IssueManagerIT {
                 newIssue.delete();
             }
             if (newIssueCategory != null) {
-                issueManager.deleteCategory(newIssueCategory);
+                newIssueCategory.delete();
             }
         }
     }

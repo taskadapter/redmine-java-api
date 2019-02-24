@@ -2,8 +2,6 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
-import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
@@ -206,16 +204,16 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testCategoryDefaults() throws RedmineException {
-		final Project projectByKey = projectManager.getProjectByKey(projectKey);
-		final IssueCategory template = IssueCategoryFactory.create(projectByKey.getId(), "test name");
-		final IssueCategory category = issueManager.createCategory(template);
+		Project projectByKey = projectManager.getProjectByKey(projectKey);
+		IssueCategory category = new IssueCategory(transport, projectByKey.getId(), "test name")
+				.create();
 		try {
 			Assert.assertNotNull(category.getId());
 			Assert.assertEquals("test name", category.getName());
 			Assert.assertNotNull(category.getProjectId());
 			Assert.assertNull(category.getAssigneeId());
 		} finally {
-			issueManager.deleteCategory(category);
+			category.delete();
 		}
 	}
 }

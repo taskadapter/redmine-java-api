@@ -270,7 +270,7 @@ public final class RedmineJSONParser {
 
 	public static IssueCategory parseCategory(JSONObject content)
 			throws JSONException {
-		final IssueCategory result = IssueCategoryFactory.create(JsonInput.getInt(content, "id"));
+		final IssueCategory result = new IssueCategory(null).setId(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		final Project project = JsonInput.getObjectOrNull(content, "project", RedmineJSONParser::parseMinimalProject);
 		if (project != null) {

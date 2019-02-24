@@ -2,7 +2,6 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.entity.ContentType;
