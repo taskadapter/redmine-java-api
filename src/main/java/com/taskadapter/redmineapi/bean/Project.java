@@ -1,5 +1,11 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.NotFoundException;
+import com.taskadapter.redmineapi.RedmineAuthenticationException;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -8,12 +14,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Redmine's Project.
+ * Redmine Project.
  */
-public class Project implements Identifiable, Serializable {
+public class Project implements Identifiable, Serializable, FluentStyle {
 	private static final long serialVersionUID = 4529305420978716446L;
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     /**
      * database ID
@@ -46,20 +52,26 @@ public class Project implements Identifiable, Serializable {
      * Trackers available for this project
      */
     public final static Property<Set<Tracker>> TRACKERS = (Property<Set<Tracker>>) new Property(Set.class, "trackers");
+    private Transport transport;
 
-    Project(Integer id) {
-        storage = new PropertyStorage();
-        storage.set(DATABASE_ID, id);
+    public Project(Transport transport) {
+        this.transport = transport;
         storage.set(CUSTOM_FIELDS, new HashSet<>());
         storage.set(TRACKERS, new HashSet<>());
+    }
+
+    public Project setId(Integer id) {
+        storage.set(DATABASE_ID, id);
+        return this;
     }
 
     public String getHomepage() {
         return storage.get(HOMEPAGE);
     }
 
-    public void setHomepage(String homepage) {
+    public Project setHomepage(String homepage) {
         storage.set(HOMEPAGE, homepage);
+        return this;
     }
 
     /**
@@ -69,8 +81,9 @@ public class Project implements Identifiable, Serializable {
         return storage.get(STRING_IDENTIFIER);
     }
 
-    public void setIdentifier(String identifier) {
+    public Project setIdentifier(String identifier) {
         storage.set(STRING_IDENTIFIER, identifier);
+        return this;
     }
 
     /**
@@ -91,8 +104,9 @@ public class Project implements Identifiable, Serializable {
     /**
      * @param name the project name
      */
-    public void setName(String name) {
+    public Project setName(String name) {
         storage.set(NAME, name);
+        return this;
     }
 
     /**
@@ -126,24 +140,27 @@ public class Project implements Identifiable, Serializable {
         return storage.get(DESCRIPTION);
     }
 
-    public void setDescription(String description) {
+    public Project setDescription(String description) {
         storage.set(DESCRIPTION, description);
+        return this;
     }
 
     public Date getCreatedOn() {
         return storage.get(CREATED_ON);
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public Project setCreatedOn(Date createdOn) {
         storage.set(CREATED_ON, createdOn);
+        return this;
     }
 
     public Date getUpdatedOn() {
         return storage.get(UPDATED_ON);
     }
 
-    public void setUpdatedOn(Date updatedOn) {
+    public Project setUpdatedOn(Date updatedOn) {
         storage.set(UPDATED_ON, updatedOn);
+        return this;
     }
 
     /**
@@ -160,8 +177,9 @@ public class Project implements Identifiable, Serializable {
         return storage.get(PARENT_DATABASE_ID);
     }
 
-    public void setParentId(Integer parentId) {
+    public Project setParentId(Integer parentId) {
         storage.set(PARENT_DATABASE_ID, parentId);
+        return this;
     }
 
     /**
@@ -177,24 +195,27 @@ public class Project implements Identifiable, Serializable {
         return storage.get(PUBLIC);
     }
     
-    public void setInheritMembers(Boolean inheritMembers) {
+    public Project setInheritMembers(Boolean inheritMembers) {
         storage.set(INHERIT_MEMBERS, inheritMembers);
+        return this;
     }
 
     public Boolean getInheritMembers() {
         return storage.get(INHERIT_MEMBERS);
     }
 
-    public void setProjectPublic(Boolean projectPublic) {
+    public Project setProjectPublic(Boolean projectPublic) {
         storage.set(PUBLIC, projectPublic);
+        return this;
     }
 
     public Collection<CustomField> getCustomFields() {
         return storage.get(CUSTOM_FIELDS);
     }
 
-    public void addCustomFields(Collection<CustomField> customFields) {
+    public Project addCustomFields(Collection<CustomField> customFields) {
         storage.get(CUSTOM_FIELDS).addAll(customFields);
+        return this;
     }
 
     public CustomField getCustomFieldById(int customFieldId) {
@@ -225,5 +246,53 @@ public class Project implements Identifiable, Serializable {
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
+    }
+
+    /**
+     * Sample usage:
+     *
+     * <pre>
+     * {@code
+     * 	Project project = new Project(transport);
+     * 	Long timeStamp = Calendar.getInstance().getTimeInMillis();
+     * 	String key = "projkey" + timeStamp;
+     * 	String name = &quot;project number &quot; + timeStamp;
+     * 	String description = &quot;some description for the project&quot;;
+     * 	project.setIdentifier(key)
+     * 	  .setName(name)
+     * 	  .setDescription(description)
+     * 	  .create();
+     * }
+     * </pre>
+     *
+     * @return the newly created Project object.
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws RedmineException
+     */
+    public Project create() throws RedmineException {
+        return transport.addObject(this, new BasicNameValuePair("include",
+                "trackers"));
+    }
+
+    public void update() throws RedmineException {
+        transport.updateObject(this);
+    }
+
+    /**
+     * The project object must have projectKey set (String-based identifier like "project-ABC",
+     * NOT a database numeric ID!)
+     *
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       if the project with this key is not found
+     */
+    public void delete() throws RedmineException {
+        transport.deleteObject(Project.class, getIdentifier());
     }
 }

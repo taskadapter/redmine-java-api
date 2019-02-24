@@ -42,7 +42,7 @@ public class RedmineManagerDefaultsIT {
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
 
-        Project junitTestProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
+        Project junitTestProject = ProjectFactory.create(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
 
 
         try {
@@ -70,7 +70,7 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testProjectDefaults() throws RedmineException {
-		final Project template = ProjectFactory.create("Test name", "key" + Calendar.getInstance().getTimeInMillis());
+		final Project template = ProjectFactory.create(transport, "Test name", "key" + Calendar.getInstance().getTimeInMillis());
 		final Project result = projectManager.createProject(template);
 		try {
 			Assert.assertNotNull(result.getId());

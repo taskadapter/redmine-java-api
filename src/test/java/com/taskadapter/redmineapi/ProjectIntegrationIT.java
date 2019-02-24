@@ -8,6 +8,7 @@ import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -34,13 +35,15 @@ public class ProjectIntegrationIT {
     private static String projectKey;
     private static Project project;
     private static Integer projectId;
+    private static Transport transport;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
         projectManager = mgr.getProjectManager();
+        transport = mgr.getTransport();
         try {
-            project = IntegrationTestHelper.createProject(mgr);
+            project = IntegrationTestHelper.createProject(transport);
             projectKey = project.getIdentifier();
             projectId = project.getId();
         } catch (Exception e) {
@@ -50,7 +53,7 @@ public class ProjectIntegrationIT {
 
     @AfterClass
     public static void oneTimeTearDown() {
-        IntegrationTestHelper.deleteProject(mgr, projectKey);
+        IntegrationTestHelper.deleteProject(transport, projectKey);
     }
 
     @Test(expected = NotFoundException.class)
@@ -107,7 +110,7 @@ public class ProjectIntegrationIT {
         Project projectToCreate = generateRandomProject();
         String key = null;
         try {
-            Project createdProject = projectManager.createProject(projectToCreate);
+            Project createdProject = projectToCreate.create();
             key = createdProject.getIdentifier();
 
             assertNotNull(
@@ -138,19 +141,18 @@ public class ProjectIntegrationIT {
     @Test
     public void testCreateGetUpdateDeleteProject() throws RedmineException {
         Project projectToCreate = generateRandomProject();
-        String key = null;
+        Project createdProject = null;
         try {
-            projectToCreate.setIdentifier("id" + new Date().getTime());
-            Project createdProject = projectManager.createProject(projectToCreate);
-            key = createdProject.getIdentifier();
+            createdProject = projectToCreate.setIdentifier("id" + new Date().getTime())
+                    .create();
             String newDescr = "NEW123";
             String newName = "new name here";
 
-            createdProject.setName(newName);
-            createdProject.setDescription(newDescr);
-            projectManager.update(createdProject);
+            createdProject.setName(newName)
+                    .setDescription(newDescr)
+                    .update();
 
-            Project updatedProject = projectManager.getProjectByKey(key);
+            Project updatedProject = projectManager.getProjectByKey(createdProject.getIdentifier());
             assertNotNull(updatedProject);
 
             assertEquals(createdProject.getIdentifier(),
@@ -163,30 +165,25 @@ public class ProjectIntegrationIT {
             assertTrue("checking that project has some trackers",
                     !(trackers.isEmpty()));
         } finally {
-            if (key != null) {
-                projectManager.deleteProject(key);
+            if (createdProject != null) {
+                createdProject.delete();
             }
         }
     }
 
     @Test
     public void createProjectFailsWithReservedIdentifier() throws Exception {
-        Project projectToCreate = ProjectFactory.create("new", "new");
-        String createdProjectKey = null;
+        Project projectToCreate = ProjectFactory.create(transport, "new", "new");
+        Project createdProject = null;
         try {
-            Project createdProject = projectManager.createProject(projectToCreate);
-            // in case if the creation haven't failed (although it should have
-            // had!),
-            // need to cleanup - delete this project
-            createdProjectKey = createdProject.getIdentifier();
-
+            createdProject = projectToCreate.create();
         } catch (RedmineProcessingException e) {
             assertNotNull(e.getErrors());
             assertEquals(1, e.getErrors().size());
             assertEquals("Identifier is reserved", e.getErrors().get(0));
         } finally {
-            if (createdProjectKey != null) {
-                projectManager.deleteProject(createdProjectKey);
+            if (createdProject != null) {
+                createdProject.delete();
             }
         }
     }
@@ -198,14 +195,15 @@ public class ProjectIntegrationIT {
         project.setDescription("test");
         final String longHomepageName = "http://www.localhost.com/asdf?a=\"&b=\"&c=\"&d=\"&e=\"&f=\"&g=\"&h=\"&i=\"&j=\"&k=\"&l=\"&m=\"&n=\"&o=\"&p=\"&q=\"&r=\"&s=\"&t=\"&u=\"&v=\"&w=\"&x=\"&y=\"&zо=авфбвоафжывлдаофжывладоджлфоывадлфоываждфлоываждфлоываждлфоываждлфова&&\\&&&&&&&&&&&&&&&&&&\\&&&&&&&&&&&&&&&&&&&&&&&&&&&&<>>";
         project.setHomepage(longHomepageName);
-        final Project created = projectManager.createProject(project);
+        Project created = projectManager.createProject(project);
         created.setDescription("updated description");
         try {
-            projectManager.update(created);
-            final Project updated = projectManager.getProjectByKey(project.getIdentifier());
+            created.update();
+
+            Project updated = projectManager.getProjectByKey(project.getIdentifier());
             assertEquals(longHomepageName, updated.getHomepage());
         } finally {
-            projectManager.deleteProject(created.getIdentifier());
+            created.delete();
         }
     }
 
@@ -254,9 +252,9 @@ public class ProjectIntegrationIT {
         return projects;
     }
 
-    private void deleteProjects(List<Project> projects) throws RedmineException {
+    private static void deleteProjects(List<Project> projects) throws RedmineException {
         for (Project p : projects) {
-            projectManager.deleteProject(p.getIdentifier());
+            p.delete();
         }
     }
 
@@ -266,7 +264,7 @@ public class ProjectIntegrationIT {
         String name = "project number " + timeStamp;
         String description = "some description for the project";
 
-        Project project = ProjectFactory.create(name, key);
+        Project project = ProjectFactory.create(transport, name, key);
         project.setDescription(description);
         project.setHomepage("www.randompage" + timeStamp + ".com");
         return project;
@@ -292,7 +290,7 @@ public class ProjectIntegrationIT {
                     createdMainProject.getId(), subProject.getParentId());
         } finally {
             if (createdMainProject != null) {
-                projectManager.deleteProject(createdMainProject.getIdentifier());
+                createdMainProject.delete();
             }
         }
     }
@@ -319,7 +317,7 @@ public class ProjectIntegrationIT {
             assertThat(createdProject.getCustomFieldById(fieldId).getValue()).isEqualTo("value1");
         } finally {
             if (createdProject != null) {
-                projectManager.deleteProject(createdProject.getIdentifier());
+                createdProject.delete();
             }
         }
     }
@@ -347,7 +345,7 @@ public class ProjectIntegrationIT {
             assertTrue("List of versions of test project must be empty now but is "
                     + versions, versions.isEmpty());
         } finally {
-            projectManager.deleteProject(project.getIdentifier());
+            project.delete();
         }
     }
 
@@ -383,7 +381,7 @@ public class ProjectIntegrationIT {
             if (testVersion2 != null) {
                 projectManager.deleteVersion(testVersion2);
             }
-            projectManager.deleteProject(project.getIdentifier());
+            project.delete();
         }
     }
 
@@ -432,15 +430,15 @@ public class ProjectIntegrationIT {
 
     private Project createProject() throws RedmineException {
         long id = new Date().getTime();
-        Project mainProject = ProjectFactory.create("project" + id, "project" + id);
-        return projectManager.createProject(mainProject);
+        return ProjectFactory.create(transport, "project" + id, "project" + id)
+                .create();
     }
 
     private Project createSubProject(Project parent) throws RedmineException {
         long id = new Date().getTime();
-        Project project = ProjectFactory.create("sub_pr" + id, "subpr" + id);
-        project.setParentId(parent.getId());
-        return projectManager.createProject(project);
+        return ProjectFactory.create(transport, "sub_pr" + id, "subpr" + id)
+                .setParentId(parent.getId())
+                .create();
     }
 
     /**

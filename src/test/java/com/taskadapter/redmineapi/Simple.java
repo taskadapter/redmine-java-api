@@ -62,7 +62,7 @@ public class Simple {
 		final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
 				"application/ternary", content);
-		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
+		final Project tmpProject = ProjectFactory.create(mgr.getTransport(), "Upload project", "uploadtmpproject");
 		final Project project = mgr.getProjectManager().createProject(tmpProject);
 		try {
 			Issue issue = new Issue(mgr.getTransport(), project.getId(), "This is upload ticket!")

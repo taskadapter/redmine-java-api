@@ -4,7 +4,6 @@ import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -48,29 +47,9 @@ public class ProjectManager {
     }
 
     /**
-     * Sample usage:
-     * 
-     * <pre>
-     * {@code
-     * 	Project project = new Project();
-     * 	Long timeStamp = Calendar.getInstance().getTimeInMillis();
-     * 	String key = "projkey" + timeStamp;
-     * 	String name = &quot;project number &quot; + timeStamp;
-     * 	String description = &quot;some description for the project&quot;;
-     * 	project.setIdentifier(key);
-     * 	project.setName(name);
-     * 	project.setDescription(description);
-     *
-     * 	Project createdProject = mgr.createProject(project);
-     * }
-     * </pre>
-     *
-     * @param project project to create on the server
-     * @return the newly created Project object.
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
+     * DEPRECATED. use project.create() instead
      */
+    @Deprecated
     public Project createProject(Project project) throws RedmineException {
         return transport.addObject(project, new BasicNameValuePair("include",
                 "trackers"));
@@ -127,12 +106,9 @@ public class ProjectManager {
     }
 
     /**
-     * @param projectKey string key like "project-ABC", NOT a database numeric ID
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       if the project with the given key is not found
-     * @throws RedmineException
+     * DEPRECATED. use project.delete() instead
      */
+    @Deprecated
     public void deleteProject(String projectKey) throws RedmineException {
         transport.deleteObject(Project.class, projectKey);
     }
@@ -190,6 +166,7 @@ public class ProjectManager {
         return transport.getObject(Version.class, versionId);
     }
 
+    @Deprecated
     public void update(Project object) throws RedmineException {
         transport.updateObject(object);
     }
@@ -213,7 +190,7 @@ public class ProjectManager {
 
     public Membership addUserToProject(int projectId, int userId, Collection<Role> roles) throws RedmineException {
         Membership membership = MembershipFactory.create();
-        Project project = ProjectFactory.create(projectId);
+        Project project = new Project(transport).setId(projectId);
         membership.setProject(project);
         membership.setUserId(userId);
         membership.addRoles(roles);
@@ -222,7 +199,7 @@ public class ProjectManager {
 
     public Membership addGroupToProject(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
         Membership membership = MembershipFactory.create();
-        Project project = ProjectFactory.create(projectId);
+        Project project = new Project(transport).setId(projectId);
         membership.setProject(project);
         // This is nuts, but according to the documentation the way it is supposed
         // to work:

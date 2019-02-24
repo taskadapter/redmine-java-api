@@ -38,14 +38,14 @@ public class AttachmentManagerIT {
 
         issueManager = mgr.getIssueManager();
         attachmentManager = mgr.getAttachmentManager();
-        Project project = IntegrationTestHelper.createProject(mgr);
+        Project project = IntegrationTestHelper.createProject(transport);
         projectId = project.getId();
         projectKey = project.getIdentifier();
     }
 
     @AfterClass
     public static void oneTimeTearDown() {
-        IntegrationTestHelper.deleteProject(mgr, projectKey);
+        IntegrationTestHelper.deleteProject(transport, projectKey);
     }
 
     @Test

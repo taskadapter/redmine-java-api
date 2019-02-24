@@ -33,7 +33,7 @@ public class MembershipIT {
         projectManager = mgr.getProjectManager();
         userManager = mgr.getUserManager();
         try {
-            project = IntegrationTestHelper.createAndReturnProject(mgr.getProjectManager());
+            project = IntegrationTestHelper.createProject(mgr.getTransport());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -41,7 +41,11 @@ public class MembershipIT {
 
     @AfterClass
     public static void oneTimeTearDown() {
-        IntegrationTestHelper.deleteProject(mgr, project.getIdentifier());
+        try {
+            project.delete();
+        } catch (RedmineException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

@@ -55,32 +55,23 @@ public class IntegrationTestHelper {
         return RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey(), client);
     }
 
-    public static Project createProject(RedmineManager mgr) {
-        Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
+    public static Project createProject(Transport transport) {
+        Project testProject = ProjectFactory.create(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
         try {
-            return mgr.getProjectManager().createProject(testProject);
+            return testProject.create();
         } catch (Exception e) {
             logger.error("Exception while configuring tests", e);
             throw new RuntimeException(e);
         }
     }
 
-    public static Project createAndReturnProject(ProjectManager mgr) {
-        Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
-        try {
-            return mgr.createProject(testProject);
-        } catch (Exception e) {
-            logger.error("Exception while configuring tests", e);
-            throw new RuntimeException(e);
-        }
-    }
     /**
      * Delete the project if it exists. this method ignores NULL or empty projectKey parameter.
      */
-    public static void deleteProject(RedmineManager mgr, String projectKey) {
+    public static void deleteProject(Transport transport, String projectKey) {
         try {
-            if (mgr != null && projectKey != null) {
-                mgr.getProjectManager().deleteProject(projectKey);
+            if (transport != null && projectKey != null) {
+                new Project(transport).setIdentifier(projectKey).delete();;
             }
         } catch (Exception e) {
             logger.error("Exception while deleting test project", e);

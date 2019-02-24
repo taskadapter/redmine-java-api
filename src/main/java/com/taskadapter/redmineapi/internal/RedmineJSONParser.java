@@ -163,7 +163,7 @@ public final class RedmineJSONParser {
 	 */
 	public static Project parseMinimalProject(JSONObject content)
 			throws JSONException {
-		final Project result = ProjectFactory.create(JsonInput.getInt(content, "id"));
+		final Project result = new Project(null).setId(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		return result;
@@ -177,7 +177,7 @@ public final class RedmineJSONParser {
 	 * @return parsed project.
 	 */
 	public static Project parseProject(JSONObject content) throws JSONException {
-		final Project result = ProjectFactory.create(JsonInput.getInt(content, "id"));
+		final Project result = new Project(null).setId(JsonInput.getInt(content, "id"));
 		result.setIdentifier(JsonInput.getStringOrNull(content, "identifier"));
 		result.setName(JsonInput.getStringNotNull(content, "name"));
 		result.setProjectPublic(JsonInput.getOptionalBool(content, "is_public"));

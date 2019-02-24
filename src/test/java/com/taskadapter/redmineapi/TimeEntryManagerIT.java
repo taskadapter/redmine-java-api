@@ -31,7 +31,6 @@ public class TimeEntryManagerIT {
 
     private static ProjectManager projectManager;
     private static TimeEntryManager timeEntryManager;
-    private static IssueManager issueManager;
     private static String projectKey;
     private static Integer projectId;
     private static Transport transport;
@@ -42,12 +41,11 @@ public class TimeEntryManagerIT {
         transport = mgr.getTransport();
         timeEntryManager = mgr.getTimeEntryManager();
         projectManager = mgr.getProjectManager();
-        issueManager = mgr.getIssueManager();
-
-        Project junitTestProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
 
         try {
-            Project createdProject = projectManager.createProject(junitTestProject);
+            Project createdProject = ProjectFactory.create(transport, "test project",
+                    "test" + Calendar.getInstance().getTimeInMillis())
+                    .create();
             projectKey = createdProject.getIdentifier();
             projectId = createdProject.getId();
         } catch (Exception e) {

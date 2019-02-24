@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.ProjectFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -10,11 +11,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ParentProjectIT {
 
     private static ProjectManager projectManager;
+    private static Transport transport;
 
     @BeforeClass
     public static void oneTimeSetUp() {
         RedmineManager redmineManager = IntegrationTestHelper.createRedmineManager();
         projectManager = redmineManager.getProjectManager();
+        transport = redmineManager.getTransport();
     }
 
     @Test
@@ -32,7 +35,7 @@ public class ParentProjectIT {
             // Alexey: I verified that deleting the parent project deletes the child one as well
             // (at least on Redmine 2.3.3)
             // Thus, there's no need in deleting the child one separately
-            projectManager.deleteProject(parentKey);
+            parentProject.delete();
         }
     }
 
@@ -40,11 +43,11 @@ public class ParentProjectIT {
      * @param parentId id of the parent project or null
      */
     private Project createProject(String key, String name, Integer parentId) throws RedmineException {
-        Project newProject = ProjectFactory.create(name, key);
+        Project newProject = ProjectFactory.create(transport, name, key);
         if (parentId != null) {
             newProject.setParentId(parentId);
         }
-        projectManager.createProject(newProject);
+        newProject.create();
         return projectManager.getProjectByKey(key);
     }
 

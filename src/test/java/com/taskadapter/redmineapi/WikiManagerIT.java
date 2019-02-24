@@ -1,6 +1,7 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.*;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -29,11 +30,13 @@ public class WikiManagerIT {
 
     private static WikiManager manager;
     private static User currentUser;
+    private static Transport transport;
 
     @BeforeClass
     public static void beforeClass() throws RedmineException {
         redmineManager = IntegrationTestHelper.createRedmineManager();
-        project = IntegrationTestHelper.createProject(redmineManager);
+        transport = redmineManager.getTransport();
+        project = IntegrationTestHelper.createProject(transport);
         projectKey = project.getIdentifier();
         manager = redmineManager.getWikiManager();
         UserManager userManager = redmineManager.getUserManager();
@@ -42,7 +45,7 @@ public class WikiManagerIT {
 
     @AfterClass
     public static void oneTimeTearDown() {
-        IntegrationTestHelper.deleteProject(redmineManager, project.getIdentifier());
+        IntegrationTestHelper.deleteProject(transport, project.getIdentifier());
     }
 
     @Test

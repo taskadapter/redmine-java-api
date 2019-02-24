@@ -76,10 +76,10 @@ public class IssueManagerIT {
         userManager = mgr.getUserManager();
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
-        project = IntegrationTestHelper.createProject(mgr);
+        project = IntegrationTestHelper.createProject(transport);
         projectId = project.getId();
         projectKey = project.getIdentifier();
-        project2 = IntegrationTestHelper.createProject(mgr);
+        project2 = IntegrationTestHelper.createProject(transport);
         projectKey2 = project2.getIdentifier();
         demoGroup = new Group(transport).setName("Group" + System.currentTimeMillis())
                 .create();
@@ -96,8 +96,8 @@ public class IssueManagerIT {
 
     @AfterClass
     public static void oneTimeTearDown() throws RedmineException {
-        IntegrationTestHelper.deleteProject(mgr, project.getIdentifier());
-        IntegrationTestHelper.deleteProject(mgr, project2.getIdentifier());
+        project.delete();
+        project2.delete();
         demoGroup.delete();
     }
 
