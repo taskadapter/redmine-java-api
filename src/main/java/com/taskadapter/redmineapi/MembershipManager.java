@@ -95,7 +95,7 @@ public class MembershipManager {
 
 
     /**
-     * Use {@link ProjectManager#addGroupToProject(int, int, Collection)} instead.
+     * Use membership.create() instead.
      */
     @Deprecated
     public Membership createMembershipForGroup(int projectId, int itemId, Collection<Role> roles) throws RedmineException {
@@ -110,7 +110,7 @@ public class MembershipManager {
     }
 
     /**
-     * Use {@link ProjectManager#addUserToProject(int, int, Collection)} instead.
+     * Use membership.create() instead.
      */
     @Deprecated
     public Membership createMembershipForUser(int projectId, int itemId, Collection<Role> roles) throws RedmineException {

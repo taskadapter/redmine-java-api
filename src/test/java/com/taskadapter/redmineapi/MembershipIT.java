@@ -52,8 +52,13 @@ public class MembershipIT {
         List<Role> roles = userManager.getRoles();
         User user = UserGenerator.generateRandomUser(transport).create();
         try {
-            projectManager.addUserToProject(project.getId(), user.getId(), roles);
-            final User userWithMembership = userManager.getUserById(user.getId());
+            new Membership(transport)
+                    .setProject(project)
+                    .setUserId(user.getId())
+                    .addRoles(roles)
+                    .create();
+//            projectManager.addUserToProject(project.getId(), user.getId(), roles);
+            User userWithMembership = userManager.getUserById(user.getId());
             assertThat(userWithMembership.getMemberships()).isNotEmpty();
         } finally {
             user.delete();
@@ -87,8 +92,9 @@ public class MembershipIT {
         final User currentUser = mgr.getUserManager().getCurrentUser();
         final int totalRoles = roles.size();
 
-        final Membership membership = projectManager.addUserToProject(project.getId(),
-                                        currentUser.getId(), roles);
+        Membership membership = new Membership(transport, project, currentUser.getId())
+                .addRoles(roles).create();
+
         assertThat(membership.getRoles().size()).isEqualTo(totalRoles);
 
         Membership membershipWithOnlyOneRole = new Membership(transport).setId(membership.getId())
@@ -100,7 +106,7 @@ public class MembershipIT {
         final Membership updatedEmptyMembership = projectManager.getProjectMember(membership.getId());
 
         assertThat(updatedEmptyMembership.getRoles().size()).isEqualTo(1);
-        projectManager.deleteProjectMembership(membership);
+        membership.delete();
     }
 
     @Test
@@ -108,10 +114,12 @@ public class MembershipIT {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        final Membership membershipForUser = projectManager.addUserToProject(project.getId(), currentUser.getId(), roles);
+        Membership membership = new Membership(transport, project, currentUser.getId())
+                .addRoles(roles).create();
+
         final List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
         verifyMemberships(roles, currentUser, memberships);
-        projectManager.deleteProjectMembership(membershipForUser);
+        membership.delete();
     }
 
     @Test
@@ -119,10 +127,12 @@ public class MembershipIT {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        final Membership membershipForUser = projectManager.addUserToProject(project.getId(), currentUser.getId(), roles);
+        Membership membership = new Membership(transport, project, currentUser.getId())
+                .addRoles(roles).create();
+
         final List<Membership> memberships = projectManager.getProjectMembers(project.getId());
         verifyMemberships(roles, currentUser, memberships);
-        projectManager.deleteProjectMembership(membershipForUser);
+        membership.delete();
     }
 
     @Test
@@ -130,20 +140,25 @@ public class MembershipIT {
         final List<Role> roles = mgr.getUserManager().getRoles();
         final User currentUser = mgr.getUserManager().getCurrentUser();
 
-        final Membership membershipForUser = projectManager.addUserToProject(project.getId(), currentUser.getId(), roles);
+        Membership membership = new Membership(transport, project, currentUser.getId())
+                .addRoles(roles).create();
+
         final List<Membership> memberships = projectManager.getProjectMembers(project.getId());
         assertThat(memberships.get(0).getUserName()).isEqualTo(currentUser.getFullName());
-        projectManager.deleteProjectMembership(membershipForUser);
+        membership.delete();
     }
     
     @Test
-    public void membershipsContainGoupName() throws RedmineException {
+    public void groupMembershipIsAdded() throws RedmineException {
         final Group group = new Group(transport).setName("group" + new Random().nextDouble());
         Group createdGroup = null;
         try {
             createdGroup = group.create();
 
-            projectManager.addGroupToProject(project.getId(), createdGroup.getId(), userManager.getRoles());
+            new Membership(transport, project, createdGroup.getId())
+                    .addRoles(userManager.getRoles())
+                    .create();
+
             List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
             assertThat(memberships.get(0).getGroupName()).isEqualTo(createdGroup.getName());
         } finally {
@@ -163,7 +178,9 @@ public class MembershipIT {
     public void membershipCanBeUsedFluentStyle() throws RedmineException {
         User user = UserGenerator.generateRandomUser(transport).create();
         try {
-            projectManager.addUserToProject(project.getId(), user.getId(), userManager.getRoles());
+            new Membership(transport, project, user.getId())
+                    .addRoles(userManager.getRoles())
+                    .create();
 
             userManager.getUserById(user.getId())
                     .getMemberships().iterator().next().delete();

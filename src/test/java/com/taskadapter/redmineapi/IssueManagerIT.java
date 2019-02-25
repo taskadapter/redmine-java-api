@@ -11,6 +11,7 @@ import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
+import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.RoleFactory;
@@ -87,8 +88,14 @@ public class IssueManagerIT {
                 RoleFactory.create(4), // Developer
                 RoleFactory.create(5)  // Reporter
         );
-        projectManager.addGroupToProject(project.getId(), demoGroup.getId(), allRoles);
-        projectManager.addGroupToProject(project2.getId(), demoGroup.getId(), allRoles);
+
+        new Membership(transport, project, demoGroup.getId())
+                .addRoles(allRoles)
+                .create();
+
+        new Membership(transport, project2, demoGroup.getId())
+                .addRoles(allRoles)
+                .create();
 
         ourUser = IntegrationTestHelper.getOurUser(transport);
     }

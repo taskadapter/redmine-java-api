@@ -38,6 +38,12 @@ public class Membership implements Identifiable, FluentStyle {
 		setTransport(transport);
 	}
 
+	public Membership(Transport transport, Project project, int userId) {
+		this(transport);
+		setProject(project);
+		setUserId(userId);
+	}
+
     /**
      * @param id database ID.
      */
@@ -129,6 +135,19 @@ public class Membership implements Identifiable, FluentStyle {
 		return storage;
 	}
 
+	/**
+	 * Required attributes: 1) project    2) either userId/groupId or roles collection
+	 */
+	public Membership create() throws RedmineException {
+		if (getProject() == null) {
+			throw new IllegalArgumentException("Project must be set");
+		}
+		if (getUserId() == null && getRoles().isEmpty()) {
+			throw new IllegalArgumentException("Either User or Roles field must be set");
+		}
+		return transport.addChildEntry(Project.class, getProject().getId() + "", this);
+	}
+
 	public void update() throws RedmineException {
 		transport.updateObject(this);
 	}
@@ -143,5 +162,6 @@ public class Membership implements Identifiable, FluentStyle {
 	@Override
 	public void setTransport(Transport transport) {
 		this.transport = transport;
+		PropertyStorageUtil.updateCollections(storage, transport);
 	}
 }

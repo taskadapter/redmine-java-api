@@ -171,26 +171,31 @@ public class ProjectManager {
         return transport.getObjectsList(News.class, params);
     }
 
+    /**
+     * DEPRECATED. use membership.create()
+     */
+    @Deprecated
     public Membership addUserToProject(int projectId, int userId, Collection<Role> roles) throws RedmineException {
-        Project project = new Project(transport).setId(projectId);
-        Membership membership = new Membership(transport)
-                .setProject(project)
+        return new Membership(transport)
+                .setProject(new Project(transport).setId(projectId))
                 .setUserId(userId)
-                .addRoles(roles);
-        return addMembership(membership);
+                .addRoles(roles)
+                .create();
     }
 
+    /**
+     * DEPRECATED. use membership.create()
+     */
+    @Deprecated
     public Membership addGroupToProject(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
         // "add user" and "add group" behave exactly the same way, actually. see
         // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
         // http://www.redmine.org/issues/17904
-        Project project = new Project(transport).setId(projectId);
-        Membership membership = new Membership(transport)
-                .setProject(project)
+        return new Membership(transport)
+                .setProject(new Project(transport).setId(projectId))
                 .setUserId(groupId)
-                .addRoles(roles);
-
-        return addMembership(membership);
+                .addRoles(roles)
+                .create();
     }
 
     /**
@@ -223,22 +228,19 @@ public class ProjectManager {
         transport.deleteObject(Membership.class, Integer.toString(membershipId));
     }
 
+    /**
+     * DEPRECATED. use membership.delete() instead.
+     */
+    @Deprecated
     public void deleteProjectMembership(Membership membership) throws RedmineException {
         transport.deleteObject(Membership.class, membership.getId().toString());
     }
 
+    /**
+     * DEPRECATED. use membership.update() instead.
+     */
+    @Deprecated
     public void updateProjectMembership(Membership membership) throws RedmineException {
         transport.updateObject(membership);
-    }
-
-    private Membership addMembership(Membership membership) throws RedmineException {
-        final Project project = membership.getProject();
-        if (project == null) {
-            throw new IllegalArgumentException("Project must be set");
-        }
-        if (membership.getUserId() == null && membership.getRoles().isEmpty()) {
-            throw new IllegalArgumentException("Either User or Roles field must be set");
-        }
-        return transport.addChildEntry(Project.class, project.getId() + "", membership);
     }
 }

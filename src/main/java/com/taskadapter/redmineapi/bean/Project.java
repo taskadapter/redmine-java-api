@@ -251,6 +251,7 @@ public class Project implements Identifiable, Serializable, FluentStyle {
     @Override
     public void setTransport(Transport transport) {
         this.transport = transport;
+        PropertyStorageUtil.updateCollections(storage, transport);
     }
 
     /**
