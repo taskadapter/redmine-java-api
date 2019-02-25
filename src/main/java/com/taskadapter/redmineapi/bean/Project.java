@@ -60,6 +60,12 @@ public class Project implements Identifiable, Serializable, FluentStyle {
         storage.set(TRACKERS, new HashSet<>());
     }
 
+    public Project(Transport transport, String name, String key) {
+        this(transport);
+        setName(name);
+        setIdentifier(key);
+    }
+
     public Project setId(Integer id) {
         storage.set(DATABASE_ID, id);
         return this;

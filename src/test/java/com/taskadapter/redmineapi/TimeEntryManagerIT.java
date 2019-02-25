@@ -2,7 +2,6 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -43,7 +42,7 @@ public class TimeEntryManagerIT {
         projectManager = mgr.getProjectManager();
 
         try {
-            Project createdProject = ProjectFactory.create(transport, "test project",
+            Project createdProject = new Project(transport, "test project",
                     "test" + Calendar.getInstance().getTimeInMillis())
                     .create();
             projectKey = createdProject.getIdentifier();

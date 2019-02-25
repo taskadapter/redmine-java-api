@@ -6,7 +6,6 @@ import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
@@ -61,8 +60,11 @@ public class Simple {
 		final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
 				"application/ternary", content);
-		final Project tmpProject = ProjectFactory.create(mgr.getTransport(), "Upload project", "uploadtmpproject");
-		final Project project = mgr.getProjectManager().createProject(tmpProject);
+		Project project = new Project(mgr.getTransport())
+				.setName("Upload project")
+				.setIdentifier("uploadtmpproject")
+				.create();
+
 		try {
 			Issue issue = new Issue(mgr.getTransport(), project.getId(), "This is upload ticket!")
 					.addAttachment(attach1)
@@ -74,7 +76,7 @@ public class Simple {
 				issue.delete();
 			}
 		} finally {
-			mgr.getProjectManager().deleteProject(project.getIdentifier());
+			project.delete();
 		}
 	}
 
@@ -88,9 +90,9 @@ public class Simple {
 	@SuppressWarnings("unused")
 	private static void changeIssueStatus(IssueManager issueManager)
 			throws RedmineException {
-		Issue issue = issueManager.getIssueById(1771);
-		issue.setSubject("new");
-		issueManager.update(issue);
+		issueManager.getIssueById(1771)
+				.setSubject("new")
+				.update();
 	}
 
 	@SuppressWarnings("unused")

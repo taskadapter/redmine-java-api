@@ -19,6 +19,14 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
 
 # Sample code.
 
+# Obtain `transport` required for fluent-style calls
+
+The new (February 2019) fluent-style API (v. 4.x) requires a `transport` instance for most calls. 
+First, create an instance of RedmineManager and then obtain its transport:
+
+    RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
+    Transport transport = mgr.getTransport();
+
 ## Get list of issues
 
     String uri = "https://www.hostedredmine.com";
@@ -63,7 +71,7 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
 
     RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);	
 	Version ver = new Version().setId(512);
-	IssueCategory cat = IssueCategoryFactory.create(673);
+	IssueCategory cat = new IssueCategory(transport).setId(673);
     ProjectManager projectManager = manager.getProjectManager();
     Project projectByKey = projectManager.getProjectByKey("testid");
 
@@ -87,6 +95,13 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
     issue.addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value));
     issueManager.update(issue);
 
+## Create project
+
+	Project project = new Project(transport)
+ 				.setName("Upload project")
+   				.setIdentifier("uploadtmpproject")
+   				.create();
+
 ## Get all projects
 
     List<Project> projects = mgr.getProjectManager().getProjects();
@@ -98,13 +113,18 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
 
 ## Create a group and add user to it
 
-    Group template = new Group().setName("group " + System.currentTimeMillis());
-    Group group = userManager.createGroup(template);
-    User newUser = userManager.createUser(UserGenerator.generateRandomUser());
-    userManager.addUserToGroup(newUser, group);
+    Group group = new Group(transport)
+        .setName("group")
+        .create();
+        
+    User user = new User(transport).set(...)
+        .create();
+        
+    userManager.addUserToGroup(user, group);
 
 ##  Delete user
-    userManager.deleteUser(123);
+    
+    user.delete();
 
 ## Get time entries
     TimeEntryManager timeEntryManager = redmineManager.getTimeEntryManager();

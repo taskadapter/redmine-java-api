@@ -4,7 +4,6 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -172,7 +171,7 @@ public class ProjectIntegrationIT {
 
     @Test
     public void createProjectFailsWithReservedIdentifier() throws Exception {
-        Project projectToCreate = ProjectFactory.create(transport, "new", "new");
+        Project projectToCreate = new Project(transport, "new", "new");
         Project createdProject = null;
         try {
             createdProject = projectToCreate.create();
@@ -263,7 +262,7 @@ public class ProjectIntegrationIT {
         String name = "project number " + timeStamp;
         String description = "some description for the project";
 
-        Project project = ProjectFactory.create(transport, name, key);
+        Project project = new Project(transport, name, key);
         project.setDescription(description);
         project.setHomepage("www.randompage" + timeStamp + ".com");
         return project;
@@ -432,13 +431,13 @@ public class ProjectIntegrationIT {
 
     private Project createProject() throws RedmineException {
         long id = new Date().getTime();
-        return ProjectFactory.create(transport, "project" + id, "project" + id)
+        return new Project(transport, "project" + id, "project" + id)
                 .create();
     }
 
     private Project createSubProject(Project parent) throws RedmineException {
         long id = new Date().getTime();
-        return ProjectFactory.create(transport, "sub_pr" + id, "subpr" + id)
+        return new Project(transport, "sub_pr" + id, "subpr" + id)
                 .setParentId(parent.getId())
                 .create();
     }

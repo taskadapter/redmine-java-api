@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
@@ -56,7 +55,7 @@ public class IntegrationTestHelper {
     }
 
     public static Project createProject(Transport transport) {
-        Project testProject = ProjectFactory.create(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
+        Project testProject = new Project(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
         try {
             return testProject.create();
         } catch (Exception e) {

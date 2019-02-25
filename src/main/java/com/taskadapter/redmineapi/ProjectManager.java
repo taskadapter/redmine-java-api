@@ -27,13 +27,6 @@ import java.util.Set;
  projectManager.getProjectById(123);
 
  projects = projectManager.getProjects();
-
- // create project
- Project project = ProjectFactory.create();
- project.setName("MyProject");
- project.setDescription("description");
- project.setHomepage("www.mypage.com");
- createdProject = projectManager.createProject(project);
  * </pre>
  *
  * @see RedmineManager#getIssueManager()

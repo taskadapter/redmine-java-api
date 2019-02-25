@@ -4,7 +4,6 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
@@ -41,7 +40,7 @@ public class RedmineManagerDefaultsIT {
         issueManager = mgr.getIssueManager();
         projectManager = mgr.getProjectManager();
 
-        Project junitTestProject = ProjectFactory.create(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
+        Project junitTestProject = new Project(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
 
 
         try {
@@ -69,8 +68,8 @@ public class RedmineManagerDefaultsIT {
 
 	@Test
 	public void testProjectDefaults() throws RedmineException {
-		final Project template = ProjectFactory.create(transport, "Test name", "key" + Calendar.getInstance().getTimeInMillis());
-		final Project result = projectManager.createProject(template);
+		Project template = new Project(transport, "Test name", "key" + Calendar.getInstance().getTimeInMillis());
+		Project result = template.create();
 		try {
 			Assert.assertNotNull(result.getId());
 			Assert.assertEquals(template.getIdentifier(),

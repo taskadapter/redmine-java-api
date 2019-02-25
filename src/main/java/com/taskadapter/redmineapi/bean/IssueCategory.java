@@ -25,13 +25,6 @@ public class IssueCategory implements Identifiable, Serializable, FluentStyle {
     public final static Property<String> ASSIGNEE_NAME = new Property<>(String.class, "assigneeName");
     private Transport transport;
 
-    /**
-     * @param id database ID.
-     */
-    IssueCategory(Integer id) {
-        setId(id);
-    }
-
     public IssueCategory(Transport transport) {
         setTransport(transport);
     }

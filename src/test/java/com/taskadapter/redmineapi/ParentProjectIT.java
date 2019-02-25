@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class ParentProjectIT {
      * @param parentId id of the parent project or null
      */
     private Project createProject(String key, String name, Integer parentId) throws RedmineException {
-        Project newProject = ProjectFactory.create(transport, name, key);
+        Project newProject = new Project(transport, name, key);
         if (parentId != null) {
             newProject.setParentId(parentId);
         }
