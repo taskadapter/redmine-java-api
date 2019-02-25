@@ -19,7 +19,6 @@ import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.JournalFactory;
 import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.NewsFactory;
 import com.taskadapter.redmineapi.bean.Project;
@@ -425,7 +424,7 @@ public final class RedmineJSONParser {
 
 	public static Membership parseMembership(JSONObject content)
 			throws JSONException {
-		final Membership result = MembershipFactory.create(JsonInput.getIntOrNull(content, "id"));
+		final Membership result = new Membership(null).setId(JsonInput.getIntOrNull(content, "id"));
 		result.setProject(JsonInput.getObjectOrNull(content, "project",
 				RedmineJSONParser::parseMinimalProject));
 		final User user = JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser);

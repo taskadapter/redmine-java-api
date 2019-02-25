@@ -321,6 +321,7 @@ public class User implements Identifiable, FluentStyle {
     @Override
     public void setTransport(Transport transport) {
         this.transport = transport;
+        PropertyStorageUtil.updateCollections(storage, transport);
     }
 
     public User create() throws RedmineException {

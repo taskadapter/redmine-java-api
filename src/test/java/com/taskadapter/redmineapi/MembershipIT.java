@@ -2,7 +2,6 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
@@ -51,14 +50,13 @@ public class MembershipIT {
     @Test
     public void membershipCanBeSetForUsers() throws RedmineException {
         List<Role> roles = userManager.getRoles();
-        User user = UserGenerator.generateRandomUser(transport);
-        User createdUser = user.create();
+        User user = UserGenerator.generateRandomUser(transport).create();
         try {
-            projectManager.addUserToProject(project.getId(), createdUser.getId(), roles);
-            final User userWithMembership = userManager.getUserById(createdUser.getId());
+            projectManager.addUserToProject(project.getId(), user.getId(), roles);
+            final User userWithMembership = userManager.getUserById(user.getId());
             assertThat(userWithMembership.getMemberships()).isNotEmpty();
         } finally {
-            createdUser.delete();
+            user.delete();
         }
     }
 
@@ -93,10 +91,10 @@ public class MembershipIT {
                                         currentUser.getId(), roles);
         assertThat(membership.getRoles().size()).isEqualTo(totalRoles);
 
-        final Membership membershipWithOnlyOneRole = MembershipFactory.create(membership.getId());
-        membershipWithOnlyOneRole.setProject(membership.getProject());
-        membershipWithOnlyOneRole.setUserId(membership.getUserId());
-        membershipWithOnlyOneRole.addRoles(Collections.singletonList(roles.get(0)));
+        Membership membershipWithOnlyOneRole = new Membership(transport).setId(membership.getId())
+                .setProject(membership.getProject())
+                .setUserId(membership.getUserId())
+                .addRoles(Collections.singletonList(roles.get(0)));
 
         projectManager.updateProjectMembership(membershipWithOnlyOneRole);
         final Membership updatedEmptyMembership = projectManager.getProjectMember(membership.getId());
@@ -140,20 +138,44 @@ public class MembershipIT {
     
     @Test
     public void membershipsContainGoupName() throws RedmineException {
-        final List<Role> roles = mgr.getUserManager().getRoles();
         final Group group = new Group(transport).setName("group" + new Random().nextDouble());
         Group createdGroup = null;
         try {
             createdGroup = group.create();
 
-            projectManager.addGroupToProject(project.getId(), createdGroup.getId(), roles);
+            projectManager.addGroupToProject(project.getId(), createdGroup.getId(), userManager.getRoles());
             List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
             assertThat(memberships.get(0).getGroupName()).isEqualTo(createdGroup.getName());
         } finally {
             createdGroup.delete();
         }
     }
-    
+
+    /**
+     * Check that membership object acquires "transport" object when loaded *indirectly* (!) via "user" object,
+     * which allows to use fluent-style API (call ".delete" on that membership instance):
+     * <pre>
+     *      userManager.getUserById(createdUser.getId())
+     *         .getMemberships().iterator().next().delete();
+     * </pre>
+     */
+    @Test
+    public void membershipCanBeUsedFluentStyle() throws RedmineException {
+        User user = UserGenerator.generateRandomUser(transport).create();
+        try {
+            projectManager.addUserToProject(project.getId(), user.getId(), userManager.getRoles());
+
+            userManager.getUserById(user.getId())
+                    .getMemberships().iterator().next().delete();
+
+            List<Membership> memberships = projectManager.getProjectMembers(project.getIdentifier());
+            assertThat(memberships).isEmpty();
+
+        } finally {
+            user.delete();
+        }
+    }
+
     private void verifyMemberships(List<Role> roles, User currentUser, List<Membership> memberships) throws RedmineException {
         assertThat(memberships.size()).isEqualTo(1);
         final Membership membership = memberships.get(0);

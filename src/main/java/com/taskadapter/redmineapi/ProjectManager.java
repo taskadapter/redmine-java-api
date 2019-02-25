@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
@@ -173,24 +172,23 @@ public class ProjectManager {
     }
 
     public Membership addUserToProject(int projectId, int userId, Collection<Role> roles) throws RedmineException {
-        Membership membership = MembershipFactory.create();
         Project project = new Project(transport).setId(projectId);
-        membership.setProject(project);
-        membership.setUserId(userId);
-        membership.addRoles(roles);
+        Membership membership = new Membership(transport)
+                .setProject(project)
+                .setUserId(userId)
+                .addRoles(roles);
         return addMembership(membership);
     }
 
     public Membership addGroupToProject(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
-        Membership membership = MembershipFactory.create();
-        Project project = new Project(transport).setId(projectId);
-        membership.setProject(project);
-        // This is nuts, but according to the documentation the way it is supposed
-        // to work:
+        // "add user" and "add group" behave exactly the same way, actually. see
         // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
         // http://www.redmine.org/issues/17904
-        membership.setUserId(groupId);
-        membership.addRoles(roles);
+        Project project = new Project(transport).setId(projectId);
+        Membership membership = new Membership(transport)
+                .setProject(project)
+                .setUserId(groupId)
+                .addRoles(roles);
 
         return addMembership(membership);
     }

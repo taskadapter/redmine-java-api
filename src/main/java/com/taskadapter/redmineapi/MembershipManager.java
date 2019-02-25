@@ -1,7 +1,6 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -70,14 +69,26 @@ public class MembershipManager {
         return transport.getObject(Membership.class, membershipId);
     }
 
+    /**
+     * DEPRECATED. use membership.delete() instead
+     */
+    @Deprecated
     public void delete(int membershipId) throws RedmineException {
         transport.deleteObject(Membership.class, Integer.toString(membershipId));
     }
 
+    /**
+     * DEPRECATED. use membership.delete() instead
+     */
+    @Deprecated
     public void delete(Membership membership) throws RedmineException {
         transport.deleteObject(Membership.class, membership.getId().toString());
     }
 
+    /**
+     * DEPRECATED. use membership.update() instead
+     */
+    @Deprecated
     public void update(Membership membership) throws RedmineException {
         transport.updateObject(membership);
     }
@@ -88,11 +99,12 @@ public class MembershipManager {
      */
     @Deprecated
     public Membership createMembershipForGroup(int projectId, int itemId, Collection<Role> roles) throws RedmineException {
-        final Membership membership = MembershipFactory.create();
         Project project = new Project(transport).setId(projectId);
-        membership.setProject(project);
-        membership.setUserId(itemId);
-        membership.addRoles(roles);
+
+        Membership membership = new Membership(transport)
+                .setProject(project)
+                .setUserId(itemId)
+                .addRoles(roles);
 
         return addMembership(membership);
     }
