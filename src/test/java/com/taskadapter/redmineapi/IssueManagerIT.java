@@ -444,7 +444,7 @@ public class IssueManagerIT {
     @Test
     public void issueRelationIsDeleted() throws RedmineException {
         IssueRelation relation = createTwoRelatedIssues();
-        issueManager.deleteRelation(relation.getId());
+        relation.delete();
         Issue issue = issueManager.getIssueById(relation.getIssueId(), Include.relations);
         assertThat(issue.getRelations()).isEmpty();
     }
@@ -481,40 +481,24 @@ public class IssueManagerIT {
      * Requires Redmine 2.3
      */
     @Test
-    public void testAddIssueWatcher() throws RedmineException {
+    public void testAddDeleteIssueWatcher() throws RedmineException {
         Issue issue = createIssues(transport, projectId, 1).get(0);
-        Issue retrievedIssue = issueManager.getIssueById(issue.getId());
-        assertEquals(issue, retrievedIssue);
 
         User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
-            Watcher watcher = new Watcher().setId(newUser.getId());
-            issueManager.addWatcherToIssue(watcher, issue);
+            issue.addWatcher(newUser.getId());
+
+            Collection<Watcher> watchers = issueManager.getIssueById(issue.getId(), Include.watchers).getWatchers();
+            assertThat(watchers).hasSize(1);
+            assertThat(watchers.iterator().next().getId()).isEqualTo(newUser.getId());
+
+            issue.deleteWatcher(newUser.getId());
+            assertThat(
+                    issueManager.getIssueById(issue.getId()).getWatchers())
+                    .isEmpty();
         } finally {
             newUser.delete();
         }
-
-        issueManager.getIssueById(issue.getId());
-    }
-
-    /**
-     * Requires Redmine 2.3
-     */
-    @Test
-    public void testDeleteIssueWatcher() throws RedmineException {
-        final Issue issue = createIssues(transport, projectId, 1).get(0);
-        final Issue retrievedIssue = issueManager.getIssueById(issue.getId());
-        assertEquals(issue, retrievedIssue);
-
-        User newUser = UserGenerator.generateRandomUser(transport).create();
-        try {
-            Watcher watcher = new Watcher().setId(newUser.getId());
-            issueManager.addWatcherToIssue(watcher, issue);
-            issueManager.deleteWatcherFromIssue(watcher, issue);
-        } finally {
-            newUser.delete();
-        }
-
         issue.delete();
     }
 
@@ -523,15 +507,14 @@ public class IssueManagerIT {
      */
     @Test
     public void testGetIssueWatcher() throws RedmineException {
-        final Issue issue = createIssues(transport, projectId, 1).get(0);
-        final Issue retrievedIssue = issueManager.getIssueById(issue.getId());
+        Issue issue = createIssues(transport, projectId, 1).get(0);
+        Issue retrievedIssue = issueManager.getIssueById(issue.getId());
         assertEquals(issue, retrievedIssue);
 
         User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
-            Watcher watcher = new Watcher().setId(newUser.getId());
-            issueManager.addWatcherToIssue(watcher, issue);
-            final Issue includeWatcherIssue = issueManager.getIssueById(issue.getId(),
+            issue.addWatcher(newUser.getId());
+            Issue includeWatcherIssue = issueManager.getIssueById(issue.getId(),
                     Include.watchers);
             if (!includeWatcherIssue.getWatchers().isEmpty()) {
                 Watcher watcher1 = includeWatcherIssue.getWatchers().iterator().next();
@@ -541,7 +524,7 @@ public class IssueManagerIT {
             newUser.delete();
         }
 
-        issueManager.getIssueById(issue.getId());
+        issue.delete();
     }
 
     @Test

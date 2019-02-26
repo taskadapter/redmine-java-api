@@ -126,10 +126,18 @@ public class IssueManager {
         return transport.getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
+    /**
+     * DEPRECATED. use issue.addWatcher(..)
+     */
+    @Deprecated
     public void addWatcherToIssue(Watcher watcher, Issue issue) throws RedmineException {
         transport.addWatcherToIssue(watcher.getId(), issue.getId());
     }
 
+    /**
+     * DEPRECATED. use issue.deleteWatcher(..)
+     */
+    @Deprecated
     public void deleteWatcherFromIssue(Watcher watcher, Issue issue) throws RedmineException {
         transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId());
     }
@@ -231,7 +239,7 @@ public class IssueManager {
      */
     @Deprecated
     public void update(Issue obj) throws RedmineException {
-        transport.updateObject(obj);
+        obj.update();
     }
 
     /**

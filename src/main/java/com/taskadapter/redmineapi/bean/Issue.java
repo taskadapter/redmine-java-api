@@ -629,6 +629,14 @@ public class Issue implements Identifiable, FluentStyle {
         transport.deleteObject(Issue.class, Integer.toString(this.getId()));
     }
 
+    public void addWatcher(int watcherId) throws RedmineException {
+        transport.addWatcherToIssue(watcherId, getId());
+    }
+
+    public void deleteWatcher(int watcherId) throws RedmineException {
+        transport.deleteChildId(Issue.class, Integer.toString(getId()), new Watcher(), watcherId);
+    }
+
     @Override
     public void setTransport(Transport transport) {
         this.transport = transport;
