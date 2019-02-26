@@ -303,8 +303,8 @@ public class ProjectIntegrationIT {
     public void projectIsCreatedWithCustomField() throws RedmineException {
         List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();
         CustomFieldDefinition customFieldDefinition = getCustomFieldByName(customFieldDefinitions, "custom_project_field_1");
-        final Integer fieldId = customFieldDefinition.getId();
-        final CustomField customField = CustomFieldFactory.create(fieldId);
+        Integer fieldId = customFieldDefinition.getId();
+        CustomField customField = new CustomField().setId(fieldId);
         customField.setValue("value1");
         final Project project = generateRandomProject();
         project.setName("project-with-custom-field");

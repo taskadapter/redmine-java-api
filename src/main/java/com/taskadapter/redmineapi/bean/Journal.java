@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Journal {
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     /**
      * database numeric ID.
@@ -22,15 +22,16 @@ public class Journal {
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
     public final static Property<List<JournalDetail>> DETAILS = (Property<List<JournalDetail>>) new Property(List.class, "details");
 
+    public Journal() {
+        storage.set(DETAILS, new ArrayList<>());
+    }
+
     /**
-     * Use JournalFactory to create instances of this class.
-     *
      * @param id database ID.
      */
-    Journal(Integer id) {
-        storage = new PropertyStorage();
-        storage.set(DETAILS, new ArrayList<>());
+    public Journal setId(Integer id) {
         storage.set(DATABASE_ID, id);
+        return this;
     }
 
     public Date getCreatedOn() {

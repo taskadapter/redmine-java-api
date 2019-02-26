@@ -1,6 +1,11 @@
 package com.taskadapter.redmineapi.bean;
 
-public class IssueRelation implements Identifiable {
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+
+public class IssueRelation implements Identifiable, FluentStyle {
+    private Transport transport;
+
     public enum TYPE {
         precedes
     }
@@ -19,7 +24,7 @@ public class IssueRelation implements Identifiable {
      </relation>
      */
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     /**
      * database numeric Id
@@ -30,9 +35,20 @@ public class IssueRelation implements Identifiable {
     public final static Property<String> RELATION_TYPE = new Property<>(String.class, "relationType");
     public final static Property<Integer> DELAY = new Property<>(Integer.class, "delay");
 
-    IssueRelation(Integer id) {
-        storage = new PropertyStorage();
+    public IssueRelation(Transport transport) {
+        setTransport(transport);
+    }
+
+    public IssueRelation(Transport transport, Integer issueId, Integer issueToId, String type) {
+        setTransport(transport);
+        setIssueId(issueId);
+        setIssueToId(issueToId);
+        setType(type);
+    }
+
+    public IssueRelation setId(Integer id) {
         storage.set(DATABASE_ID, id);
+        return this;
     }
 
     @Override
@@ -44,32 +60,36 @@ public class IssueRelation implements Identifiable {
         return storage.get(ISSUE_ID);
     }
 
-    public void setIssueId(Integer issueId) {
+    public IssueRelation setIssueId(Integer issueId) {
         storage.set(ISSUE_ID, issueId);
+        return this;
     }
 
     public Integer getIssueToId() {
         return storage.get(ISSUE_TO_ID);
     }
 
-    public void setIssueToId(Integer issueToId) {
+    public IssueRelation setIssueToId(Integer issueToId) {
         storage.set(ISSUE_TO_ID, issueToId);
+        return this;
     }
 
     public Integer getDelay() {
         return storage.get(DELAY);
     }
 
-    public void setDelay(Integer delay) {
+    public IssueRelation setDelay(Integer delay) {
         storage.set(DELAY, delay);
+        return this;
     }
 
     public String getType() {
         return storage.get(RELATION_TYPE);
     }
 
-    public void setType(String type) {
+    public IssueRelation setType(String type) {
         storage.set(RELATION_TYPE, type);
+        return this;
     }
 
     @Override
@@ -99,4 +119,21 @@ public class IssueRelation implements Identifiable {
     public PropertyStorage getStorage() {
         return storage;
     }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
+    }
+
+    /**
+     * Each relation must have issueId, issueToId and type set.
+     */
+    public IssueRelation create() throws RedmineException {
+        return transport.addChildEntry(Issue.class, getIssueId().toString(), this);
+    }
+
+    public void delete() throws RedmineException {
+        transport.deleteObject(IssueRelation.class, Integer.toString(getId()));
+    }
+
 }

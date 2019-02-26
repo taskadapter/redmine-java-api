@@ -11,7 +11,6 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.TrackerFactory;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
@@ -56,8 +55,10 @@ public class RedmineJSONParserTest {
 				.parse("11.05.2012 06:53:21 -0700"));
 		template.setUpdatedOn(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss Z")
 				.parse("11.05.2012 06:53:20 -0700"));
-		template.addTrackers(Arrays.asList(TrackerFactory.create(1, "Bug"), TrackerFactory.create(
-                2, "Feature"), TrackerFactory.create(3, "Support")));
+		template.addTrackers(Arrays.asList(
+				new Tracker().setId(1).setName("Bug"),
+				new Tracker().setId(2).setName("Feature"),
+				new Tracker().setId(3).setName("Support")));
 		template.setDescription("");
 		Assert.assertEquals(template, project);
 	}

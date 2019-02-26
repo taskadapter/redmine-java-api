@@ -9,38 +9,39 @@ public class TimeEntryTest {
 
     @Test
     public void emptyObjectIsInvalid() {
-        assertFalse(TimeEntryFactory.create().isValid());
+        assertFalse(new TimeEntry(null).isValid());
     }
 
     @Test
     public void validWithNonEmptyIssueId() {
-        TimeEntry timeEntry = TimeEntryFactory.create();
-        timeEntry.setHours(5f);
-        timeEntry.setIssueId(1);
+        TimeEntry timeEntry = new TimeEntry(null)
+                .setHours(5f)
+                .setIssueId(1);
+
         assertTrue(timeEntry.isValid());
     }
 
     @Test
     public void invalidWithoutTime() {
-        TimeEntry timeEntry = TimeEntryFactory.create();
-        timeEntry.setIssueId(1);
+        TimeEntry timeEntry = new TimeEntry(null)
+                .setIssueId(1);
         assertFalse(timeEntry.isValid());
     }
 
     @Test
     public void validWithNonEmptyProjectId() {
-        TimeEntry timeEntry = TimeEntryFactory.create();
-        timeEntry.setHours(5f);
-        timeEntry.setProjectId(123);
+        TimeEntry timeEntry = new TimeEntry(null)
+                .setHours(5f)
+                .setProjectId(123);
         assertTrue(timeEntry.isValid());
     }
 
     @Test
     public void validWithBothProjectIdAndIssueIdSet() {
-        TimeEntry timeEntry = TimeEntryFactory.create();
-        timeEntry.setHours(5f);
-        timeEntry.setIssueId(11);
-        timeEntry.setProjectId(22);
+        TimeEntry timeEntry = new TimeEntry(null)
+                .setHours(5f)
+                .setIssueId(11)
+                .setProjectId(22);
         assertTrue(timeEntry.isValid());
     }
 }

@@ -113,10 +113,9 @@ public class Simple {
 	}
 
 	@SuppressWarnings("unused")
-	private static void tryCreateRelation(IssueManager issueManager)
-			throws RedmineException {
-		IssueRelation r = issueManager.createRelation(49, 50,
-				IssueRelation.TYPE.precedes.toString());
+	private static void tryCreateRelation(Transport transport) throws RedmineException {
+		IssueRelation r = new IssueRelation(transport, 49, 50, IssueRelation.TYPE.precedes.toString())
+				.create();
 		logger.debug("Created relation " + r);
 	}
 

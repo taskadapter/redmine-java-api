@@ -80,7 +80,7 @@ public class Group implements Identifiable, FluentStyle {
     }
 
     /**
-     * Delete this group.
+     * Delete this group. The object must have Id set.
      * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      */
     public void delete() throws RedmineException {

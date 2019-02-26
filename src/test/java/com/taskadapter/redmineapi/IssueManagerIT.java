@@ -3,7 +3,6 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
-import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -14,13 +13,11 @@ import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.RoleFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.bean.WatcherFactory;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
@@ -84,9 +81,9 @@ public class IssueManagerIT {
         demoGroup = new Group(transport).setName("Group" + System.currentTimeMillis())
                 .create();
         // Add membership of group for the demo projects
-        Collection<Role> allRoles = Arrays.asList(RoleFactory.create(3), // Manager
-                RoleFactory.create(4), // Developer
-                RoleFactory.create(5)  // Reporter
+        Collection<Role> allRoles = Arrays.asList(new Role().setId(3), // Manager
+                new Role().setId(4), // Developer
+                new Role().setId(5)  // Reporter
         );
 
         new Membership(transport, project, demoGroup.getId())
@@ -407,7 +404,8 @@ public class IssueManagerIT {
         Issue target = issues.get(1);
 
         String relationText = IssueRelation.TYPE.precedes.toString();
-        IssueRelation r = issueManager.createRelation(src.getId(), target.getId(), relationText);
+        IssueRelation r = new IssueRelation(transport, src.getId(), target.getId(), relationText)
+                .create();
         assertEquals(src.getId(), r.getIssueId());
         assertEquals(target.getId(), r.getIssueToId());
         assertEquals(relationText, r.getType());
@@ -419,7 +417,8 @@ public class IssueManagerIT {
         Issue target = issues.get(1);
 
         String relationText = IssueRelation.TYPE.precedes.toString();
-        return issueManager.createRelation(src.getId(), target.getId(), relationText);
+        return new IssueRelation(transport, src.getId(), target.getId(), relationText)
+                .create();
     }
 
     @Test
@@ -457,13 +456,22 @@ public class IssueManagerIT {
         Issue target = issues.get(1);
         String relationText = IssueRelation.TYPE.precedes.toString();
 
-        issueManager.createRelation(src.getId(), target.getId(), relationText);
+        new IssueRelation(transport, src.getId(), target.getId(), relationText)
+                .create();
 
         target = issues.get(2);
-        issueManager.createRelation(src.getId(), target.getId(), relationText);
+
+        new IssueRelation(transport, src.getId(), target.getId(), relationText)
+                .create();
 
         src = issueManager.getIssueById(src.getId(), Include.relations);
-        issueManager.deleteIssueRelations(src);
+        src.getRelations().forEach(r -> {
+            try {
+                r.delete();
+            } catch (RedmineException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         Issue issue = issueManager.getIssueById(src.getId(), Include.relations);
         assertTrue(issue.getRelations().isEmpty());
@@ -480,7 +488,7 @@ public class IssueManagerIT {
 
         User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
-            Watcher watcher = WatcherFactory.create(newUser.getId());
+            Watcher watcher = new Watcher().setId(newUser.getId());
             issueManager.addWatcherToIssue(watcher, issue);
         } finally {
             newUser.delete();
@@ -500,7 +508,7 @@ public class IssueManagerIT {
 
         User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
-            Watcher watcher = WatcherFactory.create(newUser.getId());
+            Watcher watcher = new Watcher().setId(newUser.getId());
             issueManager.addWatcherToIssue(watcher, issue);
             issueManager.deleteWatcherFromIssue(watcher, issue);
         } finally {
@@ -521,7 +529,7 @@ public class IssueManagerIT {
 
         User newUser = UserGenerator.generateRandomUser(transport).create();
         try {
-            Watcher watcher = WatcherFactory.create(newUser.getId());
+            Watcher watcher = new Watcher().setId(newUser.getId());
             issueManager.addWatcherToIssue(watcher, issue);
             final Issue includeWatcherIssue = issueManager.getIssueById(issue.getId(),
                     Include.watchers);
@@ -542,7 +550,7 @@ public class IssueManagerIT {
 
         try {
             List<Watcher> watchers = new ArrayList<>();
-            Watcher watcher = WatcherFactory.create(newUserWatcher.getId());
+            Watcher watcher = new Watcher().setId(newUserWatcher.getId());
             watchers.add(watcher);
 
             Issue issue = IssueHelper.generateRandomIssue(transport, projectId)
@@ -1026,9 +1034,18 @@ public class IssueManagerIT {
         String custom2Value = "true";
 
         issue.clearCustomFields()
-            .addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value))
-            .addCustomField(CustomFieldFactory.create(customField2.getId(), customField2.getName(), custom2Value));
-        issueManager.update(issue);
+                .addCustomField(
+                        new CustomField()
+                                .setId(customField1.getId())
+                                .setName(customField1.getName())
+                                .setValue(custom1Value)
+                )
+                .addCustomField(
+                        new CustomField()
+                                .setId(customField2.getId())
+                                .setName(customField2.getName())
+                                .setValue(custom2Value));
+        issue.update();
 
         Issue updatedIssue = issueManager.getIssueById(issue.getId());
         assertThat(updatedIssue.getCustomFieldByName(customField1.getName()).getValue()).isEqualTo(custom1Value);
@@ -1049,7 +1066,7 @@ public class IssueManagerIT {
     @Test
     public void setOneValueForMultiLineCustomField() throws Exception {
         CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
-        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId());
+        CustomField customField = new CustomField().setId(multiFieldDefinition.getId());
         String defaultValue = multiFieldDefinition.getDefaultValue();
         customField.setValues(Collections.singletonList(defaultValue));
 
@@ -1074,7 +1091,7 @@ public class IssueManagerIT {
     @Test
     public void setMultiValuesForMultiLineCustomField() throws Exception {
         CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
-        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId())
+        CustomField customField = new CustomField().setId(multiFieldDefinition.getId())
                 .setValues(Arrays.asList("V1", "V3"));
         Issue issue = new Issue(transport, projectId).setSubject("test for custom multi fields - set multiple values")
                 .addCustomField(customField)
@@ -1096,7 +1113,7 @@ public class IssueManagerIT {
     @Test
     public void createIssueWithEmptyListInMultilineCustomFields() throws Exception {
         CustomFieldDefinition multiFieldDefinition = loadMultiLineCustomFieldDefinition();
-        CustomField customField = CustomFieldFactory.create(multiFieldDefinition.getId())
+        CustomField customField = new CustomField().setId(multiFieldDefinition.getId())
                 .setValues(Collections.EMPTY_LIST);
 
         Issue newIssue = new Issue(transport, projectId).setSubject("test for custom multi fields - set multiple values")

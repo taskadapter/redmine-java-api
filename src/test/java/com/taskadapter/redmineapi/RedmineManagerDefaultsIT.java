@@ -165,8 +165,8 @@ public class RedmineManagerDefaultsIT {
 			Issue issue2 = new Issue(transport, projectId, "this is a test")
 					.create();
 			try {
-				final IssueRelation relation = issueManager.createRelation(
-						issue1.getId(), issue2.getId(), "blocks");
+				IssueRelation relation = new IssueRelation(transport, issue1.getId(), issue2.getId(), "blocks")
+						.create();
 				Assert.assertNotNull(relation.getId());
 				Assert.assertEquals(issue1.getId(), relation.getIssueId());
 				Assert.assertEquals(issue2.getId(), relation.getIssueToId());

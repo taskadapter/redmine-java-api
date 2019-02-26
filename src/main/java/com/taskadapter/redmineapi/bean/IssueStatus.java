@@ -8,14 +8,14 @@ import java.io.Serializable;
 public class IssueStatus implements Identifiable, Serializable {
 	private static final long serialVersionUID = -2221390098554222099L;
 
-	private final Integer id;
-
+	private Integer id;
     private String name;
     private boolean defaultStatus = false;
     private boolean closed = false;
 
-    IssueStatus(Integer id) {
+    public IssueStatus setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public Integer getId() {
@@ -26,8 +26,9 @@ public class IssueStatus implements Identifiable, Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public IssueStatus setName(String name) {
         this.name = name;
+        return this;
     }
 
     public boolean isDefaultStatus() {

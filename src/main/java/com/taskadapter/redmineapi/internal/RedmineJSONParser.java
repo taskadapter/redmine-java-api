@@ -5,39 +5,28 @@ import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinitionFactory;
-import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssuePriority;
-import com.taskadapter.redmineapi.bean.IssuePriorityFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueRelationFactory;
 import com.taskadapter.redmineapi.bean.IssueStatus;
-import com.taskadapter.redmineapi.bean.IssueStatusFactory;
 import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
 import com.taskadapter.redmineapi.bean.JournalFactory;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.News;
-import com.taskadapter.redmineapi.bean.NewsFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
-import com.taskadapter.redmineapi.bean.RoleFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryActivity;
-import com.taskadapter.redmineapi.bean.TimeEntryActivityFactory;
-import com.taskadapter.redmineapi.bean.TimeEntryFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.TrackerFactory;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.bean.WatcherFactory;
 import com.taskadapter.redmineapi.bean.WikiPage;
 import com.taskadapter.redmineapi.bean.WikiPageDetail;
-import com.taskadapter.redmineapi.bean.WikiPageFactory;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,7 +54,7 @@ public final class RedmineJSONParser {
 	public static Tracker parseTracker(JSONObject object) throws JSONException {
 		final int id = JsonInput.getInt(object, "id");
 		final String name = JsonInput.getStringNotNull(object, "name");
-		return TrackerFactory.create(id, name);
+		return new Tracker().setId(id).setName(name);
 	}
 
 	/**
@@ -79,7 +68,7 @@ public final class RedmineJSONParser {
 			throws JSONException {
 		final int id = JsonInput.getInt(object, "id");
 		final String name = JsonInput.getStringNotNull(object, "name");
-		final IssueStatus result = IssueStatusFactory.create(id, name);
+		final IssueStatus result = new IssueStatus().setId(id).setName(name);
 		if (object.has("is_default"))
 			result.setDefaultStatus(JsonInput.getOptionalBool(object,
 					"is_default"));
@@ -97,7 +86,7 @@ public final class RedmineJSONParser {
 	}
 
 	public static News parseNews(JSONObject object) throws JSONException {
-		final News result = NewsFactory.create(JsonInput.getIntOrNull(object, "id"));
+		final News result = new News().setId(JsonInput.getIntOrNull(object, "id"));
 		result.setProject(JsonInput.getObjectOrNull(object, "project", RedmineJSONParser::parseMinimalProject));
 		result.setUser(JsonInput.getObjectOrNull(object, "author", RedmineJSONParser::parseUser));
 		result.setTitle(JsonInput.getStringOrNull(object, "title"));
@@ -109,14 +98,7 @@ public final class RedmineJSONParser {
 
 	public static TimeEntry parseTimeEntry(JSONObject object)
 			throws JSONException {
-		/**
-		 * JsonOutput.addIfNotNull(writer, "hours", timeEntry.getHours());
-		 * JsonOutput.addIfNotNull(writer, "comment", timeEntry.getComment());
-		 * addIfNotNullShort(writer, "spent_on", timeEntry.getSpentOn());
-		 * addIfNotNullFull(writer, "created_on", timeEntry.getSpentOn());
-		 * addIfNotNullFull(writer, "updated_on", timeEntry.getSpentOn());
-		 */
-		final TimeEntry result = TimeEntryFactory.create(JsonInput.getIntOrNull(object, "id"));
+		TimeEntry result = new TimeEntry(null).setId(JsonInput.getIntOrNull(object, "id"));
 		final JSONObject issueObject = JsonInput.getObjectOrNull(object,
 				"issue");
 		if (issueObject != null)
@@ -295,7 +277,7 @@ public final class RedmineJSONParser {
 
 	public static IssueRelation parseRelation(JSONObject content)
 			throws JSONException {
-		final IssueRelation result = IssueRelationFactory.create(JsonInput.getIntOrNull(content, "id"));
+		final IssueRelation result = new IssueRelation(null).setId(JsonInput.getIntOrNull(content, "id"));
 		result.setIssueId(JsonInput.getIntOrNull(content, "issue_id"));
 		result.setIssueToId(JsonInput.getIntOrNull(content, "issue_to_id"));
 		result.setType(JsonInput.getStringOrNull(content, "relation_type"));
@@ -317,7 +299,7 @@ public final class RedmineJSONParser {
 
 	public static CustomField parseCustomField(JSONObject content)
 			throws JSONException {
-		final CustomField result = CustomFieldFactory.create(JsonInput.getInt(content, "id"));
+		final CustomField result = new CustomField().setId(JsonInput.getInt(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 
 		if (!content.has("multiple")) {
@@ -346,7 +328,7 @@ public final class RedmineJSONParser {
 	}
 
 	public static Journal parseJournal(JSONObject content) throws JSONException {
-		final Journal result = JournalFactory.create(JsonInput.getInt(content, "id"));
+		final Journal result = new Journal().setId(JsonInput.getInt(content, "id"));
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser));
@@ -408,7 +390,7 @@ public final class RedmineJSONParser {
 	}
 
 	public static Role parseRole(JSONObject content) throws JSONException {
-		final Role role = RoleFactory.create(JsonInput.getIntOrNull(content, "id"));
+		final Role role = new Role().setId(JsonInput.getIntOrNull(content, "id"));
 		role.setName(JsonInput.getStringOrNull(content, "name"));
 		role.setInherited(content.has("inherited")
 				&& content.getBoolean("inherited"));
@@ -443,28 +425,28 @@ public final class RedmineJSONParser {
 
     public static IssuePriority parseIssuePriority(JSONObject content)
             throws JSONException {
-        final IssuePriority result = IssuePriorityFactory.create(JsonInput.getInt(content, "id"));
+        final IssuePriority result = new IssuePriority().setId(JsonInput.getInt(content, "id"));
         result.setName(JsonInput.getStringNotNull(content, "name"));
         result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
         return result;
     }
 
-    public static TimeEntryActivity parseTimeEntryActivity(JSONObject content)
-            throws JSONException {
-        final TimeEntryActivity result = TimeEntryActivityFactory.create(JsonInput.getInt(content, "id"));
-        result.setName(JsonInput.getStringNotNull(content, "name"));
-        result.setDefault(JsonInput.getOptionalBool(content, "is_default"));
-        return result;
-    }
+	public static TimeEntryActivity parseTimeEntryActivity(JSONObject content)
+			throws JSONException {
+		return new TimeEntryActivity()
+				.setId(JsonInput.getInt(content, "id"))
+				.setName(JsonInput.getStringNotNull(content, "name"))
+				.setDefault(JsonInput.getOptionalBool(content, "is_default"));
+	}
 
 	public static Watcher parseWatcher(JSONObject content) throws JSONException {
-		final Watcher result = WatcherFactory.create(JsonInput.getIntOrNull(content, "id"));
+		final Watcher result = new Watcher().setId(JsonInput.getIntOrNull(content, "id"));
 		result.setName(JsonInput.getStringOrNull(content, "name"));
 		return result;
 	}
         
     public static WikiPage parseWikiPage(JSONObject object) throws JSONException {
-        WikiPage wikiPage = WikiPageFactory.create(JsonInput.getStringNotNull(object, "title"));
+        WikiPage wikiPage = new WikiPage().setTitle(JsonInput.getStringNotNull(object, "title"));
         wikiPage.setVersion(JsonInput.getIntOrNull(object, "version"));
         wikiPage.setCreatedOn(getDateOrNull(object, "created_on"));
         wikiPage.setUpdatedOn(getDateOrNull(object, "updated_on"));
@@ -555,7 +537,9 @@ public final class RedmineJSONParser {
                     JSONObject valueObject = possible_values.getJSONObject(i);
                     int id = valueObject.getInt("id");
                     String name = valueObject.getString("name");
-                    result.getTrackers().add(TrackerFactory.create(id, name));
+                    result.getTrackers().add(
+                    		new Tracker().setId(id).setName(name)
+					);
                 }
             }
             if (content.has("roles")) {
@@ -564,9 +548,9 @@ public final class RedmineJSONParser {
                     JSONObject valueObject = possible_values.getJSONObject(i);
                     int id = valueObject.getInt("id");
                     String name = valueObject.getString("name");
-                    Role role = RoleFactory.create(id);
-                    role.setName(name);
-                    result.getRoles().add(role);
+					Role role = new Role().setId(id)
+							.setName(name);
+					result.getRoles().add(role);
                 }
             }
             return result;

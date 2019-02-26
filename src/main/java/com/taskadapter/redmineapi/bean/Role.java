@@ -12,22 +12,18 @@ public class Role {
     /**
      * database ID.
      */
-    private final Integer id;
-
+    private Integer id;
 	private String name;
 	private Boolean inherited;
 
 	private final Collection<String> permissions = new HashSet<>();
 
     /**
-     * Use RoleFactory to create instances of this class.
-     *
      * @param id database ID.
-     *
-     * @see com.taskadapter.redmineapi.bean.RoleFactory
      */
-    Role(Integer id) {
+    public Role setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public Integer getId() {
@@ -38,8 +34,9 @@ public class Role {
 		return name;
 	}
 
-	public void setName(String name) {
+	public Role setName(String name) {
 		this.name = name;
+		return this;
 	}
 
 	public Boolean getInherited() {

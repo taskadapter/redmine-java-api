@@ -4,7 +4,6 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueRelationFactory;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.SavedQuery;
@@ -187,32 +186,26 @@ public class IssueManager {
     }
 
     /**
-     * @param issueId id of the source issue
-     * @param issueToId if of the target issue
-     * @param type type of the relation. e.g. "precedes". see IssueRelation.TYPE for possible types.
-     * @return newly created IssueRelation instance.
-     *
-     * @see com.taskadapter.redmineapi.bean.IssueRelation.TYPE
+     * DEPRECATED. use relation.create()
      */
+    @Deprecated
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
-        IssueRelation toCreate = IssueRelationFactory.create();
-        toCreate.setIssueId(issueId);
-        toCreate.setIssueToId(issueToId);
-        toCreate.setType(type);
-        return transport.addChildEntry(Issue.class, issueId.toString(),
-                toCreate);
+        return new IssueRelation(transport, issueId, issueToId, type)
+                .create();
     }
 
     /**
-     * Delete Issue Relation with the given Id.
+     * DEPRECATED. use relation.delete()
      */
+    @Deprecated
     public void deleteRelation(Integer id) throws RedmineException {
-        transport.deleteObject(IssueRelation.class, Integer.toString(id));
+        new IssueRelation(transport).setId(id).delete();
     }
 
     /**
-     * Delete all issue's relations
+     * DEPRECATED. use relation.delete()
      */
+    @Deprecated
     public void deleteIssueRelations(Issue redmineIssue) throws RedmineException {
         for (IssueRelation relation : redmineIssue.getRelations()) {
             deleteRelation(relation.getId());
