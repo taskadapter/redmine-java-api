@@ -4,7 +4,6 @@ import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
-import com.taskadapter.redmineapi.bean.CustomFieldDefinitionFactory;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -13,7 +12,6 @@ import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Journal;
 import com.taskadapter.redmineapi.bean.JournalDetail;
-import com.taskadapter.redmineapi.bean.JournalFactory;
 import com.taskadapter.redmineapi.bean.Membership;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
@@ -510,8 +508,8 @@ public final class RedmineJSONParser {
 
         public static CustomFieldDefinition parseCustomFieldDefinition(JSONObject content)
                 throws JSONException {
-            final CustomFieldDefinition result = CustomFieldDefinitionFactory
-                    .create(JsonInput.getInt(content, "id"));
+            final CustomFieldDefinition result = new CustomFieldDefinition()
+					.setId(JsonInput.getInt(content, "id"));
             result.setName(JsonInput.getStringOrNull(content, "name"));
             result.setCustomizedType(JsonInput.getStringNotNull(content, "customized_type"));
             result.setFieldFormat(JsonInput.getStringNotNull(content, "field_format"));

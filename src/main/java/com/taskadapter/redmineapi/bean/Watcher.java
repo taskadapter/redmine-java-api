@@ -9,8 +9,6 @@ public class Watcher {
     private String name;
 
     /**
-     * Use WatcherFactory to create instances of this class.
-     *
      * @param id database Id
      */
     public Watcher setId(Integer id) {
