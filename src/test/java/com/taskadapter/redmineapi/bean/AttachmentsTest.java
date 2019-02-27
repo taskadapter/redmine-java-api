@@ -20,7 +20,7 @@ public class AttachmentsTest {
                 .setContentType("text/plain");
         List<Attachment> attachments = Arrays.asList(attachment1, attachment2);
 
-        WikiPageDetail wikiPageDetail = new WikiPageDetail();
+        WikiPageDetail wikiPageDetail = new WikiPageDetail(null);
         wikiPageDetail.setText("text");
         wikiPageDetail.setAttachments(attachments);
 

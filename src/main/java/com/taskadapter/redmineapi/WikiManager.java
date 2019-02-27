@@ -54,34 +54,28 @@ public class WikiManager {
      * @since Redmine 2.2
      */
     public WikiPageDetail getWikiPageDetailByProjectAndTitle(String projectKey, String pageTitle) throws RedmineException {
-        String urlSafeString = getUrlSafeString(pageTitle);
-        return transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, urlSafeString, new BasicNameValuePair("include", "attachments"));
+        String urlSafeString = WikiPageDetail.getUrlSafeString(pageTitle);
+        WikiPageDetail wikiPageDetail = transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, urlSafeString, new BasicNameValuePair("include", "attachments"));
+        // Redmine REST API does not provide projectKey in response, so...
+        wikiPageDetail.setProjectKey(projectKey);
+        return wikiPageDetail;
     }
 
     /**
-     * At this moment create() simply calls update(). There are no differences between these two functions.
+     * DEPRECATED. use wikiPageDetail.create()
      */
+    @Deprecated
     public void create(String projectKey, WikiPageDetail detail) throws RedmineException {
         update(projectKey, detail);
     }
 
     /**
- 	 * @param projectKey the key of the project (like "TEST-12") we want the wiki page from
- 	 * @param detail the WikiPageDetail with its text and comment updated.
- 	 *               Version must be set to the latest version of the document.
+ 	 * DEPRECATED. use wikiPageDetail.update()
  	 */
+    @Deprecated
  	public void update(String projectKey, WikiPageDetail detail) throws RedmineException {
-        String urlSafeTitle = getUrlSafeString(detail.getTitle());
+        String urlSafeTitle = WikiPageDetail.getUrlSafeString(detail.getTitle());
         transport.updateChildEntry(Project.class, projectKey, detail, urlSafeTitle);
  	}
 
-    private static String getUrlSafeString(String string) {
-        String urlSafeTitle;
-        try {
-            urlSafeTitle = URLEncoder.encode(string, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("UnsupportedEncodingException when converting the page title to url: " + e.toString(), e);
-        }
-        return urlSafeTitle;
-    }
 }

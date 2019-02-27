@@ -452,7 +452,7 @@ public final class RedmineJSONParser {
     }
 
     public static WikiPageDetail parseWikiPageDetail(JSONObject object) throws JSONException {
-        WikiPageDetail wikiPage = new WikiPageDetail();
+        WikiPageDetail wikiPage = new WikiPageDetail(null);
 
         wikiPage.setTitle(JsonInput.getStringOrEmpty(object, "title"));
         wikiPage.setText(JsonInput.getStringOrEmpty(object, "text"));

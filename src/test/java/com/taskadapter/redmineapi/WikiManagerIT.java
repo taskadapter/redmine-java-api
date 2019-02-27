@@ -76,14 +76,15 @@ public class WikiManagerIT {
                 .uploadAttachment(Files.probeContentType(attachmentPath), attachmentPath.toFile());
 
         String pageTitle = "title " + System.currentTimeMillis();
-        WikiPageDetail wikiPage = new WikiPageDetail()
+        WikiPageDetail wikiPage = new WikiPageDetail(transport)
                 .setTitle(pageTitle)
                 .setText("some text here")
                 .setVersion(1)
                 .setCreatedOn(new Date())
-                .setAttachments(Arrays.asList(attachment));
+                .setAttachments(Arrays.asList(attachment))
+                .setProjectKey(projectKey);
 
-        manager.update(projectKey, wikiPage);
+        wikiPage.update();
 
         WikiPageDetail actualWikiPage = manager.getWikiPageDetailByProjectAndTitle(projectKey, pageTitle);
         String urlSafeTitleIsExpected = URLEncoder.encode(wikiPage.getTitle(), StandardCharsets.UTF_8.name());
@@ -120,18 +121,19 @@ public class WikiManagerIT {
     public void wikiPageIsUpdated() throws Exception {
         WikiPageDetail specificPage = createSomeWikiPage();
         String newText = "updated text";
-        specificPage.setText(newText);
-        manager.update(projectKey, specificPage);
+        specificPage.setText(newText)
+                .update();
 
         WikiPageDetail updatedPage = manager.getWikiPageDetailByProjectAndTitle(projectKey, specificPage.getTitle());
         assertThat(updatedPage.getText()).isEqualTo(newText);
     }
 
     private WikiPageDetail createSomeWikiPage() throws RedmineException {
-        WikiPageDetail wikiPageDetail = new WikiPageDetail()
+        WikiPageDetail wikiPageDetail = new WikiPageDetail(transport)
                 .setTitle("title " + System.currentTimeMillis())
-                .setText("some text here");
-        manager.update(projectKey, wikiPageDetail);
+                .setText("some text here")
+                .setProjectKey(projectKey);
+        wikiPageDetail.create();
         return wikiPageDetail;
     }
 }
