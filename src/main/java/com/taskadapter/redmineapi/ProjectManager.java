@@ -213,10 +213,9 @@ public class ProjectManager {
     }
 
     /**
-     * Remove the project member from the project. This does not delete the user/group itself.
-     *
-     * @param membershipId id of the "membership" relation
+     * DEPRECATED. use membership.delete() instead.
      */
+    @Deprecated
     public void deleteProjectMembership(int membershipId) throws RedmineException {
         transport.deleteObject(Membership.class, Integer.toString(membershipId));
     }

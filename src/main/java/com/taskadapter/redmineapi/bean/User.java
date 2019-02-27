@@ -333,6 +333,21 @@ public class User implements Identifiable, FluentStyle {
     }
 
     /**
+     * Adds this user (ID must be set!) to the given group.
+     * <p>
+     * Note: "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0 when
+     * executed twice on the same user. I submitted a bug: http://www.redmine.org/issues/19363 which was closed as
+     * "invalid"...
+     *
+     * @param groupId - id of the group to add to.
+     * @throws RedmineException
+     * @since Redmine 2.1
+     */
+    public void addToGroup(int groupId) throws RedmineException {
+        transport.addUserToGroup(getId(), groupId);
+    }
+
+    /**
      * The user object must have ID set.
      */
     public void delete() throws RedmineException {

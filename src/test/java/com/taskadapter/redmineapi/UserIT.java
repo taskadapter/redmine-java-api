@@ -214,36 +214,10 @@ public class UserIT {
         try {
             User newUser = UserGenerator.generateRandomUser(transport).create();
             try {
-                userManager.addUserToGroup(newUser, group);
+                newUser.addToGroup(group.getId());
                 final Collection<Group> userGroups = userManager.getUserById(newUser.getId()).getGroups();
                 assertThat(userGroups).hasSize(1);
                 assertThat(userGroups.iterator().next().getName()).isEqualTo(group.getName());
-            } finally {
-                newUser.delete();
-            }
-        } finally {
-            group.delete();
-        }
-    }
-
-
-    /**
-     * "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0.
-     * I submitted a bug: http://www.redmine.org/issues/19363, which was closed as "invalid".
-     * Marking this test as "Ignored" for now.
-     */
-    @Ignore
-    @Test
-    public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
-        Group group = new Group(transport).setName("some test " + System.currentTimeMillis())
-                .create();
-        try {
-            User newUser = UserGenerator.generateRandomUser(transport).create();
-            try {
-                userManager.addUserToGroup(newUser, group);
-                userManager.addUserToGroup(newUser, group);
-                final User userById = userManager.getUserById(newUser.getId());
-                assertThat(userById.getGroups()).hasSize(1);
             } finally {
                 newUser.delete();
             }
