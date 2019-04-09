@@ -110,7 +110,11 @@ public class URIConfigurator {
                 builder.addParameter("key", apiAccessKey);
             }
             if (!query.isEmpty()) {
-                builder.setPath(builder.getPath() + "/" + query);
+                String builderPath = builder.getPath();
+                if (null == builderPath) {
+                    builderPath = "";
+                }
+                builder.setPath(builderPath + "/" + query);
             }
             return builder.build();
         } catch (URISyntaxException e) {
