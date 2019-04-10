@@ -5,7 +5,6 @@ import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Tracker;
-import com.taskadapter.redmineapi.bean.TrackerFactory;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
@@ -213,7 +212,7 @@ public class ProjectIntegrationIT {
         Project projectToCreate = generateRandomProject();
         assertEquals(0, projectToCreate.getTrackers().size());
         
-        Collection<Tracker> trackers=new HashSet<>(Arrays.asList(TrackerFactory.create(1,"Bug")));
+        Collection<Tracker> trackers=new HashSet<>(Arrays.asList(new Tracker().setId(1).setName("Bug")));
         projectToCreate.addTrackers(trackers);
         assertEquals(1, projectToCreate.getTrackers().size());
         
@@ -266,7 +265,7 @@ public class ProjectIntegrationIT {
     @Test(expected = NotFoundException.class)
     public void testUpdateTrackersInvalidGivesException() throws RedmineException {
         int nonExistingTrackerId = 99999999;
-        Collection<Tracker> trackers=new HashSet<>(Arrays.asList(TrackerFactory.create(nonExistingTrackerId,"NonExisting")));
+        Collection<Tracker> trackers=new HashSet<>(Arrays.asList(new Tracker().setId(nonExistingTrackerId).setName("NonExisting")));
         Project projectToCreate = generateRandomProject();
         projectToCreate.addTrackers(trackers);
         projectManager.createProject(projectToCreate);
