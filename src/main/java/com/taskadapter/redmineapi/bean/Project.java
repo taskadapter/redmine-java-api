@@ -221,8 +221,9 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * the **current Redmine version in 2018** does not allow reopen, close or archive projects,
      * see https://www.redmine.org/issues/13725)
      */
-    public void setStatus(Integer status) {
+    public Project setStatus(Integer status) {
     	storage.set(STATUS, status);
+    	return this;
     }
 
     /**
