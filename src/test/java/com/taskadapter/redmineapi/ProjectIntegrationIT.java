@@ -105,6 +105,7 @@ public class ProjectIntegrationIT {
 
     @Test
     public void testCreateProject() throws RedmineException {
+    	final Integer statusActive = 1;
         Project projectToCreate = generateRandomProject();
         String key = null;
         try {
@@ -123,7 +124,7 @@ public class ProjectIntegrationIT {
                     createdProject.getDescription());
             assertEquals(projectToCreate.getHomepage(),
                     createdProject.getHomepage());
-            assertEquals(Project.STATUS_ACTIVE, 
+            assertEquals(statusActive, 
             		createdProject.getStatus());
 
             Collection<Tracker> trackers = createdProject.getTrackers();
@@ -140,6 +141,8 @@ public class ProjectIntegrationIT {
 
     @Test
     public void testCreateGetUpdateDeleteProject() throws RedmineException {
+    	final Integer statusActive = 1;
+    	final Integer statusClosed = 5;
         Project projectToCreate = generateRandomProject();
         Project createdProject = null;
         try {
@@ -148,16 +151,10 @@ public class ProjectIntegrationIT {
             String newDescr = "NEW123";
             String newName = "new name here";
 
-<<<<<<< Upstream, based on master
             createdProject.setName(newName)
                     .setDescription(newDescr)
+                    .setStatus(statusClosed)
                     .update();
-=======
-            createdProject.setName(newName);
-            createdProject.setDescription(newDescr);
-            createdProject.setStatus(Project.STATUS_CLOSED);
-            projectManager.update(createdProject);
->>>>>>> b4ed298 Add getter for project status
 
             Project updatedProject = projectManager.getProjectByKey(createdProject.getIdentifier());
             assertNotNull(updatedProject);
@@ -167,7 +164,7 @@ public class ProjectIntegrationIT {
             assertEquals(newName, updatedProject.getName());
             assertEquals(newDescr, updatedProject.getDescription());
             //status should not change to closed as currently redmine api does not allow reopen/close/archive projects
-            assertEquals(Project.STATUS_ACTIVE, updatedProject.getStatus());
+            assertEquals(statusActive, updatedProject.getStatus());
             Collection<Tracker> trackers = updatedProject.getTrackers();
             assertNotNull("checking that project has some trackers",
                     trackers);

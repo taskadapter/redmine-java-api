@@ -53,17 +53,7 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * Trackers available for this project
      */
     public final static Property<Set<Tracker>> TRACKERS = (Property<Set<Tracker>>) new Property(Set.class, "trackers");
-<<<<<<< Upstream, based on master
     private Transport transport;
-=======
-    
-    /**
-     * Project status values, as defined in http://www.redmine.org/projects/redmine/repository/entry/trunk/app/models/project.rb
-     */
-    public static final Integer STATUS_ACTIVE = 1;
-    public static final Integer STATUS_CLOSED = 5;
-    public static final Integer STATUS_ARCHIVED= 9;
->>>>>>> b4ed298 Add getter for project status
 
     public Project(Transport transport) {
         this.transport = transport;
