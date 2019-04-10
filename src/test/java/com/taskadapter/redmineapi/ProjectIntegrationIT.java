@@ -244,8 +244,8 @@ public class ProjectIntegrationIT {
             assertEquals(1, createdProject.getTrackers().size());
 
             //add more than one tracker, it does not replace previous trackers
-            trackers=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(1), availableTrackers.get(2)));
-            createdProject.addTrackers(trackers);
+            Collection<Tracker> trackersToAdd=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(1), availableTrackers.get(2)));
+            createdProject.addTrackers(trackersToAdd);
             projectManager.update(createdProject);
             createdProject=projectManager.getProjectByKey(createdProjectKey);
             assertEquals(3, createdProject.getTrackers().size());

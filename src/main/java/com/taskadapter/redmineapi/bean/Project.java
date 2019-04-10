@@ -130,7 +130,7 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      */
     public Project addTrackers(Collection<Tracker> trackers) {
     	if (!storage.isPropertySet(TRACKERS)) //checks because trackers storage is not created for new projects
-    		this.clearTrackers();
+    		storage.set(TRACKERS, new HashSet<>());
         storage.get(TRACKERS).addAll(trackers);
         return this;
     }
@@ -293,6 +293,12 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * 	  .create();
      * }
      * </pre>
+     * <p> 
+     * Note: if {@code project} trackers have not been set with {@link Project#addTrackers} 
+     * and if they have been cleared with {@link Project#clearTrackers},
+     * the created project will get the server default trackers (if any).
+     * Otherwise, the {@code Project} trackers will override the server default settings. 
+     * </p>
      *
      * @return the newly created Project object.
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
