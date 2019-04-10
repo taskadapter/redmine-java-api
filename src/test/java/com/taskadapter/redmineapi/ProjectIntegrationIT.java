@@ -231,33 +231,29 @@ public class ProjectIntegrationIT {
         try {
             //project created with default trackers has been tested by testCreateProject
             //test override of default trackers on project creation
-            projectToCreate.clearTrackers();
-            Project createdProject = projectManager.createProject(projectToCreate);
+            Project createdProject = projectToCreate.clearTrackers().create();
             createdProjectKey = createdProject.getIdentifier();
             assertEquals(0, createdProject.getTrackers().size());
            
             //add single tracker
-            Collection<Tracker> trackers=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(0)));
-            createdProject.addTrackers(trackers);
-            projectManager.update(createdProject);
+            Collection<Tracker> trackersToSet=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(0)));
+            createdProject.addTrackers(trackersToSet).update();
             createdProject=projectManager.getProjectByKey(createdProjectKey);
             assertEquals(1, createdProject.getTrackers().size());
 
             //add more than one tracker, it does not replace previous trackers
             Collection<Tracker> trackersToAdd=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(1), availableTrackers.get(2)));
-            createdProject.addTrackers(trackersToAdd);
-            projectManager.update(createdProject);
+            createdProject.addTrackers(trackersToAdd).update();
             createdProject=projectManager.getProjectByKey(createdProjectKey);
             assertEquals(3, createdProject.getTrackers().size());
             
             //all trackers can be removed
-            createdProject.clearTrackers();
-            projectManager.update(createdProject);
+            createdProject.clearTrackers().update();
             createdProject=projectManager.getProjectByKey(createdProjectKey);
             assertEquals(0, createdProject.getTrackers().size());
         } finally {
             if (createdProjectKey != null) {
-                projectManager.deleteProject(createdProjectKey);
+            	projectManager.getProjectByKey(createdProjectKey).delete();
             }
         }
     }
@@ -268,7 +264,7 @@ public class ProjectIntegrationIT {
         Collection<Tracker> trackers=new HashSet<>(Arrays.asList(new Tracker().setId(nonExistingTrackerId).setName("NonExisting")));
         Project projectToCreate = generateRandomProject();
         projectToCreate.addTrackers(trackers);
-        projectManager.createProject(projectToCreate);
+        projectToCreate.create();
     }
 
     @Test
