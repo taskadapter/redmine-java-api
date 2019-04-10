@@ -1,9 +1,8 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ClientConnectionManager;
 import org.slf4j.Logger;
@@ -26,13 +25,13 @@ public class IntegrationTestHelper {
         return new TestConfig();
     }
 
-    public static User getOurUser() {
+    public static User getOurUser(Transport transport) {
         TestConfig testConfig = getTestConfig();
         Integer userId = Integer.parseInt(testConfig.getParam("createissue.userid"));
         String login = testConfig.getLogin();
         String fName = testConfig.getParam("userFName");
         String lName = testConfig.getParam("userLName");
-        return UserFactory.create(userId)
+        return new User(transport).setId(userId)
                 .setLogin(login)
                 .setFirstName(fName)
                 .setLastName(lName)
@@ -55,32 +54,23 @@ public class IntegrationTestHelper {
         return RedmineManagerFactory.createWithApiKey(testConfig.getURI(), testConfig.getApiKey(), client);
     }
 
-    public static Project createProject(RedmineManager mgr) {
-        Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
+    public static Project createProject(Transport transport) {
+        Project testProject = new Project(transport, "test project", "test" + Calendar.getInstance().getTimeInMillis());
         try {
-            return mgr.getProjectManager().createProject(testProject);
+            return testProject.create();
         } catch (Exception e) {
             logger.error("Exception while configuring tests", e);
             throw new RuntimeException(e);
         }
     }
 
-    public static Project createAndReturnProject(ProjectManager mgr) {
-        Project testProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
-        try {
-            return mgr.createProject(testProject);
-        } catch (Exception e) {
-            logger.error("Exception while configuring tests", e);
-            throw new RuntimeException(e);
-        }
-    }
     /**
      * Delete the project if it exists. this method ignores NULL or empty projectKey parameter.
      */
-    public static void deleteProject(RedmineManager mgr, String projectKey) {
+    public static void deleteProject(Transport transport, String projectKey) {
         try {
-            if (mgr != null && projectKey != null) {
-                mgr.getProjectManager().deleteProject(projectKey);
+            if (transport != null && projectKey != null) {
+                new Project(transport).setIdentifier(projectKey).delete();;
             }
         } catch (Exception e) {
             logger.error("Exception while deleting test project", e);

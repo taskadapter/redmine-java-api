@@ -41,31 +41,31 @@ public class UserManager {
         return transport.getCurrentUser();
     }
 
+    /**
+     * DEPRECATED. use user.create() instead.
+     */
+    @Deprecated
     public User createUser(User user) throws RedmineException {
-        return transport.addObject(user);
+        return user.create();
     }
 
     /**
+     * DEPRECATED. use user.delete() instead
+     *
      * @param userId user identifier (numeric ID)
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
      *                                 requires authorization. Check the constructor arguments.
      * @throws NotFoundException       if the user with the given id is not found
      */
+    @Deprecated
     public void deleteUser(Integer userId) throws RedmineException {
         transport.deleteObject(User.class, Integer.toString(userId));
     }
 
     /**
-     * Adds the given user to the given group.
-     * <p>
-     * Note: "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0 when
-     * executed twice on the same user. I submitted a bug: http://www.redmine.org/issues/19363
-     *
-     * @param user  - The user being added.
-     * @param group - The new group of the user.
-     * @throws RedmineException
-     * @since Redmine 2.1
+     * DEPRECATED. use user.addToGroup()
      */
+    @Deprecated
     public void addUserToGroup(User user, Group group) throws RedmineException {
         transport.addUserToGroup(user.getId(), group.getId());
     }
@@ -157,11 +157,14 @@ public class UserManager {
     }
 
     /**
+     * DEPRECATED. use group.create()
+     *
      * Creates a new group.
      * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      * @return created group.
      * @throws RedmineException
      */
+    @Deprecated
     public Group createGroup(Group base) throws RedmineException {
         return transport.addObject(base);
     }
@@ -170,6 +173,7 @@ public class UserManager {
      * Deletes a group.
      * <p><strong>This operation requires "Redmine Administrator" permission.</strong>
      */
+    @Deprecated
     public void deleteGroup(Group base) throws RedmineException {
         transport.deleteObject(Group.class, base.getId().toString());
     }
@@ -182,10 +186,12 @@ public class UserManager {
         return transport.getObject(Role.class, id);
     }
 
+    @Deprecated
     public void update(User obj) throws RedmineException {
         transport.updateObject(obj);
     }
 
+    @Deprecated
     public void update(Group group) throws RedmineException {
         transport.updateObject(group);
     }

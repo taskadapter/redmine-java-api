@@ -1,5 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -8,9 +11,9 @@ import java.util.Set;
 /**
  * User or group membership.
  */
-public class Membership implements Identifiable {
+public class Membership implements Identifiable, FluentStyle {
 
-	private final PropertyStorage storage;
+	private final PropertyStorage storage= new PropertyStorage();
 
 	/**
 	 * database numeric ID.
@@ -28,18 +31,25 @@ public class Membership implements Identifiable {
 	public final static Property<Integer> GROUP_ID = new Property<>(Integer.class, "groupId");
         public final static Property<String> GROUP_NAME = new Property<>(String.class, "groupName");
 	public final static Property<Set<Role>> ROLES = (Property<Set<Role>>) new Property(Set.class, "roles");
+	private Transport transport;
+
+	public Membership(Transport transport) {
+		storage.set(ROLES, new HashSet<>());
+		setTransport(transport);
+	}
+
+	public Membership(Transport transport, Project project, int userId) {
+		this(transport);
+		setProject(project);
+		setUserId(userId);
+	}
 
     /**
-     * Use MembershipFactory to create instances of this class.
-     *
      * @param id database ID.
-     *
-     * @see com.taskadapter.redmineapi.bean.MembershipFactory
      */
-    Membership(Integer id) {
-    	storage = new PropertyStorage();
-		storage.set(ROLES, new HashSet<>());
+    public Membership setId(Integer id) {
         storage.set(DATABASE_ID, id);
+        return this;
     }
 
     @Override
@@ -51,16 +61,18 @@ public class Membership implements Identifiable {
 		return storage.get(PROJECT);
 	}
 
-	public void setProject(Project project) {
+	public Membership setProject(Project project) {
 		storage.set(PROJECT, project);
+		return this;
 	}
 
 	public Integer getUserId() {
 		return storage.get(USER_ID);
 	}
 
-	public void setUserId(Integer id) {
+	public Membership setUserId(Integer id) {
 		storage.set(USER_ID, id);
+		return this;
 	}
 
     public Integer getGroupId() {
@@ -91,8 +103,9 @@ public class Membership implements Identifiable {
 		return Collections.unmodifiableCollection(storage.get(ROLES));
 	}
 
-	public void addRoles(Collection<Role> roles) {
+	public Membership addRoles(Collection<Role> roles) {
 		storage.get(ROLES).addAll(roles);
+		return this;
 	}
 
     @Override
@@ -120,5 +133,35 @@ public class Membership implements Identifiable {
 
 	public PropertyStorage getStorage() {
 		return storage;
+	}
+
+	/**
+	 * Required attributes: 1) project    2) either userId/groupId or roles collection
+	 */
+	public Membership create() throws RedmineException {
+		if (getProject() == null) {
+			throw new IllegalArgumentException("Project must be set");
+		}
+		if (getUserId() == null && getRoles().isEmpty()) {
+			throw new IllegalArgumentException("Either User or Roles field must be set");
+		}
+		return transport.addChildEntry(Project.class, getProject().getId() + "", this);
+	}
+
+	public void update() throws RedmineException {
+		transport.updateObject(this);
+	}
+
+	/**
+	 * this object must have ID property set
+	 */
+	public void delete() throws RedmineException {
+		transport.deleteObject(Membership.class, Integer.toString(getId()));
+	}
+
+	@Override
+	public void setTransport(Transport transport) {
+		this.transport = transport;
+		PropertyStorageUtil.updateCollections(storage, transport);
 	}
 }

@@ -4,7 +4,6 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
 import com.taskadapter.redmineapi.bean.IssuePriority;
 import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.IssueRelationFactory;
 import com.taskadapter.redmineapi.bean.IssueStatus;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.SavedQuery;
@@ -127,22 +126,24 @@ public class IssueManager {
         return transport.getObject(Issue.class, id, new BasicNameValuePair("include", value));
     }
 
+    /**
+     * DEPRECATED. use issue.addWatcher(..)
+     */
+    @Deprecated
     public void addWatcherToIssue(Watcher watcher, Issue issue) throws RedmineException {
         transport.addWatcherToIssue(watcher.getId(), issue.getId());
     }
 
+    /**
+     * DEPRECATED. use issue.deleteWatcher(..)
+     */
+    @Deprecated
     public void deleteWatcherFromIssue(Watcher watcher, Issue issue) throws RedmineException {
         transport.deleteChildId(Issue.class, Integer.toString(issue.getId()), watcher, watcher.getId());
     }
 
     /**
-     * Sample usage:
-     * <pre>
-     * {@code
-     *   Issue issueToCreate = IssueFactory.create(projectDatabaseId, subject);
-     *   Issue newIssue = mgr.createIssue(issueToCreate);
-     * }
-     * </pre>
+     * Deprecated. Use the new fluent-style API: new Issue(...).create();
      *
      * @param issue      the Issue object to create on the server.
      * @return the newly created Issue.
@@ -151,11 +152,17 @@ public class IssueManager {
      * @throws NotFoundException       the project is not found
      * @throws RedmineException
      */
+    @Deprecated
     public Issue createIssue(Issue issue) throws RedmineException {
-        return transport.addObject(issue, new BasicNameValuePair("include",
-               Include.attachments.toString()));
+        return issue.create();
     }
 
+    /**
+     * Deprecated. use issue.delete() instead.
+     *
+     * @throws RedmineException
+     */
+    @Deprecated
     public void deleteIssue(Integer id) throws RedmineException {
         transport.deleteObject(Issue.class, Integer.toString(id));
     }
@@ -187,32 +194,26 @@ public class IssueManager {
     }
 
     /**
-     * @param issueId id of the source issue
-     * @param issueToId if of the target issue
-     * @param type type of the relation. e.g. "precedes". see IssueRelation.TYPE for possible types.
-     * @return newly created IssueRelation instance.
-     *
-     * @see com.taskadapter.redmineapi.bean.IssueRelation.TYPE
+     * DEPRECATED. use relation.create()
      */
+    @Deprecated
     public IssueRelation createRelation(Integer issueId, Integer issueToId, String type) throws RedmineException {
-        IssueRelation toCreate = IssueRelationFactory.create();
-        toCreate.setIssueId(issueId);
-        toCreate.setIssueToId(issueToId);
-        toCreate.setType(type);
-        return transport.addChildEntry(Issue.class, issueId.toString(),
-                toCreate);
+        return new IssueRelation(transport, issueId, issueToId, type)
+                .create();
     }
 
     /**
-     * Delete Issue Relation with the given Id.
+     * DEPRECATED. use relation.delete()
      */
+    @Deprecated
     public void deleteRelation(Integer id) throws RedmineException {
-        transport.deleteObject(IssueRelation.class, Integer.toString(id));
+        new IssueRelation(transport).setId(id).delete();
     }
 
     /**
-     * Delete all issue's relations
+     * DEPRECATED. use relation.delete()
      */
+    @Deprecated
     public void deleteIssueRelations(Issue redmineIssue) throws RedmineException {
         for (IssueRelation relation : redmineIssue.getRelations()) {
             deleteRelation(relation.getId());
@@ -233,8 +234,12 @@ public class IssueManager {
         return transport.getObjectsList(IssuePriority.class);
     }
 
+    /**
+     * Deprecated. use issue.update() instead.
+     */
+    @Deprecated
     public void update(Issue obj) throws RedmineException {
-        transport.updateObject(obj);
+        obj.update();
     }
 
     /**
@@ -252,6 +257,8 @@ public class IssueManager {
     }
 
     /**
+     * DEPRECATED. use category.create() instead.
+     *
      * creates a new {@link IssueCategory} for the {@link Project} contained. <br>
      * Pre-condition: the attribute {@link Project} for the {@link IssueCategory} must
      * not be null!
@@ -263,6 +270,7 @@ public class IssueManager {
      * @throws RedmineException         thrown in case something went wrong in Redmine
      * @throws NotFoundException        thrown in case an object can not be found
      */
+    @Deprecated
     public IssueCategory createCategory(IssueCategory category) throws RedmineException {
         if (category.getProjectId() == null) {
             throw new IllegalArgumentException(
@@ -273,6 +281,8 @@ public class IssueManager {
     }
 
     /**
+     * DEPRECATED. use category.delete() instead
+     *
      * deletes an {@link IssueCategory}. <br>
      *
      * @param category the {@link IssueCategory}.
@@ -280,6 +290,7 @@ public class IssueManager {
      * @throws RedmineException        thrown in case something went wrong in Redmine
      * @throws NotFoundException       thrown in case an object can not be found
      */
+    @Deprecated
     public void deleteCategory(IssueCategory category) throws RedmineException {
         transport.deleteObject(IssueCategory.class,
                 Integer.toString(category.getId()));

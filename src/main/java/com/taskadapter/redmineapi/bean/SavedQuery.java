@@ -1,17 +1,15 @@
 package com.taskadapter.redmineapi.bean;
 
 public class SavedQuery {
-    private final Integer id;
+    private Integer id;
 
     private String name;
     private boolean publicQuery;
     private Integer projectId;
 
-    /**
-     * @param id database Id
-     */
-    SavedQuery(Integer id) {
+    public SavedQuery setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     @Override
@@ -39,24 +37,27 @@ public class SavedQuery {
         return name;
     }
 
-    public void setName(String name) {
+    public SavedQuery setName(String name) {
         this.name = name;
+        return this;
     }
 
     public boolean isPublicQuery() {
         return publicQuery;
     }
 
-    public void setPublicQuery(boolean isPublic) {
+    public SavedQuery setPublicQuery(boolean isPublic) {
         this.publicQuery = isPublic;
+        return this;
     }
 
     public Integer getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Integer value) {
+    public SavedQuery setProjectId(Integer value) {
         this.projectId = value;
+        return this;
     }
 
     @Override

@@ -1,10 +1,9 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.GroupFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -22,20 +21,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
 public class UserIT {
-    private static final User OUR_USER = IntegrationTestHelper.getOurUser();
+    private static User OUR_USER;
 
     private static UserManager userManager;
 
     private static Integer nonAdminUserId;
+    private static User nonAdminUser;
     private static String nonAdminUserLogin;
     private static String nonAdminPassword;
+    private static Transport transport;
 
     @BeforeClass
     public static void oneTimeSetup() {
         RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
+        transport = mgr.getTransport();
         userManager = mgr.getUserManager();
+        OUR_USER = IntegrationTestHelper.getOurUser(transport);
         try {
-            createNonAdminUser();
+            User userToCreate = UserGenerator.generateRandomUser(transport);
+            nonAdminUser = userToCreate.create();
+            nonAdminUserId = nonAdminUser.getId();
+            nonAdminUserLogin = userToCreate.getLogin();
+            // note that created users do NOT have passwords set due to security considerations
+            nonAdminPassword = userToCreate.getPassword();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -44,18 +52,10 @@ public class UserIT {
     @AfterClass
     public static void afterClass() {
         try {
-            userManager.deleteUser(nonAdminUserId);
+            nonAdminUser.delete();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private static void createNonAdminUser() throws RedmineException {
-        User user = UserGenerator.generateRandomUser();
-        User nonAdminUser = userManager.createUser(user);
-        nonAdminUserId = nonAdminUser.getId();
-        nonAdminUserLogin = user.getLogin();
-        nonAdminPassword = user.getPassword();
     }
 
     @Test
@@ -93,16 +93,13 @@ public class UserIT {
     @Test
     public void userCanBeFoundByFreeFormSearch() throws RedmineException {
         String name = "UniqueName";
-        User user = UserFactory.create()
+        User user = new User(transport)
                 .setLogin("login" + System.currentTimeMillis())
                 .setFirstName(name)
                 .setLastName("LName")
                 .setMail("aa@aaa.ccc");
-        Integer id = null;
+        User created = user.create();
         try {
-            final User created = userManager.createUser(user);
-            id = created.getId();
-
             Map<String, String> params = new HashMap<>();
             params.put("name", name);
             List<User> list = userManager.getUsers(params).getResults();
@@ -110,7 +107,7 @@ public class UserIT {
             final User loaded = list.get(0);
             assertThat(loaded.getFirstName()).isEqualTo(name);
         } finally {
-            userManager.deleteUser(id);
+            created.delete();
         }
     }
 
@@ -121,80 +118,76 @@ public class UserIT {
 
     @Test
     public void testCreateUser() throws RedmineException {
-        User createdUser = null;
-        try {
-            User userToCreate = UserGenerator.generateRandomUser();
-            createdUser = userManager.createUser(userToCreate);
+        User user = UserGenerator.generateRandomUser(transport);
+        User createdUser = user.create();
 
-            assertThat(createdUser).isNotNull();
+        assertThat(createdUser).isNotNull();
 
-            assertThat(createdUser.getLogin()).isEqualTo(userToCreate.getLogin());
-            assertThat(createdUser.getFirstName()).isEqualTo(userToCreate.getFirstName());
-            assertThat(createdUser.getLastName()).isEqualTo(userToCreate.getLastName());
-            assertThat(createdUser.getId()).isNotNull();
-        } finally {
-            if (createdUser != null) {
-                userManager.deleteUser(createdUser.getId());
-            }
-        }
+        assertThat(createdUser.getLogin()).isEqualTo(user.getLogin());
+        assertThat(createdUser.getFirstName()).isEqualTo(user.getFirstName());
+        assertThat(createdUser.getLastName()).isEqualTo(user.getLastName());
+        assertThat(createdUser.getId()).isNotNull();
+
+        createdUser.delete();
     }
-    
+
     @Test
     public void testCreateUserWithAuthSource() throws RedmineException {
         User createdUser = null;
         try {
-            User userToCreate = UserGenerator.generateRandomUser();
+            User userToCreate = UserGenerator.generateRandomUser(transport);
             userToCreate.setAuthSourceId(1);
-            createdUser = userManager.createUser(userToCreate);
+            createdUser = userToCreate.create();
 
             // Redmine doesn't return it, so let's consider a non-exceptional return as success for now.
             assertThat(createdUser).isNotNull();
         } finally {
             if (createdUser != null) {
-                userManager.deleteUser(createdUser.getId());
+                createdUser.delete();
             }
         }
     }
 
     @Test
     public void testUpdateUser() throws RedmineException {
-        User userToCreate = UserFactory.create();
-        userToCreate.setFirstName("fname2");
-        userToCreate.setLastName("lname2");
         long randomNumber = new Date().getTime();
-        userToCreate.setLogin("login33" + randomNumber);
-        userToCreate.setMail("email" + randomNumber + "@somedomain.com");
-        userToCreate.setPassword("1234asdf");
+
         String newFirstName = "fnameNEW";
         String newLastName = "lnameNEW";
         String newMail = "newmail" + randomNumber + "@asd.com";
-        User createdUser = userManager.createUser(userToCreate)
-                .setFirstName(newFirstName)
-                .setLastName(newLastName)
-                .setMail(newMail);
-        Integer userId = createdUser.getId();
-        try {
-            userManager.update(createdUser);
 
-            User updatedUser = userManager.getUserById(userId);
+        User user = new User(transport)
+                .setFirstName("fname2")
+                .setLastName("lname2")
+                .setLogin("login33" + randomNumber)
+                .setMail("email" + randomNumber + "@somedomain.com")
+                .setPassword("1234asdf")
+                .create();
+
+        user.setFirstName(newFirstName)
+                .setLastName(newLastName)
+                .setMail(newMail)
+                .update();
+        try {
+            User updatedUser = userManager.getUserById(user.getId());
 
             assertThat(updatedUser.getFirstName()).isEqualTo(newFirstName);
             assertThat(updatedUser.getLastName()).isEqualTo(newLastName);
             assertThat(updatedUser.getMail()).isEqualTo(newMail);
-            assertThat(updatedUser.getId()).isEqualTo(userId);
+            assertThat(updatedUser.getId()).isEqualTo(user.getId());
         } finally {
-            userManager.deleteUser(userId);
+            user.delete();
         }
     }
 
     @Test
     public void userCanBeDeleted() throws RedmineException {
-        User user = UserGenerator.generateRandomUser();
-        User createdUser = userManager.createUser(user);
+        User user = UserGenerator.generateRandomUser(transport);
+        User createdUser = user.create();
         Integer newUserId = createdUser.getId();
 
         try {
-            userManager.deleteUser(newUserId);
+            createdUser.delete();
         } catch (Exception e) {
             fail(e.getMessage());
         }
@@ -208,7 +201,7 @@ public class UserIT {
 
     @Test(expected = NotFoundException.class)
     public void deletingNonExistingUserThrowsNFE() throws RedmineException {
-        userManager.deleteUser(999999);
+        new User(transport).setId(999999).delete();
     }
 
     /**
@@ -216,68 +209,40 @@ public class UserIT {
      */
     @Test
     public void testAddUserToGroup() throws RedmineException {
-        final Group template = GroupFactory.create("group " + System.currentTimeMillis());
-        final Group group = userManager.createGroup(template);
+        Group group = new Group(transport).setName("group " + System.currentTimeMillis())
+                .create();
         try {
-            final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
+            User newUser = UserGenerator.generateRandomUser(transport).create();
             try {
-                userManager.addUserToGroup(newUser, group);
+                newUser.addToGroup(group.getId());
                 final Collection<Group> userGroups = userManager.getUserById(newUser.getId()).getGroups();
                 assertThat(userGroups).hasSize(1);
                 assertThat(userGroups.iterator().next().getName()).isEqualTo(group.getName());
             } finally {
-                userManager.deleteUser(newUser.getId());
+                newUser.delete();
             }
         } finally {
-            userManager.deleteGroup(group);
-        }
-    }
-
-
-    /**
-     * "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0.
-     * I submitted a bug: http://www.redmine.org/issues/19363, which was closed as "invalid".
-     * Marking this test as "Ignored" for now.
-     */
-    @Ignore
-    @Test
-    public void addingUserToGroupTwiceDoesNotGiveErrors() throws RedmineException {
-        final Group template = GroupFactory.create("some test " + System.currentTimeMillis());
-        final Group group = userManager.createGroup(template);
-        try {
-            final User newUser = userManager.createUser(UserGenerator.generateRandomUser());
-            try {
-                userManager.addUserToGroup(newUser, group);
-                userManager.addUserToGroup(newUser, group);
-                final User userById = userManager.getUserById(newUser.getId());
-                assertThat(userById.getGroups()).hasSize(1);
-            } finally {
-                userManager.deleteUser(newUser.getId());
-            }
-        } finally {
-            userManager.deleteGroup(group);
+            group.delete();
         }
     }
 
     @Test
     public void testGroupCRUD() throws RedmineException {
-        final Group template = GroupFactory.create("Template group " + System.currentTimeMillis());
-        final Group created = userManager.createGroup(template);
-
+        Group toCreate = new Group(transport).setName("Template group " + System.currentTimeMillis());
+        Group created = toCreate.create();
         try {
-            assertThat(created.getName()).isEqualTo(template.getName());
-            final Group loaded = userManager.getGroupById(created.getId());
+            assertThat(created.getName()).isEqualTo(toCreate.getName());
+            Group loaded = userManager.getGroupById(created.getId());
             assertThat(created.getName()).isEqualTo(loaded.getName());
 
-            final Group update = GroupFactory.create(loaded.getId());
-            update.setName("Group update " + System.currentTimeMillis());
-
-            userManager.update(update);
+            Group toUpdate = new Group(transport).setId(loaded.getId())
+                    .setName("Group update " + System.currentTimeMillis());
+            toUpdate.update();
 
             final Group loaded2 = userManager.getGroupById(created.getId());
-            assertThat(loaded2.getName()).isEqualTo(update.getName());
+            assertThat(loaded2.getName()).isEqualTo(toUpdate.getName());
         } finally {
-            userManager.deleteGroup(created);
+            created.delete();
         }
 
         try {
@@ -317,44 +282,46 @@ public class UserIT {
 
     @Test
     public void testUserDefaults() throws RedmineException {
-        final User template = UserFactory.create();
-        template.setFirstName("first name");
-        template.setLastName("last name");
-        final String email = System.currentTimeMillis() + "@globalhost.ru";
-        template.setMail(email);
-        template.setPassword("aslkdj32jnrfds7asdfn23()[]:kajsdf");
-        final String login = "login" + System.currentTimeMillis();
-        template.setLogin(login);
-        final User result = userManager.createUser(template);
+        String email = System.currentTimeMillis() + "@globalhost.ru";
+        String login = "login" + System.currentTimeMillis();
+
+        User user = new User(transport)
+                .setFirstName("first name")
+                .setLastName("last name")
+                .setMail(email)
+                .setPassword("aslkdj32jnrfds7asdfn23()[]:kajsdf")
+                .setLogin(login)
+                .create();
+
         try {
-            Assert.assertNotNull(result.getId());
-            Assert.assertEquals(login, result.getLogin());
-            Assert.assertNull(result.getPassword());
-            Assert.assertEquals("first name", result.getFirstName());
-            Assert.assertEquals("last name", result.getLastName());
-            Assert.assertEquals(email, result.getMail());
-            Assert.assertNotNull(result.getCreatedOn());
-            Assert.assertNull(result.getLastLoginOn());
-            Assert.assertNotNull(result.getCustomFields());
+            Assert.assertNotNull(user.getId());
+            Assert.assertEquals(login, user.getLogin());
+            Assert.assertNull(user.getPassword());
+            Assert.assertEquals("first name", user.getFirstName());
+            Assert.assertEquals("last name", user.getLastName());
+            Assert.assertEquals(email, user.getMail());
+            Assert.assertNotNull(user.getCreatedOn());
+            Assert.assertNull(user.getLastLoginOn());
+            Assert.assertNotNull(user.getCustomFields());
         } finally {
-            userManager.deleteUser(result.getId());
+            user.delete();
         }
     }
 
     @Test
     public void testLockUser() throws RedmineException {
-        User user = userManager.getUserById(nonAdminUserId);
-        user.setStatus(User.STATUS_LOCKED);
-        userManager.update(user);
+        User user = userManager.getUserById(nonAdminUserId)
+                .setStatus(User.STATUS_LOCKED);
+        user.update();
 
-        user = userManager.getUserById(nonAdminUserId);
-        Assert.assertEquals(User.STATUS_LOCKED, user.getStatus());
+        User loadedById = userManager.getUserById(nonAdminUserId);
+        Assert.assertEquals(User.STATUS_LOCKED, loadedById.getStatus());
 
-        user.setStatus(User.STATUS_ACTIVE);
-        userManager.update(user);
+        loadedById.setStatus(User.STATUS_ACTIVE)
+                .update();
 
-        user = userManager.getUserById(nonAdminUserId);
-        Assert.assertEquals(User.STATUS_ACTIVE, user.getStatus());
+        User loadedAgain = userManager.getUserById(nonAdminUserId);
+        Assert.assertEquals(User.STATUS_ACTIVE, loadedAgain.getStatus());
     }
 
     private RedmineManager getNonAdminManager() {

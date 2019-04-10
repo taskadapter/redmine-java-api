@@ -12,15 +12,15 @@ public class AttachmentsTest {
 
     @Test
     public void wikiPageDetailWrite() {
-        Attachment attachment1 = new Attachment(1);
-        attachment1.setToken("TOKEN1");
-        attachment1.setContentType("text/plain");
-        Attachment attachment2 = new Attachment(2);
-        attachment2.setToken("TOKEN2");
-        attachment2.setContentType("text/plain");
+        Attachment attachment1 = new Attachment(null).setId(1)
+                .setToken("TOKEN1")
+                .setContentType("text/plain");
+        Attachment attachment2 = new Attachment(null).setId(2)
+                .setToken("TOKEN2")
+                .setContentType("text/plain");
         List<Attachment> attachments = Arrays.asList(attachment1, attachment2);
 
-        WikiPageDetail wikiPageDetail = new WikiPageDetail();
+        WikiPageDetail wikiPageDetail = new WikiPageDetail(null);
         wikiPageDetail.setText("text");
         wikiPageDetail.setAttachments(attachments);
 

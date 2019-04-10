@@ -1,11 +1,9 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueFactory;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.bean.TimeEntryFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -31,21 +29,22 @@ public class TimeEntryManagerIT {
 
     private static ProjectManager projectManager;
     private static TimeEntryManager timeEntryManager;
-    private static IssueManager issueManager;
     private static String projectKey;
     private static Integer projectId;
+    private static Transport transport;
+    private static Project createdProject;
 
     @BeforeClass
     public static void oneTimeSetUp() {
         RedmineManager mgr = IntegrationTestHelper.createRedmineManager();
+        transport = mgr.getTransport();
         timeEntryManager = mgr.getTimeEntryManager();
         projectManager = mgr.getProjectManager();
-        issueManager = mgr.getIssueManager();
-
-        Project junitTestProject = ProjectFactory.create("test project", "test" + Calendar.getInstance().getTimeInMillis());
 
         try {
-            Project createdProject = projectManager.createProject(junitTestProject);
+            createdProject = new Project(transport, "test project",
+                    "test" + Calendar.getInstance().getTimeInMillis())
+                    .create();
             projectKey = createdProject.getIdentifier();
             projectId = createdProject.getId();
         } catch (Exception e) {
@@ -57,7 +56,7 @@ public class TimeEntryManagerIT {
     public static void oneTimeTearDown() {
         try {
             if (projectManager != null && projectKey != null) {
-                projectManager.deleteProject(projectKey);
+                createdProject.delete();
             }
         } catch (Exception e) {
             Assert.fail("can't delete the test project '" + projectKey
@@ -67,15 +66,14 @@ public class TimeEntryManagerIT {
 
     @Test
     public void testTimeEntryDefaults() throws RedmineException {
-        final TimeEntry template = TimeEntryFactory.create();
+        Issue issue = new Issue(transport, projectId, "aaabbbccc").create();
 
-        final Issue tmp = IssueFactory.create(projectId, "aaabbbccc");
-        final Issue tmpIssue = issueManager.createIssue(tmp);
         try {
-            template.setHours(123.f);
-            template.setActivityId(ACTIVITY_ID);
-            template.setIssueId(tmpIssue.getId());
-            final TimeEntry result = timeEntryManager.createTimeEntry(template);
+            TimeEntry result = new TimeEntry(transport)
+                    .setHours(123.f)
+                    .setActivityId(ACTIVITY_ID)
+                    .setIssueId(issue.getId())
+                    .create();
             try {
                 Assert.assertNotNull(result.getId());
                 Assert.assertNotNull(result.getIssueId());
@@ -91,10 +89,10 @@ public class TimeEntryManagerIT {
                 Assert.assertNotNull(result.getCreatedOn());
                 Assert.assertNotNull(result.getUpdatedOn());
             } finally {
-                timeEntryManager.deleteTimeEntry(result.getId());
+                result.delete();
             }
         } finally {
-            issueManager.deleteIssue(tmpIssue.getId());
+            issue.delete();
         }
     }
 
@@ -104,26 +102,24 @@ public class TimeEntryManagerIT {
      */
     @Test
     public void testTimeEntryComments() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
+        Issue issue = createIssues(transport, projectId, 1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = TimeEntryFactory.create();
-        Float hours = 11f;
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        final String comment = "This is a comment although it may not look like it";
-        entry.setComment(comment);
-        // TODO We don't know activities IDs!
-        // see feature request http://www.redmine.org/issues/7506
-        entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = timeEntryManager.createTimeEntry(entry);
+        String comment = "This is a comment although it may not look like it";
+        TimeEntry entry = new TimeEntry(transport)
+                .setHours(11f)
+                .setIssueId(issueId)
+                .setComment(comment)
+                // TODO We don't know activities IDs! see feature request http://www.redmine.org/issues/7506
+                .setActivityId(ACTIVITY_ID)
+                .create();
 
-        assertNotNull(createdEntry);
-        assertEquals(comment, createdEntry.getComment());
+        assertNotNull(entry);
+        assertEquals(comment, entry.getComment());
 
-        createdEntry.setComment("New comment");
-        timeEntryManager.update(createdEntry);
-        final TimeEntry updatedEntry = timeEntryManager.getTimeEntry(createdEntry.getId());
+        entry.setComment("New comment")
+                .update();
+        TimeEntry updatedEntry = timeEntryManager.getTimeEntry(entry.getId());
         assertEquals("New comment", updatedEntry.getComment());
     }
 
@@ -131,6 +127,7 @@ public class TimeEntryManagerIT {
     public void testTimeEntryActivities() throws RedmineException {
         assertTrue(timeEntryManager.getTimeEntryActivities().size() > 0);
     }
+
     @Test
     public void testGetTimeEntries() throws RedmineException {
         List<TimeEntry> list = timeEntryManager.getTimeEntries();
@@ -139,50 +136,48 @@ public class TimeEntryManagerIT {
 
     @Test
     public void testCreateGetTimeEntry() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
+        Issue issue = createIssues(transport, projectId, 1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 11f;
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        // TODO We don't know activities IDs!
-        // see feature request http://www.redmine.org/issues/7506
-        entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = timeEntryManager.createTimeEntry(entry);
+        TimeEntry entry = new TimeEntry(transport)
+                .setHours(11f)
+                .setIssueId(issueId)
+                // TODO We don't know activities IDs! see feature request http://www.redmine.org/issues/7506
+                .setActivityId(ACTIVITY_ID)
+                .create();
 
-        assertNotNull(createdEntry);
-        assertEquals(hours, createdEntry.getHours());
+        assertNotNull(entry);
+        assertEquals(hours, entry.getHours());
 
         Float newHours = 22f;
-        createdEntry.setHours(newHours);
+        entry.setHours(newHours)
+                .update();
 
-        timeEntryManager.update(createdEntry);
-
-        TimeEntry updatedEntry = timeEntryManager.getTimeEntry(createdEntry.getId());
+        TimeEntry updatedEntry = timeEntryManager.getTimeEntry(entry.getId());
         assertEquals(newHours, updatedEntry.getHours());
     }
 
     @Test(expected = NotFoundException.class)
     public void testCreateDeleteTimeEntry() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
+        Issue issue = createIssues(transport, projectId, 1).get(0);
         Integer issueId = issue.getId();
 
-        TimeEntry entry = TimeEntryFactory.create();
         Float hours = 4f;
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        entry.setActivityId(ACTIVITY_ID);
-        TimeEntry createdEntry = timeEntryManager.createTimeEntry(entry);
-        assertNotNull(createdEntry);
+        TimeEntry entry = new TimeEntry(transport)
+                .setHours(hours)
+                .setIssueId(issueId)
+                .setActivityId(ACTIVITY_ID)
+                .create();
+        assertNotNull(entry);
 
-        timeEntryManager.deleteTimeEntry(createdEntry.getId());
-        timeEntryManager.getTimeEntry(createdEntry.getId());
+        entry.delete();
+        timeEntryManager.getTimeEntry(entry.getId());
     }
 
     @Test
     public void testGetTimeEntriesForIssue() throws RedmineException {
-        Issue issue = createIssues(issueManager, projectId, 1).get(0);
+        Issue issue = createIssues(transport, projectId, 1).get(0);
         Integer issueId = issue.getId();
         Float hours1 = 2f;
         Float hours2 = 7f;
@@ -207,12 +202,13 @@ public class TimeEntryManagerIT {
 
     private TimeEntry createTimeEntry(Integer issueId, float hours, int activityId)
             throws RedmineException {
-        TimeEntry entry = TimeEntryFactory.create();
-        entry.setHours(hours);
-        entry.setIssueId(issueId);
-        entry.setActivityId(activityId);
-        return timeEntryManager.createTimeEntry(entry);
+        return new TimeEntry(transport)
+                .setHours(hours)
+                .setIssueId(issueId)
+                .setActivityId(activityId)
+                .create();
     }
+
     @Test(expected = IllegalArgumentException.class)
     public void invalidTimeEntryFailsWithIAEOnCreate() throws RedmineException {
         timeEntryManager.createTimeEntry(createIncompleteTimeEntry());
@@ -224,11 +220,10 @@ public class TimeEntryManagerIT {
     }
 
     private TimeEntry createIncompleteTimeEntry() {
-        TimeEntry timeEntry = TimeEntryFactory.create();
-        timeEntry.setActivityId(ACTIVITY_ID);
-        timeEntry.setSpentOn(new Date());
-        timeEntry.setHours(1.5f);
-        return timeEntry;
+        return new TimeEntry(transport)
+                .setActivityId(ACTIVITY_ID)
+                .setSpentOn(new Date())
+                .setHours(1.5f);
     }
 
     @Test
@@ -247,7 +242,7 @@ public class TimeEntryManagerIT {
     @Test
     public void timeEntriesAreFoundByFreeFormSearch() throws RedmineException {
         // create some random issues in the project
-        Issue createdIssue = createIssue(issueManager, projectId);
+        Issue createdIssue = createIssue(transport, projectId);
 
         // TODO We don't know activities' IDs
         // see feature request http://www.redmine.org/issues/7506
@@ -270,7 +265,7 @@ public class TimeEntryManagerIT {
             List<TimeEntry> timeEntriesForActivity9 = timeEntryManager.getTimeEntries(paramsForActivity9).getResults();
             assertThat(timeEntriesForActivity9.size()).isEqualTo(1);
         } finally {
-            issueManager.deleteIssue(createdIssueId);
+            createdIssue.delete();
         }
     }
 

@@ -3,15 +3,13 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
-import com.taskadapter.redmineapi.bean.IssueCategoryFactory;
 import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,24 +57,26 @@ public class Simple {
     @SuppressWarnings("unused")
 	private static void tryUpload(RedmineManager mgr, IssueManager issueManager, AttachmentManager attachmentManager) throws RedmineException,
 			IOException {
-		final byte[] content = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+		final byte[] content = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 		final Attachment attach1 = attachmentManager.uploadAttachment("test.bin",
 				"application/ternary", content);
-		final Project tmpProject = ProjectFactory.create("Upload project", "uploadtmpproject");
-		final Project project = mgr.getProjectManager().createProject(tmpProject);
-		final Issue testIssue = new Issue();
-		testIssue.setSubject("This is upload ticket!");
-		testIssue.addAttachment(attach1);
-		testIssue.setProjectId(project.getId());
+		Project project = new Project(mgr.getTransport())
+				.setName("Upload project")
+				.setIdentifier("uploadtmpproject")
+				.create();
+
 		try {
-			final Issue createdIssue = issueManager.createIssue(testIssue);
+			Issue issue = new Issue(mgr.getTransport(), project.getId(), "This is upload ticket!")
+					.addAttachment(attach1)
+					.create();
+
 			try {
-				System.out.println(createdIssue.getAttachments());
+				System.out.println(issue.getAttachments());
 			} finally {
-				issueManager.deleteIssue(createdIssue.getId());
+				issue.delete();
 			}
 		} finally {
-			mgr.getProjectManager().deleteProject(project.getIdentifier());
+			project.delete();
 		}
 	}
 
@@ -90,9 +90,9 @@ public class Simple {
 	@SuppressWarnings("unused")
 	private static void changeIssueStatus(IssueManager issueManager)
 			throws RedmineException {
-		Issue issue = issueManager.getIssueById(1771);
-		issue.setSubject("new");
-		issueManager.update(issue);
+		issueManager.getIssueById(1771)
+				.setSubject("new")
+				.update();
 	}
 
 	@SuppressWarnings("unused")
@@ -113,10 +113,9 @@ public class Simple {
 	}
 
 	@SuppressWarnings("unused")
-	private static void tryCreateRelation(IssueManager issueManager)
-			throws RedmineException {
-		IssueRelation r = issueManager.createRelation(49, 50,
-				IssueRelation.TYPE.precedes.toString());
+	private static void tryCreateRelation(Transport transport) throws RedmineException {
+		IssueRelation r = new IssueRelation(transport, 49, 50, IssueRelation.TYPE.precedes.toString())
+				.create();
 		logger.debug("Created relation " + r);
 	}
 
@@ -147,17 +146,13 @@ public class Simple {
 	@SuppressWarnings("unused")
 	private static void tryCreateIssue(RedmineManager manager)
 			throws RedmineException {
-		Issue issue = new Issue();
-		issue.setSubject("test123");
-		final Version ver = VersionFactory.create(512);
-		issue.setTargetVersion(ver);
-		final IssueCategory cat = IssueCategoryFactory.create(673);
-		issue.setCategory(cat);
-
-        ProjectManager projectManager = manager.getProjectManager();
-        Project projectByKey = projectManager.getProjectByKey("testid");
-        issue.setProjectId(projectByKey.getId());
-        manager.getIssueManager().createIssue(issue);
+		ProjectManager projectManager = manager.getProjectManager();
+		Project project = projectManager.getProjectByKey("testid");
+		Transport transport = manager.getTransport();
+		Issue issue = new Issue(transport, project.getId(), "test123")
+				.setTargetVersion(new Version().setId(512))
+				.setCategory(new IssueCategory(transport).setId(673))
+				.create();
 	}
 
 	@SuppressWarnings("unused")
@@ -186,8 +181,9 @@ public class Simple {
 		User currentUser = mgr.getCurrentUser();
 		logger.debug("user=" + currentUser.getMail());
 
-		currentUser.setMail("ne@com123.com");
-		mgr.update(currentUser);
+		currentUser.setMail("ne@com123.com")
+				.update();
+
 		logger.debug("updated user");
 
 		User currentUser2 = mgr.getCurrentUser();

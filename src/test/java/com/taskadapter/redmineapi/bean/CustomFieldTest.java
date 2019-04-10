@@ -23,7 +23,7 @@ public class CustomFieldTest {
     }
 
     private CustomField getField(int id, String... values) {
-        CustomField field = new CustomField(id);
+        CustomField field = new CustomField().setId(id);
         field.setValues(Arrays.asList(values));
         return field;
     }

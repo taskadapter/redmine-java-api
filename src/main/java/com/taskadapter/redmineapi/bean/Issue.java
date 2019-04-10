@@ -1,5 +1,13 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.Include;
+import com.taskadapter.redmineapi.IssueManager;
+import com.taskadapter.redmineapi.NotFoundException;
+import com.taskadapter.redmineapi.RedmineAuthenticationException;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+import org.apache.http.message.BasicNameValuePair;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -18,9 +26,9 @@ import java.util.Set;
  * 
  * @see <a href="http://www.redmine.org/projects/redmine/wiki/Rest_Issues">http://www.redmine.org/projects/redmine/wiki/Rest_Issues</a> 
  */
-public class Issue implements Identifiable {
+public class Issue implements Identifiable, FluentStyle {
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
     public final static Property<String> SUBJECT = new Property<>(String.class, "subject");
@@ -67,17 +75,30 @@ public class Issue implements Identifiable {
     public final static Property<Set<Watcher>> WATCHERS = (Property<Set<Watcher>>) new Property(Set.class, "watchers");
     public final static Property<Set<Issue>> CHILDREN = (Property<Set<Issue>>) new Property(Set.class, "children");
 
-    /**
-     * @param id database ID.
-     */
-    Issue(Integer id) {
-        this();
-        storage.set(DATABASE_ID, id);
-    }
+    private Transport transport;
 
     public Issue() {
-        this.storage = new PropertyStorage();
         initCollections(storage);
+    }
+
+
+    /**
+     * Each Issue object must have project Id set in order for Redmine 3.x to accept it via REST API.
+     */
+    public Issue(Transport transport, int projectId) {
+        this();
+        this.transport = transport;
+        setProjectId(projectId);
+    }
+
+    /**
+     * @param projectId Each Issue object must have project Id set in order for Redmine 3.x to accept it via REST API.
+     */
+    public Issue(Transport transport, int projectId, String subject) {
+        this();
+        this.transport = transport;
+        setSubject(subject);
+        setProjectId(projectId);
     }
 
     private void initCollections(PropertyStorage storage) {
@@ -94,24 +115,36 @@ public class Issue implements Identifiable {
         return storage.get(PROJECT_ID);
     }
 
-    public void setProjectId(Integer projectId) {
+    public Issue setProjectId(Integer projectId) {
         storage.set(PROJECT_ID, projectId);
+        return this;
     }
 
     public String getProjectName() {
         return storage.get(PROJECT_NAME);
     }
 
-    public void setProjectName(String name) {
+
+    public Issue setProjectName(String name) {
         storage.set(PROJECT_NAME, name);
+        return this;
+    }
+
+    /**
+     * @param id database ID.
+     */
+    public Issue setId(Integer id) {
+        storage.set(DATABASE_ID, id);
+        return this;
     }
 
     public Integer getDoneRatio() {
         return storage.get(DONE_RATIO);
     }
 
-    public void setDoneRatio(Integer doneRatio) {
+    public Issue setDoneRatio(Integer doneRatio) {
         storage.set(DONE_RATIO, doneRatio);
+        return this;
     }
 
     public String getPriorityText() {
@@ -136,32 +169,36 @@ public class Issue implements Identifiable {
         return storage.get(ASSIGNEE_ID);
     }
 
-    public void setAssigneeId(Integer assigneeId) {
+    public Issue setAssigneeId(Integer assigneeId) {
         storage.set(ASSIGNEE_ID, assigneeId);
+        return this;
     }
 
     public String getAssigneeName() {
         return storage.get(ASSIGNEE_NAME);
     }
 
-    public void setAssigneeName(String assigneeName) {
+    public Issue setAssigneeName(String assigneeName) {
         storage.set(ASSIGNEE_NAME, assigneeName);
+        return this;
     }
 
     public Float getEstimatedHours() {
         return storage.get(ESTIMATED_HOURS);
     }
 
-    public void setEstimatedHours(Float estimatedTime) {
+    public Issue setEstimatedHours(Float estimatedTime) {
         storage.set(ESTIMATED_HOURS, estimatedTime);
+        return this;
     }
 
     public Float getSpentHours() {
         return storage.get(SPENT_HOURS);
     }
 
-    public void setSpentHours(Float spentHours) {
+    public Issue setSpentHours(Float spentHours) {
         storage.set(SPENT_HOURS, spentHours);
+        return this;
     }
 
   /**
@@ -173,8 +210,9 @@ public class Issue implements Identifiable {
         return storage.get(PARENT_ID);
     }
 
-    public void setParentId(Integer parentId) {
+    public Issue setParentId(Integer parentId) {
         storage.set(PARENT_ID, parentId);
+        return this;
     }
 
     /**
@@ -189,96 +227,108 @@ public class Issue implements Identifiable {
         return storage.get(SUBJECT);
     }
 
-    public void setSubject(String subject) {
+    public Issue setSubject(String subject) {
         storage.set(SUBJECT, subject);
+        return this;
     }
 
     public Date getStartDate() {
         return storage.get(START_DATE);
     }
 
-    public void setStartDate(Date startDate) {
+    public Issue setStartDate(Date startDate) {
         storage.set(START_DATE, startDate);
+        return this;
     }
 
     public Date getDueDate() {
         return storage.get(DUE_DATE);
     }
 
-    public void setDueDate(Date dueDate) {
+    public Issue setDueDate(Date dueDate) {
         storage.set(DUE_DATE, dueDate);
+        return this;
     }
 
     public Integer getAuthorId() {
         return storage.get(AUTHOR_ID);
     }
 
-    public void setAuthorId(Integer id) {
+    public Issue setAuthorId(Integer id) {
         storage.set(AUTHOR_ID, id);
+        return this;
     }
 
     public String getAuthorName() {
         return storage.get(AUTHOR_NAME);
     }
 
-    public void setAuthorName(String name) {
+    public Issue setAuthorName(String name) {
         storage.set(AUTHOR_NAME, name);
+        return this;
     }
 
     public Tracker getTracker() {
         return storage.get(TRACKER);
     }
 
-    public void setTracker(Tracker tracker) {
+    public Issue setTracker(Tracker tracker) {
         storage.set(TRACKER, tracker);
+        return this;
     }
 
     public String getDescription() {
         return storage.get(DESCRIPTION);
     }
 
-    public void setDescription(String description) {
+    public Issue setDescription(String description) {
         storage.set(DESCRIPTION, description);
+        return this;
     }
 
     public Date getCreatedOn() {
         return storage.get(CREATED_ON);
     }
 
-    public void setCreatedOn(Date createdOn) {
+    public Issue setCreatedOn(Date createdOn) {
         storage.set(CREATED_ON, createdOn);
+        return this;
     }
 
     public Date getUpdatedOn() {
         return storage.get(UPDATED_ON);
     }
 
-    public void setUpdatedOn(Date updatedOn) {
+    public Issue setUpdatedOn(Date updatedOn) {
         storage.set(UPDATED_ON, updatedOn);
+        return this;
     }
 
     public Date getClosedOn() {
         return storage.get(CLOSED_ON);
     }
 
-    public void setClosedOn(Date closedOn) {
+    public Issue setClosedOn(Date closedOn) {
         storage.set(CLOSED_ON, closedOn);
+        return this;
     }
 
     public Integer getStatusId() {
         return storage.get(STATUS_ID);
     }
 
-    public void setStatusId(Integer statusId) {
+    public Issue setStatusId(Integer statusId) {
         storage.set(STATUS_ID, statusId);
+        return this;
     }
 
     public String getStatusName() {
         return storage.get(STATUS_NAME);
     }
 
-    public void setStatusName(String statusName) {
+    public Issue setStatusName(String statusName) {
         storage.set(STATUS_NAME, statusName);
+        return this;
     }
 
     /**
@@ -288,15 +338,18 @@ public class Issue implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(CUSTOM_FIELDS));
     }
 
-    public void clearCustomFields() {
+    public Issue clearCustomFields() {
         storage.set(CUSTOM_FIELDS, new HashSet<>());
+        return this;
     }
 
     /**
-     * NOTE: The custom field(s) <strong>must have correct database ID set</strong> to be saved to Redmine. This is Redmine REST API's limitation.
+     * NOTE: The custom field(s) <strong>must have correct database ID set</strong> to be saved to Redmine.
+     * This is Redmine REST API's requirement.
      */
-    public void addCustomFields(Collection<CustomField> customFields) {
+    public Issue addCustomFields(Collection<CustomField> customFields) {
         storage.get(CUSTOM_FIELDS).addAll(customFields);
+        return this;
     }
 
     /**
@@ -305,8 +358,9 @@ public class Issue implements Identifiable {
      *
      * @param customField the field to add to the issue.
      */
-    public void addCustomField(CustomField customField) {
+    public Issue addCustomField(CustomField customField) {
         storage.get(CUSTOM_FIELDS).add(customField);
+        return this;
     }
 
     @Deprecated
@@ -324,8 +378,9 @@ public class Issue implements Identifiable {
     /**
      * @param notes Some comment describing the issue update
      */
-    public void setNotes(String notes) {
+    public Issue setNotes(String notes) {
         storage.set(NOTES, notes);
+        return this;
     }
 
     public boolean isPrivateNotes() {
@@ -335,8 +390,9 @@ public class Issue implements Identifiable {
     /**
      * @param privateNotes mark note as private
      */
-    public void setPrivateNotes(boolean privateNotes) {
+    public Issue setPrivateNotes(boolean privateNotes) {
         storage.set(PRIVATE_NOTES, privateNotes);
+        return this;
     }
 
     /**
@@ -376,8 +432,9 @@ public class Issue implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(CHANGESETS));
     }
 
-    public void addChangesets(Collection<Changeset> changesets) {
+    public Issue addChangesets(Collection<Changeset> changesets) {
         storage.get(CHANGESETS).addAll(changesets);
+        return this;
     }
 
     /**
@@ -392,8 +449,9 @@ public class Issue implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(WATCHERS));
     }
 
-    public void addWatchers(Collection<Watcher> watchers) {
+    public Issue addWatchers(Collection<Watcher> watchers) {
         storage.get(WATCHERS).addAll(watchers);
+        return this;
     }
 
     /**
@@ -408,8 +466,9 @@ public class Issue implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(CHILDREN));
     }
 
-    public void addChildren(Collection<Issue> children) {
+    public Issue addChildren(Collection<Issue> children) {
         storage.get(CHILDREN).addAll(children);
+        return this;
     }
 
     /**
@@ -479,16 +538,18 @@ public class Issue implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(RELATIONS));
     }
 
-    public void addRelations(Collection<IssueRelation> collection) {
+    public Issue addRelations(Collection<IssueRelation> collection) {
         storage.get(RELATIONS).addAll(collection);
+        return this;
     }
 
     public Integer getPriorityId() {
         return storage.get(PRIORITY_ID);
     }
 
-    public void setPriorityId(Integer priorityId) {
+    public Issue setPriorityId(Integer priorityId) {
         storage.set(PRIORITY_ID, priorityId);
+        return this;
     }
 
     public Version getTargetVersion() {
@@ -507,24 +568,28 @@ public class Issue implements Identifiable {
         return Collections.unmodifiableCollection(storage.get(ATTACHMENTS));
     }
 
-    public void addAttachments(Collection<Attachment> collection) {
+    public Issue addAttachments(Collection<Attachment> collection) {
         storage.get(ATTACHMENTS).addAll(collection);
+        return this;
     }
 
-    public void addAttachment(Attachment attachment) {
+    public Issue addAttachment(Attachment attachment) {
         storage.get(ATTACHMENTS).add(attachment);
+        return this;
     }
 
-    public void setTargetVersion(Version version) {
+    public Issue setTargetVersion(Version version) {
         storage.set(TARGET_VERSION, version);
+        return this;
     }
 
     public IssueCategory getCategory() {
         return storage.get(ISSUE_CATEGORY);
     }
 
-    public void setCategory(IssueCategory category) {
+    public Issue setCategory(IssueCategory category) {
         storage.set(ISSUE_CATEGORY, category);
+        return this;
     }
 
     /**
@@ -534,11 +599,47 @@ public class Issue implements Identifiable {
         return storage.get(PRIVATE_ISSUE);
     }
 
-    public void setPrivateIssue(boolean privateIssue) {
+    public Issue setPrivateIssue(boolean privateIssue) {
         storage.set(PRIVATE_ISSUE, privateIssue);
+        return this;
     }
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+    /**
+     * @return the newly created Issue.
+     *
+     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
+     *                                 requires authorization. Check the constructor arguments.
+     * @throws NotFoundException       the required project is not found
+     * @throws RedmineException
+     */
+    public Issue create() throws RedmineException {
+        return transport.addObject(this, new BasicNameValuePair("include",
+                Include.attachments.toString()));
+    }
+
+    public void update() throws RedmineException {
+        transport.updateObject(this);
+    }
+
+    public void delete() throws RedmineException {
+        transport.deleteObject(Issue.class, Integer.toString(this.getId()));
+    }
+
+    public void addWatcher(int watcherId) throws RedmineException {
+        transport.addWatcherToIssue(watcherId, getId());
+    }
+
+    public void deleteWatcher(int watcherId) throws RedmineException {
+        transport.deleteChildId(Issue.class, Integer.toString(getId()), new Watcher(), watcherId);
+    }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
+        PropertyStorageUtil.updateCollections(storage, transport);
     }
 }

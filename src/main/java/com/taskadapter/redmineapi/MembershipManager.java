@@ -1,9 +1,7 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.internal.Transport;
 
@@ -71,47 +69,55 @@ public class MembershipManager {
         return transport.getObject(Membership.class, membershipId);
     }
 
+    /**
+     * DEPRECATED. use membership.delete() instead
+     */
+    @Deprecated
     public void delete(int membershipId) throws RedmineException {
         transport.deleteObject(Membership.class, Integer.toString(membershipId));
     }
 
+    /**
+     * DEPRECATED. use membership.delete() instead
+     */
+    @Deprecated
     public void delete(Membership membership) throws RedmineException {
         transport.deleteObject(Membership.class, membership.getId().toString());
     }
 
+    /**
+     * DEPRECATED. use membership.update() instead
+     */
+    @Deprecated
     public void update(Membership membership) throws RedmineException {
         transport.updateObject(membership);
     }
 
 
     /**
-     * Use {@link ProjectManager#addGroupToProject(int, int, Collection)} instead.
+     * Use membership.create() instead.
      */
     @Deprecated
-    public Membership createMembershipForGroup(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
-        final Membership membership = MembershipFactory.create();
-        final Project project = ProjectFactory.create(projectId);
-        membership.setProject(project);
-        // This is nuts, but according to the documentation the way it is supposed
-        // to work:
-        // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
-        // http://www.redmine.org/issues/17904
-        membership.setUserId(groupId);
-        membership.addRoles(roles);
+    public Membership createMembershipForGroup(int projectId, int itemId, Collection<Role> roles) throws RedmineException {
+        Project project = new Project(transport).setId(projectId);
+
+        Membership membership = new Membership(transport)
+                .setProject(project)
+                .setUserId(itemId)
+                .addRoles(roles);
 
         return addMembership(membership);
     }
 
     /**
-     * Use {@link ProjectManager#addUserToProject(int, int, Collection)} instead.
+     * Use membership.create() instead.
      */
     @Deprecated
-    public Membership createMembershipForUser(int projectId, int userId, Collection<Role> roles) throws RedmineException {
-        final Membership membership = MembershipFactory.create();
-        final Project project = ProjectFactory.create(projectId);
-        membership.setProject(project);
-        membership.setUserId(userId);
-        membership.addRoles(roles);
-        return addMembership(membership);
+    public Membership createMembershipForUser(int projectId, int itemId, Collection<Role> roles) throws RedmineException {
+        // according to the documentation, this the way it is supposed to work : user Id is same as group ID
+        // in this context. see:
+        // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
+        // http://www.redmine.org/issues/17904
+        return createMembershipForGroup(projectId, itemId, roles);
     }
 }

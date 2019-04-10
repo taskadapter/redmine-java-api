@@ -1,14 +1,13 @@
 package com.taskadapter.redmineapi;
 
-import java.util.List;
-
-import com.taskadapter.redmineapi.bean.ProjectFactory;
-import org.json.JSONObject;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.internal.RedmineJSONParser;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +30,7 @@ public class ProjectsTest {
 
     @Test
     public void testProjects1Info() {
-        Project aceProject = ProjectFactory.create(15);
+        Project aceProject = new Project(null).setId(15);
         aceProject.setIdentifier("test1295577237142");
         aceProject.setName("test project 15");
 

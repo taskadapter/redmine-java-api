@@ -1,25 +1,5 @@
 package com.taskadapter.redmineapi.internal;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
-
-import com.taskadapter.redmineapi.bean.ProjectFactory;
-import com.taskadapter.redmineapi.bean.TrackerFactory;
-import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import com.taskadapter.redmineapi.DateComparator;
 import com.taskadapter.redmineapi.MyIOUtils;
 import com.taskadapter.redmineapi.RedmineTestUtils;
@@ -33,8 +13,25 @@ import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.json.JsonInput;
-
+import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import org.json.JSONException;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 /**
  * Redmine JSON parser tests.
@@ -50,7 +47,7 @@ public class RedmineJSONParserTest {
 		final JsonObjectParser<Project> parser = RedmineJSONParser::parseProject;
 		final Project project = parser.parse(RedmineJSONParser.getResponseSingleObject(projectString,"project"));
 
-		final Project template = ProjectFactory.create(6143);
+		Project template = new Project(null).setId(6143);
 		template.setIdentifier("test1336744548920");
 		template.setName("test project");
 		template.setHomepage("");
@@ -58,8 +55,10 @@ public class RedmineJSONParserTest {
 				.parse("11.05.2012 06:53:21 -0700"));
 		template.setUpdatedOn(new SimpleDateFormat("dd.MM.yyyy HH:mm:ss Z")
 				.parse("11.05.2012 06:53:20 -0700"));
-		template.addTrackers(Arrays.asList(TrackerFactory.create(1, "Bug"), TrackerFactory.create(
-                2, "Feature"), TrackerFactory.create(3, "Support")));
+		template.addTrackers(Arrays.asList(
+				new Tracker().setId(1).setName("Bug"),
+				new Tracker().setId(2).setName("Feature"),
+				new Tracker().setId(3).setName("Support")));
 		template.setDescription("");
 		Assert.assertEquals(template, project);
 	}

@@ -4,10 +4,9 @@ import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -34,13 +33,15 @@ public class ProjectIntegrationIT {
     private static String projectKey;
     private static Project project;
     private static Integer projectId;
+    private static Transport transport;
 
     @BeforeClass
     public static void oneTimeSetup() {
         mgr = IntegrationTestHelper.createRedmineManager();
         projectManager = mgr.getProjectManager();
+        transport = mgr.getTransport();
         try {
-            project = IntegrationTestHelper.createProject(mgr);
+            project = IntegrationTestHelper.createProject(transport);
             projectKey = project.getIdentifier();
             projectId = project.getId();
         } catch (Exception e) {
@@ -50,7 +51,7 @@ public class ProjectIntegrationIT {
 
     @AfterClass
     public static void oneTimeTearDown() {
-        IntegrationTestHelper.deleteProject(mgr, projectKey);
+        IntegrationTestHelper.deleteProject(transport, projectKey);
     }
 
     @Test(expected = NotFoundException.class)
@@ -107,7 +108,7 @@ public class ProjectIntegrationIT {
         Project projectToCreate = generateRandomProject();
         String key = null;
         try {
-            Project createdProject = projectManager.createProject(projectToCreate);
+            Project createdProject = projectToCreate.create();
             key = createdProject.getIdentifier();
 
             assertNotNull(
@@ -138,19 +139,18 @@ public class ProjectIntegrationIT {
     @Test
     public void testCreateGetUpdateDeleteProject() throws RedmineException {
         Project projectToCreate = generateRandomProject();
-        String key = null;
+        Project createdProject = null;
         try {
-            projectToCreate.setIdentifier("id" + new Date().getTime());
-            Project createdProject = projectManager.createProject(projectToCreate);
-            key = createdProject.getIdentifier();
+            createdProject = projectToCreate.setIdentifier("id" + new Date().getTime())
+                    .create();
             String newDescr = "NEW123";
             String newName = "new name here";
 
-            createdProject.setName(newName);
-            createdProject.setDescription(newDescr);
-            projectManager.update(createdProject);
+            createdProject.setName(newName)
+                    .setDescription(newDescr)
+                    .update();
 
-            Project updatedProject = projectManager.getProjectByKey(key);
+            Project updatedProject = projectManager.getProjectByKey(createdProject.getIdentifier());
             assertNotNull(updatedProject);
 
             assertEquals(createdProject.getIdentifier(),
@@ -163,30 +163,25 @@ public class ProjectIntegrationIT {
             assertTrue("checking that project has some trackers",
                     !(trackers.isEmpty()));
         } finally {
-            if (key != null) {
-                projectManager.deleteProject(key);
+            if (createdProject != null) {
+                createdProject.delete();
             }
         }
     }
 
     @Test
     public void createProjectFailsWithReservedIdentifier() throws Exception {
-        Project projectToCreate = ProjectFactory.create("new", "new");
-        String createdProjectKey = null;
+        Project projectToCreate = new Project(transport, "new", "new");
+        Project createdProject = null;
         try {
-            Project createdProject = projectManager.createProject(projectToCreate);
-            // in case if the creation haven't failed (although it should have
-            // had!),
-            // need to cleanup - delete this project
-            createdProjectKey = createdProject.getIdentifier();
-
+            createdProject = projectToCreate.create();
         } catch (RedmineProcessingException e) {
             assertNotNull(e.getErrors());
             assertEquals(1, e.getErrors().size());
             assertEquals("Identifier is reserved", e.getErrors().get(0));
         } finally {
-            if (createdProjectKey != null) {
-                projectManager.deleteProject(createdProjectKey);
+            if (createdProject != null) {
+                createdProject.delete();
             }
         }
     }
@@ -198,14 +193,15 @@ public class ProjectIntegrationIT {
         project.setDescription("test");
         final String longHomepageName = "http://www.localhost.com/asdf?a=\"&b=\"&c=\"&d=\"&e=\"&f=\"&g=\"&h=\"&i=\"&j=\"&k=\"&l=\"&m=\"&n=\"&o=\"&p=\"&q=\"&r=\"&s=\"&t=\"&u=\"&v=\"&w=\"&x=\"&y=\"&zо=авфбвоафжывлдаофжывладоджлфоывадлфоываждфлоываждфлоываждлфоываждлфова&&\\&&&&&&&&&&&&&&&&&&\\&&&&&&&&&&&&&&&&&&&&&&&&&&&&<>>";
         project.setHomepage(longHomepageName);
-        final Project created = projectManager.createProject(project);
+        Project created = projectManager.createProject(project);
         created.setDescription("updated description");
         try {
-            projectManager.update(created);
-            final Project updated = projectManager.getProjectByKey(project.getIdentifier());
+            created.update();
+
+            Project updated = projectManager.getProjectByKey(project.getIdentifier());
             assertEquals(longHomepageName, updated.getHomepage());
         } finally {
-            projectManager.deleteProject(created.getIdentifier());
+            created.delete();
         }
     }
 
@@ -254,9 +250,9 @@ public class ProjectIntegrationIT {
         return projects;
     }
 
-    private void deleteProjects(List<Project> projects) throws RedmineException {
+    private static void deleteProjects(List<Project> projects) throws RedmineException {
         for (Project p : projects) {
-            projectManager.deleteProject(p.getIdentifier());
+            p.delete();
         }
     }
 
@@ -266,7 +262,7 @@ public class ProjectIntegrationIT {
         String name = "project number " + timeStamp;
         String description = "some description for the project";
 
-        Project project = ProjectFactory.create(name, key);
+        Project project = new Project(transport, name, key);
         project.setDescription(description);
         project.setHomepage("www.randompage" + timeStamp + ".com");
         return project;
@@ -292,7 +288,7 @@ public class ProjectIntegrationIT {
                     createdMainProject.getId(), subProject.getParentId());
         } finally {
             if (createdMainProject != null) {
-                projectManager.deleteProject(createdMainProject.getIdentifier());
+                createdMainProject.delete();
             }
         }
     }
@@ -307,8 +303,8 @@ public class ProjectIntegrationIT {
     public void projectIsCreatedWithCustomField() throws RedmineException {
         List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();
         CustomFieldDefinition customFieldDefinition = getCustomFieldByName(customFieldDefinitions, "custom_project_field_1");
-        final Integer fieldId = customFieldDefinition.getId();
-        final CustomField customField = CustomFieldFactory.create(fieldId);
+        Integer fieldId = customFieldDefinition.getId();
+        CustomField customField = new CustomField().setId(fieldId);
         customField.setValue("value1");
         final Project project = generateRandomProject();
         project.setName("project-with-custom-field");
@@ -319,7 +315,7 @@ public class ProjectIntegrationIT {
             assertThat(createdProject.getCustomFieldById(fieldId).getValue()).isEqualTo("value1");
         } finally {
             if (createdProject != null) {
-                projectManager.deleteProject(createdProject.getIdentifier());
+                createdProject.delete();
             }
         }
     }
@@ -336,27 +332,23 @@ public class ProjectIntegrationIT {
         Project project = createProject();
         try {
             String name = "Test version " + UUID.randomUUID().toString();
-            Version version = VersionFactory.create(project.getId(), name);
-            version.setDescription("A test version created by " + this.getClass());
-            version.setStatus("open");
-            Version newVersion = projectManager.createVersion(version);
-            assertEquals("checking version name", name, newVersion.getName());
+            Version version = new Version(transport, project.getId(), name)
+                    .setDescription("A test version created by " + this.getClass())
+                    .setStatus("open")
+                    .create();
+            assertEquals("checking version name", name, version.getName());
 
-            projectManager.deleteVersion(newVersion);
+            version.delete();
             List<Version> versions = projectManager.getVersions(project.getId());
             assertTrue("List of versions of test project must be empty now but is "
                     + versions, versions.isEmpty());
         } finally {
-            projectManager.deleteProject(project.getIdentifier());
+            project.delete();
         }
     }
 
     /**
      * tests the retrieval of {@link Version}s.
-     *
-     * @throws RedmineException               thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test
     public void testGetVersions() throws RedmineException {
@@ -364,8 +356,10 @@ public class ProjectIntegrationIT {
         Version testVersion1 = null;
         Version testVersion2 = null;
         try {
-            testVersion1 = projectManager.createVersion(VersionFactory.create(project.getId(), "Version" + UUID.randomUUID()));
-            testVersion2 = projectManager.createVersion(VersionFactory.create(project.getId(), "Version" + UUID.randomUUID()));
+            testVersion1 = new Version(transport, project.getId(), "Version" + UUID.randomUUID())
+                    .create();
+            testVersion2 = new Version(transport, project.getId(), "Version" + UUID.randomUUID())
+                    .create();
             List<Version> versions = projectManager.getVersions(project.getId());
             assertEquals("Wrong number of versions for project "
                             + project.getName() + " delivered by Redmine Java API", 2,
@@ -378,100 +372,94 @@ public class ProjectIntegrationIT {
             }
         } finally {
             if (testVersion1 != null) {
-                projectManager.deleteVersion(testVersion1);
+                testVersion1.delete();
             }
             if (testVersion2 != null) {
-                projectManager.deleteVersion(testVersion2);
+                testVersion2.delete();
             }
-            projectManager.deleteProject(project.getIdentifier());
+            project.delete();
         }
     }
 
     @Test
     public void versionIsRetrievedById() throws RedmineException {
-        Version createdVersion = projectManager.createVersion(VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID()));
+        Version createdVersion = new Version(transport, projectId, "Version_1_" + UUID.randomUUID())
+                .create();
         Version versionById = projectManager.getVersionById(createdVersion.getId());
         assertEquals(createdVersion, versionById);
     }
 
     @Test
     public void versionIsUpdated() throws RedmineException {
-        Version createdVersion = projectManager.createVersion(VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID()));
+        Version createdVersion = new Version(transport, projectId, "Version_1_" + UUID.randomUUID())
+                .create();
         String description = "new description";
-        createdVersion.setDescription(description);
-        projectManager.update(createdVersion);
+
+        createdVersion.setDescription(description)
+                .update();
         Version versionById = projectManager.getVersionById(createdVersion.getId());
         assertEquals(description, versionById.getDescription());
     }
 
     @Test
     public void versionIsUpdatedIncludingDueDate() throws RedmineException {
-        Version createdVersion = projectManager.createVersion(VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID()));
+        Version createdVersion = new Version(transport, projectId, "Version_1_" + UUID.randomUUID())
+                .create();
         String description = "new description";
-        createdVersion.setDescription(description);
-        createdVersion.setDueDate(new Date());
-        projectManager.update(createdVersion);
+
+        createdVersion.setDescription(description)
+                .setDueDate(new Date())
+                .update();
         Version versionById = projectManager.getVersionById(createdVersion.getId());
         assertEquals(description, versionById.getDescription());
     }
 
     @Test
     public void versionSharingParameterIsSaved() throws RedmineException {
-        Version version = VersionFactory.create(projectId, "Version_1_" + UUID.randomUUID());
-        version.setSharing(Version.SHARING_NONE);
-        Version createdVersion = projectManager.createVersion(version);
+        Version createdVersion = new Version(transport, projectId, "Version_1_" + UUID.randomUUID())
+                .setSharing(Version.SHARING_NONE)
+                .create();
         Version versionById = projectManager.getVersionById(createdVersion.getId());
         assertEquals(Version.SHARING_NONE, versionById.getSharing());
 
-        Version versionShared = VersionFactory.create(projectId, "Version_2_" + UUID.randomUUID());
-        versionShared.setSharing(Version.SHARING_HIERARCHY);
-        Version createdVersion2 = projectManager.createVersion(versionShared);
+        Version createdVersion2 = new Version(transport, projectId, "Version_2_" + UUID.randomUUID())
+        .setSharing(Version.SHARING_HIERARCHY)
+                .create();
         Version version2ById = projectManager.getVersionById(createdVersion2.getId());
         assertEquals(Version.SHARING_HIERARCHY, version2ById.getSharing());
     }
 
     private Project createProject() throws RedmineException {
         long id = new Date().getTime();
-        Project mainProject = ProjectFactory.create("project" + id, "project" + id);
-        return projectManager.createProject(mainProject);
+        return new Project(transport, "project" + id, "project" + id)
+                .create();
     }
 
     private Project createSubProject(Project parent) throws RedmineException {
         long id = new Date().getTime();
-        Project project = ProjectFactory.create("sub_pr" + id, "subpr" + id);
-        project.setParentId(parent.getId());
-        return projectManager.createProject(project);
+        return new Project(transport, "sub_pr" + id, "subpr" + id)
+                .setParentId(parent.getId())
+                .create();
     }
 
-    /**
-     * tests the creation of an invalid {@link Version}.
-     *
-     * @throws RedmineException               thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException              thrown in case the objects requested for could not be found
-     */
-    @Test(expected = IllegalArgumentException.class)
-    public void testCreateInvalidVersion() throws RedmineException {
-        Version version = VersionFactory.create(null, "Invalid version " + UUID.randomUUID().toString());
-        projectManager.createVersion(version);
+    @Test(expected = NotFoundException.class)
+    public void versionWithNonExistingProjectIdGivesNotFoundException() throws RedmineException {
+        new Version(transport, -1, "Invalid version " + UUID.randomUUID().toString())
+                .create();
     }
 
     /**
      * tests the deletion of an invalid {@link Version}. Expects a
      * {@link NotFoundException} to be thrown.
-     *
-     * @throws RedmineException               thrown in case something went wrong in Redmine
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws NotFoundException              thrown in case the objects requested for could not be found
      */
     @Test(expected = NotFoundException.class)
     public void testDeleteInvalidVersion() throws RedmineException {
-        // create new test version with invalid id: -1.
-        Version version = VersionFactory.create(-1);
-        version.setName("name invalid version " + UUID.randomUUID().toString());
-        version.setDescription("An invalid test version created by " + this.getClass());
-        // now try to delete version
-        projectManager.deleteVersion(version);
+        // version with invalid id: -1.
+        Version version = new Version(transport, projectId, "123").setId(-1)
+                .setName("name invalid version " + UUID.randomUUID().toString())
+                .setDescription("An invalid test version created by " + this.getClass());
+
+        version.delete();
     }
 
     @Test

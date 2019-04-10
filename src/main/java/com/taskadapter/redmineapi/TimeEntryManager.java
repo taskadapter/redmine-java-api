@@ -69,28 +69,22 @@ public final class TimeEntryManager {
         return DirectObjectsSearcher.getObjectsListNoPaging(transport, parameters, TimeEntry.class);
     }
 
+    @Deprecated
     public TimeEntry createTimeEntry(TimeEntry obj) throws RedmineException {
-        validate(obj);
-        return transport.addObject(obj);
+        return obj.create();
     }
 
-    private void validate(TimeEntry obj) {
-        if (!obj.isValid()) {
-            throw new IllegalArgumentException("You have to either define a Project or Issue ID for a Time Entry. "
-                    + "The given Time Entry object has neither defined.");
-        }
-    }
-
+    @Deprecated
     public void deleteTimeEntry(Integer id) throws RedmineException {
-        transport.deleteObject(TimeEntry.class, Integer.toString(id));
+        new TimeEntry(transport).setId(id).delete();
     }
 
     public List<TimeEntryActivity> getTimeEntryActivities() throws RedmineException {
         return transport.getObjectsList(TimeEntryActivity.class);
     }
 
+    @Deprecated
     public void update(TimeEntry obj) throws RedmineException {
-        validate(obj);
-        transport.updateObject(obj);
+        obj.update();
     }
 }

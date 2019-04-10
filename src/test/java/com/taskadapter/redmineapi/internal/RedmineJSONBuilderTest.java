@@ -1,20 +1,17 @@
 package com.taskadapter.redmineapi.internal;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import com.taskadapter.redmineapi.bean.Group;
-import com.taskadapter.redmineapi.bean.GroupFactory;
-import com.taskadapter.redmineapi.bean.IssueFactory;
-import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
-import org.junit.Test;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.Version;
-import com.taskadapter.redmineapi.bean.VersionFactory;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldFactory;
+import com.taskadapter.redmineapi.bean.Group;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.User;
+import com.taskadapter.redmineapi.bean.Version;
+import org.junit.Test;
+
 import java.util.Collections;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class RedmineJSONBuilderTest {
 
@@ -32,7 +29,7 @@ public class RedmineJSONBuilderTest {
 	 */
 	@Test
 	public void customFieldsAreWrittenToVersionIfProvided() {
-		Version version = VersionFactory.create(1);
+		Version version = new Version().setId(1);
 		CustomField field = CustomFieldFactory.create(2, "myName", "myValue");
 		version.addCustomFields(Collections.singletonList(field));
 
@@ -42,15 +39,15 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void fieldsExplicitlySetToNullAreAddedToIssueJSonAsNull() {
-		Issue issue = IssueFactory.create(null);
-		issue.setSubject("subj1");
-		issue.setDescription(null);
-		issue.setDoneRatio(null);
-		issue.setParentId(null);
-		issue.setAssigneeId(null);
-		issue.setEstimatedHours(null);
-		issue.setSpentHours(null);
-		issue.setNotes(null);
+		Issue issue = new Issue().setId(null)
+				.setSubject("subj1")
+				.setDescription(null)
+				.setDoneRatio(null)
+				.setParentId(null)
+				.setAssigneeId(null)
+				.setEstimatedHours(null)
+				.setSpentHours(null)
+				.setNotes(null);
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON("some_project_key", issue, RedmineJSONBuilder::writeIssue);
 		assertThat(generatedJSON).contains("\"id\":null");
 		assertThat(generatedJSON).contains("\"subject\":\"subj1\"");
@@ -65,7 +62,7 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void onlyExplicitlySetFieldsAreAddedToUserJSon() {
-		User user = UserFactory.create()
+		User user = new User(null)
 				.setLogin("login1")
 				.setMail(null)
 				.setStatus(null);
@@ -78,11 +75,11 @@ public class RedmineJSONBuilderTest {
 
 	@Test
 	public void onlyExplicitlySetFieldsAreAddedToGroupJSon() {
-		Group groupWithoutName = GroupFactory.create(4);
+		Group groupWithoutName = new Group(null).setId(4);
 		final String generatedJSON = RedmineJSONBuilder.toSimpleJSON("some_project_key", groupWithoutName, RedmineJSONBuilder::writeGroup);
 		assertThat(generatedJSON).doesNotContain("\"name\"");
 
-		Group groupWithName = GroupFactory.create(4);
+		Group groupWithName = new Group(null).setId(4);
 		groupWithName.setName("some name");
 		final String generatedJSONWithName = RedmineJSONBuilder.toSimpleJSON("some_project_key", groupWithName, RedmineJSONBuilder::writeGroup);
 		assertThat(generatedJSONWithName).contains("\"name\":\"some name\"");

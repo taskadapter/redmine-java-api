@@ -5,7 +5,7 @@ public class TimeEntryActivity {
     /**
      * database Id
      */
-    private final Integer id;
+    private Integer id;
 
     private String name;
     private boolean isDefault;
@@ -13,8 +13,9 @@ public class TimeEntryActivity {
     /**
      * @param id database Id
      */
-    TimeEntryActivity(Integer id) {
+    public TimeEntryActivity setId(Integer id) {
         this.id = id;
+        return this;
     }
 
     public Integer getId() {
@@ -25,16 +26,18 @@ public class TimeEntryActivity {
         return name;
     }
 
-    public void setName(String name) {
+    public TimeEntryActivity setName(String name) {
         this.name = name;
+        return this;
     }
 
     public boolean isDefault() {
         return isDefault;
     }
 
-    public void setDefault(boolean isDefault) {
+    public TimeEntryActivity setDefault(boolean isDefault) {
         this.isDefault = isDefault;
+        return this;
     }
 
     @Override

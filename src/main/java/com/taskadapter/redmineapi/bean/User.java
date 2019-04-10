@@ -1,5 +1,8 @@
 package com.taskadapter.redmineapi.bean;
 
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.Transport;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -7,9 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Redmine's User.
+ * Redmine User.
  */
-public class User implements Identifiable {
+public class User implements Identifiable, FluentStyle {
 
     public static final Integer STATUS_ANONYMOUS = 0;
 
@@ -19,7 +22,7 @@ public class User implements Identifiable {
 
     public static final Integer STATUS_LOCKED = 3;
 
-    private final PropertyStorage storage;
+    private final PropertyStorage storage = new PropertyStorage();
 
     public final static Property<Integer> ID = new Property<>(Integer.class, "id");
     public final static Property<String> LOGIN = new Property<>(String.class, "login");
@@ -40,27 +43,22 @@ public class User implements Identifiable {
     public final static Property<Set<Membership>> MEMBERSHIP = (Property<Set<Membership>>) new Property(Set.class, "membership");
     public final static Property<Set<Group>> GROUPS = (Property<Set<Group>>) new Property(Set.class, "groups");
 
-    /**
-     * Use UserFactory to create instances of this class.
-     *
-     * @param id database ID.
-     *
-     * @see UserFactory
-     */
-    public User(Integer id) {
-        this();
-        storage.set(ID, id);
-    }
+    private Transport transport;
 
-    public User() {
-        this.storage = new PropertyStorage();
+    public User(Transport transport) {
         initCollections();
+        setTransport(transport);
     }
 
     private void initCollections() {
         this.storage.set(CUSTOM_FIELDS, new HashSet<>());
         this.storage.set(MEMBERSHIP, new HashSet<>());
         this.storage.set(GROUPS, new HashSet<>());
+    }
+
+    public User setId(int id) {
+        storage.set(ID, id);
+        return this;
     }
 
     @Override
@@ -318,5 +316,41 @@ public class User implements Identifiable {
 
     public PropertyStorage getStorage() {
         return storage;
+    }
+
+    @Override
+    public void setTransport(Transport transport) {
+        this.transport = transport;
+        PropertyStorageUtil.updateCollections(storage, transport);
+    }
+
+    public User create() throws RedmineException {
+        return transport.addObject(this);
+    }
+
+    public void update() throws RedmineException {
+        transport.updateObject(this);
+    }
+
+    /**
+     * Adds this user (ID must be set!) to the given group.
+     * <p>
+     * Note: "add to group" operation used to be safe (idempotent) for Redmine 2.6.x, but FAILS for Redmine 3.0.0 when
+     * executed twice on the same user. I submitted a bug: http://www.redmine.org/issues/19363 which was closed as
+     * "invalid"...
+     *
+     * @param groupId - id of the group to add to.
+     * @throws RedmineException
+     * @since Redmine 2.1
+     */
+    public void addToGroup(int groupId) throws RedmineException {
+        transport.addUserToGroup(getId(), groupId);
+    }
+
+    /**
+     * The user object must have ID set.
+     */
+    public void delete() throws RedmineException {
+        transport.deleteObject(User.class, Integer.toString(getId()));
     }
 }

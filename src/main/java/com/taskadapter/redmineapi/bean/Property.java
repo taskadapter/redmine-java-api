@@ -18,10 +18,6 @@ public class Property<T> {
         return type;
     }
 
-    T cloneDeep(Object t) {
-        return (T) t;
-    }
-
     @Override
     public String toString() {
         return "Property{" +

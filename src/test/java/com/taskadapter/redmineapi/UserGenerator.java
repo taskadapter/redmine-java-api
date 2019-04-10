@@ -1,14 +1,14 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.User;
-import com.taskadapter.redmineapi.bean.UserFactory;
+import com.taskadapter.redmineapi.internal.Transport;
 
 import java.util.Date;
 
 public class UserGenerator {
-    public static User generateRandomUser() {
+    public static User generateRandomUser(Transport transport) {
         long randomNumber = new Date().getTime();
-        return UserFactory.create()
+        return new User(transport)
                 .setFirstName("fname")
                 .setLastName("lname")
                 .setLogin("login" + randomNumber)

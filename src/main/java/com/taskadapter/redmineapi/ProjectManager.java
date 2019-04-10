@@ -1,10 +1,8 @@
 package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.bean.Membership;
-import com.taskadapter.redmineapi.bean.MembershipFactory;
 import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
-import com.taskadapter.redmineapi.bean.ProjectFactory;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -29,13 +27,6 @@ import java.util.Set;
  projectManager.getProjectById(123);
 
  projects = projectManager.getProjects();
-
- // create project
- Project project = ProjectFactory.create();
- project.setName("MyProject");
- project.setDescription("description");
- project.setHomepage("www.mypage.com");
- createdProject = projectManager.createProject(project);
  * </pre>
  *
  * @see RedmineManager#getIssueManager()
@@ -48,29 +39,9 @@ public class ProjectManager {
     }
 
     /**
-     * Sample usage:
-     * 
-     * <pre>
-     * {@code
-     * 	Project project = new Project();
-     * 	Long timeStamp = Calendar.getInstance().getTimeInMillis();
-     * 	String key = "projkey" + timeStamp;
-     * 	String name = &quot;project number &quot; + timeStamp;
-     * 	String description = &quot;some description for the project&quot;;
-     * 	project.setIdentifier(key);
-     * 	project.setName(name);
-     * 	project.setDescription(description);
-     *
-     * 	Project createdProject = mgr.createProject(project);
-     * }
-     * </pre>
-     *
-     * @param project project to create on the server
-     * @return the newly created Project object.
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws RedmineException
+     * DEPRECATED. use project.create() instead
      */
+    @Deprecated
     public Project createProject(Project project) throws RedmineException {
         return transport.addObject(project, new BasicNameValuePair("include",
                 "trackers"));
@@ -127,45 +98,25 @@ public class ProjectManager {
     }
 
     /**
-     * @param projectKey string key like "project-ABC", NOT a database numeric ID
-     * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which
-     *                                 requires authorization. Check the constructor arguments.
-     * @throws NotFoundException       if the project with the given key is not found
-     * @throws RedmineException
+     * DEPRECATED. use project.delete() instead
      */
+    @Deprecated
     public void deleteProject(String projectKey) throws RedmineException {
         transport.deleteObject(Project.class, projectKey);
     }
 
     /**
-     * creates a new {@link com.taskadapter.redmineapi.bean.Version} for the {@link Project} contained. <br>
-     * Pre-condition: the attribute {@link Project} for the {@link com.taskadapter.redmineapi.bean.Version} must
-     * not be null!
-     *
-     * @param version the {@link com.taskadapter.redmineapi.bean.Version}. Must contain a {@link Project}.
-     * @return the new {@link com.taskadapter.redmineapi.bean.Version} created by Redmine
-     * @throws IllegalArgumentException thrown in case the version does not contain a project.
-     * @throws RedmineAuthenticationException  thrown in case something went wrong while trying to login
-     * @throws RedmineException         thrown in case something went wrong in Redmine
-     * @throws NotFoundException        thrown in case an object can not be found
+     * DEPRECATED. use version.create() instead.
      */
+    @Deprecated
     public Version createVersion(Version version) throws RedmineException {
-        // check project
-        if (version.getProjectId() == null) {
-            throw new IllegalArgumentException(
-                    "Version must contain projectId");
-        }
-        return transport.addChildEntry(Project.class, version.getProjectId().toString(), version);
+        return version.create();
     }
 
     /**
-     * deletes a new {@link Version} from the {@link Project} contained. <br>
-     *
-     * @param version the {@link Version}.
-     * @throws RedmineAuthenticationException thrown in case something went wrong while trying to login
-     * @throws RedmineException        thrown in case something went wrong in Redmine
-     * @throws NotFoundException       thrown in case an object can not be found
+     * DEPRECATED. use version.create() instead.
      */
+    @Deprecated
     public void deleteVersion(Version version) throws RedmineException {
         transport
                 .deleteObject(Version.class, Integer.toString(version.getId()));
@@ -190,10 +141,12 @@ public class ProjectManager {
         return transport.getObject(Version.class, versionId);
     }
 
+    @Deprecated
     public void update(Project object) throws RedmineException {
         transport.updateObject(object);
     }
 
+    @Deprecated
     public void update(Version object) throws RedmineException {
         transport.updateObject(object);
     }
@@ -211,27 +164,31 @@ public class ProjectManager {
         return transport.getObjectsList(News.class, params);
     }
 
+    /**
+     * DEPRECATED. use membership.create()
+     */
+    @Deprecated
     public Membership addUserToProject(int projectId, int userId, Collection<Role> roles) throws RedmineException {
-        Membership membership = MembershipFactory.create();
-        Project project = ProjectFactory.create(projectId);
-        membership.setProject(project);
-        membership.setUserId(userId);
-        membership.addRoles(roles);
-        return addMembership(membership);
+        return new Membership(transport)
+                .setProject(new Project(transport).setId(projectId))
+                .setUserId(userId)
+                .addRoles(roles)
+                .create();
     }
 
+    /**
+     * DEPRECATED. use membership.create()
+     */
+    @Deprecated
     public Membership addGroupToProject(int projectId, int groupId, Collection<Role> roles) throws RedmineException {
-        Membership membership = MembershipFactory.create();
-        Project project = ProjectFactory.create(projectId);
-        membership.setProject(project);
-        // This is nuts, but according to the documentation the way it is supposed
-        // to work:
+        // "add user" and "add group" behave exactly the same way, actually. see
         // http://www.redmine.org/projects/redmine/wiki/Rest_Memberships#POST
         // http://www.redmine.org/issues/17904
-        membership.setUserId(groupId);
-        membership.addRoles(roles);
-
-        return addMembership(membership);
+        return new Membership(transport)
+                .setProject(new Project(transport).setId(projectId))
+                .setUserId(groupId)
+                .addRoles(roles)
+                .create();
     }
 
     /**
@@ -256,30 +213,26 @@ public class ProjectManager {
     }
 
     /**
-     * Remove the project member from the project. This does not delete the user/group itself.
-     *
-     * @param membershipId id of the "membership" relation
+     * DEPRECATED. use membership.delete() instead.
      */
+    @Deprecated
     public void deleteProjectMembership(int membershipId) throws RedmineException {
         transport.deleteObject(Membership.class, Integer.toString(membershipId));
     }
 
+    /**
+     * DEPRECATED. use membership.delete() instead.
+     */
+    @Deprecated
     public void deleteProjectMembership(Membership membership) throws RedmineException {
         transport.deleteObject(Membership.class, membership.getId().toString());
     }
 
+    /**
+     * DEPRECATED. use membership.update() instead.
+     */
+    @Deprecated
     public void updateProjectMembership(Membership membership) throws RedmineException {
         transport.updateObject(membership);
-    }
-
-    private Membership addMembership(Membership membership) throws RedmineException {
-        final Project project = membership.getProject();
-        if (project == null) {
-            throw new IllegalArgumentException("Project must be set");
-        }
-        if (membership.getUserId() == null && membership.getRoles().isEmpty()) {
-            throw new IllegalArgumentException("Either User or Roles field must be set");
-        }
-        return transport.addChildEntry(Project.class, project.getId() + "", membership);
     }
 }
