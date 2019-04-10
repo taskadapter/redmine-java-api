@@ -44,6 +44,7 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * This is the *database ID*, not a String-based key.
      */
     public final static Property<Integer> PARENT_DATABASE_ID = new Property<>(Integer.class, "parentId");
+    public final static Property<Integer> STATUS = new Property<>(Integer.class, "status");
     public final static Property<Boolean> PUBLIC = new Property<>(Boolean.class, "public");
     public final static Property<Boolean> INHERIT_MEMBERS = new Property<>(Boolean.class, "inheritMembers");
     public final static Property<Set<CustomField>> CUSTOM_FIELDS = (Property<Set<CustomField>>) new Property(Set.class, "customFields");
@@ -186,6 +187,33 @@ public class Project implements Identifiable, Serializable, FluentStyle {
     public Project setParentId(Integer parentId) {
         storage.set(PARENT_DATABASE_ID, parentId);
         return this;
+    }
+
+    /**
+     * Returns the project status. This number can theoretically be different for different Redmine versions,
+     * But the **current Redmine version in 2018** defines these numbers as:
+     * <ul>
+     *   <li>1: status active</li>
+     *   <li>5: status closed</li>
+     *   <li>9: status archived</li>
+     * </ul>
+     * 
+     * <p>see http://www.redmine.org/projects/redmine/repository/entry/trunk/app/models/project.rb
+     *
+     * @return possibly Redmine-version-specific number that represents project status (active/closed/archived)
+     * @since Redmine REST API 2.5.0
+     */
+    public Integer getStatus() {
+    	return storage.get(STATUS);
+    }
+    /**
+     * Sets the project status (Note that this will not take effect when updating a project as
+     * the **current Redmine version in 2018** does not allow reopen, close or archive projects,
+     * see https://www.redmine.org/issues/13725)
+     */
+    public Project setStatus(Integer status) {
+    	storage.set(STATUS, status);
+    	return this;
     }
 
     /**

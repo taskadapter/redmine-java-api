@@ -105,6 +105,7 @@ public class ProjectIntegrationIT {
 
     @Test
     public void testCreateProject() throws RedmineException {
+    	final Integer statusActive = 1;
         Project projectToCreate = generateRandomProject();
         String key = null;
         try {
@@ -123,6 +124,8 @@ public class ProjectIntegrationIT {
                     createdProject.getDescription());
             assertEquals(projectToCreate.getHomepage(),
                     createdProject.getHomepage());
+            assertEquals(statusActive, 
+            		createdProject.getStatus());
 
             Collection<Tracker> trackers = createdProject.getTrackers();
             assertNotNull("checking that project has some trackers",
@@ -138,6 +141,8 @@ public class ProjectIntegrationIT {
 
     @Test
     public void testCreateGetUpdateDeleteProject() throws RedmineException {
+    	final Integer statusActive = 1;
+    	final Integer statusClosed = 5;
         Project projectToCreate = generateRandomProject();
         Project createdProject = null;
         try {
@@ -148,6 +153,7 @@ public class ProjectIntegrationIT {
 
             createdProject.setName(newName)
                     .setDescription(newDescr)
+                    .setStatus(statusClosed)
                     .update();
 
             Project updatedProject = projectManager.getProjectByKey(createdProject.getIdentifier());
@@ -157,6 +163,8 @@ public class ProjectIntegrationIT {
                     updatedProject.getIdentifier());
             assertEquals(newName, updatedProject.getName());
             assertEquals(newDescr, updatedProject.getDescription());
+            //status should not change to closed as currently redmine api does not allow reopen/close/archive projects
+            assertEquals(statusActive, updatedProject.getStatus());
             Collection<Tracker> trackers = updatedProject.getTrackers();
             assertNotNull("checking that project has some trackers",
                     trackers);

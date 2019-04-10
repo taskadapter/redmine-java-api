@@ -164,6 +164,7 @@ public final class RedmineJSONParser {
 				"parent");
 		if (parentProject != null)
 			result.setParentId(JsonInput.getInt(parentProject, "id"));
+		result.setStatus(JsonInput.getIntOrNull(content, "status"));
 		result.addTrackers(JsonInput.getListOrEmpty(content, "trackers", RedmineJSONParser::parseTracker));
         result.addCustomFields(JsonInput.getListOrEmpty(content, "custom_fields", RedmineJSONParser::parseCustomField));
 		return result;
