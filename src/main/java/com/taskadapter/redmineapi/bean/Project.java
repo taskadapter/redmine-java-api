@@ -119,7 +119,7 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      */
     public Collection<Tracker> getTrackers() {
     	if (!storage.isPropertySet(TRACKERS)) //checks because trackers storage is not created for new projects
-    		return new HashSet<>();
+    		return Collections.unmodifiableCollection(new HashSet<Tracker>());
         return Collections.unmodifiableCollection(storage.get(TRACKERS));
     }
 
