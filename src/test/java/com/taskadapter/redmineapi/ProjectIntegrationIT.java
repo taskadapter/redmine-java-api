@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -213,12 +214,67 @@ public class ProjectIntegrationIT {
         }
     }
 
-    // Redmine ignores this parameter for "get projects" request. see bug
-    // http://www.redmine.org/issues/8545
-    // The field is already accessible for a specific project for a long time (GET /projects/:id)
-    // but in the projects list (GET /projects) it's only on the svn trunk for now (Sep 8, 2014).
-    // It will be included in Redmine 2.6.0 which isn't out yet.
-    @Ignore
+    @Test
+    public void testUpdateTrackersBeforeRedmineUpdate() throws RedmineException {
+        //Trackers are undefined for new project beans, updating trackers on the project object should be allowed
+        Project projectToCreate = generateRandomProject();
+        assertEquals(0, projectToCreate.getTrackers().size());
+        
+        Collection<Tracker> trackers=new HashSet<>(Arrays.asList(new Tracker().setId(1).setName("Bug")));
+        projectToCreate.addTrackers(trackers);
+        assertEquals(1, projectToCreate.getTrackers().size());
+        
+        projectToCreate.clearTrackers();
+        assertEquals(0, projectToCreate.getTrackers().size());
+    }
+    
+    @Test
+    public void testUpdateTrackersAfterRedimineUpdate() throws RedmineException {
+        //Prerequisite: verify that redmine server has at least 3 trackers (e.g. default configuration)
+        List<Tracker> availableTrackers=mgr.getIssueManager().getTrackers();
+        assertTrue("a minumum of 3 trackers should be configured in redmine", availableTrackers.size()>=3);
+
+        Project projectToCreate = generateRandomProject();
+        String createdProjectKey = null;
+        try {
+            //project created with default trackers has been tested by testCreateProject
+            //test override of default trackers on project creation
+            Project createdProject = projectToCreate.clearTrackers().create();
+            createdProjectKey = createdProject.getIdentifier();
+            assertEquals(0, createdProject.getTrackers().size());
+           
+            //add single tracker
+            Collection<Tracker> trackersToSet=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(0)));
+            createdProject.addTrackers(trackersToSet).update();
+            createdProject=projectManager.getProjectByKey(createdProjectKey);
+            assertEquals(1, createdProject.getTrackers().size());
+
+            //add more than one tracker, it does not replace previous trackers
+            Collection<Tracker> trackersToAdd=new HashSet<Tracker>(Arrays.asList(availableTrackers.get(1), availableTrackers.get(2)));
+            createdProject.addTrackers(trackersToAdd).update();
+            createdProject=projectManager.getProjectByKey(createdProjectKey);
+            assertEquals(3, createdProject.getTrackers().size());
+            
+            //all trackers can be removed
+            createdProject.clearTrackers().update();
+            createdProject=projectManager.getProjectByKey(createdProjectKey);
+            assertEquals(0, createdProject.getTrackers().size());
+        } finally {
+            if (createdProjectKey != null) {
+            	projectManager.getProjectByKey(createdProjectKey).delete();
+            }
+        }
+    }
+
+    @Test(expected = NotFoundException.class)
+    public void testUpdateTrackersInvalidGivesException() throws RedmineException {
+        int nonExistingTrackerId = 99999999;
+        Collection<Tracker> trackers=new HashSet<>(Arrays.asList(new Tracker().setId(nonExistingTrackerId).setName("NonExisting")));
+        Project projectToCreate = generateRandomProject();
+        projectToCreate.addTrackers(trackers);
+        projectToCreate.create();
+    }
+
     @Test
     public void testGetProjectsIncludesTrackers() throws RedmineException {
         List<Project> projects = projectManager.getProjects();

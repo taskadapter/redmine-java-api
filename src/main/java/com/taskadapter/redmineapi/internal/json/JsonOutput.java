@@ -160,7 +160,7 @@ public class JsonOutput {
 	}
 
 	/**
-	 * Adds a list.
+	 * Adds a list of scalar values.
 	 * 
 	 * @param writer
 	 *            used writer.
@@ -169,18 +169,21 @@ public class JsonOutput {
 	 * @param items
 	 *            used items.
 	 * @param objWriter
-	 *            single object writer.
+	 *            single value writer.
 	 */
-	public static <T> void addArrayIfNotNull(JSONWriter writer, String field,
+	public static <T> void addScalarArray(JSONWriter writer, String field,
 			Collection<T> items, JsonObjectWriter<T> objWriter)
 			throws JSONException {
-		if (items == null)
-			return;
-		addCollection(writer, field, items, objWriter);
+		writer.key(field);
+		writer.array();
+		for (T item : items) {
+			objWriter.write(writer, item);
+		}
+		writer.endArray();
 	}
 
 	/**
-	 * Adds a list.
+	 * Adds a list of objects.
 	 * 
 	 * @param writer
 	 *            used writer.

@@ -58,7 +58,6 @@ public class Project implements Identifiable, Serializable, FluentStyle {
     public Project(Transport transport) {
         this.transport = transport;
         storage.set(CUSTOM_FIELDS, new HashSet<>());
-        storage.set(TRACKERS, new HashSet<>());
     }
 
     public Project(Transport transport, String name, String key) {
@@ -120,11 +119,29 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * @return Trackers allowed in this project (e.g.: Bug, Feature, Support, Task, ...)
      */
     public Collection<Tracker> getTrackers() {
+    	if (!storage.isPropertySet(TRACKERS)) //checks because trackers storage is not created for new projects
+    		return Collections.unmodifiableCollection(new HashSet<Tracker>());
         return Collections.unmodifiableCollection(storage.get(TRACKERS));
     }
 
-    public void addTrackers(Collection<Tracker> trackers) {
+    /**
+     * Adds the specified trackers to this project.
+     * If this project is created or updated on the redmine server, 
+     * each tracker id must be a valid tracker on the server.
+     */
+    public Project addTrackers(Collection<Tracker> trackers) {
+    	if (!storage.isPropertySet(TRACKERS)) //checks because trackers storage is not created for new projects
+    		storage.set(TRACKERS, new HashSet<>());
         storage.get(TRACKERS).addAll(trackers);
+        return this;
+    }
+
+    /**
+     * Removes all of the trackers from this project.
+     */
+    public Project clearTrackers() {
+    	storage.set(TRACKERS, new HashSet<>());
+    	return this;
     }
 
     public Tracker getTrackerByName(String trackerName) {
@@ -304,6 +321,12 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * 	  .create();
      * }
      * </pre>
+     * <p> 
+     * Note: if {@code project} trackers have not been set with {@link Project#addTrackers} 
+     * and if they have been cleared with {@link Project#clearTrackers},
+     * the created project will get the server default trackers (if any).
+     * Otherwise, the {@code Project} trackers will override the server default settings. 
+     * </p>
      *
      * @return the newly created Project object.
      * @throws RedmineAuthenticationException invalid or no API access key is used with the server, which

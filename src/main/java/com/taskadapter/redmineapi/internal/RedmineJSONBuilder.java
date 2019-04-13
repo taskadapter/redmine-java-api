@@ -27,6 +27,7 @@ import org.json.JSONWriter;
 
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -76,24 +77,6 @@ public class RedmineJSONBuilder {
 		addIfSetFullDate(writer, "created_on", storage, TimeEntry.SPENT_ON);
 		addIfSetFullDate(writer, "updated_on", storage, TimeEntry.SPENT_ON);
 		writeCustomFields(writer, timeEntry.getCustomFields());
-	}
-
-	/**
-	 * Writes a tracker.
-	 * 
-	 * @param writer
-	 *            used writer.
-	 * @param tracker
-	 *            tracker to writer.
-	 * @throws JSONException
-	 *             if error occurs.
-	 */
-	static void writeTracker(JSONWriter writer, Tracker tracker)
-			throws JSONException {
-		writer.key("id");
-		writer.value(tracker.getId());
-		writer.key("name");
-		writer.value(tracker.getName());
 	}
 
 	static void writeRelation(JSONWriter writer, IssueRelation relation)
@@ -165,7 +148,21 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "status", storage, Project.STATUS);
 		addIfSet(writer, "is_public", storage, Project.PUBLIC);
 		addIfSet(writer, "inherit_members", storage, Project.INHERIT_MEMBERS);
-		JsonOutput.addArrayIfNotNull(writer, "trackers", project.getTrackers(), RedmineJSONBuilder::writeTracker);
+		writeProjectTrackers(writer, project);
+	}
+	private static void writeProjectTrackers(JSONWriter writer, Project project) throws JSONException {
+		//skip if storage is not already set to allow new projects get the redmine system default trackers
+		PropertyStorage storage = project.getStorage();
+		if (storage.isPropertySet(Project.TRACKERS)) {
+			Collection<Integer> trackerIds=new ArrayList<>();
+			for (Tracker tracker : project.getTrackers())
+				trackerIds.add(tracker.getId());
+			JsonOutput.addScalarArray(writer, "tracker_ids", trackerIds, RedmineJSONBuilder::writeScalarValue);			
+		}
+	}
+
+	static void writeScalarValue(JSONWriter writer, Object object) throws JSONException {
+		writer.value(object);
 	}
 
 	public static void writeCategory(final JSONWriter writer, IssueCategory category) throws JSONException {
