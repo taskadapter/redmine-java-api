@@ -274,7 +274,7 @@ public final class Transport {
 					" it is required to identify the object in the target system");
 		}
 		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
-				Integer.toString(id));
+				Integer.toString(id), params);
 		final HttpPut http = new HttpPut(uri);
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
