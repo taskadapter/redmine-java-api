@@ -3,6 +3,7 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.WikiPage;
 import com.taskadapter.redmineapi.bean.WikiPageDetail;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -55,7 +56,7 @@ public class WikiManager {
      */
     public WikiPageDetail getWikiPageDetailByProjectAndTitle(String projectKey, String pageTitle) throws RedmineException {
         String urlSafeString = WikiPageDetail.getUrlSafeString(pageTitle);
-        WikiPageDetail wikiPageDetail = transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, urlSafeString, new BasicNameValuePair("include", "attachments"));
+        WikiPageDetail wikiPageDetail = transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, urlSafeString, new RequestParam("include", "attachments"));
         // Redmine REST API does not provide projectKey in response, so...
         wikiPageDetail.setProjectKey(projectKey);
         return wikiPageDetail;

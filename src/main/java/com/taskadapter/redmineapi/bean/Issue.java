@@ -5,6 +5,7 @@ import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
 import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -613,14 +614,14 @@ public class Issue implements Identifiable, FluentStyle {
      * @throws NotFoundException       the required project is not found
      * @throws RedmineException
      */
-    public Issue create(NameValuePair... params) throws RedmineException {
-        NameValuePair[] enrichParams = Arrays.copyOf(params, params.length + 1);
-        enrichParams[params.length] = new BasicNameValuePair("include",
+    public Issue create(RequestParam... params) throws RedmineException {
+        RequestParam[] enrichParams = Arrays.copyOf(params, params.length + 1);
+        enrichParams[params.length] = new RequestParam("include",
                 Include.attachments.toString());
         return transport.addObject(this, enrichParams);
     }
 
-    public void update(NameValuePair... params) throws RedmineException {
+    public void update(RequestParam... params) throws RedmineException {
         transport.updateObject(this, params);
     }
 

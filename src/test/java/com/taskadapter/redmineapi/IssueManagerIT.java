@@ -18,6 +18,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
@@ -301,6 +302,19 @@ public class IssueManagerIT {
         // check AUTHOR
         Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser(transport).getId();
         assertEquals(EXPECTED_AUTHOR_ID, issue.getAuthorId());
+    }
+
+    @Test
+    public void testCreateIssueWithParams() throws RedmineException {
+        RequestParam param = new RequestParam(" ", "");
+        Issue issue = new Issue(transport, projectId).setSubject( "This is the Issue with params")
+                .create(param);
+        assertNotNull("Checking returned result", issue);
+        assertNotNull("New issue must have some ID", issue.getId());
+
+        // check AUTHOR
+        Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser(transport).getId();
+//        assertEquals(EXPECTED_AUTHOR_ID, issue.get);
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.message.BasicNameValuePair;
@@ -83,7 +84,7 @@ public class UserManager {
      * @throws RedmineException
      */
     public List<User> getUsers() throws RedmineException {
-        return transport.getObjectsList(User.class, new BasicNameValuePair(
+        return transport.getObjectsList(User.class, new RequestParam(
                 "include", "memberships,groups"));
     }
 
@@ -111,7 +112,7 @@ public class UserManager {
      * This does NOT require Admin privileges by default Redmine installation (tested with Redmine 2.0.3).
      */
     public User getUserById(Integer userId) throws RedmineException {
-        return transport.getObject(User.class, userId, new BasicNameValuePair(
+        return transport.getObject(User.class, userId, new RequestParam(
                 "include", "memberships,groups"));
     }
 

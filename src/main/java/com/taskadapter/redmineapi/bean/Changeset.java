@@ -7,6 +7,7 @@ import java.util.Date;
  */
 public class Changeset {
 
+
     private final PropertyStorage storage;
 
     public final static Property<String> REVISION = new Property<>(String.class, "revision");

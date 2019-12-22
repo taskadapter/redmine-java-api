@@ -3,6 +3,7 @@ package com.taskadapter.redmineapi.bean;
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
 import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -334,7 +335,7 @@ public class Project implements Identifiable, Serializable, FluentStyle {
      * @throws RedmineException
      */
     public Project create() throws RedmineException {
-        return transport.addObject(this, new BasicNameValuePair("include",
+        return transport.addObject(this, new RequestParam("include",
                 "trackers"));
     }
 

@@ -9,10 +9,7 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
-import com.taskadapter.redmineapi.internal.Joiner;
-import com.taskadapter.redmineapi.internal.ResultsWrapper;
-import com.taskadapter.redmineapi.internal.Transport;
+import com.taskadapter.redmineapi.internal.*;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -57,11 +54,11 @@ public class IssueManager {
     public List<Issue> getIssuesBySummary(String projectKey, String summaryField) throws RedmineException {
         if ((projectKey != null) && (projectKey.length() > 0)) {
             return transport.getObjectsList(Issue.class,
-                    new BasicNameValuePair("subject", summaryField),
-                    new BasicNameValuePair("project_id", projectKey));
+                    new RequestParam("subject", summaryField),
+                    new RequestParam("project_id", projectKey));
         } else {
             return transport.getObjectsList(Issue.class,
-                    new BasicNameValuePair("subject", summaryField));
+                    new RequestParam("subject", summaryField));
         }
     }
 
@@ -123,7 +120,7 @@ public class IssueManager {
      */
     public Issue getIssueById(Integer id, Include... include) throws RedmineException {
         String value = Joiner.join(",", include);
-        return transport.getObject(Issue.class, id, new BasicNameValuePair("include", value));
+        return transport.getObject(Issue.class, id, new RequestParam("include", value));
     }
 
     /**
@@ -179,16 +176,16 @@ public class IssueManager {
      * @see Issue
      */
     public List<Issue> getIssues(String projectKey, Integer queryId, Include... include) throws RedmineException {
-        List<NameValuePair> params = new ArrayList<>();
+        List<RequestParam> params = new ArrayList<>();
         if (queryId != null) {
-            params.add(new BasicNameValuePair("query_id", String.valueOf(queryId)));
+            params.add(new RequestParam("query_id", String.valueOf(queryId)));
         }
 
         if ((projectKey != null) && (projectKey.length() > 0)) {
-            params.add(new BasicNameValuePair("project_id", projectKey));
+            params.add(new RequestParam("project_id", projectKey));
         }
         String includeStr = Joiner.join(",", include);
-        params.add(new BasicNameValuePair("include", includeStr));
+        params.add(new RequestParam("include", includeStr));
 
         return transport.getObjectsList(Issue.class, params);
     }
@@ -324,10 +321,10 @@ public class IssueManager {
      * <p>This REST API feature was added in Redmine 1.3.0. See http://www.redmine.org/issues/5737</p>
      */
     public List<SavedQuery> getSavedQueries(String projectKey) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<>();
+        Set<RequestParam> params = new HashSet<>();
 
         if ((projectKey != null) && (projectKey.length() > 0)) {
-            params.add(new BasicNameValuePair("project_id", projectKey));
+            params.add(new RequestParam("project_id", projectKey));
         }
 
         return transport.getObjectsList(SavedQuery.class, params);
