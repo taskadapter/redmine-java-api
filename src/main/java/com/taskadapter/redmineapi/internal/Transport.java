@@ -201,24 +201,10 @@ public final class Transport {
 	}
 
 	public User getCurrentUser(RequestParam... params) throws RedmineException {
-		URI uri = getURIConfigurator().createURI("users/current.json", convert(params));
+		URI uri = getURIConfigurator().createURI("users/current.json", params);
 		HttpGet http = new HttpGet(uri);
 		String response = send(http);
 		return parseResponse(response, "user", RedmineJSONParser::parseUser);
-	}
-
-	private BasicNameValuePair[] convert(RequestParam... params) {
-		return Arrays
-				.stream(params)
-				.map(param -> new BasicNameValuePair(param.getName(), param.getValue()))
-				.toArray(BasicNameValuePair[]::new);
-	}
-
-	private List<BasicNameValuePair> convertToList(Collection<? extends RequestParam> params) {
-		return params
-				.stream()
-				.map(param -> new BasicNameValuePair(param.getName(), param.getValue()))
-				.collect(Collectors.toList());
 	}
 
 	/**
@@ -238,7 +224,7 @@ public final class Transport {
         if (config.writer == null) {
             throw new RuntimeException("can't create object: writer is not implemented or is not registered in RedmineJSONBuilder for object " + object);
         }
-		URI uri = getURIConfigurator().getObjectsURI(object.getClass(), convert(params));
+		URI uri = getURIConfigurator().getObjectsURI(object.getClass(), params);
 		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName, object, config.writer);
 		setEntity(httpPost, body);
@@ -264,7 +250,7 @@ public final class Transport {
 			RequestParam... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(object.getClass());
 		URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
-				parentId, object.getClass(), convert(params));
+				parentId, object.getClass(), params);
 		HttpPost httpPost = new HttpPost(uri);
 		String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName,
 				object, config.writer);
@@ -289,7 +275,7 @@ public final class Transport {
 					" it is required to identify the object in the target system");
 		}
 		final URI uri = getURIConfigurator().getObjectURI(obj.getClass(),
-				Integer.toString(id), convert(params));
+				Integer.toString(id), params);
 		final HttpPut http = new HttpPut(uri);
 		final String body = RedmineJSONBuilder.toSimpleJSON(
 				config.singleObjectName, obj, config.writer);
@@ -304,7 +290,7 @@ public final class Transport {
 	public <T> void updateChildEntry(Class<?> parentClass, String parentId,
 			T obj, String objId, RequestParam... params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(obj.getClass());
-		URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, obj.getClass(), objId, convert(params));
+		URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, obj.getClass(), objId, params);
 		final HttpPut http = new HttpPut(uri);
 		final String body = RedmineJSONBuilder.toSimpleJSON(config.singleObjectName, obj, config.writer);
 		setEntity(http, body);
@@ -364,7 +350,7 @@ public final class Transport {
 	public <T> T getObject(Class<T> classs, String key, RequestParam... params)
 			throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
-		final URI uri = getURIConfigurator().getObjectURI(classs, key, convert(params));
+		final URI uri = getURIConfigurator().getObjectURI(classs, key, params);
 		final HttpGet http = new HttpGet(uri);
 		String response = send(http);
 		logger.debug(response);
@@ -467,9 +453,9 @@ public final class Transport {
 
 		Integer totalObjectsFoundOnServer;
 		do {
-			final List<NameValuePair> newParams = new ArrayList<>(convertToList(params));
-			newParams.add(new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
-			newParams.add(new BasicNameValuePair("offset", String.valueOf(offset)));
+			final List<RequestParam> newParams = new ArrayList<>(params);
+			newParams.add(new RequestParam("limit", String.valueOf(objectsPerPage)));
+			newParams.add(new RequestParam("offset", String.valueOf(offset)));
 
 			final ResultsWrapper<T> wrapper = getObjectsListNoPaging(objectClass, newParams);
 			result.addAll(wrapper.getResults());
@@ -496,7 +482,7 @@ public final class Transport {
 	 * @return objects list, never NULL
 	 */
 	public <T> ResultsWrapper<T> getObjectsListNoPaging(Class<T> objectClass,
-											  Collection<? extends NameValuePair> params) throws RedmineException {
+											  Collection<? extends RequestParam> params) throws RedmineException {
 		final EntityConfig<T> config = getConfig(objectClass);
 		try {
 			final JSONObject responseObject = getJsonResponseFromGet(objectClass, params);
@@ -519,9 +505,9 @@ public final class Transport {
 	 </pre>
 	 */
 	public <T> JSONObject getJsonResponseFromGet(Class<T> objectClass,
-												 Collection<? extends NameValuePair> params) throws RedmineException, JSONException {
-		final List<NameValuePair> newParams = new ArrayList<>(params);
-		List<NameValuePair> paramsList = new ArrayList<>(newParams);
+												 Collection<? extends RequestParam> params) throws RedmineException, JSONException {
+		final List<RequestParam> newParams = new ArrayList<>(params);
+		List<RequestParam> paramsList = new ArrayList<>(newParams);
 		final URI uri = getURIConfigurator().getObjectsURI(objectClass, paramsList);
 		final HttpGet http = new HttpGet(uri);
 		final String response = send(http);
@@ -541,7 +527,7 @@ public final class Transport {
 	public <T> List<T> getChildEntries(Class<?> parentClass, String parentKey, Class<T> classs) throws RedmineException {
 		final EntityConfig<T> config = getConfig(classs);
 		final URI uri = getURIConfigurator().getChildObjectsURI(parentClass,
-				parentKey, classs, new BasicNameValuePair("limit", String.valueOf(objectsPerPage)));
+				parentKey, classs, new RequestParam("limit", String.valueOf(objectsPerPage)));
 
 		HttpGet http = new HttpGet(uri);
 		String response = send(http);
@@ -560,7 +546,7 @@ public final class Transport {
     public <T> T getChildEntry(Class<?> parentClass, String parentId,
                                Class<T> classs, String childId, RequestParam... params) throws RedmineException {
         final EntityConfig<T> config = getConfig(classs);
-		final URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, classs, childId, convert(params));
+		final URI uri = getURIConfigurator().getChildIdURI(parentClass, parentId, classs, childId, params);
         HttpGet http = new HttpGet(uri);
         String response = send(http);
 

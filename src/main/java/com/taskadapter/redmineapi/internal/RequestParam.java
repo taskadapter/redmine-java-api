@@ -9,7 +9,7 @@ public class RequestParam {
 
     public RequestParam(final String name, final String value) {
         this.name = Objects.requireNonNull(name, "Name may not be null");
-        this.value = value;
+        this.value = Objects.requireNonNull(value, "Value may not be null");
     }
 
     public String getName() {
@@ -25,13 +25,12 @@ public class RequestParam {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RequestParam that = (RequestParam) o;
-        return name.equals(that.name) &&
-                Objects.equals(value, that.value);
+        return name.equals(that.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, value);
+        return Objects.hash(name);
     }
 
     @Override
