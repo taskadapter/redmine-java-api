@@ -254,6 +254,12 @@ public class Issue implements Identifiable, FluentStyle {
         return storage.get(AUTHOR_ID);
     }
 
+    /**
+     * Marking as "deprecated": according to Redmine REST API docs
+     * https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Creating-an-issue , this parameter is not used
+     * when creating issues (January 2020).
+     */
+    @Deprecated
     public Issue setAuthorId(Integer id) {
         storage.set(AUTHOR_ID, id);
         return this;
@@ -263,6 +269,12 @@ public class Issue implements Identifiable, FluentStyle {
         return storage.get(AUTHOR_NAME);
     }
 
+    /**
+     * Marking as "deprecated": according to Redmine REST API docs
+     * https://www.redmine.org/projects/redmine/wiki/Rest_Issues#Creating-an-issue , this parameter is not used
+     * when creating issues (January 2020).
+     */
+    @Deprecated
     public Issue setAuthorName(String name) {
         storage.set(AUTHOR_NAME, name);
         return this;
