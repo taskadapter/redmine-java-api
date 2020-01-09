@@ -1,14 +1,11 @@
 package com.taskadapter.redmineapi.bean;
 
 import com.taskadapter.redmineapi.Include;
-import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.util.*;
 

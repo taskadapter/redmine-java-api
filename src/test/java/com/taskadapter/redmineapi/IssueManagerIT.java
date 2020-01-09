@@ -307,11 +307,8 @@ public class IssueManagerIT {
     @Test
     public void testCreateIssueWithParam() throws RedmineException {
         RequestParam param = new RequestParam("name", "value");
-        Issue issue = new Issue(transport, projectId)
-                .setSubject("This is the Issue with one param")
-                .create(param);
-        assertNotNull("Checking returned result", issue);
-        assertNotNull("New issue must have some ID", issue.getId());
+        create(new Issue(transport, projectId)
+                .setSubject("This is the Issue with one param"), param);
     }
 
     @Test
@@ -320,56 +317,42 @@ public class IssueManagerIT {
         RequestParam param2 = null;
         RequestParam param3 = new RequestParam("name3", "param3");
         RequestParam param4 = new RequestParam("name4", "param4");
-        Issue issue = new Issue(transport, projectId).setSubject("This is the Issue with null params")
-                .create(param1, param2, param3, param4);
-        assertNotNull("Checking returned result", issue);
-        assertNotNull("New issue must have some ID", issue.getId());
+        create(new Issue(transport, projectId).setSubject("This is the Issue with null params"), param1, param2, param3, param4);
     }
 
     @Test
-    public void testCreateIssueWithNullParams2() throws RedmineException {
+    public void testCreateIssueWithDuplicateAndNullParams() throws RedmineException {
         RequestParam param1 = new RequestParam("name1", "param1");
         RequestParam param2 = null;
         RequestParam param3 = new RequestParam("name3", "param3");
         RequestParam param4 = new RequestParam("name3", "param4");
-        Issue issue = new Issue(transport, projectId).setSubject("This is the Issue with null params")
-                .create(param1, param2, param3, param4);
-        assertNotNull("Checking returned result", issue);
-        assertNotNull("New issue must have some ID", issue.getId());
-    }
-
-    @Test
-    public void testCreateIssueWithNullParams3() throws RedmineException {
-        RequestParam param1 = new RequestParam("name1", "param1");
-        RequestParam param3 = new RequestParam("name3", "param3");
-        Issue issue = new Issue(transport, projectId).setSubject("This is the Issue with null params")
-                .create(param1, null, param3);
-        assertNotNull("Checking returned result", issue);
-        assertNotNull("New issue must have some ID", issue.getId());
+        create(new Issue(transport, projectId).setSubject("This is the Issue with duplicate and null params"), param1, param2, param3, param4);
     }
 
     @Test(expected = NullPointerException.class)
     public void testCreateIssueWithNullName() throws RedmineException {
         RequestParam param1 = new RequestParam(null, "param1");
         RequestParam param2 = new RequestParam("name2", "param2");
-        new Issue(transport, projectId).setSubject("This is the Issue with null params")
-                .create(param1, param2);
+        create(new Issue(transport, projectId).setSubject("This is the Issue with null name params"), param1, param2);
     }
 
     @Test(expected = NullPointerException.class)
     public void testCreateIssueWithNullValue() throws RedmineException {
         RequestParam param1 = new RequestParam("name1", "param1");
         RequestParam param2 = new RequestParam("name2", null);
-        new Issue(transport, projectId).setSubject("This is the Issue with null params")
-                .create(param1, param2);
+        create(new Issue(transport, projectId).setSubject("This is the Issue with null value params"), param1, param2);
     }
 
     @Test
     public void testCreateIssueWithoutParams() throws RedmineException {
-        Issue issue = new Issue(transport, projectId).setSubject( "This is the Issue without params")
-                .create();
-        assertNotNull("Checking returned result", issue);
-        assertNotNull("New issue must have some ID", issue.getId());
+        create(new Issue(transport, projectId).setSubject("This is the Issue without params"));
+    }
+
+    private Issue create(Issue issue, RequestParam... params) throws RedmineException {
+        Issue responseIssue = issue.create(params);
+        assertNotNull("Checking returned result", responseIssue);
+        assertNotNull("New issue must have some ID", responseIssue.getId());
+        return responseIssue;
     }
 
     @Test

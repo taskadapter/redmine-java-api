@@ -9,9 +9,11 @@ import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.SavedQuery;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.Watcher;
-import com.taskadapter.redmineapi.internal.*;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
+import com.taskadapter.redmineapi.internal.Joiner;
+import com.taskadapter.redmineapi.internal.RequestParam;
+import com.taskadapter.redmineapi.internal.ResultsWrapper;
+import com.taskadapter.redmineapi.internal.Transport;
 
 import java.util.ArrayList;
 import java.util.HashSet;

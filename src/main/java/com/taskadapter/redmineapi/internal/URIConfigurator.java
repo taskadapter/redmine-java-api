@@ -31,7 +31,12 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class URIConfigurator {
@@ -93,15 +98,11 @@ public class URIConfigurator {
      */
     private URI createURI(String query,
                           Collection<? extends RequestParam> origParams) {
-
-//        final List<NameValuePair> params = new ArrayList<>(origParams);
-//        if (apiAccessKey != null) {
-//            params.add(new BasicNameValuePair("key", apiAccessKey));
-//        }
-        Set<RequestParam> requestParamSet = new HashSet<RequestParam>(origParams);
+        Collection<? extends RequestParam> distinctParams = distinct(origParams);
+        Collection<? extends NameValuePair> nameValueParams = toNameValue(distinctParams);
         try {
             final URIBuilder builder = new URIBuilder(baseURL.toURI());
-            builder.addParameters(new ArrayList<>(convert(requestParamSet)));
+            builder.addParameters(new ArrayList<>(nameValueParams));
             //extra List creation needed because addParameters doesn't accept Collection<? extends NameValuePair>
             if (apiAccessKey != null) {
                 builder.addParameter("key", apiAccessKey);
@@ -115,7 +116,15 @@ public class URIConfigurator {
         }
     }
 
-    public Collection<? extends NameValuePair> convert(Collection<? extends RequestParam> origParams) {
+    private static Collection<? extends RequestParam> distinct(Collection<? extends RequestParam> origParams) {
+        return origParams
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(RequestParam::getName, a -> a, (s1, s2) -> s1))
+                .values();
+    }
+
+    private static Collection<? extends NameValuePair> toNameValue(Collection<? extends RequestParam> origParams) {
         return origParams
                 .stream()
                 .filter(Objects::nonNull)

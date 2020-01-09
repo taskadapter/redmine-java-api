@@ -25,12 +25,13 @@ public class RequestParam {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RequestParam that = (RequestParam) o;
-        return name.equals(that.name);
+        return name.equals(that.name) &&
+                value.equals(that.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name);
+        return Objects.hash(name, value);
     }
 
     @Override
