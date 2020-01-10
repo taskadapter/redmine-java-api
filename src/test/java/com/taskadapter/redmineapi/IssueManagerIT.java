@@ -18,6 +18,7 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.bean.User;
 import com.taskadapter.redmineapi.bean.Version;
 import com.taskadapter.redmineapi.bean.Watcher;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.client.HttpClient;
@@ -301,6 +302,57 @@ public class IssueManagerIT {
         // check AUTHOR
         Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser(transport).getId();
         assertEquals(EXPECTED_AUTHOR_ID, issue.getAuthorId());
+    }
+
+    @Test
+    public void testCreateIssueWithParam() throws RedmineException {
+        RequestParam param = new RequestParam("name", "value");
+        create(new Issue(transport, projectId)
+                .setSubject("This is the Issue with one param"), param);
+    }
+
+    @Test
+    public void testCreateIssueWithNullParams() throws RedmineException {
+        RequestParam param1 = new RequestParam("name1", "param1");
+        RequestParam param2 = null;
+        RequestParam param3 = new RequestParam("name3", "param3");
+        RequestParam param4 = new RequestParam("name4", "param4");
+        create(new Issue(transport, projectId).setSubject("This is the Issue with null params"), param1, param2, param3, param4);
+    }
+
+    @Test
+    public void testCreateIssueWithDuplicateAndNullParams() throws RedmineException {
+        RequestParam param1 = new RequestParam("name1", "param1");
+        RequestParam param2 = null;
+        RequestParam param3 = new RequestParam("name3", "param3");
+        RequestParam param4 = new RequestParam("name3", "param4");
+        create(new Issue(transport, projectId).setSubject("This is the Issue with duplicate and null params"), param1, param2, param3, param4);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateIssueWithNullName() throws RedmineException {
+        RequestParam param1 = new RequestParam(null, "param1");
+        RequestParam param2 = new RequestParam("name2", "param2");
+        create(new Issue(transport, projectId).setSubject("This is the Issue with null name params"), param1, param2);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateIssueWithNullValue() throws RedmineException {
+        RequestParam param1 = new RequestParam("name1", "param1");
+        RequestParam param2 = new RequestParam("name2", null);
+        create(new Issue(transport, projectId).setSubject("This is the Issue with null value params"), param1, param2);
+    }
+
+    @Test
+    public void testCreateIssueWithoutParams() throws RedmineException {
+        create(new Issue(transport, projectId).setSubject("This is the Issue without params"));
+    }
+
+    private Issue create(Issue issue, RequestParam... params) throws RedmineException {
+        Issue responseIssue = issue.create(params);
+        assertNotNull("Checking returned result", responseIssue);
+        assertNotNull("New issue must have some ID", responseIssue.getId());
+        return responseIssue;
     }
 
     @Test
@@ -749,7 +801,7 @@ public class IssueManagerIT {
         issueManager.update(createdIssue);
         Issue updatedIssue = issueManager.getIssueById(createdIssue.getId());
         assertThat(updatedIssue.getTargetVersion().getName()).isEqualTo(version2Name);
-        
+
         createdIssue.setTargetVersion(null);
         issueManager.update(createdIssue);
         updatedIssue = issueManager.getIssueById(createdIssue.getId());
@@ -859,7 +911,7 @@ public class IssueManagerIT {
                 "List of categories of test project must be empty now but is "
                         + categories, categories.isEmpty());
     }
-    
+
     /**
      * tests the retrieval of {@link IssueCategory}s.
      *
@@ -1000,7 +1052,7 @@ public class IssueManagerIT {
         // Custom Field with ID 2 needs to be:
         // name: custom_boolean_1
         // format: Boolean (bool)
-        // 
+        //
         // Custom Field with ID 3 needs to be:
         // name: custom_multi_list
         // format: List (list)
@@ -1188,7 +1240,7 @@ public class IssueManagerIT {
         Issue issueWithUpdatedStatus = issueManager.getIssueById(retrievedIssue.getId());
         assertThat(issueWithUpdatedStatus.getStatusId()).isEqualTo(newStatusId);
     }
-    
+
     @Test
     public void changeProject() throws RedmineException {
         Project project1 = mgr.getProjectManager().getProjectByKey(projectKey);
@@ -1202,8 +1254,8 @@ public class IssueManagerIT {
         assertThat(retrievedIssue.getProjectId()).isEqualTo(project2.getId());
         deleteIssueIfNotNull(issue);
     }
-    
-    /** This test requires one-time Redmine server configuration: 
+
+    /** This test requires one-time Redmine server configuration:
      * "Settings" -> "Issue Tracking" -> "allow issue assignment to groups" : ON
      */
     @Test

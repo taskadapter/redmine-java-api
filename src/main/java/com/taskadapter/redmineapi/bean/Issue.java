@@ -1,18 +1,13 @@
 package com.taskadapter.redmineapi.bean;
 
 import com.taskadapter.redmineapi.Include;
-import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.NotFoundException;
 import com.taskadapter.redmineapi.RedmineAuthenticationException;
 import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
-import org.apache.http.message.BasicNameValuePair;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Redmine's Issue.
@@ -628,13 +623,15 @@ public class Issue implements Identifiable, FluentStyle {
      * @throws NotFoundException       the required project is not found
      * @throws RedmineException
      */
-    public Issue create() throws RedmineException {
-        return transport.addObject(this, new BasicNameValuePair("include",
-                Include.attachments.toString()));
+    public Issue create(RequestParam... params) throws RedmineException {
+        RequestParam[] enrichParams = Arrays.copyOf(params, params.length + 1);
+        enrichParams[params.length] = new RequestParam("include",
+                Include.attachments.toString());
+        return transport.addObject(this, enrichParams);
     }
 
-    public void update() throws RedmineException {
-        transport.updateObject(this);
+    public void update(RequestParam... params) throws RedmineException {
+        transport.updateObject(this, params);
     }
 
     public void delete() throws RedmineException {

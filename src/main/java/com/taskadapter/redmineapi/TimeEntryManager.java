@@ -3,9 +3,9 @@ package com.taskadapter.redmineapi;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.TimeEntryActivity;
 import com.taskadapter.redmineapi.internal.DirectObjectsSearcher;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public final class TimeEntryManager {
 
     public List<TimeEntry> getTimeEntriesForIssue(Integer issueId) throws RedmineException {
         return transport.getObjectsList(TimeEntry.class,
-                new BasicNameValuePair("issue_id", Integer.toString(issueId)));
+                new RequestParam("issue_id", Integer.toString(issueId)));
     }
 
     /**

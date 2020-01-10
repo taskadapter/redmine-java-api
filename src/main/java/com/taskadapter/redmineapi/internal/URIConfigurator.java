@@ -35,8 +35,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class URIConfigurator {
     private static final String URL_POSTFIX = ".json";
@@ -87,7 +88,7 @@ public class URIConfigurator {
         return createURI(query, new ArrayList<>());
     }
 
-    public URI createURI(String query, NameValuePair... param) {
+    public URI createURI(String query, RequestParam... param) {
         return createURI(query, Arrays.asList(param));
     }
 
@@ -96,15 +97,12 @@ public class URIConfigurator {
      * @return URI with auth parameter "key" if not in "basic auth mode.
      */
     private URI createURI(String query,
-                          Collection<? extends NameValuePair> origParams) {
-        final List<NameValuePair> params = new ArrayList<>(
-                origParams);
-        if (apiAccessKey != null) {
-            params.add(new BasicNameValuePair("key", apiAccessKey));
-        }
+                          Collection<? extends RequestParam> origParams) {
+        Collection<? extends RequestParam> distinctParams = distinct(origParams);
+        Collection<? extends NameValuePair> nameValueParams = toNameValue(distinctParams);
         try {
             final URIBuilder builder = new URIBuilder(baseURL.toURI());
-            builder.addParameters(new ArrayList<>(origParams));
+            builder.addParameters(new ArrayList<>(nameValueParams));
             //extra List creation needed because addParameters doesn't accept Collection<? extends NameValuePair>
             if (apiAccessKey != null) {
                 builder.addParameter("key", apiAccessKey);
@@ -118,8 +116,24 @@ public class URIConfigurator {
         }
     }
 
+    static Collection<? extends RequestParam> distinct(Collection<? extends RequestParam> origParams) {
+        return origParams
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(RequestParam::getName, a -> a, (s1, s2) -> s1))
+                .values();
+    }
+
+    static Collection<? extends NameValuePair> toNameValue(Collection<? extends RequestParam> origParams) {
+        return origParams
+                .stream()
+                .filter(Objects::nonNull)
+                .map(p -> new BasicNameValuePair(p.getName(), p.getValue()))
+                .collect(Collectors.toSet());
+    }
+
     public URI getChildObjectsURI(Class<?> parent, String parentId,
-                                  Class<?> child, NameValuePair... args) {
+                                  Class<?> child, RequestParam... args) {
         final String base = getConfig(parent);
         final String detal = getConfig(child);
         return createURI(base + "/" + parentId + "/" + detal + URL_POSTFIX,
@@ -127,32 +141,32 @@ public class URIConfigurator {
     }
 
     public URI getChildIdURI(Class<?> parent, String parentId,
-                             Class<?> child, int value, NameValuePair... params) {
+                             Class<?> child, int value, RequestParam... params) {
         return this.getChildIdURI(parent, parentId, child, String.valueOf(value), params);
     }
 
     public URI getChildIdURI(Class<?> parent, String parentId,
-                             Class<?> child, String value, NameValuePair... params) {
+                             Class<?> child, String value, RequestParam... params) {
         final String base = getConfig(parent);
         final String detal = getConfig(child);
         return createURI(base + "/" + parentId + "/" + detal +
                 "/" + value + URL_POSTFIX, params);
     }
 
-    public URI getObjectsURI(Class<?> child, NameValuePair... args) {
+    public URI getObjectsURI(Class<?> child, RequestParam... params) {
         final String detal = getConfig(child);
-        return createURI(detal + URL_POSTFIX, args);
+        return createURI(detal + URL_POSTFIX, params);
     }
 
     public URI getObjectsURI(Class<?> child,
-                             Collection<? extends NameValuePair> args) {
+                             Collection<? extends RequestParam> args) {
         final String detal = getConfig(child);
         return createURI(detal + URL_POSTFIX, args);
     }
 
-    public URI getObjectURI(Class<?> object, String id, NameValuePair... args) {
+    public URI getObjectURI(Class<?> object, String id, RequestParam... params) {
         final String detal = getConfig(object);
-        return createURI(detal + "/" + id + URL_POSTFIX, args);
+        return createURI(detal + "/" + id + URL_POSTFIX, params);
     }
 
     private String getConfig(Class<?> item) {

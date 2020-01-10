@@ -5,6 +5,7 @@ import com.taskadapter.redmineapi.bean.News;
 import com.taskadapter.redmineapi.bean.Project;
 import com.taskadapter.redmineapi.bean.Role;
 import com.taskadapter.redmineapi.bean.Version;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -43,7 +44,7 @@ public class ProjectManager {
      */
     @Deprecated
     public Project createProject(Project project) throws RedmineException {
-        return transport.addObject(project, new BasicNameValuePair("include",
+        return transport.addObject(project, new RequestParam("include",
                 "trackers"));
     }
 
@@ -64,7 +65,7 @@ public class ProjectManager {
     public List<Project> getProjects() throws RedmineException {
         try {
             return transport.getObjectsList(Project.class,
-                    new BasicNameValuePair("include", "trackers"));
+                    new RequestParam("include", "trackers"));
         } catch (NotFoundException e) {
             throw new RedmineInternalError("NotFoundException received, which should never happen in this request");
         }
@@ -81,7 +82,7 @@ public class ProjectManager {
      */
     public Project getProjectByKey(String projectKey) throws RedmineException {
         return transport.getObject(Project.class, projectKey,
-                new BasicNameValuePair("include", "trackers"));
+                new RequestParam("include", "trackers"));
     }
 
     /**
@@ -94,7 +95,7 @@ public class ProjectManager {
      * @throws RedmineException
      */
     public Project getProjectById(int id) throws RedmineException {
-        return transport.getObject(Project.class, id, new BasicNameValuePair("include", "trackers"));
+        return transport.getObject(Project.class, id, new RequestParam("include", "trackers"));
     }
 
     /**
@@ -157,9 +158,9 @@ public class ProjectManager {
      * @see com.taskadapter.redmineapi.bean.News
      */
     public List<News> getNews(String projectKey) throws RedmineException {
-        Set<NameValuePair> params = new HashSet<>();
+        Set<RequestParam> params = new HashSet<>();
         if ((projectKey != null) && (projectKey.length() > 0)) {
-            params.add(new BasicNameValuePair("project_id", projectKey));
+            params.add(new RequestParam("project_id", projectKey));
         }
         return transport.getObjectsList(News.class, params);
     }
