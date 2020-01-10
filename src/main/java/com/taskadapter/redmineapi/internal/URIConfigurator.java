@@ -116,7 +116,7 @@ public class URIConfigurator {
         }
     }
 
-    private static Collection<? extends RequestParam> distinct(Collection<? extends RequestParam> origParams) {
+    static Collection<? extends RequestParam> distinct(Collection<? extends RequestParam> origParams) {
         return origParams
                 .stream()
                 .filter(Objects::nonNull)
@@ -124,7 +124,7 @@ public class URIConfigurator {
                 .values();
     }
 
-    private static Collection<? extends NameValuePair> toNameValue(Collection<? extends RequestParam> origParams) {
+    static Collection<? extends NameValuePair> toNameValue(Collection<? extends RequestParam> origParams) {
         return origParams
                 .stream()
                 .filter(Objects::nonNull)
