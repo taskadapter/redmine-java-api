@@ -90,10 +90,12 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
     List<CustomFieldDefinition> customFieldDefinitions = mgr.getCustomFieldManager().getCustomFieldDefinitions();
     // sample implementation for getCustomFieldByName() is in CustomFieldResolver (test class).
     // in prod code you would typically know the custom field name or id already 
-    CustomFieldDefinition customField1 = getCustomFieldByName(customFieldDefinitions, "my_custom_1");
+    int custom1Id = ...
     String custom1Value = "some value 123";
-    issue.addCustomField(CustomFieldFactory.create(customField1.getId(), customField1.getName(), custom1Value));
-    issueManager.update(issue);
+    issue.getCustomFieldById(custom1Id).setValue(custom1Value);
+    issue.setDescription("some description abc");
+    Transport t = mgr.getTransport();
+    t.updateObject(issue);
 
 ## Create project
 
