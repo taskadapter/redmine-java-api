@@ -54,7 +54,7 @@ import java.util.List;
  * @see RedmineManager
  */
 public final class RedmineManagerFactory {
-    private static final String AUTHENTICATOR_CHARSET = "UTF-8";
+    private static final String DEFAULT_USER_PASSWORD_AUTHENTICATOR_CHARSET = "UTF-8";
 
     /**
      * Prevent construction of this object even with use of dirty tricks.
@@ -142,7 +142,11 @@ public final class RedmineManagerFactory {
     }
 
     /**
-     * Creates a new redmine managen with user-based authentication.
+     * Creates a new redmine manager with user-based authentication.
+     *
+     * This method will use UTF-8 when converting login plus password into Base64-encoded blob.
+     * Please use another "create" method in this class if you want to use some other encoding.
+     * although... why would you? please save the world and use UTF-8 encoding where possible.
      *
      * @param uri      redmine manager URI.
      * @param login    user's name.
@@ -155,7 +159,29 @@ public final class RedmineManagerFactory {
         Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(httpClient);
 
         RedmineUserPasswordAuthenticator<HttpResponse> passwordAuthenticator = new RedmineUserPasswordAuthenticator<>(
-                baseCommunicator, AUTHENTICATOR_CHARSET, login, password);
+                baseCommunicator, DEFAULT_USER_PASSWORD_AUTHENTICATOR_CHARSET, login, password);
+        Transport transport = new Transport(
+                new URIConfigurator(uri), httpClient, passwordAuthenticator);
+        return new RedmineManager(transport);
+    }
+
+    /**
+     * Creates a new redmine manager with user-based authentication.
+     *
+     * @param uri      redmine manager URI.
+     * @param authenticationCharset charset to use when converting login and password to Base64-encoded string
+     * @param login    user's name.
+     * @param password user's password.
+     * @param httpClient you can provide your own pre-configured HttpClient if you want
+     *                     to control connection pooling, manage connections eviction, closing, etc.
+     */
+    public static RedmineManager createWithUserAuth(String uri, String authenticationCharset,
+                                                    String login,
+                                                    String password, HttpClient httpClient) {
+        Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(httpClient);
+
+        RedmineUserPasswordAuthenticator<HttpResponse> passwordAuthenticator = new RedmineUserPasswordAuthenticator<>(
+                baseCommunicator, authenticationCharset, login, password);
         Transport transport = new Transport(
                 new URIConfigurator(uri), httpClient, passwordAuthenticator);
         return new RedmineManager(transport);
