@@ -2,9 +2,14 @@ package com.taskadapter.redmineapi;
 
 import com.taskadapter.redmineapi.internal.Transport;
 import com.taskadapter.redmineapi.internal.URIConfigurator;
+import com.taskadapter.redmineapi.internal.comm.BaseCommunicator;
+import com.taskadapter.redmineapi.internal.comm.Communicator;
 import com.taskadapter.redmineapi.internal.comm.betterssl.BetterSSLFactory;
 import com.taskadapter.redmineapi.internal.comm.naivessl.NaiveSSLFactory;
+import com.taskadapter.redmineapi.internal.comm.redmine.RedmineApiKeyAuthenticator;
+import com.taskadapter.redmineapi.internal.comm.redmine.RedmineUserPasswordAuthenticator;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -49,6 +54,8 @@ import java.util.List;
  * @see RedmineManager
  */
 public final class RedmineManagerFactory {
+    private static final String AUTHENTICATOR_CHARSET = "UTF-8";
+
     /**
      * Prevent construction of this object even with use of dirty tricks.
      */
@@ -111,8 +118,14 @@ public final class RedmineManagerFactory {
      */
     public static RedmineManager createWithApiKey(String uri,
                                                   String apiAccessKey, HttpClient httpClient) {
-        return new RedmineManager(new Transport(new URIConfigurator(uri,
-                apiAccessKey), httpClient));
+        Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(httpClient);
+
+        RedmineApiKeyAuthenticator<HttpResponse> authenticator = new RedmineApiKeyAuthenticator<>(
+                baseCommunicator, apiAccessKey);
+
+        return new RedmineManager(
+                new Transport(new URIConfigurator(uri), httpClient, authenticator)
+        );
     }
 
     /**
@@ -139,9 +152,12 @@ public final class RedmineManagerFactory {
      */
     public static RedmineManager createWithUserAuth(String uri, String login,
                                                     String password, HttpClient httpClient) {
-        final Transport transport = new Transport(
-                new URIConfigurator(uri, null), httpClient);
-        transport.setCredentials(login, password);
+        Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(httpClient);
+
+        RedmineUserPasswordAuthenticator<HttpResponse> passwordAuthenticator = new RedmineUserPasswordAuthenticator<>(
+                baseCommunicator, AUTHENTICATOR_CHARSET, login, password);
+        Transport transport = new Transport(
+                new URIConfigurator(uri), httpClient, passwordAuthenticator);
         return new RedmineManager(transport);
     }
 

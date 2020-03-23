@@ -69,19 +69,16 @@ public class URIConfigurator {
     }
 
     private final URL baseURL;
-    private final String apiAccessKey;
 
-    public URIConfigurator(String host, String apiAccessKey) {
+    public URIConfigurator(String host) {
         if (host == null || host.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "The host parameter is NULL or empty");
+            throw new IllegalArgumentException("The host parameter is NULL or empty");
         }
         try {
             this.baseURL = new URL(host);
         } catch (MalformedURLException e) {
             throw new IllegalArgumentException("Illegal host URL " + host, e);
         }
-        this.apiAccessKey = apiAccessKey;
     }
 
     public URI createURI(String query) {
@@ -104,9 +101,9 @@ public class URIConfigurator {
             final URIBuilder builder = new URIBuilder(baseURL.toURI());
             builder.addParameters(new ArrayList<>(nameValueParams));
             //extra List creation needed because addParameters doesn't accept Collection<? extends NameValuePair>
-            if (apiAccessKey != null) {
-                builder.addParameter("key", apiAccessKey);
-            }
+//            if (apiAccessKey != null) {
+//                builder.addParameter("key", apiAccessKey);
+//            }
             if (!query.isEmpty()) {
                 builder.setPath((builder.getPath() == null? "" : builder.getPath()) + "/" + query);
             }
@@ -179,23 +176,5 @@ public class URIConfigurator {
 
     public URI getUploadURI() {
         return createURI("uploads" + URL_POSTFIX);
-    }
-
-    /**
-     * Adds API key to URI, if the key is specified
-     *
-     * @param uri Original URI string
-     * @return URI with API key added
-     */
-    public URI addAPIKey(String uri) {
-        try {
-            final URIBuilder builder = new URIBuilder(uri);
-            if (apiAccessKey != null) {
-                builder.setParameter("key", apiAccessKey);
-            }
-            return builder.build();
-        } catch (URISyntaxException e) {
-            throw new RedmineInternalError(e);
-        }
     }
 }
