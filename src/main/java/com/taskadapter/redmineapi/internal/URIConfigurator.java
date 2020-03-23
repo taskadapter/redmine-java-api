@@ -99,11 +99,8 @@ public class URIConfigurator {
         Collection<? extends NameValuePair> nameValueParams = toNameValue(distinctParams);
         try {
             final URIBuilder builder = new URIBuilder(baseURL.toURI());
-            builder.addParameters(new ArrayList<>(nameValueParams));
             //extra List creation needed because addParameters doesn't accept Collection<? extends NameValuePair>
-//            if (apiAccessKey != null) {
-//                builder.addParameter("key", apiAccessKey);
-//            }
+            builder.addParameters(new ArrayList<>(nameValueParams));
             if (!query.isEmpty()) {
                 builder.setPath((builder.getPath() == null? "" : builder.getPath()) + "/" + query);
             }
