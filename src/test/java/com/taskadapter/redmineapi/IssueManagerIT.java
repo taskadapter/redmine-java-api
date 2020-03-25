@@ -69,7 +69,7 @@ public class IssueManagerIT {
 
     @BeforeClass
     public static void oneTimeSetup() throws RedmineException {
-        mgr = IntegrationTestHelper.createRedmineManager();
+        mgr = IntegrationTestHelper.createRedmineManagerWithAPIKey();
         transport = mgr.getTransport();
         userManager = mgr.getUserManager();
         issueManager = mgr.getIssueManager();

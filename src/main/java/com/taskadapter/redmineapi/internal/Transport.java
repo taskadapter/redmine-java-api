@@ -42,7 +42,6 @@ import com.taskadapter.redmineapi.internal.json.JsonObjectParser;
 import com.taskadapter.redmineapi.internal.json.JsonObjectWriter;
 import org.apache.http.HttpEntityEnclosingRequest;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -52,7 +51,6 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONWriter;
@@ -69,7 +67,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public final class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<>();
@@ -82,7 +79,7 @@ public final class Transport {
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
 	private final SimpleCommunicator<String> communicator;
 	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
-	private final RedmineAuthenticator<HttpResponse> authenticator;
+	private final Communicator<HttpResponse> authenticator;
 
     private String onBehalfOfUser = null;
 
@@ -198,6 +195,20 @@ public final class Transport {
             Communicators.contentReader());
 		this.communicator = Communicators.simplify(coreCommunicator,
                 Communicators.<String>identityHandler());
+	}
+
+	public Transport(URIConfigurator configurator, HttpClient client, Communicator communicator) {
+		this.configurator = configurator;
+		this.authenticator = communicator;
+		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
+		errorCheckingCommunicator = Communicators.fmap(
+				authenticator,
+				Communicators.compose(errorProcessor,
+						Communicators.transportDecoder()));
+		Communicator<String> coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
+				Communicators.contentReader());
+		this.communicator = Communicators.simplify(coreCommunicator,
+				Communicators.<String>identityHandler());
 	}
 
 	public User getCurrentUser(RequestParam... params) throws RedmineException {
@@ -371,8 +382,7 @@ public final class Transport {
 	public <R> R download(String uri,
 			ContentHandler<BasicHttpResponse, R> handler)
 			throws RedmineException {
-		final URI requestUri = configurator.addAPIKey(uri);
-		final HttpGet request = new HttpGet(requestUri);
+		final HttpGet request = new HttpGet(uri);
         if (onBehalfOfUser != null) {
             request.addHeader("X-Redmine-Switch-User", onBehalfOfUser);
         }
@@ -650,20 +660,6 @@ public final class Transport {
 			String urlPrefix, JsonObjectWriter<T> writer,
 			JsonObjectParser<T> parser) {
 		return new EntityConfig<>(objectField, urlPrefix, writer, parser);
-	}
-
-	public void setCredentials(String login, String password) {
-		this.login = login;
-		this.password = password;
-		authenticator.setCredentials(login, password);
-	}
-
-	public void setPassword(String password) {
-		setCredentials(login, password);
-	}
-
-	public void setLogin(String login) {
-		setCredentials(login, password);
 	}
 
     /**
