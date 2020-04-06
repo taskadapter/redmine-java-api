@@ -3,15 +3,16 @@ package com.taskadapter.redmineapi.internal.comm.betterssl;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.UnrecoverableKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.X509TrustManager;
-
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
 /**
@@ -51,6 +52,30 @@ public class BetterSSLFactory {
 			throw new Error("No SSL protocols supported :(", e);
 		}
 	}
+
+        public static SSLSocketFactory createSocketFactory(KeyStore keystore, String keystorePassword, Collection<KeyStore> extraStores) throws KeyStoreException, KeyManagementException {
+		final Collection<X509TrustManager> managers = new ArrayList<>();
+
+                for (KeyStore ks : extraStores) {
+			addX509Managers(managers, ks);
+		}
+		/* Add default manager. */
+		addX509Managers(managers, null);
+		final TrustManager tm = new CompositeTrustManager(managers);
+
+		try {
+                    final KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                    kmf.init(keystore, keystorePassword.toCharArray());
+                    final SSLContext ctx = SSLContext.getInstance("TLSv1.2");
+                    ctx.init(kmf.getKeyManagers(), new TrustManager[] {tm}, new SecureRandom());
+                    return new SSLSocketFactory(ctx);
+		} catch (NoSuchAlgorithmException e) {
+                    throw new Error("No SSL protocols supported :(", e);
+		} catch (UnrecoverableKeyException e) {
+                    throw new Error("Could not load RSA Key!", e);
+                }
+	}
+
 
 	/**
 	 * Adds X509 keystore-backed trust manager into the list of managers. 

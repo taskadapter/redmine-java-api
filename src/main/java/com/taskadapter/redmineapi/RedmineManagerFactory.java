@@ -209,6 +209,22 @@ public final class RedmineManagerFactory {
     	return createConnectionManager(BetterSSLFactory.createSocketFactory(trustStores));
     }
 
+        /**
+     * Creates a connection manager with extended trust relations and Client 
+     * Certificate authentication. It would use both default system trusted 
+     * certificates as well as all certificates defined in the 
+     * <code>trustStores</code>.
+     * @param keyStore key store containing the client certificate to use.
+     * @param keyStorePassword the keyStore password string.
+     * @param trustStores list of additional trust stores.
+     * @return connection manager with extended trust relationship.
+     * @throws KeyManagementException
+     * @throws KeyStoreException
+     */
+    public static ClientConnectionManager createConnectionManagerWithClientCertificate(KeyStore keyStore, String keyStorePassword, Collection<KeyStore> trustStores) throws KeyManagementException, KeyStoreException {
+        return createConnectionManager(BetterSSLFactory.createSocketFactory(keyStore, keyStorePassword, trustStores));
+    }
+
     /**
      * Creates default connection manager.
      */
