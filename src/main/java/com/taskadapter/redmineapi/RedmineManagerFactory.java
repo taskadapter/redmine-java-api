@@ -202,7 +202,9 @@ public final class RedmineManagerFactory {
      * Creates a connection manager with extended trust relations. It would 
      * use both default system trusted certificates as well as all certificates
      * defined in the <code>trustStores</code>.
-     * @param trustStores list of additional trust stores.
+     * @param trustStores list of additional trust stores to be included in the
+     *           trust chain. The server will be validated against all system-provided
+     *           CAs and all the ones provided via this list.
      * @return connection manager with extended trust relationship.
      */
     public static ClientConnectionManager createConnectionManagerWithExtraTrust(Collection<KeyStore> trustStores) throws KeyManagementException, KeyStoreException {
@@ -216,7 +218,9 @@ public final class RedmineManagerFactory {
      * <code>trustStores</code>.
      * @param keyStore key store containing the client certificate to use.
      * @param keyStorePassword the keyStore password string.
-     * @param trustStores list of additional trust stores.
+     * @param trustStores list of additional trust stores to be included in the
+     *           trust chain. The server will be validated against all system-provided
+     *           CAs and all the ones provided via this list.
      * @return connection manager with extended trust relationship.
      * @throws KeyManagementException
      * @throws KeyStoreException
