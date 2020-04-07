@@ -93,10 +93,18 @@ public class IntegrationTestHelper {
 
     private static ClientConnectionManager createConnectionManagerWithOurDevKeystore() throws KeyManagementException, KeyStoreException {
         final Optional<KeyStore> builtInExtension = getExtensionKeystore();
-        if (builtInExtension.isPresent()) {
+        final Optional<KeyStore> builtInClient = getClientKeystore();
+
+        if (builtInExtension.isPresent() && ! builtInClient.isPresent()) {
             return RedmineManagerFactory.createConnectionManagerWithExtraTrust(
                     Collections.singletonList(builtInExtension.get()));
         }
+
+        if (builtInExtension.isPresent() && builtInClient.isPresent()) {
+            return RedmineManagerFactory.createConnectionManagerWithClientCertificate(builtInClient.get(), 
+                    "123456", Collections.singletonList(builtInExtension.get()));
+        }
+
         return RedmineManagerFactory.createDefaultConnectionManager();
     }
 
@@ -127,4 +135,33 @@ public class IntegrationTestHelper {
             }
         }
     }
+
+    /**
+     * Returns a key store with the additional SSL certificates.
+     * this is how we provide the self-signed SSL certificate for our
+     * Redmine dev server.
+     */
+    private static Optional<KeyStore> getClientKeystore() {
+        final InputStream extStore =
+                IntegrationTestHelper.class.getClassLoader().getResourceAsStream("ta-dev-keys");
+        if (extStore == null) {
+            return Optional.empty();
+        }
+        try {
+            final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+            // "123456" is the password for this custom keystore
+            ks.load(extStore, "123456".toCharArray());
+            return Optional.of(ks);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Optional.empty();
+        } finally {
+            try {
+                extStore.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

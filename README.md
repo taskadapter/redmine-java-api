@@ -141,3 +141,14 @@ See IntegrationTestHelper class:
         return RedmineManagerFactory.createConnectionManagerWithExtraTrust(
                 Collections.singletonList(builtInExtension.get()));
     }
+
+## Using a custom (e.g. self-signed) SSL certificate with Client Certificate Authentication
+See IntegrationTestHelper class:
+
+    final Optional<KeyStore> builtInExtension = getExtensionKeystore();
+    final Optional<KeyStore> builtInClient = getClientKeystore();
+
+    if (builtInExtension.isPresent() && builtInClient.isPresent()) {
+        return RedmineManagerFactory.createConnectionManagerWithClientCertificate(builtInClient.get(), 
+                "keystore-password", Collections.singletonList(builtInExtension.get()));
+    }
