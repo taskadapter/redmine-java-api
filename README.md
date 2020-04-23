@@ -183,9 +183,9 @@ connect to Redmine:
     }
 
 For another example, see IntegrationTestHelper class:
+
     Optional<KeyStore> builtInExtension = getExtensionKeystore();
     Optional<KeyStore> builtInClient = getClientKeystore();
-
     if (builtInExtension.isPresent() && builtInClient.isPresent()) {
         return RedmineManagerFactory.createConnectionManagerWithClientCertificate(builtInClient.get(), 
                 "keystore-password", Collections.singletonList(builtInExtension.get()));
