@@ -134,20 +134,58 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
     final List<TimeEntry> elements = timeEntryManager.getTimeEntries(params);
 
 ## Using a custom (e.g. self-signed) SSL certificate
-See IntegrationTestHelper class:
+Supposing you have:
+* caTrustStore: a Collection\<KeyStore\> object that has the custom CAs to use
 
-    final Optional<KeyStore> builtInExtension = getExtensionKeystore();
+Then the following function will return a RedmineManager object that uses those TrustStores
+to connect to Redmine:
+
+    public RedmineManager connectToRedmine(String apiAccessKey, String url) throws IOException {
+        try {
+            ClientConnectionManaget connectionManager =
+                    RedmineManagerFactory.createConnectionManagerWithExtraTrust(caTrustStore);
+            HttpClient client = RedmineManagerFactory.getNewHttpClient(url, connectionManager);
+            return RedmineManagerFactory.createWithApiKey(url, apiAccessKey, client);
+        } catch (Exception e) {
+            System.out.println("Could not connect to Redmine");
+            throw new IOException(e.getMessage());
+        }
+    }
+
+For another example, see IntegrationTestHelper class:
+
+    Optional<KeyStore> builtInExtension = getExtensionKeystore();
     if (builtInExtension.isPresent()) {
         return RedmineManagerFactory.createConnectionManagerWithExtraTrust(
                 Collections.singletonList(builtInExtension.get()));
     }
 
 ## Using a custom (e.g. self-signed) SSL certificate with Client Certificate Authentication
-See IntegrationTestHelper class:
+Supposing you have: 
+* clientKeyStore: a KeyStore object that has your Client Certificate and Private Key loaded 
+* caTrustStore: a Collection\<KeyStore\> object that has the custom CAs to use
+* password: A string representing clientKeyStore's password
 
-    final Optional<KeyStore> builtInExtension = getExtensionKeystore();
-    final Optional<KeyStore> builtInClient = getClientKeystore();
+Then the following function will return a RedmineManager object that uses those KeyStores to
+connect to Redmine:
 
+    public RedmineManager connectToRedmine(String apiAccessKey, String url) throws IOException {
+        try {
+            ClientConnectionManaget connectionManager = 
+                    RedmineManagerFactory.createConnectionManagerWithClientCertificate(
+                    clientKeyStore, password, caTrustStore);  
+            HttpClient client = RedmineManagerFactory.getNewHttpClient(url, connectionManager);
+            return RedmineManagerFactory.createWithApiKey(url, apiAccessKey, client);
+        } catch (Exception e) {
+            System.out.println("Could not connect to Redmine");
+            throw new IOException(e.getMessage());
+        } 
+    }
+
+For another example, see IntegrationTestHelper class:
+
+    Optional<KeyStore> builtInExtension = getExtensionKeystore();
+    Optional<KeyStore> builtInClient = getClientKeystore();
     if (builtInExtension.isPresent() && builtInClient.isPresent()) {
         return RedmineManagerFactory.createConnectionManagerWithClientCertificate(builtInClient.get(), 
                 "keystore-password", Collections.singletonList(builtInExtension.get()));
