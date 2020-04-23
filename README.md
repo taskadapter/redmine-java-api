@@ -163,7 +163,7 @@ For another example, see IntegrationTestHelper class:
 ## Using a custom (e.g. self-signed) SSL certificate with Client Certificate Authentication
 Supposing you have: 
 * clientKeyStore: a KeyStore object that has your Client Certificate and Private Key loaded 
-* caTrustStore: a Collection<KeyStore> object that has the custom CAs to use
+* caTrustStore: a Collection\<KeyStore\> object that has the custom CAs to use
 * password: A string representing clientKeyStore's password
 
 Then the following function will return a RedmineManager object that uses those KeyStores to
