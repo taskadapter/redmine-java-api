@@ -135,7 +135,7 @@ Redmine searches for "Open" issues by default. You can specify "all" in your Map
 
 ## Using a custom (e.g. self-signed) SSL certificate
 Supposing you have:
-* caTrustStore: a Collection<KeyStore> object that has the custom CAs to use
+* caTrustStore: a Collection\<KeyStore\> object that has the custom CAs to use
 
 Then the following function will return a RedmineManager object that uses those TrustStores
 to connect to Redmine:
