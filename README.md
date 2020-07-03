@@ -2,7 +2,7 @@
 
 * Uses Redmine's REST API (don't forget to enable it in Redmine server settings).
 * Does not require any plugins installed on Redmine/Chiliproject server.
-* Runs on any standard Java 8+ platform (Android does not have standard Java).
+* Requires JVM 11 or newer.
 * Supports HTTP proxy
 * Supports GZipped responses from servers
 * Uses SLF4J for logging. Provide [your own SLF4J binding](http://www.slf4j.org/codes.html#StaticLoggerBinder)
@@ -21,7 +21,7 @@ Check the [latest release version in Maven Central](http://search.maven.org/#sea
 
 # Obtain `transport` required for fluent-style calls
 
-The new (February 2019) fluent-style API (v. 4.x) requires a `transport` instance for most calls. 
+The new fluent-style API (v. 4.x) requires a `transport` instance for most calls. 
 First, create an instance of RedmineManager and then obtain its transport:
 
     RedmineManager mgr = RedmineManagerFactory.createWithApiKey(uri, apiAccessKey);
