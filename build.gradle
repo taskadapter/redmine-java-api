@@ -8,10 +8,10 @@ apply plugin: 'signing'
 apply plugin: 'eclipse'
 
 group = 'com.taskadapter'
-version = '4.0.0.rc1'
+version = '4.0.0.rc2-SNAPSHOT'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
