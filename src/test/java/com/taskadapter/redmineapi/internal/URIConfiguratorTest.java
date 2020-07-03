@@ -34,6 +34,16 @@ public class URIConfiguratorTest {
     }
 
     @Test
+    public void distinctWithDifferentNamesSameValuesShouldKeepAllItems() {
+        assertThat(URIConfigurator.distinct(
+                params("one", "value",
+                        "two", "value")
+        )).containsOnlyElementsOf(
+                params("one", "value",
+                        "two", "value"));
+    }
+
+    @Test
     public void toNameValueConvertsCollection() {
         assertThat(URIConfigurator.toNameValue(Arrays.asList(param1, param2))).containsOnly(
                 new BasicNameValuePair(param1.getName(), param1.getValue()),
@@ -45,5 +55,15 @@ public class URIConfiguratorTest {
         assertThat(URIConfigurator.toNameValue(Arrays.asList(param1, null, param2))).containsOnly(
                 new BasicNameValuePair(param1.getName(), param1.getValue()),
                 new BasicNameValuePair(param2.getName(), param2.getValue()));
+    }
+
+    private static List<RequestParam> params(String name, String value) {
+        return Arrays.asList(new RequestParam(name, value));
+    }
+
+    private static List<RequestParam> params(String name1, String value1,
+                                             String name2, String value2) {
+        return Arrays.asList(new RequestParam(name1, value1),
+                new RequestParam(name2, value2));
     }
 }
