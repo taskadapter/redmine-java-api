@@ -1,6 +1,8 @@
-# 4.0.0-SNAPSHOT
-* Fluent-style API. see README for details
+# 4.0.0-rc2
 * Built with Java 11 target. Java 8 target is no longer supported. You can now use Java 11 syntax in the code.
+
+# 4.0.0-rc1
+* Fluent-style API. see README for details
 
 # 3.1.1
 * integrated project membership methods from MembershipManager into ProjectManager
