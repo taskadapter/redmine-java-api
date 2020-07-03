@@ -94,11 +94,11 @@ public class URIConfigurator {
      * @return URI with auth parameter "key" if not in "basic auth mode.
      */
     private URI createURI(String query,
-                          Collection<? extends RequestParam> origParams) {
-        Collection<? extends RequestParam> distinctParams = distinct(origParams);
-        Collection<? extends NameValuePair> nameValueParams = toNameValue(distinctParams);
+                          Collection<RequestParam> origParams) {
+        var distinctParams = distinct(origParams);
+        var nameValueParams = toNameValue(distinctParams);
         try {
-            final URIBuilder builder = new URIBuilder(baseURL.toURI());
+            var builder = new URIBuilder(baseURL.toURI());
             //extra List creation needed because addParameters doesn't accept Collection<? extends NameValuePair>
             builder.addParameters(new ArrayList<>(nameValueParams));
             if (!query.isEmpty()) {
@@ -110,7 +110,7 @@ public class URIConfigurator {
         }
     }
 
-    static Collection<? extends RequestParam> distinct(Collection<? extends RequestParam> origParams) {
+    static Collection<RequestParam> distinct(Collection<RequestParam> origParams) {
         return origParams
                 .stream()
                 .filter(Objects::nonNull)
@@ -118,7 +118,7 @@ public class URIConfigurator {
                 .values();
     }
 
-    static Collection<? extends NameValuePair> toNameValue(Collection<? extends RequestParam> origParams) {
+    static Collection<NameValuePair> toNameValue(Collection<RequestParam> origParams) {
         return origParams
                 .stream()
                 .filter(Objects::nonNull)
@@ -129,8 +129,8 @@ public class URIConfigurator {
     public URI getChildObjectsURI(Class<?> parent, String parentId,
                                   Class<?> child, RequestParam... args) {
         final String base = getConfig(parent);
-        final String detal = getConfig(child);
-        return createURI(base + "/" + parentId + "/" + detal + URL_POSTFIX,
+        final String detail = getConfig(child);
+        return createURI(base + "/" + parentId + "/" + detail + URL_POSTFIX,
                 args);
     }
 
@@ -142,25 +142,25 @@ public class URIConfigurator {
     public URI getChildIdURI(Class<?> parent, String parentId,
                              Class<?> child, String value, RequestParam... params) {
         final String base = getConfig(parent);
-        final String detal = getConfig(child);
-        return createURI(base + "/" + parentId + "/" + detal +
+        final String detail = getConfig(child);
+        return createURI(base + "/" + parentId + "/" + detail +
                 "/" + value + URL_POSTFIX, params);
     }
 
     public URI getObjectsURI(Class<?> child, RequestParam... params) {
-        final String detal = getConfig(child);
-        return createURI(detal + URL_POSTFIX, params);
+        final String detail = getConfig(child);
+        return createURI(detail + URL_POSTFIX, params);
     }
 
     public URI getObjectsURI(Class<?> child,
-                             Collection<? extends RequestParam> args) {
-        final String detal = getConfig(child);
-        return createURI(detal + URL_POSTFIX, args);
+                             Collection<RequestParam> args) {
+        final String detail = getConfig(child);
+        return createURI(detail + URL_POSTFIX, args);
     }
 
     public URI getObjectURI(Class<?> object, String id, RequestParam... params) {
-        final String detal = getConfig(object);
-        return createURI(detal + "/" + id + URL_POSTFIX, params);
+        final String detail = getConfig(object);
+        return createURI(detail + "/" + id + URL_POSTFIX, params);
     }
 
     private String getConfig(Class<?> item) {

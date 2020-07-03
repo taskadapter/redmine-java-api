@@ -4,6 +4,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,11 +58,11 @@ public class URIConfiguratorTest {
                 new BasicNameValuePair(param2.getName(), param2.getValue()));
     }
 
-    private static List<RequestParam> params(String name, String value) {
+    private static Collection<RequestParam> params(String name, String value) {
         return Arrays.asList(new RequestParam(name, value));
     }
 
-    private static List<RequestParam> params(String name1, String value1,
+    private static Collection<RequestParam> params(String name1, String value1,
                                              String name2, String value2) {
         return Arrays.asList(new RequestParam(name1, value1),
                 new RequestParam(name2, value2));
