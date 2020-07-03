@@ -28,9 +28,9 @@ public class URIConfiguratorTest {
     }
 
     @Test
-    public void testDistinctWithSimilarNames() {
+    public void testDistinctWithSimilarNamesButDifferentValues() {
         List<RequestParam> params = Arrays.asList(param2, param2WithDifferentValue);
-        assertThat(URIConfigurator.distinct(params)).containsOnly(param2);
+        assertThat(URIConfigurator.distinct(params)).containsOnly(param2, param2WithDifferentValue);
     }
 
     @Test

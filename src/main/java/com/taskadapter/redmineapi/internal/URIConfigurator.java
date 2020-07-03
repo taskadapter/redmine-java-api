@@ -98,7 +98,8 @@ public class URIConfigurator {
      */
     private URI createURI(String query,
                           Collection<? extends RequestParam> origParams) {
-        Collection<? extends NameValuePair> nameValueParams = toNameValue(origParams);
+        Collection<? extends RequestParam> distinctParams = distinct(origParams);
+        Collection<? extends NameValuePair> nameValueParams = toNameValue(distinctParams);
         try {
             final URIBuilder builder = new URIBuilder(baseURL.toURI());
             builder.addParameters(new ArrayList<>(nameValueParams));
@@ -113,6 +114,14 @@ public class URIConfigurator {
         } catch (URISyntaxException e) {
             throw new RedmineInternalError(e);
         }
+    }
+
+    static Collection<? extends RequestParam> distinct(Collection<? extends RequestParam> origParams) {
+        return origParams
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(RequestParam::getValue, a -> a, (s1, s2) -> s1))
+                .values();
     }
 
     static Collection<? extends NameValuePair> toNameValue(Collection<? extends RequestParam> origParams) {
