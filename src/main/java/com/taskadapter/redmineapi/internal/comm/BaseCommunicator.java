@@ -43,6 +43,12 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 		try {
 			final HttpResponse httpResponse = httpclient
 					.execute((HttpUriRequest) request);
+
+			if ((httpResponse.getEntity() == null) &&
+				(httpResponse.getStatusLine().getStatusCode() == 204)) {
+				 return null;
+			}
+
 			try {
 				return handler.processContent(httpResponse);
 			} finally {
