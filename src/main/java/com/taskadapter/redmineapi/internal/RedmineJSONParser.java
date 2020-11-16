@@ -4,6 +4,7 @@ import com.taskadapter.redmineapi.bean.Attachment;
 import com.taskadapter.redmineapi.bean.Changeset;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.CustomFieldDefinition;
+import com.taskadapter.redmineapi.bean.File;
 import com.taskadapter.redmineapi.bean.Group;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.IssueCategory;
@@ -554,4 +555,19 @@ public final class RedmineJSONParser {
             }
             return result;
         }
+
+  public static File parseFiles(JSONObject content) {
+    return new File(null)
+        .setId(content.getInt("id"))
+        .setFileName(content.getString("filename"))
+        .setFileSize(content.getLong("filesize"))
+        .setContentType(JsonInput.getStringOrNull(content,"content_type"))
+        .setDescription(content.optString("description"))
+        .setContentURL(content.getString("content_url"))
+        .setAuthor(JsonInput.getObjectOrNull(content, "author", RedmineJSONParser::parseUser))
+        .setCreatedOn(getDateOrNull(content, "created_on"))
+        .setVersion(JsonInput.getObjectOrNull(content, "version", RedmineJSONParser::parseVersion))
+        .setDigest(content.getString("digest"))
+        .setDownloads(content.optInt("downloads"));
+  }
 }
