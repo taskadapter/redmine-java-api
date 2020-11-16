@@ -55,8 +55,7 @@ public class WikiManager {
      * @since Redmine 2.2
      */
     public WikiPageDetail getWikiPageDetailByProjectAndTitle(String projectKey, String pageTitle) throws RedmineException {
-        String urlSafeString = WikiPageDetail.getUrlSafeString(pageTitle);
-        WikiPageDetail wikiPageDetail = transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, urlSafeString, new RequestParam("include", "attachments"));
+        WikiPageDetail wikiPageDetail = transport.getChildEntry(Project.class, projectKey, WikiPageDetail.class, pageTitle, new RequestParam("include", "attachments"));
         // Redmine REST API does not provide projectKey in response, so...
         wikiPageDetail.setProjectKey(projectKey);
         return wikiPageDetail;
