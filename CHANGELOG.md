@@ -1,10 +1,19 @@
 # 4.0.0.rc2
-* Built with Java 11 target. Java 8 target is no longer supported. You can now use Java 11 syntax in the code.
+* Version 4.x is now built with Java 11 target. Java 8 target is no longer supported for 4.x releases. You can now use Java 11 syntax in the code.
 
 # 4.0.0.rc1
 * Fluent-style API. see README for details
 
-# 3.1.1
+# 3.1.3 (2020-01-22)
+* fixed a bug in URI creation that happens with Apache httpclient 4.5.6 or newer.
+
+# 3.1.2 (2019-02-13)
+* Issue 312: exposed "getTransport" in RedmineManager class to allow custom requests
+* Issue 313: added some missing params for user creation
+* Issue 315: support for wiki attachments
+* fluent API for User, WikiPage, WikiPageDetails classes  
+
+# 3.1.1 (2018-09-21)
 * integrated project membership methods from MembershipManager into ProjectManager
 (MembershipManager is now deprecated)
 * use newer version of apache httpclient: 4.5.1 -> 4.5.6
