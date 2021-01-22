@@ -1,3 +1,12 @@
+# 3.1.3
+* fixed a bug in URI creation that happens with Apache httpclient 4.5.6 or newer.
+
+# 3.1.2
+* Issue 312: exposed "getTransport" in RedmineManager class to allow custom requests
+* Issue 313: added some missing params for user creation
+* Issue 315: support for wiki attachments
+* fluent API for User, WikiPage, WikiPageDetails classes  
+
 # 3.1.1
 * integrated project membership methods from MembershipManager into ProjectManager
 (MembershipManager is now deprecated)
