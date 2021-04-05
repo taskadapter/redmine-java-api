@@ -76,6 +76,10 @@ public class Issue implements Identifiable, FluentStyle {
         initCollections(storage);
     }
 
+    public Issue(Transport transport) {
+        this();
+        setTransport(transport);
+    }
 
     /**
      * Each Issue object must have project Id set in order for Redmine 3.x to accept it via REST API.
