@@ -1,3 +1,7 @@
+# 4.0.0.rc3
+* added support for downloading files (#358)
+* fixed a bug in Transport class constructor: the provided client was not used
+
 # 4.0.0.rc2
 * Version 4.x is now built with Java 11 target. Java 8 target is no longer supported for 4.x releases. You can now use Java 11 syntax in the code.
 
