@@ -3,6 +3,9 @@ package com.taskadapter.redmineapi.bean;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.internal.Transport;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class IssueRelation implements Identifiable, FluentStyle {
     private Transport transport;
 
@@ -31,18 +34,25 @@ public class IssueRelation implements Identifiable, FluentStyle {
      */
     public final static Property<Integer> DATABASE_ID = new Property<>(Integer.class, "id");
     public final static Property<Integer> ISSUE_ID = new Property<>(Integer.class, "issueId");
-    public final static Property<Integer> ISSUE_TO_ID = new Property<>(Integer.class, "issueToId");
+    public final static Property<List<Integer>> ISSUE_TO_ID = new Property(List.class, "issueToId");
+
     public final static Property<String> RELATION_TYPE = new Property<>(String.class, "relationType");
     public final static Property<Integer> DELAY = new Property<>(Integer.class, "delay");
 
+    private IssueRelation() {
+        storage.set(ISSUE_TO_ID, new ArrayList<>());
+    }
+
     public IssueRelation(Transport transport) {
+        this();
         setTransport(transport);
     }
 
     public IssueRelation(Transport transport, Integer issueId, Integer issueToId, String type) {
+        this();
         setTransport(transport);
         setIssueId(issueId);
-        setIssueToId(issueToId);
+        addIssueToId(issueToId);
         setType(type);
     }
 
@@ -66,11 +76,13 @@ public class IssueRelation implements Identifiable, FluentStyle {
     }
 
     public Integer getIssueToId() {
-        return storage.get(ISSUE_TO_ID);
+        return storage.get(ISSUE_TO_ID)
+                .stream()
+                .findFirst().orElse(null);
     }
 
-    public IssueRelation setIssueToId(Integer issueToId) {
-        storage.set(ISSUE_TO_ID, issueToId);
+    public IssueRelation addIssueToId(Integer issueToId) {
+        storage.get(ISSUE_TO_ID).add(issueToId);
         return this;
     }
 

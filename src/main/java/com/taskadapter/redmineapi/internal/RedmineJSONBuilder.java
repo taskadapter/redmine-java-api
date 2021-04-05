@@ -82,9 +82,21 @@ public class RedmineJSONBuilder {
 	static void writeRelation(JSONWriter writer, IssueRelation relation)
 			throws JSONException {
 		PropertyStorage storage = relation.getStorage();
-		addIfSet(writer, "issue_to_id", storage, IssueRelation.ISSUE_TO_ID);
+		if (storage.get(IssueRelation.ISSUE_TO_ID).isEmpty()) {
+			throw new IllegalArgumentException("cannot create a relation object with no target issues defined.");
+		}
+
 		addIfSet(writer, "relation_type", storage, IssueRelation.RELATION_TYPE);
 		addIfSet(writer, "delay", storage, IssueRelation.DELAY);
+
+		// custom mapping for "issue_to_id" field
+		writer.key("issue_to_id");
+		// convert number to string to support Redmine 4.x REST API, which brought a backward incompatible change
+		// in the way issue_to_id works.
+		var value = storage.get(IssueRelation.ISSUE_TO_ID).stream()
+				.map(number -> number+"")
+				.collect(Collectors.joining(","));
+		writer.value(value);
 	}
 
 	static void writeVersion(JSONWriter writer, Version version)

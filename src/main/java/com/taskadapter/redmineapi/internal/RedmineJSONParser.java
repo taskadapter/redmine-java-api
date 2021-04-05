@@ -279,7 +279,7 @@ public final class RedmineJSONParser {
 			throws JSONException {
 		final IssueRelation result = new IssueRelation(null).setId(JsonInput.getIntOrNull(content, "id"));
 		result.setIssueId(JsonInput.getIntOrNull(content, "issue_id"));
-		result.setIssueToId(JsonInput.getIntOrNull(content, "issue_to_id"));
+		result.addIssueToId(JsonInput.getIntOrNull(content, "issue_to_id"));
 		result.setType(JsonInput.getStringOrNull(content, "relation_type"));
 		result.setDelay(JsonInput.getInt(content, "delay", 0));
 		return result;
