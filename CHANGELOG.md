@@ -1,4 +1,4 @@
-# NEXT
+# 4.0.0.rc4
 * support Redmine 4 "delete object" responses. Redmine 4 returns an empty response for at least some "Delete" calls,
 and the library did not know how to handle those. I added null entity handling in TransportDecoder.
 
