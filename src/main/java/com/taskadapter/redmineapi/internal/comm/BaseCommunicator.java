@@ -39,15 +39,13 @@ public class BaseCommunicator implements Communicator<HttpResponse> {
 		logger.debug(request.getRequestLine().toString());
 
 		request.addHeader("Accept-Encoding", "gzip");
-		final HttpClient httpclient = client;
 		try {
-			final HttpResponse httpResponse = httpclient
+			final HttpResponse httpResponse = client
 					.execute((HttpUriRequest) request);
 			try {
 				return handler.processContent(httpResponse);
 			} finally {
 				EntityUtils.consume(httpResponse.getEntity());
-
 			}
 		} catch (ClientProtocolException e1) {
 			throw new RedmineFormatException(e1);

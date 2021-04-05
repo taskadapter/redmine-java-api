@@ -77,9 +77,9 @@ public final class Transport {
 	private static final String KEY_OFFSET = "offset";
 
 	private final Logger logger = LoggerFactory.getLogger(RedmineManager.class);
-	private final SimpleCommunicator<String> communicator;
-	private final Communicator<BasicHttpResponse> errorCheckingCommunicator;
-	private final Communicator<HttpResponse> authenticator;
+	private SimpleCommunicator<String> communicator;
+	private Communicator<BasicHttpResponse> errorCheckingCommunicator;
+	private Communicator<HttpResponse> authenticator;
 
     private String onBehalfOfUser = null;
 
@@ -175,29 +175,21 @@ public final class Transport {
 						RedmineJSONParser::parseAttachments));
     }
 
-	private final URIConfigurator configurator;
-	private String login;
-	private String password;
+	private URIConfigurator configurator;
 	private int objectsPerPage = DEFAULT_OBJECTS_PER_PAGE;
 	private static final String CHARSET = "UTF-8";
 
 	public Transport(URIConfigurator configurator, HttpClient client) {
-		this.configurator = configurator;
-        final Communicator<HttpResponse> baseCommunicator = new BaseCommunicator(client);
-		this.authenticator = new RedmineAuthenticator<>(
-				baseCommunicator, CHARSET);
-		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();
-		errorCheckingCommunicator = Communicators.fmap(
-				authenticator,
-				Communicators.compose(errorProcessor,
-						Communicators.transportDecoder()));
-        Communicator<String> coreCommunicator = Communicators.fmap(errorCheckingCommunicator,
-            Communicators.contentReader());
-		this.communicator = Communicators.simplify(coreCommunicator,
-                Communicators.<String>identityHandler());
+		var baseCommunicator = new BaseCommunicator(client);
+		var redmineAuthenticator = new RedmineAuthenticator<>(baseCommunicator, CHARSET);
+		configure(configurator, redmineAuthenticator);
 	}
 
-	public Transport(URIConfigurator configurator, HttpClient client, Communicator communicator) {
+	public Transport(URIConfigurator configurator, Communicator communicator) {
+		configure(configurator, communicator);
+	}
+
+	private void configure(URIConfigurator configurator, Communicator communicator) {
 		this.configurator = configurator;
 		this.authenticator = communicator;
 		final ContentHandler<BasicHttpResponse, BasicHttpResponse> errorProcessor = new RedmineErrorHandler();

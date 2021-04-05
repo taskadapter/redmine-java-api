@@ -124,7 +124,7 @@ public final class RedmineManagerFactory {
                 baseCommunicator, apiAccessKey);
 
         return new RedmineManager(
-                new Transport(new URIConfigurator(uri), httpClient, authenticator)
+                new Transport(new URIConfigurator(uri), authenticator)
         );
     }
 
@@ -161,7 +161,7 @@ public final class RedmineManagerFactory {
         RedmineUserPasswordAuthenticator<HttpResponse> passwordAuthenticator = new RedmineUserPasswordAuthenticator<>(
                 baseCommunicator, DEFAULT_USER_PASSWORD_AUTHENTICATOR_CHARSET, login, password);
         Transport transport = new Transport(
-                new URIConfigurator(uri), httpClient, passwordAuthenticator);
+                new URIConfigurator(uri), passwordAuthenticator);
         return new RedmineManager(transport);
     }
 
@@ -183,7 +183,7 @@ public final class RedmineManagerFactory {
         RedmineUserPasswordAuthenticator<HttpResponse> passwordAuthenticator = new RedmineUserPasswordAuthenticator<>(
                 baseCommunicator, authenticationCharset, login, password);
         Transport transport = new Transport(
-                new URIConfigurator(uri), httpClient, passwordAuthenticator);
+                new URIConfigurator(uri), passwordAuthenticator);
         return new RedmineManager(transport);
     }
 
