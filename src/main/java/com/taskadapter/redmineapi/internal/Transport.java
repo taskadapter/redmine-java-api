@@ -69,7 +69,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Transport {
+public class Transport {
 	private static final Map<Class<?>, EntityConfig<?>> OBJECT_CONFIGS = new HashMap<>();
 	private static final String CONTENT_TYPE = "application/json; charset=utf-8";
 	private static final int DEFAULT_OBJECTS_PER_PAGE = 25;
