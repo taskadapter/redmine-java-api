@@ -2,6 +2,7 @@ package com.taskadapter.redmineapi.internal.comm;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -20,14 +21,19 @@ final class TransportDecoder implements
 		ContentHandler<HttpResponse, BasicHttpResponse> {
 
 	@Override
-	public BasicHttpResponse processContent(HttpResponse content)
+	public BasicHttpResponse processContent(HttpResponse response)
 			throws RedmineException {
-		final HttpEntity entity = content.getEntity();
+		final HttpEntity entity = response.getEntity();
+		if (entity == null) {
+			return new BasicHttpResponse(response.getStatusLine().getStatusCode(),
+					InputStream.nullInputStream(),
+					StandardCharsets.UTF_8.name());
+		}
 		final String charset = HttpUtil.getCharset(entity);
 		final String encoding = HttpUtil.getEntityEncoding(entity);
 		try {
 			final InputStream initialStream = entity.getContent();
-			return new BasicHttpResponse(content.getStatusLine()
+			return new BasicHttpResponse(response.getStatusLine()
 					.getStatusCode(), decodeStream(encoding, initialStream),
 					charset);
 		} catch (IOException e) {
