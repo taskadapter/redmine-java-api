@@ -62,6 +62,20 @@ public class WikiManagerIT {
     }
 
     @Test
+    public void wikiPageWithWeirdSymbolsCanBeLoaded() throws Exception {
+        var wikiPageDetail = new WikiPageDetail(transport)
+                .setTitle("title " + System.currentTimeMillis() + "ä ö ü")
+                .setText("some text here")
+                .setProjectKey(projectKey);
+        wikiPageDetail.create();
+
+        var loaded = manager.getWikiPageDetailByProjectAndTitle(projectKey, wikiPageDetail.getTitle());
+        String title = wikiPageDetail.getTitle();
+        String urlSafeTitleIsExpected = URLEncoder.encode(title, StandardCharsets.UTF_8.name());
+        assertThat(loaded.getTitle()).isEqualToIgnoringCase(urlSafeTitleIsExpected);
+    }
+
+    @Test
     public void getWikiPagesIndexByProject() throws Exception {
         createSomeWikiPage();
         createSomeWikiPage();
