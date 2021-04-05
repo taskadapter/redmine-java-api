@@ -153,7 +153,7 @@ public class IssueManagerIT {
         assertEquals(due.get(Calendar.DAY_OF_MONTH), returnedDueCal.get(Calendar.DAY_OF_MONTH));
 
         // check ASSIGNEE
-        assertThat(ourUser.getId()).isEqualTo(newIssue.getAssigneeId());
+        assertThat(newIssue.getAssigneeId()).isEqualTo(ourUser.getId());
 
         // check AUTHOR
         Integer EXPECTED_AUTHOR_ID = IntegrationTestHelper.getOurUser(transport).getId();

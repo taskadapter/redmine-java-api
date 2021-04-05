@@ -1,3 +1,11 @@
+# NEXT
+* support Redmine 4 "delete object" responses. Redmine 4 returns an empty response for at least some "Delete" calls,
+and the library did not know how to handle those. I added null entity handling in TransportDecoder.
+
+### known issue with Redmine 4.x: 
+Redmine 4.x REST API has a backward incompatible change in "create issue relation" API. it no longer accepts
+issue_to_id numeric parameter. it requires a comma-separated string instead. this is not yet supported in redmine-java-api. 
+
 # 4.0.0.rc3
 * added support for downloading files (#358)
 * fixed a bug in Transport class constructor: the provided client was not used
