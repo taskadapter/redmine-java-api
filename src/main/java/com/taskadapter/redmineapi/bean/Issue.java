@@ -29,6 +29,8 @@ public class Issue implements Identifiable, FluentStyle {
     public final static Property<String> SUBJECT = new Property<>(String.class, "subject");
     public final static Property<Date> START_DATE = new Property<>(Date.class, "startDate");
     public final static Property<Date> DUE_DATE = new Property<>(Date.class, "dueDate");
+    public final static Property<Date> ACTUAL_START_DATE = new Property<>(Date.class, "actualStartDate");
+    public final static Property<Date> ACTUAL_DUE_DATE = new Property<>(Date.class, "actualDueDate");
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
     public final static Property<Date> UPDATED_ON = new Property<>(Date.class, "updatedOn");
     public final static Property<Integer> DONE_RATIO = new Property<>(Integer.class, "doneRatio");
@@ -246,6 +248,24 @@ public class Issue implements Identifiable, FluentStyle {
 
     public Issue setDueDate(Date dueDate) {
         storage.set(DUE_DATE, dueDate);
+        return this;
+    }
+
+    public Date getActualStartDate() {
+        return storage.get(ACTUAL_START_DATE);
+    }
+
+    public Issue setActualStartDate(Date actualStartDate) {
+        storage.set(ACTUAL_START_DATE, actualStartDate);
+        return this;
+    }
+
+    public Date getActualDueDate() {
+        return storage.get(ACTUAL_DUE_DATE);
+    }
+
+    public Issue setActualDueDate(Date actualStartDate) {
+        storage.set(ACTUAL_DUE_DATE, actualStartDate);
         return this;
     }
 

@@ -22,10 +22,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -39,6 +36,8 @@ import static org.junit.Assert.fail;
 public class RedmineJSONParserTest {
 	private static final String FILE_EMPTY_ISSUES = "issue/issues_empty_list.json";
 	private static final String REDMINE_ISSUES = "issue/redmine_issues.json";
+	private static final String REDMINE_ISSUES_WITH_ACTUAL_START_AND_DUE_DATES =
+			"issue/redmine_issues_with_actual_start_and_due_dates.json";
 
 	@Test
 	public void testParseProject1() throws ParseException, JSONException {
@@ -93,8 +92,34 @@ public class RedmineJSONParserTest {
 
 	}
 
+	@Test
+	public void testParseIssuesWithActualStartAndDates() {
+		try {
+			List<Issue> issues = loadRedmineIssuesWithActualStartAndDueDates();
+
+			Assert.assertEquals(3, issues.size());
+			Assert.assertEquals(new GregorianCalendar(2020, Calendar.DECEMBER, 15).getTime(),
+					issues.get(0).getActualStartDate());
+			Assert.assertNull(issues.get(0).getActualDueDate());
+			Assert.assertEquals(new GregorianCalendar(2020, Calendar.DECEMBER, 15).getTime(),
+					issues.get(1).getActualStartDate());
+			Assert.assertEquals(new GregorianCalendar(2021, Calendar.FEBRUARY, 4).getTime(),
+					issues.get(1).getActualDueDate());
+			Assert.assertNull(issues.get(2).getActualStartDate());
+			Assert.assertNull(issues.get(2).getActualDueDate());
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+	}
+
 	private List<Issue> loadRedmine11Issues() throws IOException, JSONException {
 		String json = MyIOUtils.getResourceAsString(REDMINE_ISSUES);
+		return JsonInput.getListOrEmpty(RedmineJSONParser.getResponse(json),
+				"issues", RedmineJSONParser::parseIssue);
+	}
+
+	private List<Issue> loadRedmineIssuesWithActualStartAndDueDates() throws IOException {
+		String json = MyIOUtils.getResourceAsString(REDMINE_ISSUES_WITH_ACTUAL_START_AND_DUE_DATES);
 		return JsonInput.getListOrEmpty(RedmineJSONParser.getResponse(json),
 				"issues", RedmineJSONParser::parseIssue);
 	}

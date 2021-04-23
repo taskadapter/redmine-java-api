@@ -229,6 +229,10 @@ public class RedmineJSONBuilder {
 		addIfSet(writer, "author_id", storage, Issue.AUTHOR_ID);
 		addIfSet(writer, "start_date", storage, Issue.START_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
 		addIfSet(writer, "due_date", storage, Issue.DUE_DATE, RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
+		addIfSet(writer, "actual_start_date", storage, Issue.ACTUAL_START_DATE,
+				RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
+		addIfSet(writer, "actual_due_date", storage, Issue.ACTUAL_DUE_DATE,
+				RedmineDateParser.SHORT_DATE_FORMAT_V2.get());
                 addIfSetIdentifiable(writer, "tracker_id", storage, Issue.TRACKER);
 		addIfSet(writer, "description", storage, Issue.DESCRIPTION);
 
