@@ -1,0 +1,49 @@
+{"total_count":3, "limit":25, "offset":0, "issues":[
+  {
+    "id":72,
+    "project":{"name":"test project","id":27},
+    "tracker":{"name":"Bug","id":1},
+    "status":{"name":"New","id":1},
+    "priority":{"name":"Normal","id":4},
+    "author":{"name":"Redmine Admin","id":1},
+    "subject":"testGetIssues: Thu Dec 10 13:59:26 PST 2020",
+    "description":"",
+    "start_date":"2020-12-14",
+    "due_date":"2020-12-15",
+    "actual_start_date": "2020-12-15",
+    "done_ratio":0,
+    "created_on":"2020-12-10T13:59:25Z",
+    "updated_on":"2020-12-10T13:59:25Z"
+  },
+  {
+    "id":71,
+    "project":{"name":"test project","id":26},
+    "tracker":{"name":"Bug","id":1},
+    "status":{"name":"New","id":1},
+    "priority":{"name":"Normal","id":4},
+    "author":{"name":"Redmine Admin","id":1},
+    "subject":"testGetIssues: Fri Dec 11 13:57:58 PST 2011",
+    "description":"",
+    "start_date": "2020-12-16",
+    "due_date": "2021-01-12",
+    "actual_start_date": "2020-12-15",
+    "actual_due_date": "2021-02-04",
+    "done_ratio":0,
+    "created_on":"2020-12-11T14:58:59Z",
+    "updated_on":"2020-12-11T16:57:59Z"
+  },
+  {
+    "id":70,
+    "project":{"name":"test project","id":25},
+    "tracker":{"name":"Bug","id":1},
+    "status":{"name":"New","id":1},
+    "priority":{"name":"Normal","id":4},
+    "author":{"name":"Redmine Admin","id":1},
+    "subject":"Issue Fri Dec 11 13:57:22 PST 2020",
+    "description":"",
+    "start_date":"2020-12-12",
+    "done_ratio":0,
+    "created_on":"2020-12-11T13:57:20Z",
+    "updated_on":"2020-12-11T13:57:20Z"
+  }]
+}
