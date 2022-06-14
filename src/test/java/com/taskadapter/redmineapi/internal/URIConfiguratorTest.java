@@ -14,6 +14,8 @@ public class URIConfiguratorTest {
     private static final RequestParam param1 = new RequestParam("name1", "value1");
     private static final RequestParam param2 = new RequestParam("name3", "value3");
     private static final RequestParam param2WithDifferentValue = new RequestParam("name3", "anotherValue3");
+    private static final RequestParam arrayParam1 = new RequestParam("name4[]", "value4");
+    private static final RequestParam arrayParam1WithDifferentValue = new RequestParam("name4[]", "anotherValue4");
     private static final RequestParam nullParam = null;
 
     @Test
@@ -42,6 +44,24 @@ public class URIConfiguratorTest {
         )).containsOnlyElementsOf(
                 params("one", "value",
                         "two", "value"));
+    }
+
+    @Test
+    public void dedupRemovesDuplicates() {
+        List<RequestParam> params = Arrays.asList(param2, param2WithDifferentValue);
+        assertThat(URIConfigurator.dedup(params)).containsOnly(param2);
+    }
+
+    @Test
+    public void dedupDoesNotRemoveArrays() {
+        List<RequestParam> params = Arrays.asList(arrayParam1, arrayParam1WithDifferentValue);
+        assertThat(URIConfigurator.dedup(params)).containsAll(params);
+    }
+
+    @Test
+    public void dedupWithDifferentNamesSameValuesShouldKeepAllItems() {
+        List<RequestParam> params = Arrays.asList(param1, param2, arrayParam1);
+        assertThat(URIConfigurator.dedup(params)).containsAll(params);
     }
 
     @Test
