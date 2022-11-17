@@ -20,6 +20,7 @@ public class Journal {
     public final static Property<String> NOTES = new Property<String>(String.class, "notes");
     public final static Property<User> USER = new Property<>(User.class, "user");
     public final static Property<Date> CREATED_ON = new Property<>(Date.class, "createdOn");
+    public final static Property<Boolean> PRIVATE_NOTES = new Property<>(Boolean.class, "privateNotes");
     public final static Property<List<JournalDetail>> DETAILS = (Property<List<JournalDetail>>) new Property(List.class, "details");
 
     public Journal() {
@@ -68,6 +69,14 @@ public class Journal {
 
     public void addDetails(Collection<JournalDetail> details) {
         storage.get(DETAILS).addAll(details);
+    }
+    
+    public Boolean isPrivateNotes() {
+        return storage.get(PRIVATE_NOTES);
+    }
+    
+    public void setIsPrivateNotes(Boolean isPrivate) {
+        storage.set(PRIVATE_NOTES, isPrivate);
     }
 
     @Override
