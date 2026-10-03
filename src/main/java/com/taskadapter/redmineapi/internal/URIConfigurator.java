@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class URIConfigurator {
     private static final String URL_POSTFIX = ".json";
@@ -97,7 +98,7 @@ public class URIConfigurator {
      */
     private URI createURI(String query,
                           Collection<RequestParam> origParams) {
-        var distinctParams = distinct(origParams);
+        var distinctParams = dedup(origParams);
         var nameValueParams = toNameValue(distinctParams);
         try {
             var builder = new URIBuilder(baseURL.toURI());
@@ -118,6 +119,25 @@ public class URIConfigurator {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(RequestParam::getName, a -> a, (s1, s2) -> s1))
                 .values();
+    }
+
+    /**
+     * Gives a list of parameters with any duplicates removed.
+     * <br />
+     * Parameters are considered to be duplicates if they have the same parameter name;
+     * however, parameters with names ending in "[]" will NOT be removed, as that indicates
+     * an array element which may be repeated.  (In particular, free-form Redmine queries
+     * all have a parameter called "f[]", and so those must be preserved.)
+     * <br />
+     * This does NOT preserve the order of parameters.
+     */
+    static Collection<RequestParam> dedup(Collection<RequestParam> origParams) {
+        var repeatableParams = origParams.stream()
+                               .filter(param -> param != null && param.getName().endsWith("[]"));
+        var distinctNonRepeatableParams = distinct(origParams).stream()
+                               .filter(param -> param != null && !param.getName().endsWith("[]"));
+        return Stream.concat(repeatableParams, distinctNonRepeatableParams)
+                     .collect(Collectors.toList());
     }
 
     static Collection<NameValuePair> toNameValue(Collection<RequestParam> origParams) {
