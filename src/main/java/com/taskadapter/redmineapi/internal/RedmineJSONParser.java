@@ -332,6 +332,7 @@ public final class RedmineJSONParser {
 		result.setCreatedOn(getDateOrNull(content, "created_on"));
 		result.setNotes(JsonInput.getStringOrNull(content, "notes"));
 		result.setUser(JsonInput.getObjectOrNull(content, "user", RedmineJSONParser::parseUser));
+		result.setIsPrivateNotes(JsonInput.getOptionalBool(content, "private_notes"));
 		result.addDetails(JsonInput.getListOrEmpty(content, "details", RedmineJSONParser::parseJournalDetail));
 		return result;
 	}
